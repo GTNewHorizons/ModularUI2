@@ -29,7 +29,7 @@ public class OrganizedPanel extends ModularPanel {
     }
 
     private ParentWidget<?> getHeader() {
-        if (this.header != null) {
+        if (this.header == null) {
             this.header = new ParentWidget<>();
             getChildren().add(this.header);
         }
@@ -37,7 +37,7 @@ public class OrganizedPanel extends ModularPanel {
     }
 
     private ParentWidget<?> getLeftSide() {
-        if (this.leftSide != null) {
+        if (this.leftSide == null) {
             this.leftSide = new ParentWidget<>();
             getChildren().add(this.leftSide);
         }
@@ -45,7 +45,7 @@ public class OrganizedPanel extends ModularPanel {
     }
 
     private ParentWidget<?> getRightSide() {
-        if (this.rightSide != null) {
+        if (this.rightSide == null) {
             this.rightSide = new ParentWidget<>();
             getChildren().add(this.rightSide);
         }
@@ -53,7 +53,7 @@ public class OrganizedPanel extends ModularPanel {
     }
 
     private ParentWidget<?> getFooter() {
-        if (this.footer != null) {
+        if (this.footer == null) {
             this.footer = new ParentWidget<>();
             getChildren().add(this.footer);
         }
