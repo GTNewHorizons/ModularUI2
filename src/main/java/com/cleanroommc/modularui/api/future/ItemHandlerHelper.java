@@ -33,7 +33,7 @@ public class ItemHandlerHelper {
     }
 
     public static boolean canItemStacksStack(@Nullable ItemStack a, @Nullable ItemStack b) {
-        if (a != null && a.isItemEqual(b) && a.hasTagCompound() == b.hasTagCompound()) {
+        if (a != null && b != null && a.isItemEqual(b) && a.hasTagCompound() == b.hasTagCompound()) {
             return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound()));
         } else {
             return false;
