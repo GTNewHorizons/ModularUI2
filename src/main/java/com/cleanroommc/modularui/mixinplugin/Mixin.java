@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.cleanroommc.modularui.mixinplugin.TargetedMod.THAUMCRAFT;
 import static com.cleanroommc.modularui.mixinplugin.TargetedMod.VANILLA;
 
 public enum Mixin {
@@ -24,7 +25,8 @@ public enum Mixin {
     MinecraftMixin("MinecraftMixin", Side.CLIENT, VANILLA),
     SlotMixin("SlotMixin", Side.CLIENT, VANILLA),
     PacketBufferMixin("PacketBufferMixin", Side.BOTH, VANILLA),
-    SimpleNetworkWrapperMixin("SimpleNetworkWrapperMixin", Side.BOTH, VANILLA);
+    SimpleNetworkWrapperMixin("SimpleNetworkWrapperMixin", Side.BOTH, VANILLA),
+    ThaumcraftMixin("thaumcraft.ClientTickEventsFMLMixin", Side.CLIENT, THAUMCRAFT);
 
     public final String mixinClass;
     public final List<TargetedMod> targetedMods;
