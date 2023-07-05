@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixins;
+package com.cleanroommc.modularui.mixins.early.minecraft;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.ModularScreen;

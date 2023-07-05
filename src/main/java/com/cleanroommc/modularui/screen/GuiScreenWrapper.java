@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
-import com.cleanroommc.modularui.mixins.GuiContainerAccessor;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.utils.Color;

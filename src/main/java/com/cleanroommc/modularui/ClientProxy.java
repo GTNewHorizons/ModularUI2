@@ -6,7 +6,7 @@ import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.integration.nei.ModularUIContainerObjectHandler;
 import com.cleanroommc.modularui.integration.nei.ModularUIInputHandler;
-import com.cleanroommc.modularui.mixins.ForgeHooksClientMixin;
+import com.cleanroommc.modularui.mixins.early.forge.ForgeHooksClientMixin;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;

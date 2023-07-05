@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixins;
+package com.cleanroommc.modularui.mixins.early.minecraft;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;

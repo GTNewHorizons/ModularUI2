@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixins;
+package com.cleanroommc.modularui.mixins.early.forge;
 
 import net.minecraftforge.client.ForgeHooksClient;
 import org.spongepowered.asm.mixin.Mixin;

@@ -10,7 +10,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.nei.NEIState;
-import com.cleanroommc.modularui.mixins.GuiContainerAccessor;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
