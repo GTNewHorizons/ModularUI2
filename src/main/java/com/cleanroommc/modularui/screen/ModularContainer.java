@@ -183,7 +183,9 @@ public class ModularContainer extends Container {
                 } else {
                     slot.putStack(stack.splitStack(stack.stackSize));
                 }
-                break;
+                if (stack.stackSize < 1) {
+                    break;
+                }
             }
         }
         return stack;
