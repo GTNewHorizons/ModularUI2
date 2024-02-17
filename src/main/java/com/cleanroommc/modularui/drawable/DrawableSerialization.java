@@ -12,20 +12,20 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDeserializer<IDrawable> {
 
-    private static final Map<String, Function<JsonObject, IDrawable>> DRAWABLE_TYPES = new HashMap<>();
-    private static final Map<String, UITexture> TEXTURES = new HashMap<>();
+    private static final Map<String, Function<JsonObject, IDrawable>> DRAWABLE_TYPES = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, UITexture> TEXTURES = new Object2ObjectOpenHashMap<>();
 
     public static void registerTexture(String s, UITexture texture) {
         TEXTURES.put(s, texture);

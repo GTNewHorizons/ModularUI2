@@ -17,6 +17,10 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,7 +37,7 @@ import java.util.*;
 
 public class GuiManager {
 
-    private static final Map<String, UIFactory<?>> FACTORIES = new HashMap<>(16);
+    private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
     private static GuiScreenWrapper lastMui;
     private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);

@@ -5,14 +5,14 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Alignment {
 
-    private static final Map<String, Alignment> ALIGNMENT_MAP = new HashMap<>();
+    private static final Map<String, Alignment> ALIGNMENT_MAP = new Object2ObjectOpenHashMap<>();
 
     public final float x, y;
 

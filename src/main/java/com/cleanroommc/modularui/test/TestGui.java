@@ -13,9 +13,9 @@ import com.cleanroommc.modularui.widgets.SortableListWidget;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,7 +41,7 @@ public class TestGui extends CustomModularScreen {
         if (this.lines == null) {
             this.lines = IntStream.range(0, 20).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
             this.configuredOptions = this.lines;
-            this.availableElements = new HashMap<>();
+            this.availableElements = new Object2ObjectOpenHashMap<>();
         }
         AtomicReference<SortableListWidget<String, SortableListWidget.Item<String>>> ref = new AtomicReference<>(null);
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {

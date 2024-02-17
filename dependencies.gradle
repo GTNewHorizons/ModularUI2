@@ -30,6 +30,7 @@
  */
 dependencies {
     api("org.jetbrains:annotations:24.0.1")
+    api("com.github.GTNewHorizons:GTNHLib:0.2.4:dev")
 
     compileOnly("com.github.GTNewHorizons:NotEnoughItems:2.5.4-GTNH:dev")
     compileOnly("com.github.GTNewHorizons:Hodgepodge:2.4.8:dev") { transitive = false }

@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.GuiAxis;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
@@ -16,9 +15,10 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Unit;
-import gnu.trove.iterator.TDoubleIterator;
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.array.TDoubleArrayList;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+
+import it.unimi.dsi.fastutil.doubles.DoubleList;
+
 import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     private IDrawable stopperDrawable = new Rectangle().setColor(Color.withAlpha(Color.WHITE.main, 0.4f));
     private IDrawable handleDrawable = GuiTextures.BUTTON_CLEAN;
     private GuiAxis axis = GuiAxis.X;
-    private TDoubleList stopper;
+    private DoubleList stopper;
     private int stopperWidth = 2, stopperHeight = 4;
     private final Unit sliderWidth = new Unit(), sliderHeight = new Unit();
     private final Area sliderArea = new Area();
@@ -53,7 +53,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
             this.doubleValue = new DoubleValue((this.max - this.min) * 0.5 + this.min);
         }
         if (this.each > 0 && this.stopper == null) {
-            this.stopper = new TDoubleArrayList();
+            this.stopper = new DoubleArrayList();
             for (double d = this.min; d < this.max; d += this.each) {
                 this.stopper.add(d);
             }
@@ -74,9 +74,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     public void drawBackground(GuiContext context, WidgetTheme widgetTheme) {
         super.drawBackground(context, widgetTheme);
         if (this.stopper != null && this.stopperDrawable != null && this.stopperWidth > 0 && this.stopperHeight > 0) {
-            TDoubleIterator it = this.stopper.iterator();
-            while (it.hasNext()) {
-                double stop = it.next();
+            for (double stop : this.stopper) {
                 int pos = valueToPos(stop) + this.sliderArea.getSize(this.axis) / 2;
                 if (this.axis.isHorizontal()) {
                     pos -= this.stopperWidth / 2;
@@ -209,19 +207,19 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
         return this;
     }
 
-    public SliderWidget stopper(TDoubleList stopper) {
-        if (this.stopper == null) this.stopper = new TDoubleArrayList();
+    public SliderWidget stopper(DoubleList stopper) {
+        if (this.stopper == null) this.stopper = new DoubleArrayList();
         this.stopper.addAll(stopper);
-        this.stopper.sort();
+        this.stopper.sort(Double::compare);
         return this;
     }
 
     public SliderWidget stopper(double... stopper) {
-        if (this.stopper == null) this.stopper = new TDoubleArrayList();
+        if (this.stopper == null) this.stopper = new DoubleArrayList();
         for (double stop : stopper) {
             this.stopper.add(stop);
         }
-        this.stopper.sort();
+        this.stopper.sort(Double::compare);
         return this;
     }
 

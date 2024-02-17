@@ -8,10 +8,11 @@ import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,8 +50,8 @@ public class ListWidget<T, I extends IWidget, W extends ListWidget<T, I, W>> ext
     }
 
     public static <T, I extends IWidget, W extends ListWidget<T, I, W>> ListWidget<T, I, W> builder(List<T> list, Function<T, I> creator) {
-        Map<T, I> map = new HashMap<>();
-        Map<I, T> map_reverse = new HashMap<>();
+        Map<T, I> map = new Object2ObjectOpenHashMap<>();
+        Map<I, T> map_reverse = new Object2ObjectOpenHashMap<>();
         ListWidget<T, I, W> listWidget = new ListWidget<>(map::get, map_reverse::get);
         for (T t : list) {
             I widget = creator.apply(t);

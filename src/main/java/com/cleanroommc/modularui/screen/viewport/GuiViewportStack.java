@@ -2,9 +2,10 @@ package com.cleanroommc.modularui.screen.viewport;
 
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
-import com.cleanroommc.modularui.utils.ArrayListStack;
 import com.cleanroommc.modularui.utils.GuiUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
@@ -24,7 +25,7 @@ public class GuiViewportStack implements IViewportStack {
 
     private static final Vector3f sharedVec = new Vector3f();
 
-    private final ArrayListStack<TransformationMatrix> viewportStack = new ArrayListStack<>();
+    private final ObjectArrayList<TransformationMatrix> viewportStack = new ObjectArrayList<>();
     private final List<Area> viewportAreas = new ArrayList<>();
     private TransformationMatrix top;
     private TransformationMatrix topViewport;

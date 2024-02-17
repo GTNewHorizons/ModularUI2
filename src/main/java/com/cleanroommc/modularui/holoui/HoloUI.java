@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.NEISettingsImpl;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -18,7 +21,7 @@ import java.util.function.Supplier;
 @ApiStatus.Experimental
 public class HoloUI {
 
-    private static final Map<ResourceLocation, Supplier<ModularScreen>> syncedHolos = new HashMap<>();
+    private static final Map<ResourceLocation, Supplier<ModularScreen>> syncedHolos = new Object2ObjectOpenHashMap<>();
 
     public static void registerSyncedHoloUI(ResourceLocation loc, Supplier<ModularScreen> screen) {
         syncedHolos.put(loc, screen);

@@ -5,7 +5,8 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.screen.Tooltip;
 
-import java.util.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.util.Map;
 
 public class Theme implements ITheme {
@@ -18,7 +19,7 @@ public class Theme implements ITheme {
     public static final String TEXT_FIELD = "textField";
     public static final String TOGGLE_BUTTON = "toggleButton";
 
-    private final Map<String, WidgetTheme> widgetThemes = new HashMap<>();
+    private final Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
 
     private final String id;
     private final ITheme parentTheme;

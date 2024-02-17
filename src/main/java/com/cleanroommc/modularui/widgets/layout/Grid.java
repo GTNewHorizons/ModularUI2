@@ -8,8 +8,8 @@ import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,8 +54,8 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
     @Override
     public void layoutWidgets() {
-        TIntList rowSizes = new TIntArrayList();
-        TIntList colSizes = new TIntArrayList();
+        IntList rowSizes = new IntArrayList();
+        IntList colSizes = new IntArrayList();
 
         int i = 0, j;
         for (List<IWidget> row : this.matrix) {
@@ -129,7 +129,7 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
 
     @Override
     public int getDefaultWidth() {
-        TIntList colSizes = new TIntArrayList();
+        IntList colSizes = new IntArrayList();
         int i = 0, j;
         for (List<? extends IWidget> row : this.matrix) {
             j = 0;
@@ -138,13 +138,17 @@ public class Grid extends ScrollWidget<Grid> implements ILayoutWidget {
                     colSizes.add(this.minColWidth);
                 }
                 if (child != null) {
-                    colSizes.set(j, Math.max(colSizes.get(j), getElementWidth(child.getArea())));
+                    colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
                 }
                 j++;
             }
             i++;
         }
-        return colSizes.sum();
+        int w = 0;
+        for (int colWidth : colSizes) {
+            w += colWidth;
+        }
+        return w;
     }
 
     public <I extends IWidget> Grid matrix(List<List<I>> matrix) {

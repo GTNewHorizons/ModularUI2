@@ -3,9 +3,9 @@ package com.cleanroommc.modularui;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +14,7 @@ public class GuiErrorHandler {
 
     public static final GuiErrorHandler INSTANCE = new GuiErrorHandler();
 
-    private final Set<GuiError> errorSet = new HashSet<>();
+    private final Set<GuiError> errorSet = new ObjectOpenHashSet<>();
     private final List<GuiError> errors = new ArrayList<>();
 
     private GuiErrorHandler() {

@@ -33,10 +33,11 @@ import com.cleanroommc.modularui.utils.math.functions.utility.Random;
 import com.cleanroommc.modularui.utils.math.functions.utility.RandomInteger;
 import com.cleanroommc.modularui.widgets.textfield.BaseTextFieldWidget;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.lang.reflect.Constructor;
 import java.text.ParsePosition;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,12 +63,12 @@ public class MathBuilder {
      * Named variables that can be used in math expression by this
      * builder
      */
-    public final Map<String, Variable> variables = new HashMap<>();
+    public final Map<String, Variable> variables = new Object2ObjectOpenHashMap<>();
 
     /**
      * Map of functions which can be used in the math expressions
      */
-    public final Map<String, Class<? extends Function>> functions = new HashMap<>();
+    public final Map<String, Class<? extends Function>> functions = new Object2ObjectOpenHashMap<>();
 
     /**
      * Whether math expression parser should be strict about which characters

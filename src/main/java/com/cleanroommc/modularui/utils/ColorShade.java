@@ -1,13 +1,12 @@
 package com.cleanroommc.modularui.utils;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntIterable;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntIterators;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-public class ColorShade implements Iterable<Integer> {
+public class ColorShade implements IntIterable {
 
     public static Builder builder(int main) {
         return new Builder(main);
@@ -43,32 +42,34 @@ public class ColorShade implements Iterable<Integer> {
 
     @NotNull
     @Override
-    public Iterator<Integer> iterator() {
-        return Arrays.stream(this.all).iterator();
+    public IntIterator iterator() {
+        return IntIterators.wrap(this.all);
     }
 
     public static class Builder {
 
         private final int main;
-        private final List<Integer> darker = new ArrayList<>();
-        private final List<Integer> brighter = new ArrayList<>();
+        private final IntArrayList darker = new IntArrayList();
+        private final IntArrayList brighter = new IntArrayList();
 
         public Builder(int main) {
             this.main = main;
         }
 
         public Builder addDarker(int... darker) {
-            Arrays.stream(darker).forEach(this.darker::add);
+            this.darker.addElements(this.darker.size(), darker, 0, darker.length);
             return this;
         }
 
         public Builder addBrighter(int... brighter) {
-            Arrays.stream(brighter).forEach(this.brighter::add);
+            this.brighter.addElements(this.brighter.size(), brighter, 0, brighter.length);
             return this;
         }
 
         public ColorShade build() {
-            return new ColorShade(this.main, this.brighter.stream().mapToInt(Integer::intValue).toArray(), this.darker.stream().mapToInt(Integer::intValue).toArray());
+            this.darker.trim();
+            this.brighter.trim();
+            return new ColorShade(this.main, this.brighter.elements(), this.darker.elements());
         }
     }
 }

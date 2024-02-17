@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 public class ModularUI {
 
     static final String DEPENDENCIES = "required-after:gtnhmixins@[2.0.1,); "
+        + "required-after:gtnhlib@[0.2.0,);"
         + "after:NotEnoughItems@[2.3.27-GTNH,);"
         + "after:hodgepodge@[2.0.0,);"
         + "before:gregtech";

@@ -1,17 +1,14 @@
 package com.cleanroommc.modularui.utils;
 
-import com.google.common.collect.ForwardingList;
-import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.objects.ObjectCollection;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
-public interface ObjectList<V> extends List<V>, Comparable<List<? extends V>> {
+public interface ObjectList<V> extends it.unimi.dsi.fastutil.objects.ObjectList<V> {
 
     static <V> ObjectArrayList<V> create() {
         return new ObjectArrayList<>();
@@ -25,6 +22,14 @@ public interface ObjectList<V> extends List<V>, Comparable<List<? extends V>> {
         return new ObjectArrayList<>(c);
     }
 
+    static <V> ObjectArrayList<V> of(ObjectCollection<? extends V> c) {
+        return new ObjectArrayList<>(c);
+    }
+
+    static <V> ObjectArrayList<V> of(it.unimi.dsi.fastutil.objects.ObjectList<? extends V> l) {
+        return new ObjectArrayList<>(l);
+    }
+
     static <V> ObjectArrayList<V> of(V[] a) {
         return new ObjectArrayList<>(a);
     }
@@ -34,6 +39,10 @@ public interface ObjectList<V> extends List<V>, Comparable<List<? extends V>> {
     }
 
     static <V> ObjectArrayList<V> of(Iterator<? extends V> i) {
+        return new ObjectArrayList<>(i);
+    }
+
+    static <V> ObjectArrayList<V> of(ObjectIterator<? extends V> i) {
         return new ObjectArrayList<>(i);
     }
 
@@ -70,37 +79,41 @@ public interface ObjectList<V> extends List<V>, Comparable<List<? extends V>> {
     @NotNull
     V[] elements();
 
-    class ObjectArrayList<V> extends ForwardingList<V> implements ObjectList<V> {
-
-        final List<V> delegate;
+    class ObjectArrayList<V> extends it.unimi.dsi.fastutil.objects.ObjectArrayList<V> implements ObjectList<V> {
 
         public ObjectArrayList(int capacity) {
-            this.delegate = new ArrayList<>(capacity);
+            super(capacity);
         }
 
         public ObjectArrayList() {
-            this.delegate = new ArrayList<>();
         }
 
         public ObjectArrayList(Collection<? extends V> c) {
-            this.delegate = new ArrayList<>(c);
+            super(c);
+        }
+
+        public ObjectArrayList(ObjectCollection<? extends V> c) {
+            super(c);
+        }
+
+        public ObjectArrayList(it.unimi.dsi.fastutil.objects.ObjectList<? extends V> l) {
+            super(l);
         }
 
         public ObjectArrayList(V[] a) {
-            this.delegate = new ArrayList<>(Arrays.asList(a));
+            super(a);
         }
 
         public ObjectArrayList(V[] a, int offset, int length) {
-            this(Arrays.copyOfRange(a, offset, offset + length));
+            super(a, offset, length);
         }
 
         public ObjectArrayList(Iterator<? extends V> i) {
-            this.delegate = Lists.newArrayList(i);
+            super(i);
         }
 
-        @Override
-        protected List<V> delegate() {
-            return this.delegate;
+        public ObjectArrayList(ObjectIterator<? extends V> i) {
+            super(i);
         }
 
         @Override
@@ -151,22 +164,6 @@ public interface ObjectList<V> extends List<V>, Comparable<List<? extends V>> {
         @Override
         public V pollLast() {
             return isEmpty() ? null : removeLast();
-        }
-
-        @Override
-        public int compareTo(@NotNull List<? extends V> o) {
-            // I don't think this will be used
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void trim() {
-            // Kept just for preserving consistency with 1.12.2 code. It looks to be not that important anyway.
-        }
-
-        @Override
-        public V[] elements() {
-            return (V[]) delegate.toArray();
         }
     }
 }

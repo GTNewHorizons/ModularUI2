@@ -5,6 +5,10 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -23,9 +27,9 @@ public class GuiSyncManager {
     private final CursorSlotSyncHandler cursorSlotSyncHandler = new CursorSlotSyncHandler();
     private final EntityPlayer player;
     private final PlayerMainInvWrapper playerInventory;
-    private final Map<String, SyncHandler> syncHandlers = new LinkedHashMap<>();
-    private final Map<String, SlotGroup> slotGroups = new HashMap<>();
-    private final Map<SyncHandler, String> reverseSyncHandlers = new HashMap<>();
+    private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
+    private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
     private ModularContainer container;
 
     private final List<Consumer<EntityPlayer>> openListener = new ArrayList<>();

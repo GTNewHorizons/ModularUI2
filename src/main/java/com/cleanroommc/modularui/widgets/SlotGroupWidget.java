@@ -3,10 +3,10 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
-import gnu.trove.map.TCharIntMap;
-import gnu.trove.map.TCharObjectMap;
-import gnu.trove.map.hash.TCharIntHashMap;
-import gnu.trove.map.hash.TCharObjectHashMap;
+import it.unimi.dsi.fastutil.chars.Char2IntMap;
+import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,7 +71,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
         private String syncKey;
         private final List<String> matrix = new ArrayList<>();
-        private final TCharObjectMap<Object> keys = new TCharObjectHashMap<>();
+        private final Char2ObjectMap<Object> keys = new Char2ObjectOpenHashMap<>();
 
         private Builder() {
             this.keys.put(' ', null);
@@ -105,7 +105,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
         public SlotGroupWidget build() {
             SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
-            TCharIntMap charCount = new TCharIntHashMap();
+            Char2IntMap charCount = new Char2IntOpenHashMap();
             int x = 0, y = 0, maxWidth = 0;
             int syncId = 0;
             for (String row : this.matrix) {

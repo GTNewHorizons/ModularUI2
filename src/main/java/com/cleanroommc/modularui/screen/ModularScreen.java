@@ -16,6 +16,11 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.Dialog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.RenderHelper;
@@ -30,8 +35,6 @@ import org.lwjgl.opengl.GL12;
 import javax.annotation.Nonnegative;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,8 +73,8 @@ public class ModularScreen {
     private final PanelManager panelManager;
     private final GuiContext context = new GuiContext(this);
     private final Area screenArea = new Area();
-    private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new HashMap<>();
-    private final Map<IWidget, Runnable> frameUpdates = new HashMap<>();
+    private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
 
     private ITheme currentTheme;
     private GuiScreenWrapper screenWrapper;
@@ -218,8 +221,8 @@ public class ModularScreen {
     @MustBeInvokedByOverriders
     public void onFrameUpdate() {
         this.panelManager.checkDirty();
-        for (Iterator<Map.Entry<IWidget, Runnable>> iterator = this.frameUpdates.entrySet().iterator(); iterator.hasNext();) {
-            Map.Entry<IWidget, Runnable> entry = iterator.next();
+        for (ObjectIterator<Object2ObjectMap.Entry<IWidget, Runnable>> iterator = this.frameUpdates.object2ObjectEntrySet().fastIterator(); iterator.hasNext(); ) {
+            Object2ObjectMap.Entry<IWidget, Runnable> entry = iterator.next();
             if (!entry.getKey().isValid()) {
                 iterator.remove();
                 continue;

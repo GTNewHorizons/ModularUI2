@@ -7,13 +7,14 @@ import com.cleanroommc.modularui.screen.ModularScreen;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import cpw.mods.fml.common.Loader;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+
 import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @Deprecated
 public class Config {
 
-    private static final Map<String, Config> configs = new HashMap<>();
+    private static final Map<String, Config> configs = new Object2ObjectLinkedOpenHashMap<>();
     private static final Path configPath = Loader.instance().getConfigDir().toPath();
 
     @NotNull
@@ -44,8 +45,8 @@ public class Config {
 
     private final String name;
     private final String basePath;
-    private final Map<String, Config> categories = new HashMap<>();
-    private final Map<String, Value> values = new HashMap<>();
+    private final Map<String, Config> categories = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<String, Value> values = new Object2ObjectLinkedOpenHashMap<>();
     private final File filePath;
     private final boolean synced;
 
@@ -159,8 +160,8 @@ public class Config {
         private final String name;
         private final Builder parent;
         private String basePath = "modularui";
-        private final Map<String, Config> categories = new HashMap<>();
-        private final Map<String, Value> values = new HashMap<>();
+        private final Map<String, Config> categories = new Object2ObjectLinkedOpenHashMap<>();
+        private final Map<String, Value> values = new Object2ObjectLinkedOpenHashMap<>();
         private boolean synced = true;
 
         private Builder(String name, Builder parent) {

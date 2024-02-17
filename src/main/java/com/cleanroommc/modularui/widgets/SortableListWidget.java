@@ -7,12 +7,13 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,7 +26,7 @@ public class SortableListWidget<T, I extends SortableListWidget.Item<T>> extends
     public static <T, I extends SortableListWidget.Item<T>> SortableListWidget<T, I> sortableBuilder(Collection<T> fullList, List<T> list, Function<T, I> builder) {
         Objects.requireNonNull(list);
         Objects.requireNonNull(builder);
-        Map<T, I> map = new HashMap<>();
+        Map<T, I> map = new Object2ObjectOpenHashMap<>();
         SortableListWidget<T, I> sortableListWidget = new SortableListWidget<>(map::get);
         for (T t : fullList) {
             I item = builder.apply(t);
