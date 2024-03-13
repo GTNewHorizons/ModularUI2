@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.api;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 
+import javax.annotation.Nullable;
+
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -22,13 +24,15 @@ public interface IFluidTankLong extends IFluidTank {
      * @param doFill Do we actually fill the tank
      * @return The amount of fluid filled into the tank
      */
-    long fillLong(Fluid fluid, long amount, boolean doFill);
+    long fillLong(@Nullable Fluid fluid, long amount, boolean doFill);
 
     long getCapacityLong();
 
     long getFluidAmountLong();
 
     Fluid getRealFluid();
+
+    void setFluid(@Nullable Fluid fluid, long amount);
 
     @Override
     default FluidStack drain(int maxDrain, boolean doDrain) {
