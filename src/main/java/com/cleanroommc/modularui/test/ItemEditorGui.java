@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.factory.SimpleGuiFactory;
 import com.cleanroommc.modularui.future.ItemStackHandler;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
@@ -32,11 +33,11 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
     private final ItemStackHandler stackHandler = new ItemStackHandler(1);
 
     private ItemStack getStack() {
-        return this.stackHandler.getStackInSlot(0);
+        return this.stackHandler.getStackInSlot(0) == null ? null : stackHandler.getStackInSlot(0).getAsItemStack();
     }
 
     private void setStack(ItemStack stack) {
-        this.stackHandler.setStackInSlot(0, stack);
+        this.stackHandler.setStackInSlot(0, new ItemStackLongDelegate(stack));
     }
 
     @Override

@@ -1,9 +1,13 @@
 package com.cleanroommc.modularui.future;
 
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+
+import static com.google.common.primitives.Ints.saturatedCast;
 
 import java.util.Objects;
+
+import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 
 public class InvWrapper implements IItemHandlerModifiable {
 
@@ -34,31 +38,31 @@ public class InvWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public ItemStack getStackInSlot(int slot) {
-        return getInv().getStackInSlot(slot);
+    public IItemStackLong getStackInSlot(int slot) {
+        return new ItemStackLongDelegate(getInv().getStackInSlot(slot));
     }
 
     @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+    public IItemStackLong insertItem(int slot, IItemStackLong stack, boolean simulate) {
         if (stack == null) return null;
 
-        ItemStack stackInSlot = getInv().getStackInSlot(slot);
+        IItemStackLong stackInSlot = new ItemStackLongDelegate(getInv().getStackInSlot(slot));
 
-        int m;
-        if (stackInSlot != null) {
-            if (stackInSlot.stackSize >= Math.min(stackInSlot.getMaxStackSize(), getSlotLimit(slot))) return stack;
+        long m;
+        if (stackInSlot.getAsItemStack() != null) {
+            if (stackInSlot.getStackSize() >= Math.min(stackInSlot.getMaxStackSize(), getSlotLimit(slot))) return stack;
 
             if (!ItemHandlerHelper.canItemStacksStack(stack, stackInSlot)) return stack;
 
-            if (!getInv().isItemValidForSlot(slot, stack)) return stack;
+            if (!getInv().isItemValidForSlot(slot, stack.getAsItemStack())) return stack;
 
-            m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot)) - stackInSlot.stackSize;
+            m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot)) - stackInSlot.getStackSize();
 
-            if (stack.stackSize <= m) {
+            if (stack.getStackSize() <= m) {
                 if (!simulate) {
-                    ItemStack copy = stack.copy();
-                    copy.stackSize += stackInSlot.stackSize;
-                    getInv().setInventorySlotContents(slot, copy);
+                    IItemStackLong copy = stack.copy();
+                    copy.setStackSize(copy.getStackSize() + stackInSlot.getStackSize());
+                    getInv().setInventorySlotContents(slot, copy.getAsItemStack());
                     getInv().markDirty();
                 }
 
@@ -67,32 +71,32 @@ public class InvWrapper implements IItemHandlerModifiable {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    ItemStack copy = stack.splitStack(m);
-                    copy.stackSize += stackInSlot.stackSize;
-                    getInv().setInventorySlotContents(slot, copy);
+                    IItemStackLong copy = stack.splitStack(m);
+                    copy.setStackSize(copy.getStackSize() + stackInSlot.getStackSize());
+                    getInv().setInventorySlotContents(slot, copy.getAsItemStack());
                     getInv().markDirty();
                 } else {
-                    stack.stackSize -= m;
+                    stack.setStackSize(stack.getStackSize() - m);
                 }
                 return stack;
             }
         } else {
-            if (!getInv().isItemValidForSlot(slot, stack)) return stack;
+            if (!getInv().isItemValidForSlot(slot, stack.getAsItemStack())) return stack;
 
             m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot));
-            if (m < stack.stackSize) {
+            if (m < stack.getStackSize()) {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    getInv().setInventorySlotContents(slot, stack.splitStack(m));
+                    getInv().setInventorySlotContents(slot, stack.splitStack(m).getAsItemStack());
                     getInv().markDirty();
                 } else {
-                    stack.stackSize -= m;
+                    stack.setStackSize(stack.getStackSize() - m);
                 }
                 return stack;
             } else {
                 if (!simulate) {
-                    getInv().setInventorySlotContents(slot, stack);
+                    getInv().setInventorySlotContents(slot, stack.getAsItemStack());
                     getInv().markDirty();
                 }
                 return null;
@@ -101,43 +105,43 @@ public class InvWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+    public IItemStackLong extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0) return null;
 
-        ItemStack stackInSlot = getInv().getStackInSlot(slot);
+        IItemStackLong stackInSlot = new ItemStackLongDelegate(getInv().getStackInSlot(slot));
 
-        if (stackInSlot == null) return null;
+        if (stackInSlot.getAsItemStack() == null) return null;
 
         if (simulate) {
-            if (stackInSlot.stackSize < amount) {
+            if (stackInSlot.getStackSize() < amount) {
                 return stackInSlot.copy();
             } else {
-                ItemStack copy = stackInSlot.copy();
-                copy.stackSize = amount;
+                IItemStackLong copy = stackInSlot.copy();
+                copy.setStackSize(amount);
                 return copy;
             }
         } else {
-            int m = Math.min(stackInSlot.stackSize, amount);
+            long m = Math.min(stackInSlot.getStackSize(), amount);
 
-            ItemStack decrStackSize = getInv().decrStackSize(slot, m);
+            IItemStackLong decrStackSize = new ItemStackLongDelegate(getInv().decrStackSize(slot, saturatedCast(m)));
             getInv().markDirty();
             return decrStackSize;
         }
     }
 
     @Override
-    public void setStackInSlot(int slot, ItemStack stack) {
-        getInv().setInventorySlotContents(slot, stack);
+    public void setStackInSlot(int slot, IItemStackLong stack) {
+        getInv().setInventorySlotContents(slot, stack == null ? null : stack.getAsItemStack());
     }
 
     @Override
-    public int getSlotLimit(int slot) {
+    public long getSlotLimit(int slot) {
         return getInv().getInventoryStackLimit();
     }
 
     @Override
-    public boolean isItemValid(int slot, ItemStack stack) {
-        return getInv().isItemValidForSlot(slot, stack);
+    public boolean isItemValid(int slot, IItemStackLong stack) {
+        return getInv().isItemValidForSlot(slot, stack.getAsItemStack());
     }
 
     @Deprecated

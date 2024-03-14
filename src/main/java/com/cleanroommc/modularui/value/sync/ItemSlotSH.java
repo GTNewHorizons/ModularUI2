@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.future.ItemHandlerHelper;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.MouseData;
+import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -44,7 +45,7 @@ public class ItemSlotSH extends SyncHandler {
         if (itemStack == null && this.lastStoredItem == null) return;
         boolean onlyAmountChanged = false;
         if (init ||
-                !ItemHandlerHelper.canItemStacksStack(this.lastStoredItem, itemStack) ||
+                !ItemHandlerHelper.canItemStacksStack(new ItemStackLongDelegate(this.lastStoredItem), new ItemStackLongDelegate(itemStack)) ||
                 (onlyAmountChanged = itemStack.stackSize != this.lastStoredItem.stackSize)) {
             getSlot().onSlotChangedReal(itemStack, onlyAmountChanged, false, init);
             if (onlyAmountChanged) {
@@ -91,7 +92,7 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack cursorStack = getSyncManager().getCursorItem();
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
-        if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
+        if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack(new ItemStackLongDelegate(cursorStack), new ItemStackLongDelegate(slotStack))) {
             stackToPut = cursorStack.copy();
             if (mouseData.mouseButton == 1) {
                 stackToPut.stackSize = 1;

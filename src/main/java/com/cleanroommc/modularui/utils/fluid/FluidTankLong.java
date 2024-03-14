@@ -77,4 +77,10 @@ public class FluidTankLong implements IFluidTankLong {
     public boolean isLocked() {
         return locked;
     }
+
+    @Override
+    public void setFluid(Fluid fluid, long amount) {
+        this.fluid = fluid;
+        this.amount = amount;
+    }
 }

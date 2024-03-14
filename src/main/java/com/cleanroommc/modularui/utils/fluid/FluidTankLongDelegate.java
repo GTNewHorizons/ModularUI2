@@ -44,4 +44,10 @@ public class FluidTankLongDelegate implements IFluidTankLong {
         if (fluid == null) return null;
         return fluid.getFluid();
     }
+
+    @Override
+    public void setFluid(Fluid fluid, long amount) {
+        delegate.drain(Integer.MAX_VALUE, true);
+        delegate.fill(new FluidStack(fluid, saturatedCast(amount)), true);
+    }
 }

@@ -56,7 +56,7 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public int getItemStackLimit(@NotNull ItemStack stack) {
+    public long getItemStackLimit(@NotNull ItemStack stack) {
         return this.ignoreMaxStackSize ? getSlotStackLimit() : super.getItemStackLimit(stack);
     }
 

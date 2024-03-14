@@ -10,7 +10,12 @@ import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import static com.google.common.primitives.Ints.saturatedCast;
+
 import javax.annotation.Nullable;
+
+import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 
 public class SlotItemHandler extends Slot {
 
@@ -26,12 +31,16 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public boolean isItemValid(ItemStack stack) {
+        return isItemValid(new ItemStackLongDelegate(stack));
+    }
+
+    public boolean isItemValid(IItemStackLong stack) {
         if (stack != null && this.itemHandler.isItemValid(this.index, stack)) {
             IItemHandler handler = this.getItemHandler();
-            ItemStack remainder;
+            IItemStackLong remainder;
             if (handler instanceof IItemHandlerModifiable) {
                 IItemHandlerModifiable handlerModifiable = (IItemHandlerModifiable) handler;
-                ItemStack currentStack = handlerModifiable.getStackInSlot(this.index);
+                IItemStackLong currentStack = handlerModifiable.getStackInSlot(this.index);
                 handlerModifiable.setStackInSlot(this.index, null);
                 remainder = handlerModifiable.insertItem(this.index, stack, true);
                 handlerModifiable.setStackInSlot(this.index, currentStack);
@@ -39,7 +48,7 @@ public class SlotItemHandler extends Slot {
                 remainder = handler.insertItem(this.index, stack, true);
             }
 
-            return remainder != null ? remainder.stackSize < stack.stackSize : stack.stackSize > 0;
+            return remainder != null ? remainder.getStackSize() < stack.getStackSize() : stack.getStackSize() > 0;
         } else {
             return false;
         }
@@ -47,13 +56,13 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public ItemStack getStack() {
-        return this.getItemHandler().getStackInSlot(this.index);
+        return this.getItemHandler().getStackInSlot(this.index) != null ? getItemHandler().getStackInSlot(this.index).getAsItemStack() : null;
     }
 
     // Override if your IItemHandler does not implement IItemHandlerModifiable
     @Override
     public void putStack(ItemStack stack) {
-        ((IItemHandlerModifiable) this.getItemHandler()).setStackInSlot(this.index, stack);
+        ((IItemHandlerModifiable) this.getItemHandler()).setStackInSlot(this.index, new ItemStackLongDelegate(stack));
         this.onSlotChanged();
     }
 
@@ -62,25 +71,25 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public int getSlotStackLimit() {
-        return this.itemHandler.getSlotLimit(this.index);
+        return saturatedCast(this.itemHandler.getSlotLimit(this.index));
     }
 
-    public int getItemStackLimit(ItemStack stack) {
-        ItemStack maxAdd = stack.copy();
+    public long getItemStackLimit(ItemStack stack) {
+        IItemStackLong maxAdd = new ItemStackLongDelegate(stack.copy());
         int maxInput = stack.getMaxStackSize();
-        maxAdd.stackSize = maxInput;
+        maxAdd.setStackSize(maxInput);
         IItemHandler handler = this.getItemHandler();
-        ItemStack currentStack = handler.getStackInSlot(this.index);
+        IItemStackLong currentStack = handler.getStackInSlot(this.index);
         if (handler instanceof IItemHandlerModifiable) {
             IItemHandlerModifiable handlerModifiable = (IItemHandlerModifiable) handler;
             handlerModifiable.setStackInSlot(this.index, null);
-            ItemStack remainder = handlerModifiable.insertItem(this.index, maxAdd, true);
+            IItemStackLong remainder = handlerModifiable.insertItem(this.index, maxAdd, true);
             handlerModifiable.setStackInSlot(this.index, currentStack);
-            return remainder != null ? maxInput - remainder.stackSize : maxInput;
+            return remainder != null ? maxInput - remainder.getStackSize() : maxInput;
         } else {
-            ItemStack remainder = handler.insertItem(this.index, maxAdd, true);
-            int current = currentStack != null ? currentStack.stackSize : 0;
-            int added = remainder != null ? maxInput - remainder.stackSize : maxInput;
+            IItemStackLong remainder = handler.insertItem(this.index, maxAdd, true);
+            long current = currentStack != null ? currentStack.getStackSize() : 0;
+            long added = remainder != null ? maxInput - remainder.getStackSize() : maxInput;
             return current + added;
         }
     }
@@ -95,7 +104,8 @@ public class SlotItemHandler extends Slot {
     @Override
     @Nullable
     public ItemStack decrStackSize(int amount) {
-        return this.getItemHandler().extractItem(this.index, amount, false);
+        IItemStackLong item = getItemHandler().extractItem(this.index, amount, false);
+        return item == null ? null : item.getAsItemStack();
     }
 
     public IItemHandler getItemHandler() {

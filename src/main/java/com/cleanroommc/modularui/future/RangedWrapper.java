@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.future;
 
+import com.cleanroommc.modularui.api.IItemStackLong;
 import com.google.common.base.Preconditions;
-import net.minecraft.item.ItemStack;
 
 /**
  * A wrapper that composes another IItemHandlerModifiable, exposing only a range of the composed slots. Shifting of slot
@@ -26,7 +26,7 @@ public class RangedWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public ItemStack getStackInSlot(int slot) {
+    public IItemStackLong getStackInSlot(int slot) {
         if (checkSlot(slot)) {
             return compose.getStackInSlot(slot + minSlot);
         }
@@ -35,7 +35,7 @@ public class RangedWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+    public IItemStackLong insertItem(int slot, IItemStackLong stack, boolean simulate) {
         if (checkSlot(slot)) {
             return compose.insertItem(slot + minSlot, stack, simulate);
         }
@@ -44,7 +44,7 @@ public class RangedWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+    public IItemStackLong extractItem(int slot, int amount, boolean simulate) {
         if (checkSlot(slot)) {
             return compose.extractItem(slot + minSlot, amount, simulate);
         }
@@ -53,14 +53,14 @@ public class RangedWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public void setStackInSlot(int slot, ItemStack stack) {
+    public void setStackInSlot(int slot, IItemStackLong stack) {
         if (checkSlot(slot)) {
             compose.setStackInSlot(slot + minSlot, stack);
         }
     }
 
     @Override
-    public int getSlotLimit(int slot) {
+    public long getSlotLimit(int slot) {
         if (checkSlot(slot)) {
             return compose.getSlotLimit(slot + minSlot);
         }
@@ -69,7 +69,7 @@ public class RangedWrapper implements IItemHandlerModifiable {
     }
 
     @Override
-    public boolean isItemValid(int slot, ItemStack stack) {
+    public boolean isItemValid(int slot, IItemStackLong stack) {
         if (checkSlot(slot)) {
             return compose.isItemValid(slot + minSlot, stack);
         }

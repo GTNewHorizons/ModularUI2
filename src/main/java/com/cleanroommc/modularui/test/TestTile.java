@@ -65,7 +65,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     private int cycleState = 0;
     private final IItemHandlerModifiable inventory = new ItemStackHandler(2) {
         @Override
-        public int getSlotLimit(int slot) {
+        public long getSlotLimit(int slot) {
             return slot == 0 ? Integer.MAX_VALUE : 64;
         }
     };

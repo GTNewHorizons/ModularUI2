@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.future;
 
+import com.cleanroommc.modularui.api.IItemStackLong;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 
 /**
  * Exposes the player inventory WITHOUT the armor inventory as IItemHandler. Also takes care of inserting/extracting
@@ -18,14 +19,16 @@ public class PlayerMainInvWrapper extends RangedWrapper {
     }
 
     @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        ItemStack rest = super.insertItem(slot, stack, simulate);
-        if (rest == null || rest.stackSize != stack.stackSize) {
+    public IItemStackLong insertItem(int slot, IItemStackLong stack, boolean simulate) {
+        IItemStackLong rest = super.insertItem(slot, stack, simulate);
+        if (rest == null || rest.getStackSize() != stack.getStackSize()) {
             // the stack in the slot changed, animate it
-            ItemStack inSlot = getStackInSlot(slot);
+            IItemStackLong inSlot = getStackInSlot(slot);
             if (inSlot != null) {
                 if (getInventoryPlayer().player.worldObj.isRemote) {
-                    inSlot.animationsToGo = 5;
+                    if (inSlot != null && inSlot.getAsItemStack() != null) {
+                        inSlot.getAsItemStack().animationsToGo = 5;
+                    }
                 } else if (getInventoryPlayer().player instanceof EntityPlayerMP) {
                     getInventoryPlayer().player.openContainer.detectAndSendChanges();
                 }
