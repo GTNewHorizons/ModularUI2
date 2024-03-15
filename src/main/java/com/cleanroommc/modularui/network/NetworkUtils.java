@@ -1,6 +1,9 @@
 package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.item.ItemStackLong;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -63,6 +66,26 @@ public class NetworkUtils {
     public static ItemStack readItemStack(PacketBuffer buffer) {
         try {
             return buffer.readItemStackFromBuffer();
+        } catch (IOException e) {
+            ModularUI.LOGGER.catching(e);
+            return null;
+        }
+    }
+
+    public static void writeItemStackLong(PacketBuffer buffer, IItemStackLong itemStack) {
+        try {
+            NBTTagCompound nbt = new NBTTagCompound();
+            itemStack.writeToNBT(nbt);
+            buffer.writeNBTTagCompoundToBuffer(nbt);
+        } catch (IOException e) {
+            ModularUI.LOGGER.catching(e);
+        }
+    }
+
+    public static IItemStackLong readItemStackLong(PacketBuffer buffer) {
+        try {
+            NBTTagCompound nbt = buffer.readNBTTagCompoundFromBuffer();
+            return IItemStackLong.loadItemStackFromNBT(nbt);
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
             return null;

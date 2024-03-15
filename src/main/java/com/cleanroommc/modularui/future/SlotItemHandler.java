@@ -56,13 +56,23 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public ItemStack getStack() {
-        return this.getItemHandler().getStackInSlot(this.index) != null ? getItemHandler().getStackInSlot(this.index).getAsItemStack() : null;
+        IItemStackLong longStack = getStackLong();
+        if (longStack == null) return null;
+        return longStack.getAsItemStack();
+    }
+
+    public IItemStackLong getStackLong() {
+        return getItemHandler().getStackInSlot(this.index);
+    }
+
+    @Override
+    public void putStack(ItemStack stack) {
+        putStackLong(new ItemStackLongDelegate(stack));
     }
 
     // Override if your IItemHandler does not implement IItemHandlerModifiable
-    @Override
-    public void putStack(ItemStack stack) {
-        ((IItemHandlerModifiable) this.getItemHandler()).setStackInSlot(this.index, new ItemStackLongDelegate(stack));
+    public void putStackLong(IItemStackLong stack) {
+        ((IItemHandlerModifiable) this.getItemHandler()).setStackInSlot(this.index, stack);
         this.onSlotChanged();
     }
 
@@ -71,7 +81,11 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public int getSlotStackLimit() {
-        return saturatedCast(this.itemHandler.getSlotLimit(this.index));
+        return saturatedCast(getSlotStackLimitLong());
+    }
+
+    public long getSlotStackLimitLong() {
+        return itemHandler.getSlotLimit(index);
     }
 
     public long getItemStackLimit(ItemStack stack) {

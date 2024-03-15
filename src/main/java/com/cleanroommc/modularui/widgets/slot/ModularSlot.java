@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.future.IItemHandler;
 import com.cleanroommc.modularui.future.SlotItemHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -64,7 +65,7 @@ public class ModularSlot extends SlotItemHandler {
     public void onSlotChanged() {
     }
 
-    public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
+    public void onSlotChangedReal(IItemStackLong itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
         this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
     }
 
