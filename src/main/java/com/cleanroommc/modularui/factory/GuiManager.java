@@ -4,12 +4,8 @@ import com.cleanroommc.modularui.api.NEISettings;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
-import com.cleanroommc.modularui.screen.ModularContainer;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.NEISettingsImpl;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.screen.*;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -65,10 +61,10 @@ public class GuiManager {
         openedContainers.add(player);
         // create panel, collect sync handlers and create container
         guiData.setNEISettings(NEISettings.DUMMY);
-        GuiSyncManager syncManager = new GuiSyncManager(player);
+        PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(syncManager);
+        ModularContainer container = new ModularContainer(player, syncManager, panel.getName());
         // sync to client
         player.getNextWindowId();
         player.closeContainer();
@@ -87,12 +83,12 @@ public class GuiManager {
         T guiData = factory.readGuiData(player, data);
         NEISettingsImpl neiSettings = new NEISettingsImpl();
         guiData.setNEISettings(neiSettings);
-        GuiSyncManager syncManager = new GuiSyncManager(player);
+        PanelSyncManager syncManager = new PanelSyncManager();
         ModularPanel panel = factory.createPanel(guiData, syncManager);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
         screen.getContext().setNEISettings(neiSettings);
-        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(syncManager), screen);
+        GuiScreenWrapper guiScreenWrapper = new GuiScreenWrapper(new ModularContainer(player, syncManager, panel.getName()), screen);
         guiScreenWrapper.inventorySlots.windowId = windowId;
         Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
         player.openContainer = guiScreenWrapper.inventorySlots;
@@ -100,9 +96,9 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    static void openScreen(ModularScreen screen, NEISettingsImpl jeiSettings) {
+    static void openScreen(ModularScreen screen, NEISettingsImpl jeiSettings, ContainerCustomizer containerCustomizer) {
         screen.getContext().setNEISettings(jeiSettings);
-        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(), screen);
+        GuiScreenWrapper screenWrapper = new GuiScreenWrapper(new ModularContainer(containerCustomizer), screen);
         Minecraft.getMinecraft().displayGuiScreen(screenWrapper);
     }
 

@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
-import com.cleanroommc.modularui.value.sync.GuiSyncManager;
+import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.ItemSlot;
@@ -24,7 +24,7 @@ public class TestItem extends Item implements IGuiHolder<GuiData> {
     public static final TestItem testItem = new TestItem();
 
     @Override
-    public ModularPanel buildUI(GuiData guiData, GuiSyncManager guiSyncManager) {
+    public ModularPanel buildUI(GuiData guiData, PanelSyncManager guiSyncManager) {
         IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData.getMainHandItem(), 4);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 

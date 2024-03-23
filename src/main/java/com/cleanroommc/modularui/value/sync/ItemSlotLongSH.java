@@ -25,9 +25,9 @@ public class ItemSlotLongSH extends SyncHandler {
     }
 
     @Override
-    public void init(String key, GuiSyncManager syncHandler) {
+    public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
-        syncHandler.getContainer().registerSlot(this.slot);
+        syncHandler.getContainer().registerSlot(syncHandler.getPanelName(), this.slot);
         IItemStackLong currentStack = getSlot().getStackLong();
         this.lastStoredItem = currentStack != null ? currentStack.copy() : null;
         if (isPhantom() && currentStack != null) {

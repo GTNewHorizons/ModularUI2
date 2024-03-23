@@ -14,25 +14,29 @@ import java.io.IOException;
 
 public class PacketSyncHandler implements IPacket {
 
+    private String panel;
     private String key;
     private PacketBuffer packet;
 
     public PacketSyncHandler() {
     }
 
-    public PacketSyncHandler(String key, PacketBuffer packet) {
+    public PacketSyncHandler(String panel, String key, PacketBuffer packet) {
+        this.panel = panel;
         this.key = key;
         this.packet = packet;
     }
 
     @Override
     public void write(PacketBuffer buf) {
+        NetworkUtils.writeStringSafe(buf, this.panel);
         NetworkUtils.writeStringSafe(buf, this.key, 64, true);
         NetworkUtils.writeByteBuf(buf, this.packet);
     }
 
     @Override
     public void read(PacketBuffer buf) {
+        this.panel = NetworkUtils.readStringSafe(buf);
         this.key = NetworkUtils.readStringSafe(buf);
         this.packet = NetworkUtils.readPacketBuffer(buf);
     }
@@ -42,7 +46,7 @@ public class PacketSyncHandler implements IPacket {
         ModularScreen screen = ModularScreen.getCurrent();
         if (screen != null) {
             try {
-                screen.getSyncManager().receiveWidgetUpdate(this.key, this.packet.readVarIntFromBuffer(), this.packet);
+                screen.getSyncManager().receiveWidgetUpdate(this.panel, this.key, this.packet.readVarIntFromBuffer(), this.packet);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -55,7 +59,7 @@ public class PacketSyncHandler implements IPacket {
         Container container = handler.playerEntity.openContainer;
         if (container instanceof ModularContainer modularContainer) {
             try {
-                modularContainer.getSyncManager().receiveWidgetUpdate(this.key, this.packet.readVarIntFromBuffer(), this.packet);
+                modularContainer.getSyncManager().receiveWidgetUpdate(this.panel, this.key, this.packet.readVarIntFromBuffer(), this.packet);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
