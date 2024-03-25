@@ -56,7 +56,6 @@ public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanil
     }
 
     protected void addToolTip(Tooltip tooltip) {
-        tooltip.excludeArea(getArea());
         if (!isSynced()) return;
         ItemStack stack = getSlot().getStack();
         if (stack == null) return;
