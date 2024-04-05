@@ -19,10 +19,13 @@ import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
+import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import gregtech.api.util.GT_Utility;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
@@ -33,7 +36,7 @@ import org.lwjgl.opengl.GL11;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
-public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
 
@@ -54,45 +57,47 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
                 .size(DEFAULT_SIZE, DEFAULT_SIZE)
                 .endDefaultMode();
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
-            IFluidTank fluidTank = getFluidTank();
-            FluidStack fluid = this.syncHandler.getValue();
-            if (this.syncHandler.isPhantom()) {
-                if (fluid != null) {
-                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
-                    if (this.syncHandler.controlsAmount()) {
-                        tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
-                    }
-                } else {
-                    tooltip.addLine(IKey.lang("modularui.fluid.empty"));
-                }
+        tooltipBuilder(this::addToolTip);
+    }
+
+    protected void addToolTip(Tooltip tooltip) {
+        IFluidTank fluidTank = getFluidTank();
+        FluidStack fluid = this.syncHandler.getValue();
+        if (this.syncHandler.isPhantom()) {
+            if (fluid != null) {
+                tooltip.addLine(IKey.str(fluid.getLocalizedName()));
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui.fluid.phantom.control"));
+                    tooltip.addLine(IKey.lang("modularui.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
                 }
             } else {
-                if (fluid != null) {
-                    tooltip.addLine(IKey.str(fluid.getLocalizedName()));
-                    tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
-                    addAdditionalFluidInfo(tooltip, fluid);
-                } else {
-                    tooltip.addLine(IKey.lang("modularui.fluid.empty"));
-                }
-                if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
-                    tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
-                    if (Interactable.hasShiftDown()) {
-                        if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
-                            tooltip.addLine(IKey.lang("modularui.fluid.click_combined"));
-                        } else if (this.syncHandler.canDrainSlot()) {
-                            tooltip.addLine(IKey.lang("modularui.fluid.click_to_fill"));
-                        } else if (this.syncHandler.canFillSlot()) {
-                            tooltip.addLine(IKey.lang("modularui.fluid.click_to_empty"));
-                        }
-                    } else {
-                        tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
+                tooltip.addLine(IKey.lang("modularui.fluid.empty"));
+            }
+            if (this.syncHandler.controlsAmount()) {
+                tooltip.addLine(IKey.lang("modularui.fluid.phantom.control"));
+            }
+        } else {
+            if (fluid != null) {
+                tooltip.addLine(IKey.str(fluid.getLocalizedName()));
+                tooltip.addLine(IKey.lang("modularui.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
+                addAdditionalFluidInfo(tooltip, fluid);
+            } else {
+                tooltip.addLine(IKey.lang("modularui.fluid.empty"));
+            }
+            if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
+                tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
+                if (Interactable.hasShiftDown()) {
+                    if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
+                        tooltip.addLine(IKey.lang("modularui.fluid.click_combined"));
+                    } else if (this.syncHandler.canDrainSlot()) {
+                        tooltip.addLine(IKey.lang("modularui.fluid.click_to_fill"));
+                    } else if (this.syncHandler.canFillSlot()) {
+                        tooltip.addLine(IKey.lang("modularui.fluid.click_to_empty"));
                     }
+                } else {
+                    tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
                 }
             }
-        });
+        }
     }
 
     public void addAdditionalFluidInfo(Tooltip tooltip, FluidStack fluidStack) {
@@ -104,11 +109,11 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     protected double getBaseUnitAmount(double amount) {
-        return amount / 1000;
+        return amount;
     }
 
     protected String getBaseUnit() {
-        return UNIT_BUCKET;
+        return UNIT_LITER;
     }
 
     @Override
@@ -130,24 +135,24 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     @Override
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         IFluidTank fluidTank = getFluidTank();
-        FluidStack content = this.syncHandler.getValue();
+        FluidStack content = getFluidStack();
         if (content != null) {
-            int y = this.contentOffsetY;
+            int y = getContentOffsetY();
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
                 float newHeight = height * content.amount * 1f / fluidTank.getCapacity();
                 y += (int) (height - newHeight);
                 height = newHeight;
             }
-            GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
+            GuiDraw.drawFluidTexture(content, getContentOffsetX(), y, getArea().width - getContentOffsetX() * 2, height, 0);
         }
         if (this.overlayTexture != null) {
             this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
         if (content != null && this.syncHandler.controlsAmount()) {
             String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(content.amount)) + getBaseUnit();
-            this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
-            this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
+            this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - getContentOffsetX() - 1f);
+            this.textRenderer.setPos((int) (getContentOffsetX() + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
         }
         if (isHovering()) {
@@ -155,6 +160,26 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GL11.glColorMask(true, true, true, true);
         }
+    }
+
+    protected int getContentOffsetX() {
+        return contentOffsetX;
+    }
+
+    protected int getContentOffsetY() {
+        return contentOffsetY;
+    }
+
+    protected boolean showFull() {
+        return alwaysShowFull;
+    }
+
+    protected TextRenderer getTextRenderer() {
+        return textRenderer;
+    }
+
+    protected IDrawable getOverlayTexture() {
+        return overlayTexture;
     }
 
     @Override
@@ -169,8 +194,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             return Result.IGNORE;
         }
         ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
-        if (this.syncHandler.isPhantom() || (cursorStack != null)) {
-            // nh todo  && cursorStack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)
+        if (this.syncHandler.isPhantom() || cursorStack != null) {
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(1, mouseData::writeToPacket);
         }
@@ -222,45 +246,47 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
      * @param x x offset
      * @param y y offset
      */
-    public FluidSlot contentOffset(int x, int y) {
+    public W contentOffset(int x, int y) {
         this.contentOffsetX = x;
         this.contentOffsetY = y;
-        return this;
+        return getThis();
     }
 
     /**
      * @param alwaysShowFull if the fluid should be rendered as full or as the partial amount.
      */
-    public FluidSlot alwaysShowFull(boolean alwaysShowFull) {
+    public W alwaysShowFull(boolean alwaysShowFull) {
         this.alwaysShowFull = alwaysShowFull;
-        return this;
+        return getThis();
     }
 
     /**
      * @param overlayTexture texture that is rendered on top of the fluid
      */
-    public FluidSlot overlayTexture(@Nullable IDrawable overlayTexture) {
+    public W overlayTexture(@Nullable IDrawable overlayTexture) {
         this.overlayTexture = overlayTexture;
-        return this;
+        return getThis();
     }
 
-    public FluidSlot syncHandler(IFluidTank fluidTank) {
+    public W syncHandler(IFluidTank fluidTank) {
         return syncHandler(new FluidSlotSyncHandler(fluidTank));
     }
 
-    public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
+    public W syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
         this.syncHandler = syncHandler;
-        return this;
+        return getThis();
     }
 
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
         if (!this.syncHandler.isPhantom()) return false;
-        // nh todo
-        this.syncHandler.setValue(null);
         draggedStack.stackSize = 0;
         return true;
+    }
+
+    protected void setPhantomValue(@NotNull ItemStack draggedStack) {
+        this.syncHandler.setValue(FluidContainerRegistry.getFluidForFilledItem(draggedStack));
     }
 
     @Override

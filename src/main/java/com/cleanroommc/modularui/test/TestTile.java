@@ -130,7 +130,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                 .child(new ButtonWidget<>()
                                                         .size(60, 18)
                                                         .overlay(IKey.dynamic(() -> "Button " + this.val)))
-                                                .child(new FluidSlot()
+                                                .child(new FluidSlot<>()
                                                         .margin(2)
                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
                                                 .child(new ButtonWidget<>()
@@ -197,7 +197,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                         .value(SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val)))*/
                                                 .child(new ItemSlot()
                                                         .slot(SyncHandlers.phantomItemSlot(this.inventory, 0).ignoreMaxStackSize(true)))
-                                                .child(new FluidSlot()
+                                                .child(new FluidSlot<>()
                                                         .margin(2)
                                                         .width(30)
                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))

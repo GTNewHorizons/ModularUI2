@@ -33,7 +33,7 @@ public class ItemStackLongDelegate implements IItemStackLong {
 
     @Override
     public int getItemDamage() {
-        return item == null ? null : item.getItemDamage();
+        return item == null ? 0 : item.getItemDamage();
     }
 
     @Override
@@ -54,14 +54,14 @@ public class ItemStackLongDelegate implements IItemStackLong {
 
     @Override
     public boolean isItemEqual(IItemStackLong other) {
-        if (item == null) return other == null ? true : other.getAsItemStack() == null;
+        if (item == null) return other == null || other.getAsItemStack() == null;
         if (item.getItem() != other.getItem()) return false;
         return true;
     }
 
     @Override
     public boolean hasTagCompound() {
-        return item.hasTagCompound();
+        return item != null && item.hasTagCompound();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ItemStackLongDelegate implements IItemStackLong {
 
     @Override
     public ItemStackLongDelegate copy() {
-        return new ItemStackLongDelegate(item.copy());
+        return item == null ? null : new ItemStackLongDelegate(item.copy());
     }
 
     @Override
@@ -87,7 +87,9 @@ public class ItemStackLongDelegate implements IItemStackLong {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         nbt.setInteger("type", 2);
-        item.writeToNBT(nbt);
+        if (item != null) {
+            item.writeToNBT(nbt);
+        }
         return nbt;
     }
 

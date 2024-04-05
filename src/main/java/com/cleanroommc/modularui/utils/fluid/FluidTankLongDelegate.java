@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.IFluidTankLong;
 
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 
 public class FluidTankLongDelegate implements IFluidTankLong {
@@ -49,5 +50,10 @@ public class FluidTankLongDelegate implements IFluidTankLong {
     public void setFluid(Fluid fluid, long amount) {
         delegate.drain(Integer.MAX_VALUE, true);
         delegate.fill(new FluidStack(fluid, saturatedCast(amount)), true);
+    }
+
+    @Override
+    public IFluidTankLong copy() {
+        return new FluidTankLongDelegate(new FluidTank(delegate.getFluid(), delegate.getCapacity()));
     }
 }

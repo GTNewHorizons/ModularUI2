@@ -233,7 +233,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 
-            if (itemstack != null) {
+            if (itemstack != null && itemstack.getAsItemStack() != null) {
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 GL11.glEnable(GL11.GL_LIGHTING);
                 RenderHelper.enableGUIStandardItemLighting();

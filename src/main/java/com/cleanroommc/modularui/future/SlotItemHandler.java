@@ -67,6 +67,10 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public void putStack(ItemStack stack) {
+        if (stack == null) {
+            putStackLong(null);
+            return;
+        }
         putStackLong(new ItemStackLongDelegate(stack));
     }
 

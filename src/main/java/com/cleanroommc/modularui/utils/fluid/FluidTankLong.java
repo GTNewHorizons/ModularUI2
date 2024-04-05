@@ -23,11 +23,16 @@ public class FluidTankLong implements IFluidTankLong {
         this(fluid, capacity, 0);
     }
 
+    public FluidTankLong(long capacity) {
+        this(null, capacity, 0);
+    }
+
     public FluidTankLong(Fluid fluid, long capacity, long amount) {
         this.fluid = fluid;
         this.capacity = capacity;
         this.amount = amount;
     }
+
     @Override
     public long drainLong(long maxDrain, boolean doDrain) {
         long toDrain = Math.min(maxDrain, amount);
@@ -82,5 +87,10 @@ public class FluidTankLong implements IFluidTankLong {
     public void setFluid(Fluid fluid, long amount) {
         this.fluid = fluid;
         this.amount = amount;
+    }
+
+    @Override
+    public IFluidTankLong copy() {
+        return new FluidTankLong(getRealFluid(), getCapacityLong(), getFluidAmountLong());
     }
 }

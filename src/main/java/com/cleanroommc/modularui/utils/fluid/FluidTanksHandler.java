@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.utils.fluid;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,6 +14,18 @@ public class FluidTanksHandler implements IFluidTanksHandler {
 
     public FluidTanksHandler(IFluidTankLong tank) {
         fluids = Collections.singletonList(tank);
+    }
+
+    public FluidTanksHandler(int size) {
+        this(size, 10000);
+    }
+
+    public FluidTanksHandler(int size, long capacity) {
+        FluidTankLong[] fluids = new FluidTankLong[size];
+        for (int i = 0; i < fluids.length; i++) {
+            fluids[i] = new FluidTankLong(capacity);
+        }
+        this.fluids = Arrays.asList(fluids);
     }
 
     @Override

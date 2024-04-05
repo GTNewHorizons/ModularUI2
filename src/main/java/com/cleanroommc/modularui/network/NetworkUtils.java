@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IFluidTankLong;
 import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
+import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -12,8 +15,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+
 import org.jetbrains.annotations.Nullable;
+
+import static com.google.common.primitives.Ints.saturatedCast;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -75,7 +84,12 @@ public class NetworkUtils {
     public static void writeItemStackLong(PacketBuffer buffer, IItemStackLong itemStack) {
         try {
             NBTTagCompound nbt = new NBTTagCompound();
-            itemStack.writeToNBT(nbt);
+            if (itemStack == null) {
+                nbt.setInteger("check", -1);
+            } else {
+                itemStack.writeToNBT(nbt);
+                nbt.setInteger("check", 1);
+            }
             buffer.writeNBTTagCompoundToBuffer(nbt);
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
@@ -85,6 +99,8 @@ public class NetworkUtils {
     public static IItemStackLong readItemStackLong(PacketBuffer buffer) {
         try {
             NBTTagCompound nbt = buffer.readNBTTagCompoundFromBuffer();
+            int check = nbt.getInteger("check");
+            if (check < 0) return null;
             return IItemStackLong.loadItemStackFromNBT(nbt);
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
@@ -113,6 +129,54 @@ public class NetworkUtils {
         }
         try {
             return FluidStack.loadFluidStackFromNBT(buffer.readNBTTagCompoundFromBuffer());
+        } catch (IOException e) {
+            ModularUI.LOGGER.catching(e);
+            return null;
+        }
+    }
+
+    public static void writeFluidTank(PacketBuffer buffer, @Nullable IFluidTankLong tank) {
+        if (tank == null) {
+            buffer.writeBoolean(true);
+        } else {
+            buffer.writeBoolean(false);
+            NBTTagCompound fluidStackTag = new NBTTagCompound();
+            fluidStackTag.setLong("cap", tank.getCapacityLong());
+            fluidStackTag.setLong("amt", tank.getFluidAmountLong());
+            if (tank.getRealFluid() != null) {
+                fluidStackTag.setString("flu", tank.getRealFluid().getName());
+            }
+            if (tank instanceof FluidTankLongDelegate) {
+                fluidStackTag.setByte("type", (byte)1);
+            } else {
+                fluidStackTag.setByte("type", (byte)0);
+            }
+            try {
+                buffer.writeNBTTagCompoundToBuffer(fluidStackTag);
+            } catch (IOException e) {
+                ModularUI.LOGGER.catching(e);
+            }
+        }
+    }
+
+    @Nullable
+    public static IFluidTankLong readFluidTank(PacketBuffer buffer) {
+        if (buffer.readBoolean()) {
+            return null;
+        }
+        try {
+            NBTTagCompound nbt = buffer.readNBTTagCompoundFromBuffer();
+            byte type = nbt.getByte("type");
+            Fluid fluid = FluidRegistry.getFluid(nbt.getString("flu"));
+            long cap = nbt.getLong("cap");
+            long amt = nbt.getLong("amt");
+            IFluidTankLong tank;
+            if (type == 1) {
+                tank = new FluidTankLongDelegate(new FluidTank(fluid, saturatedCast(cap), saturatedCast(amt)));
+            } else {
+                tank = new FluidTankLong(fluid, cap, amt);
+            }
+            return tank;
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
             return null;
