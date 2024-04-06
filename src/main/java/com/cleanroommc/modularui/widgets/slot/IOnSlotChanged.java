@@ -20,5 +20,5 @@ public interface IOnSlotChanged {
      * @param client            true if this function is currently called on client side
      * @param init              if this is the first sync call after opening the GUI. Doe not necessarily that this slot changed
      */
-    void onChange(IItemStackLong newItem, boolean onlyAmountChanged, boolean client, boolean init);
+    void onChange(ItemStack newItem, boolean onlyAmountChanged, boolean client, boolean init);
 }

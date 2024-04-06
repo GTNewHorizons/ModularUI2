@@ -57,7 +57,7 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     @Override
-    public long getItemStackLimit(@NotNull ItemStack stack) {
+    public int getItemStackLimit(@NotNull ItemStack stack) {
         return this.ignoreMaxStackSize ? getSlotStackLimit() : super.getItemStackLimit(stack);
     }
 
@@ -65,7 +65,7 @@ public class ModularSlot extends SlotItemHandler {
     public void onSlotChanged() {
     }
 
-    public void onSlotChangedReal(IItemStackLong itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
+    public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
         this.changeListener.onChange(itemStack, onlyChangedAmount, client, init);
     }
 

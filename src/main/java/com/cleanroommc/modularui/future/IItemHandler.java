@@ -8,7 +8,6 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public interface IItemHandler {
      * @return ItemStack in given slot. Empty Itemstack if the slot is empty.
      **/
     @Nullable
-    IItemStackLong getStackInSlot(int slot);
+    ItemStack getStackInSlot(int slot);
 
     /**
      * <p>
@@ -59,13 +58,13 @@ public interface IItemHandler {
      *         The returned ItemStack can be safely modified after.
      **/
     @Nullable
-    IItemStackLong insertItem(int slot, @Nullable IItemStackLong stack, boolean simulate);
+    ItemStack insertItem(int slot, @Nullable ItemStack stack, boolean simulate);
 
     /**
      * Extracts an ItemStack from the given slot.
      * <p>
      * The returned value must be empty if nothing is extracted,
-     * otherwise its stack size must be less than or equal to {@code amount} and {@link IItemStackLong#getMaxStackSize()}.
+     * otherwise its stack size must be less than or equal to {@code amount} and {@link ItemStack#getMaxStackSize()}.
      * </p>
      *
      * @param slot     Slot to extract from.
@@ -75,7 +74,7 @@ public interface IItemHandler {
      *         The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
      **/
     @Nullable
-    IItemStackLong extractItem(int slot, int amount, boolean simulate);
+    ItemStack extractItem(int slot, int amount, boolean simulate);
 
     /**
      * Retrieves the maximum stack size allowed to exist in the given slot.
@@ -83,7 +82,7 @@ public interface IItemHandler {
      * @param slot Slot to query.
      * @return     The maximum stack size allowed in the slot.
      */
-    long getSlotLimit(int slot);
+    int getSlotLimit(int slot);
 
     /**
      * <p>
@@ -104,14 +103,14 @@ public interface IItemHandler {
      * @return true if the slot can insert the ItemStack, not considering the current state of the inventory.
      *         false if the slot can never insert the ItemStack in any situation.
      */
-    default boolean isItemValid(int slot, @Nullable IItemStackLong stack) {
+    default boolean isItemValid(int slot, @Nullable ItemStack stack) {
         return true;
     }
 
     // This method doesn't exist in 1.12
     @SuppressWarnings("unused")
-    default List<IItemStackLong> getStacks() {
-        List<IItemStackLong> ret = new ArrayList<>(); for (int i = 0; i < getSlots(); i++) {
+    default List<ItemStack> getStacks() {
+        List<ItemStack> ret = new ArrayList<>(); for (int i = 0; i < getSlots(); i++) {
             ret.add(getStackInSlot(i));
         }
         return ret;

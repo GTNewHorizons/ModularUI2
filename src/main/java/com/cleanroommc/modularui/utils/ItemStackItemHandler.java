@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.utils;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.future.IItemHandlerModifiable;
 import com.cleanroommc.modularui.future.ItemHandlerHelper;
 import net.minecraft.item.ItemStack;
@@ -31,14 +30,14 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
 
     @Nullable
     @Override
-    public IItemStackLong getStackInSlot(int slot) {
+    public ItemStack getStackInSlot(int slot) {
         validateSlotIndex(slot);
         NBTTagCompound item = getItemsNbt().getCompoundTagAt(slot);
-        return item == null ? null : IItemStackLong.loadItemStackFromNBT(item);
+        return item == null ? null : ItemStack.loadItemStackFromNBT(item);
     }
 
     @Override
-    public void setStackInSlot(int slot, @Nullable IItemStackLong stack) {
+    public void setStackInSlot(int slot, @Nullable ItemStack stack) {
         validateSlotIndex(slot);
         NBTTagList list = getItemsNbt();
         list.func_150304_a(slot, stack == null ? new NBTTagCompound() : stack.writeToNBT(new NBTTagCompound()));
@@ -46,46 +45,46 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
 
     @Nullable
     @Override
-    public IItemStackLong insertItem(int slot, @Nullable IItemStackLong stack, boolean simulate) {
+    public ItemStack insertItem(int slot, @Nullable ItemStack stack, boolean simulate) {
         if (stack == null) return null;
-        IItemStackLong existing = getStackInSlot(slot);
+        ItemStack existing = getStackInSlot(slot);
 
-        long limit = getStackLimit(slot, stack);
+        int limit = getStackLimit(slot, stack);
 
         if (existing != null) {
             if (!ItemHandlerHelper.canItemStacksStack(stack, existing))
                 return stack;
 
-            limit -= existing.getStackSize();
+            limit -= existing.stackSize;
         }
 
         if (limit <= 0) return stack;
 
-        boolean reachedLimit = stack.getStackSize() > limit;
+        boolean reachedLimit = stack.stackSize > limit;
 
         if (!simulate) {
             if (existing == null) {
                 setStackInSlot(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
             } else {
-                existing.setStackSize(existing.getStackSize() + (reachedLimit ? limit :stack.getStackSize()));
+                existing.stackSize = existing.stackSize + (reachedLimit ? limit :stack.stackSize);
             }
             onContentsChanged(slot);
         }
 
-        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getStackSize() - limit) : null;
+        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.stackSize - limit) : null;
     }
 
     @Nullable
     @Override
-    public IItemStackLong extractItem(int slot, int amount, boolean simulate) {
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0) return null;
 
-        IItemStackLong existing = getStackInSlot(slot);
+        ItemStack existing = getStackInSlot(slot);
         if (existing == null) return null;
 
-        long toExtract = Math.min(amount, existing.getMaxStackSize());
+        int toExtract = Math.min(amount, existing.getMaxStackSize());
 
-        if (existing.getStackSize() <= toExtract) {
+        if (existing.stackSize <= toExtract) {
             if (!simulate) {
                 setStackInSlot(slot, null);
                 onContentsChanged(slot);
@@ -93,7 +92,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
             return existing;
         } else {
             if (!simulate) {
-                setStackInSlot(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getStackSize() - toExtract));
+                setStackInSlot(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.stackSize - toExtract));
                 onContentsChanged(slot);
             }
 
@@ -102,11 +101,11 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
     }
 
     @Override
-    public long getSlotLimit(int slot) {
+    public int getSlotLimit(int slot) {
         return 64;
     }
 
-    protected long getStackLimit(int slot, @Nonnull IItemStackLong stack) {
+    protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
         return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
     }
 

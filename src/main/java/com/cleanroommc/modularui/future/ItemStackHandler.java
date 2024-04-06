@@ -10,42 +10,39 @@ import net.minecraft.nbt.NBTTagList;
 
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-import com.cleanroommc.modularui.utils.item.ItemStackLong;
-
 import java.util.Arrays;
 import java.util.List;
 
 public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializable<NBTTagCompound> {
 
-    protected List<IItemStackLong> stacks;
+    protected List<ItemStack> stacks;
 
     public ItemStackHandler() {
         this(1);
     }
 
     public ItemStackHandler(int size) {
-        IItemStackLong[] stacks = new IItemStackLong[size];
+        ItemStack[] stacks = new ItemStack[size];
         Arrays.fill(stacks, null);
         this.stacks = Arrays.asList(stacks);
     }
 
-    public ItemStackHandler(List<IItemStackLong> stacks) {
+    public ItemStackHandler(List<ItemStack> stacks) {
         this.stacks = stacks;
     }
 
-    public ItemStackHandler(IItemStackLong[] stacks) {
+    public ItemStackHandler(ItemStack[] stacks) {
         this.stacks = Arrays.asList(stacks);
     }
 
     public void setSize(int size) {
-        IItemStackLong[] stacks = new IItemStackLong[size];
+        ItemStack[] stacks = new ItemStack[size];
         Arrays.fill(stacks, null);
         this.stacks = Arrays.asList(stacks);
     }
 
     @Override
-    public void setStackInSlot(int slot, IItemStackLong stack) {
+    public void setStackInSlot(int slot, ItemStack stack) {
         this.validateSlotIndex(slot);
         this.stacks.set(slot, stack);
         this.onContentsChanged(slot);
@@ -57,58 +54,58 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
     }
 
     @Override
-    public IItemStackLong getStackInSlot(int slot) {
+    public ItemStack getStackInSlot(int slot) {
         this.validateSlotIndex(slot);
         return this.stacks.get(slot);
     }
 
     @Override
-    public IItemStackLong insertItem(int slot, IItemStackLong stack, boolean simulate) {
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
         if (stack == null) {
             return null;
         } else {
             this.validateSlotIndex(slot);
-            IItemStackLong existing = this.stacks.get(slot);
-            long limit = this.getStackLimit(slot, stack);
+            ItemStack existing = this.stacks.get(slot);
+            int limit = this.getStackLimit(slot, stack);
             if (existing != null) {
                 if (!ItemHandlerHelper.canItemStacksStack(stack, existing)) {
                     return stack;
                 }
 
-                limit -= existing.getStackSize();
+                limit -= existing.stackSize;
             }
 
             if (limit <= 0) {
                 return stack;
             } else {
-                boolean reachedLimit = stack.getStackSize() > limit;
+                boolean reachedLimit = stack.stackSize > limit;
                 if (!simulate) {
                     if (existing == null) {
                         this.stacks.set(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
                     } else {
-                        existing.setStackSize(existing.getStackSize() + (reachedLimit ? limit : stack.getStackSize()));
+                        existing.stackSize += reachedLimit ? limit : stack.stackSize;
                     }
 
                     this.onContentsChanged(slot);
                 }
 
-                return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getStackSize() - limit) : null;
+                return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.stackSize - limit) : null;
             }
         }
     }
 
     @Override
-    public IItemStackLong extractItem(int slot, int amount, boolean simulate) {
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount == 0) {
             return null;
         } else {
             this.validateSlotIndex(slot);
-            IItemStackLong existing = this.stacks.get(slot);
+            ItemStack existing = this.stacks.get(slot);
             if (existing == null) {
                 return null;
             } else {
-                long toExtract = Math.min(amount, existing.getMaxStackSize());
-                if (existing.getStackSize() <= toExtract) {
+                int toExtract = Math.min(amount, existing.getMaxStackSize());
+                if (existing.stackSize <= toExtract) {
                     if (!simulate) {
                         this.stacks.set(slot, null);
                         this.onContentsChanged(slot);
@@ -119,7 +116,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
                     if (!simulate) {
                         this.stacks.set(
                                 slot,
-                                ItemHandlerHelper.copyStackWithSize(existing, existing.getStackSize() - toExtract));
+                                ItemHandlerHelper.copyStackWithSize(existing, existing.stackSize - toExtract));
                         this.onContentsChanged(slot);
                     }
 
@@ -130,11 +127,11 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
     }
 
     @Override
-    public long getSlotLimit(int slot) {
+    public int getSlotLimit(int slot) {
         return getStackInSlot(slot) != null ? getStackInSlot(slot).getMaxStackSize() : 64;
     }
 
-    protected long getStackLimit(int slot, @Nullable IItemStackLong stack) {
+    protected int getStackLimit(int slot, @Nullable ItemStack stack) {
         if (stack == null) {
             return 0;
         }
@@ -142,7 +139,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
     }
 
     @Override
-    public boolean isItemValid(int slot, IItemStackLong stack) {
+    public boolean isItemValid(int slot, ItemStack stack) {
         return true;
     }
 
@@ -174,7 +171,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
             NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
             int slot = itemTags.getInteger("Slot");
             if (slot >= 0 && slot < this.stacks.size()) {
-                this.stacks.set(slot, IItemStackLong.loadItemStackFromNBT(itemTags));
+                this.stacks.set(slot, ItemStack.loadItemStackFromNBT(itemTags));
             }
         }
 

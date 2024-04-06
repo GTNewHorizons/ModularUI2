@@ -327,11 +327,11 @@ public class ModularContainer extends Container {
             if (slotGroup != fromSlotGroup && toSlot.func_111238_b() && toSlot.isItemValid(fromStack)) {
                 ItemStack toStack = toSlot.getStack();
                 if (toSlot.isPhantom()) {
-                    if (toStack == null || (ItemHandlerHelper.canItemStacksStack(new ItemStackLongDelegate(fromStack), new ItemStackLongDelegate(toStack)) && toStack.stackSize < toSlot.getSlotStackLimit())) {
+                    if (toStack == null || (ItemHandlerHelper.canItemStacksStack(fromStack, toStack) && toStack.stackSize < toSlot.getSlotStackLimit())) {
                         toSlot.putStack(fromStack.copy());
                         return fromStack;
                     }
-                } else if (ItemHandlerHelper.canItemStacksStack(new ItemStackLongDelegate(fromStack), new ItemStackLongDelegate(toStack))) {
+                } else if (ItemHandlerHelper.canItemStacksStack(fromStack, toStack)) {
                     int j = toStack.stackSize + fromStack.stackSize;
                     int maxSize = Math.min(toSlot.getSlotStackLimit(), fromStack.getMaxStackSize());
 

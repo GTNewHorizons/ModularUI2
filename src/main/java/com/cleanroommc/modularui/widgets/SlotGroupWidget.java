@@ -36,13 +36,13 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {
-            slotGroupWidget.child(new ItemSlot()
+            slotGroupWidget.child(new ItemSlot<>()
                     .syncHandler(key, i)
                     .pos(i * 18, 3 * 18 + 5)
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
-            slotGroupWidget.child(new ItemSlot()
+            slotGroupWidget.child(new ItemSlot<>()
                     .syncHandler(key, i + 9)
                     .pos(i % 9 * 18, i / 9 * 18)
                     .debugName("slot_" + (i + 9)));

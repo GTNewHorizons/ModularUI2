@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.widgets;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -15,6 +14,7 @@ import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -43,9 +43,8 @@ import org.lwjgl.opengl.GL12;
 import java.util.List;
 
 import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
-import static com.google.common.primitives.Ints.saturatedCast;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -54,13 +53,15 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     public ItemSlot() {
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
-            tooltip.excludeArea(getArea());
-            if (!isSynced()) return;
-            ItemStack stack = getSlot().getStack();
-            if (stack == null) return;
-            tooltip.addStringLines(getItemTooltip(stack));
-        });
+        tooltipBuilder(this::addToolTip);
+    }
+
+    protected void addToolTip(Tooltip tooltip) {
+        tooltip.excludeArea(getArea());
+        if (!isSynced()) return;
+        ItemStack stack = getSlot().getStack();
+        if (stack == null) return;
+        tooltip.addStringLines(getItemTooltip(stack));
     }
 
     @Override
@@ -177,13 +178,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return tooltips;
     }
 
-    public ItemSlot slot(ModularSlot slot) {
+    public W slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
-        return this;
+        return getThis();
     }
 
-    public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
+    public W slot(IItemHandlerModifiable itemHandler, int index) {
         return slot(new ModularSlot(itemHandler, index));
     }
 
@@ -191,7 +192,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     private void drawSlot(ModularSlot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
         GuiContainerAccessor accessor = guiScreen.getAccessor();
-        IItemStackLong itemstack = slotIn.getStackLong();
+        ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && !accessor.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
@@ -200,7 +201,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         if (slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && accessor.getIsRightMouseClick() && itemstack != null) {
             itemstack = itemstack.copy();
-            itemstack.setStackSize(itemstack.getStackSize()/2);
+            itemstack.stackSize /= 2;
         } else if (guiScreen.isDragSplitting() && guiScreen.getDragSlots().contains(slotIn) && itemstack1 != null) {
             if (guiScreen.getDragSlots().size() == 1) {
                 return;
@@ -208,16 +209,16 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
             // canAddItemToSlot
             if (Container.func_94527_a(slotIn, itemstack1, true) && guiScreen.inventorySlots.canDragIntoSlot(slotIn)) {
-                itemstack = new ItemStackLongDelegate(itemstack1.copy());
+                itemstack = itemstack1.copy();
                 flag = true;
                 // computeStackSize
-                Container.func_94525_a(guiScreen.getDragSlots(), accessor.getDragSplittingLimit(), itemstack.getAsItemStack(), slotIn.getStackLong() == null ? 0 : saturatedCast(slotIn.getStackLong().getStackSize()));
-                long k = Math.min(itemstack.getMaxStackSize(), slotIn.getSlotStackLimitLong());
+                Container.func_94525_a(guiScreen.getDragSlots(), accessor.getDragSplittingLimit(), itemstack, slotIn.getStack() == null ? 0 : slotIn.getStack().stackSize);
+                int k = Math.min(itemstack.getMaxStackSize(), slotIn.getSlotStackLimit());
 
-                if (itemstack.getStackSize() > k) {
+                if (itemstack.stackSize > k) {
                     amount = k;
                     format = EnumChatFormatting.YELLOW.toString();
-                    itemstack.setStackSize(k);
+                    itemstack.stackSize = k;
                 }
             } else {
                 guiScreen.getDragSlots().remove(slotIn);
@@ -233,18 +234,18 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 
-            if (itemstack != null && itemstack.getAsItemStack() != null) {
+            if (itemstack != null) {
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 GL11.glEnable(GL11.GL_LIGHTING);
                 RenderHelper.enableGUIStandardItemLighting();
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 // render the item itself
-                GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack.getAsItemStack(), 1, 1);
-                GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack.getAsItemStack());
+                GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
+                GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack);
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                 if (amount < 0) {
-                    amount = itemstack.getStackSize();
+                    amount = itemstack.stackSize;
                 }
                 // render the amount overlay
                 if (amount > 1 || format != null) {
@@ -274,11 +275,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     GL11.glEnable(GL11.GL_BLEND);
                 }
 
-                long cachedCount = itemstack.getStackSize();
-                itemstack.setStackSize(1); // required to not render the amount overlay
+                int cachedCount = itemstack.stackSize;
+                itemstack.stackSize = 1; // required to not render the amount overlay
                 // render other overlays like durability bar
-                GuiScreenWrapper.getItemRenderer().renderItemOverlayIntoGUI(guiScreen.getFontRenderer(), Minecraft.getMinecraft().getTextureManager(), itemstack.getAsItemStack(), 1, 1, null);
-                itemstack.setStackSize(cachedCount);
+                GuiScreenWrapper.getItemRenderer().renderItemOverlayIntoGUI(guiScreen.getFontRenderer(), Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1, null);
+                itemstack.stackSize = cachedCount;
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
             }
         }
@@ -290,7 +291,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
         if (!this.syncHandler.isPhantom()) return false;
-        this.syncHandler.updateFromClient(new ItemStackLongDelegate(draggedStack));
+        this.syncHandler.updateFromClient(draggedStack);
         draggedStack.stackSize = 0;
         return true;
     }

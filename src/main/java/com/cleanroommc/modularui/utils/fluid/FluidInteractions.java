@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.utils.fluid;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
+import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 
 import codechicken.nei.recipe.StackInfo;
 import gregtech.api.util.GT_Utility;
@@ -16,17 +17,17 @@ public class FluidInteractions {
      */
     public static FluidStack getFluidForRealItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
-        if (isGT5ULoaded) {
-            fluidStack = GT_Utility.getFluidForFilledItem(itemStack, true);
-        }
         if (fluidStack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
         }
         if (fluidStack == null) {
             fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack);
         }
-        if (fluidStack == null) {
+        if (fluidStack == null && isNEILoaded) {
             fluidStack = StackInfo.getFluid(itemStack);
+        }
+        if (isGT5ULoaded && fluidStack == null) {
+            fluidStack = GT_Utility.getFluidForFilledItem(itemStack, true);
         }
         return fluidStack;
     }
@@ -35,11 +36,20 @@ public class FluidInteractions {
      * Gets fluid for use in phantom slot.
      */
     public static FluidStack getFluidForPhantomItem(ItemStack itemStack) {
-        if (isGT5ULoaded) {
-            return GT_Utility.getFluidFromContainerOrFluidDisplay(itemStack);
-        } else {
-            return StackInfo.getFluid(itemStack);
+        FluidStack fluidStack = null;
+        if (fluidStack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
+            fluidStack = container.getFluid(itemStack.copy());
         }
+        if (fluidStack == null) {
+            fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack.copy());
+        }
+        if (fluidStack == null && isNEILoaded) {
+            fluidStack = StackInfo.getFluid(itemStack.copy());
+        }
+        if (isGT5ULoaded && fluidStack == null) {
+            fluidStack = GT_Utility.getFluidForFilledItem(itemStack, true);
+        }
+        return fluidStack;
     }
 
     public static ItemStack fillFluidContainer(FluidStack fluidStack, ItemStack itemStack) {

@@ -10,11 +10,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-
-import static com.google.common.primitives.Ints.saturatedCast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,14 +30,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     @Nullable
     private FluidStack cache;
     private final IFluidTank fluidTank;
-    private final IFluidHandler fluidHandler;
     private boolean canFillSlot = true, canDrainSlot = true, controlsAmount = true, phantom = false;
     @Nullable
     private FluidStack lastStoredPhantomFluid;
 
     public FluidSlotSyncHandler(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
-        this.fluidHandler = FluidTankHandler.getTankFluidHandler(fluidTank);
     }
 
     @Nullable

@@ -12,14 +12,12 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 public class ItemHandlerHelper {
 
     public ItemHandlerHelper() {}
 
     @Nullable
-    public static IItemStackLong insertItem(IItemHandler dest, @Nullable IItemStackLong stack, boolean simulate) {
+    public static ItemStack insertItem(IItemHandler dest, @Nullable ItemStack stack, boolean simulate) {
         if (dest != null && stack != null) {
             for (int i = 0; i < dest.getSlots(); ++i) {
                 stack = dest.insertItem(i, stack, simulate);
@@ -34,7 +32,7 @@ public class ItemHandlerHelper {
         }
     }
 
-    public static boolean canItemStacksStack(@Nullable IItemStackLong a, @Nullable IItemStackLong b) {
+    public static boolean canItemStacksStack(@Nullable ItemStack a, @Nullable ItemStack b) {
         if (a != null && b != null && a.isItemEqual(b) && a.hasTagCompound() == b.hasTagCompound()) {
             return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound()));
         } else {
@@ -42,7 +40,7 @@ public class ItemHandlerHelper {
         }
     }
 
-    public static boolean canItemStacksStackRelaxed(@Nullable IItemStackLong a, @Nullable IItemStackLong b) {
+    public static boolean canItemStacksStackRelaxed(@Nullable ItemStack a, @Nullable ItemStack b) {
         if (a != null && b != null && a.getItem() == b.getItem()) {
             if (!a.isStackable()) {
                 return false;
@@ -59,18 +57,18 @@ public class ItemHandlerHelper {
     }
 
     @Nullable
-    public static IItemStackLong copyStackWithSize(@Nullable IItemStackLong itemStack, long size) {
+    public static ItemStack copyStackWithSize(@Nullable ItemStack itemStack, int size) {
         if (itemStack == null || size == 0) {
             return null;
         } else {
-            IItemStackLong copy = itemStack.copy();
-            copy.setStackSize(size);
+            ItemStack copy = itemStack.copy();
+            copy.stackSize = size;
             return copy;
         }
     }
 
     @Nullable
-    public static IItemStackLong insertItemStacked(IItemHandler inventory, @Nullable IItemStackLong stack, boolean simulate) {
+    public static ItemStack insertItemStacked(IItemHandler inventory, @Nullable ItemStack stack, boolean simulate) {
         if (inventory != null && stack != null) {
             if (!stack.isStackable()) {
                 return insertItem(inventory, stack, simulate);
@@ -79,7 +77,7 @@ public class ItemHandlerHelper {
 
                 int i;
                 for (i = 0; i < sizeInventory; ++i) {
-                    IItemStackLong slot = inventory.getStackInSlot(i);
+                    ItemStack slot = inventory.getStackInSlot(i);
                     if (canItemStacksStackRelaxed(slot, stack)) {
                         stack = inventory.insertItem(i, stack, simulate);
                         if (stack == null) {
@@ -106,15 +104,15 @@ public class ItemHandlerHelper {
         }
     }
 
-    public static void giveItemToPlayer(EntityPlayer player, @Nullable IItemStackLong stack) {
+    public static void giveItemToPlayer(EntityPlayer player, @Nullable ItemStack stack) {
         giveItemToPlayer(player, stack, -1);
     }
 
-    public static void giveItemToPlayer(EntityPlayer player, @Nullable IItemStackLong stack, int preferredSlot) {
+    public static void giveItemToPlayer(EntityPlayer player, @Nullable ItemStack stack, int preferredSlot) {
         if (stack != null) {
             IItemHandler inventory = new PlayerMainInvWrapper(player.inventory);
             World world = player.worldObj;
-            IItemStackLong remainder = stack;
+            ItemStack remainder = stack;
             if (preferredSlot >= 0 && preferredSlot < inventory.getSlots()) {
                 remainder = inventory.insertItem(preferredSlot, stack, false);
             }
@@ -123,7 +121,7 @@ public class ItemHandlerHelper {
                 remainder = insertItemStacked(inventory, remainder, false);
             }
 
-            if (remainder == null || remainder.getStackSize() != stack.getStackSize()) {
+            if (remainder == null || remainder.stackSize != stack.stackSize) {
                 world.playSoundAtEntity(
                         player,
                         "random.pop",
@@ -132,7 +130,7 @@ public class ItemHandlerHelper {
             }
 
             if (remainder != null && !world.isRemote) {
-                EntityItem entityitem = new EntityItem(world, player.posX, player.posY + 0.5D, player.posZ, remainder.getAsItemStack());
+                EntityItem entityitem = new EntityItem(world, player.posX, player.posY + 0.5D, player.posZ, remainder);
                 entityitem.delayBeforeCanPickup = 40;
                 entityitem.motionX = 0.0D;
                 entityitem.motionZ = 0.0D;
@@ -149,9 +147,9 @@ public class ItemHandlerHelper {
             float proportion = 0.0F;
 
             for (int j = 0; j < inv.getSlots(); ++j) {
-                IItemStackLong itemstack = inv.getStackInSlot(j);
+                ItemStack itemstack = inv.getStackInSlot(j);
                 if (itemstack != null) {
-                    proportion += (float) itemstack.getStackSize()
+                    proportion += (float) itemstack.stackSize
                             / (float) Math.min(inv.getSlotLimit(j), itemstack.getMaxStackSize());
                     ++itemsFound;
                 }

@@ -7,7 +7,6 @@ import com.cleanroommc.modularui.factory.SimpleGuiFactory;
 import com.cleanroommc.modularui.future.ItemStackHandler;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.StringSyncValue;
@@ -19,7 +18,6 @@ import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -33,11 +31,11 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
     private final ItemStackHandler stackHandler = new ItemStackHandler(1);
 
     private ItemStack getStack() {
-        return this.stackHandler.getStackInSlot(0) == null ? null : stackHandler.getStackInSlot(0).getAsItemStack();
+        return this.stackHandler.getStackInSlot(0);
     }
 
     private void setStack(ItemStack stack) {
-        this.stackHandler.setStackInSlot(0, new ItemStackLongDelegate(stack));
+        this.stackHandler.setStackInSlot(0, stack);
     }
 
     @Override

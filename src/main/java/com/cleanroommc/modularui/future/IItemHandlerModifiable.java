@@ -4,8 +4,6 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 public interface IItemHandlerModifiable extends IItemHandler {
 
     /**
@@ -19,5 +17,5 @@ public interface IItemHandlerModifiable extends IItemHandler {
      * @throws RuntimeException if the handler is called in a way that the handler
      * was not expecting.
      **/
-    void setStackInSlot(int slot, @Nullable IItemStackLong stack);
+    void setStackInSlot(int slot, @Nullable ItemStack stack);
 }
