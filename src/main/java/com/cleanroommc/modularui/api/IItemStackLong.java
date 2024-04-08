@@ -18,6 +18,17 @@ public interface IItemStackLong {
         };
     }
 
+    public static boolean areItemStacksEqual(IItemStackLong a, IItemStackLong b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        if (a.getItem() != b.getItem()) return false;
+        if (a.getItemDamage() != b.getItemDamage()) return false;
+        if (a.getStackSize() != b.getStackSize()) return false;
+        if (a.getTagCompound() == null && b.getTagCompound() == null) return true;
+        if (a.getTagCompound() == null || b.getTagCompound() == null) return false;
+        return a.getTagCompound().equals(b.getTagCompound());
+    }
+
     /**
      * @return The stacksize the item has currently
      */

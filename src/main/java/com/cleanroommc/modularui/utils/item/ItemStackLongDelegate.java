@@ -66,7 +66,7 @@ public class ItemStackLongDelegate implements IItemStackLong {
 
     @Override
     public boolean isStackable() {
-        return item.isStackable();
+        return item == null ? false : item.isStackable();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class ItemStackLongDelegate implements IItemStackLong {
 
     @Override
     public IItemStackLong splitStack(long toSplit) {
-        return new ItemStackLongDelegate(item.splitStack(saturatedCast(toSplit)));
+        return item == null ? null : new ItemStackLongDelegate(item.splitStack(saturatedCast(toSplit)));
     }
 
     @Override

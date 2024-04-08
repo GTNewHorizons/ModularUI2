@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.future.IItemHandler;
 import com.cleanroommc.modularui.future.SlotItemHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -44,6 +43,14 @@ public class ModularSlot extends SlotItemHandler {
     public ModularSlot(IItemHandler itemHandler, int index, boolean phantom) {
         super(itemHandler, index, Integer.MIN_VALUE, Integer.MIN_VALUE);
         this.phantom = phantom;
+    }
+
+    protected boolean canPut() {
+        return canPut;
+    }
+
+    protected boolean canTake() {
+        return canTake;
     }
 
     @Override

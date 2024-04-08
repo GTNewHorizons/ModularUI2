@@ -22,7 +22,6 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -299,5 +298,9 @@ public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanil
     @Override
     public @Nullable ItemStack getStackForNEI() {
         return this.syncHandler.getSlot().getStack();
+    }
+
+    protected TextRenderer getTextRenderer() {
+        return textRenderer;
     }
 }
