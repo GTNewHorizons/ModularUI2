@@ -6,6 +6,8 @@ import org.lwjgl.opengl.GL12;
 import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
+import com.cleanroommc.modularui.future.IItemHandlerLong;
+import com.cleanroommc.modularui.future.IItemHandlerModifiable;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -16,6 +18,7 @@ import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 import com.cleanroommc.modularui.value.sync.ItemSlotLongSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlotLong;
 
 import cpw.mods.fml.relauncher.Side;
@@ -159,5 +162,25 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
 
         GuiScreenWrapper.getItemRenderer().zLevel = 0.0F;
         guiScreen.setZ(0f);
+    }
+
+    @Override
+    public ItemSlotLong slot(ModularSlot slot) {
+        return this;
+    }
+
+    @Override
+    public ItemSlotLong slot(IItemHandlerModifiable itemHandler, int index) {
+        return this;
+    }
+
+    public ItemSlotLong slot(IItemHandlerLong itemHandler, int index) {
+        return slot(new ModularSlotLong(itemHandler, index));
+    }
+
+    public ItemSlotLong slot(ModularSlotLong slot) {
+        this.syncHandler = new ItemSlotLongSH(slot);
+        setSyncHandler(this.syncHandler);
+        return this;
     }
 }
