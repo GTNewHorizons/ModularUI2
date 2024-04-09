@@ -164,11 +164,17 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
         guiScreen.setZ(0f);
     }
 
+    /**
+     * Made to do nothign as we are not able to handle a slot, which is not a ModularSlotLong
+     */
     @Override
     public ItemSlotLong slot(ModularSlot slot) {
         return this;
     }
 
+    /**
+     *  Made to do nothing as we are not able to handle a handler, which doesn't use IItemHandlerLong
+     */
     @Override
     public ItemSlotLong slot(IItemHandlerModifiable itemHandler, int index) {
         return this;
