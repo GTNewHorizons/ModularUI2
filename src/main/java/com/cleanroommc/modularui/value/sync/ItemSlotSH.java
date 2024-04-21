@@ -94,7 +94,7 @@ public class ItemSlotSH extends SyncHandler {
         if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack((cursorStack), slotStack)) {
             stackToPut = (cursorStack.copy());
             if (mouseData.mouseButton == 1) {
-                stackToPut.stackSize = (1);
+                stackToPut.stackSize = 1;
             }
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
@@ -109,7 +109,7 @@ public class ItemSlotSH extends SyncHandler {
                 stackToPut = cursorStack.copy();
             }
             if (mouseData.mouseButton == 1) {
-                stackToPut.stackSize = (1);
+                stackToPut.stackSize = 1;
             }
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
@@ -195,3 +195,4 @@ public class ItemSlotSH extends SyncHandler {
         return this.slot.getSlotGroupName();
     }
 }
+

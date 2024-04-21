@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.future.ItemHandlerHelper;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.MouseData;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
+import com.cleanroommc.modularui.utils.item.ItemStackLong;
 import com.cleanroommc.modularui.widgets.slot.ModularSlotLong;
 
 import net.minecraft.item.ItemStack;
@@ -87,7 +87,7 @@ public class ItemSlotLongSH extends SyncHandler {
 
     protected void phantomClick(MouseData mouseData) {
         ItemStack cursorStackItem = getSyncManager().getCursorItem();
-        IItemStackLong cursorStack = cursorStackItem == null ? null : new ItemStackLongDelegate(cursorStackItem);
+        IItemStackLong cursorStack = cursorStackItem == null ? null : new ItemStackLong(cursorStackItem);
         IItemStackLong slotStack = getSlot().getStackLong();
         IItemStackLong stackToPut;
         if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack((cursorStack), slotStack)) {

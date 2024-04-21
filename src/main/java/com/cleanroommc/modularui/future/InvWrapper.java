@@ -57,7 +57,7 @@ public class InvWrapper implements IItemHandlerModifiable {
             if (stack.stackSize <= m) {
                 if (!simulate) {
                     ItemStack copy = stack.copy();
-                    copy.stackSize = (copy.stackSize + stackInSlot.stackSize);
+                    copy.stackSize += stackInSlot.stackSize;
                     getInv().setInventorySlotContents(slot, copy);
                     getInv().markDirty();
                 }
@@ -68,11 +68,11 @@ public class InvWrapper implements IItemHandlerModifiable {
                 stack = stack.copy();
                 if (!simulate) {
                     ItemStack copy = stack.splitStack(m);
-                    copy.stackSize = (copy.stackSize + stackInSlot.stackSize);
+                    copy.stackSize += stackInSlot.stackSize;
                     getInv().setInventorySlotContents(slot, copy);
                     getInv().markDirty();
                 } else {
-                    stack.stackSize = (stack.stackSize - m);
+                    stack.stackSize -= m;
                 }
                 return stack;
             }
@@ -87,7 +87,7 @@ public class InvWrapper implements IItemHandlerModifiable {
                     getInv().setInventorySlotContents(slot, stack.splitStack(m));
                     getInv().markDirty();
                 } else {
-                    stack.stackSize = (stack.stackSize - m);
+                    stack.stackSize -= m;
                 }
                 return stack;
             } else {

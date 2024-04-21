@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.NumberFormat;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
+import com.cleanroommc.modularui.utils.item.ItemStackLong;
 import com.cleanroommc.modularui.value.sync.ItemSlotLongSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -26,6 +26,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -62,6 +63,11 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
         return this.syncHandler.getSlot();
     }
 
+    @Override
+    public Slot getVanillaSlot() {
+        return this.syncHandler.getSlot();
+    }
+
     @SideOnly(Side.CLIENT)
     private void drawSlot(ModularSlotLong slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
@@ -70,7 +76,7 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && !accessor.getIsRightMouseClick();
         ItemStack itemstack2 = guiScreen.mc.thePlayer.inventory.getItemStack();
-        IItemStackLong itemstack1 = itemstack2 == null ? null : new ItemStackLongDelegate(itemstack2);
+        IItemStackLong itemstack1 = itemstack2 == null ? null : new ItemStackLong(itemstack2);
         long amount = -1;
         TextRenderer textRenderer = getTextRenderer();
         String format = null;

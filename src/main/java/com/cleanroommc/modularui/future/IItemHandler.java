@@ -110,7 +110,8 @@ public interface IItemHandler {
     // This method doesn't exist in 1.12
     @SuppressWarnings("unused")
     default List<ItemStack> getStacks() {
-        List<ItemStack> ret = new ArrayList<>(); for (int i = 0; i < getSlots(); i++) {
+        List<ItemStack> ret = new ArrayList<>();
+        for (int i = 0; i < getSlots(); i++) {
             ret.add(getStackInSlot(i));
         }
         return ret;
