@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+import com.cleanroommc.modularui.api.IItemStackLong;
+
 public class ItemHandlerHelper {
 
     public ItemHandlerHelper() {}
@@ -25,7 +27,6 @@ public class ItemHandlerHelper {
                     return null;
                 }
             }
-
             return stack;
         } else {
             return stack;
@@ -154,7 +155,113 @@ public class ItemHandlerHelper {
                     ++itemsFound;
                 }
             }
+            proportion /= (float) inv.getSlots();
+            return MathHelper.floor_float(proportion * 14.0F) + (itemsFound > 0 ? 1 : 0);
+        }
+    }
 
+    @Nullable
+    public static IItemStackLong insertItem(IItemHandlerLong dest, @Nullable IItemStackLong stack, boolean simulate) {
+        if (dest != null && stack != null) {
+            for (int i = 0; i < dest.getSlots(); ++i) {
+                stack = dest.insertItemLong(i, stack, simulate);
+                if (stack == null) {
+                    return null;
+                }
+            }
+            return stack;
+        } else {
+            return stack;
+        }
+    }
+
+    public static boolean canItemStacksStack(@Nullable IItemStackLong a, @Nullable IItemStackLong b) {
+        if (a != null && b != null && a.isItemEqual(b) && a.hasTagCompound() == b.hasTagCompound()) {
+            return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound()));
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean canItemStacksStackRelaxed(@Nullable IItemStackLong a, @Nullable IItemStackLong b) {
+        if (a != null && b != null && a.getItem() == b.getItem()) {
+            if (!a.isStackable()) {
+                return false;
+            } else if (a.getHasSubtypes() && a.getItemDamage() != b.getItemDamage()) {
+                return false;
+            } else if (a.hasTagCompound() != b.hasTagCompound()) {
+                return false;
+            } else {
+                return (!a.hasTagCompound() || a.getTagCompound().equals(b.getTagCompound()));
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Nullable
+    public static IItemStackLong copyStackWithSize(@Nullable IItemStackLong itemStack, long size) {
+        if (itemStack == null || size == 0) {
+            return null;
+        } else {
+            IItemStackLong copy = itemStack.copy();
+            copy.setStackSize(size);
+            return copy;
+        }
+    }
+
+    @Nullable
+    public static IItemStackLong insertItemStacked(IItemHandlerLong inventory, @Nullable IItemStackLong stack, boolean simulate) {
+        if (inventory != null && stack != null) {
+            if (!stack.isStackable()) {
+                return insertItem(inventory, stack, simulate);
+            } else {
+                int sizeInventory = inventory.getSlots();
+
+                int i;
+                for (i = 0; i < sizeInventory; ++i) {
+                    IItemStackLong slot = inventory.getStackInSlotLong(i);
+                    if (canItemStacksStackRelaxed(slot, stack)) {
+                        stack = inventory.insertItemLong(i, stack, simulate);
+                        if (stack == null) {
+                            break;
+                        }
+                    }
+                }
+
+                if (stack != null) {
+                    for (i = 0; i < sizeInventory; ++i) {
+                        if (inventory.getStackInSlot(i) == null) {
+                            stack = inventory.insertItemLong(i, stack, simulate);
+                            if (stack == null) {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return stack;
+            }
+        } else {
+            return stack;
+        }
+    }
+
+    public static int calcRedstoneFromInventory(@Nullable IItemHandlerLong inv) {
+        if (inv == null) {
+            return 0;
+        } else {
+            int itemsFound = 0;
+            float proportion = 0.0F;
+
+            for (int j = 0; j < inv.getSlots(); ++j) {
+                IItemStackLong itemstack = inv.getStackInSlotLong(j);
+                if (itemstack != null) {
+                    proportion += (float) itemstack.getStackSize()
+                            / (float) Math.min(inv.getSlotLimit(j), itemstack.getMaxStackSize());
+                    ++itemsFound;
+                }
+            }
             proportion /= (float) inv.getSlots();
             return MathHelper.floor_float(proportion * 14.0F) + (itemsFound > 0 ? 1 : 0);
         }

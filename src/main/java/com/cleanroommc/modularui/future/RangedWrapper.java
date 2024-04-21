@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.future;
 
 import com.google.common.base.Preconditions;
+
 import net.minecraft.item.ItemStack;
 
 /**

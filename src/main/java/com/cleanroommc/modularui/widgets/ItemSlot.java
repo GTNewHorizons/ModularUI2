@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets;
 
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
+
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -13,6 +14,7 @@ import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -41,7 +43,7 @@ import java.util.List;
 
 import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -50,13 +52,15 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     public ItemSlot() {
         tooltip().setAutoUpdate(true).setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
-            tooltip.excludeArea(getArea());
-            if (!isSynced()) return;
-            ItemStack stack = getSlot().getStack();
-            if (stack == null) return;
-            tooltip.addStringLines(getItemTooltip(stack));
-        });
+        tooltipBuilder(this::addToolTip);
+    }
+
+    protected void addToolTip(Tooltip tooltip) {
+        tooltip.excludeArea(getArea());
+        if (!isSynced()) return;
+        ItemStack stack = getSlot().getStack();
+        if (stack == null) return;
+        tooltip.addStringLines(getItemTooltip(stack));
     }
 
     @Override
@@ -173,30 +177,30 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return tooltips;
     }
 
-    public ItemSlot slot(ModularSlot slot) {
+    public W slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
-        return this;
+        return getThis();
     }
 
-    public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
+    public W slot(IItemHandlerModifiable itemHandler, int index) {
         return slot(new ModularSlot(itemHandler, index));
     }
 
     @SideOnly(Side.CLIENT)
-    private void drawSlot(Slot slotIn) {
+    private void drawSlot(ModularSlot slotIn) {
         GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
         GuiContainerAccessor accessor = guiScreen.getAccessor();
         ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && !accessor.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
-        int amount = -1;
+        long amount = -1;
         String format = null;
 
         if (slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && accessor.getIsRightMouseClick() && itemstack != null) {
             itemstack = itemstack.copy();
-            itemstack.stackSize = itemstack.stackSize / 2;
+            itemstack.stackSize /= 2;
         } else if (guiScreen.isDragSplitting() && guiScreen.getDragSlots().contains(slotIn) && itemstack1 != null) {
             if (guiScreen.getDragSlots().size() == 1) {
                 return;
@@ -294,5 +298,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public @Nullable ItemStack getStackForNEI() {
         return this.syncHandler.getSlot().getStack();
+    }
+
+    protected TextRenderer getTextRenderer() {
+        return textRenderer;
     }
 }

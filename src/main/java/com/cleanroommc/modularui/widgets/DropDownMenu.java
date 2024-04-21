@@ -102,15 +102,14 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             menu.getSelectedItem().draw(context, widgetTheme);
             menu.getSelectedItem().drawForeground(context);
         } else {
-            NONE.applyThemeColor(context.getTheme(), getWidgetTheme(context.getTheme()));
-            NONE.draw(context, 0, 0, area.width, area.height);
+            NONE.draw(context, 0, 0, area.width, area.height, getWidgetTheme(context.getTheme()));
         }
 
         int arrowSize = smallerSide / 2;
         if (menu.isOpen()) {
-            arrowOpened.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize);
+            arrowOpened.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
         } else {
-            arrowClosed.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize);
+            arrowClosed.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
         }
     }
 

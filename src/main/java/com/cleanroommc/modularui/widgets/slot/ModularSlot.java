@@ -45,6 +45,14 @@ public class ModularSlot extends SlotItemHandler {
         this.phantom = phantom;
     }
 
+    protected boolean canPut() {
+        return canPut;
+    }
+
+    protected boolean canTake() {
+        return canTake;
+    }
+
     @Override
     public boolean isItemValid(@Nullable ItemStack stack) {
         return this.canPut && stack != null && this.filter.test(stack) && super.isItemValid(stack);

@@ -47,10 +47,9 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public ItemStack getStack() {
-        return this.getItemHandler().getStackInSlot(this.index);
+        return itemHandler.getStackInSlot(index);
     }
 
-    // Override if your IItemHandler does not implement IItemHandlerModifiable
     @Override
     public void putStack(ItemStack stack) {
         ((IItemHandlerModifiable) this.getItemHandler()).setStackInSlot(this.index, stack);
@@ -62,7 +61,7 @@ public class SlotItemHandler extends Slot {
 
     @Override
     public int getSlotStackLimit() {
-        return this.itemHandler.getSlotLimit(this.index);
+        return itemHandler.getSlotLimit(index);
     }
 
     public int getItemStackLimit(ItemStack stack) {
@@ -95,7 +94,7 @@ public class SlotItemHandler extends Slot {
     @Override
     @Nullable
     public ItemStack decrStackSize(int amount) {
-        return this.getItemHandler().extractItem(this.index, amount, false);
+        return getItemHandler().extractItem(this.index, amount, false);
     }
 
     public IItemHandler getItemHandler() {
@@ -103,6 +102,6 @@ public class SlotItemHandler extends Slot {
     }
 
     public boolean isSameInventory(Slot other) {
-        return other instanceof SlotItemHandler && ((SlotItemHandler) other).getItemHandler() == this.itemHandler;
+        return other instanceof SlotItemHandler slotHand && slotHand.getItemHandler() == this.itemHandler;
     }
 }
