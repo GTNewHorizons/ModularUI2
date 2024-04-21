@@ -101,7 +101,7 @@ public class NetworkUtils {
             NBTTagCompound nbt = buffer.readNBTTagCompoundFromBuffer();
             int check = nbt.getInteger("check");
             if (check < 0) return null;
-            return IItemStackLong.loadItemStackFromNBT(nbt);
+            return ItemStackLong.loadFromNBT(nbt);
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
             return null;

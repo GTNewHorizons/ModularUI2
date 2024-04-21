@@ -143,7 +143,7 @@ public class ItemStackLongHandler implements IItemHandlerLong, INBTSerializable<
             NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
             int slot = itemTags.getInteger("Slot");
             if (slot >= 0 && slot < this.items.size()) {
-                this.items.set(slot, IItemStackLong.loadItemStackFromNBT(itemTags));
+                this.items.set(slot, ItemStackLong.loadFromNBT(itemTags));
             }
         }
 

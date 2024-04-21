@@ -11,7 +11,6 @@ import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.future.IItemHandlerLong;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
-import akka.io.Inet;
 import net.minecraft.item.ItemStack;
 
 public class ModularSlotLong extends ModularSlot {
@@ -45,7 +44,7 @@ public class ModularSlotLong extends ModularSlot {
     }
 
     public void putStackLong(IItemStackLong stack) {
-        if (IItemStackLong.areItemStacksEqual(stack, getStackLong())) return;
+        if (ItemStackLong.areItemStacksEqual(stack, getStackLong())) return;
         itemHandler.setStackInSlotLong(index, stack);
     }
 
