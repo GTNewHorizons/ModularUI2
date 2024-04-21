@@ -7,7 +7,6 @@ import com.cleanroommc.modularui.future.PlayerMainInvWrapper;
 import com.cleanroommc.modularui.future.SlotItemHandler;
 import com.cleanroommc.modularui.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 import com.cleanroommc.modularui.value.sync.GuiSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;

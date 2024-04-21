@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cleanroommc.modularui.api.IItemStackLong;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
+import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import net.minecraft.item.ItemStack;
 
@@ -16,7 +16,7 @@ public interface IItemHandlerLong extends IItemHandlerModifiable {
 
     @Override
     default void setStackInSlot(int slot, ItemStack stack) {
-        setStackInSlotLong(slot, new ItemStackLongDelegate(stack));
+        setStackInSlotLong(slot, new ItemStackLong(stack));
     }
 
     IItemStackLong extractItemLong(int slot, long amount, boolean simulate);
@@ -53,7 +53,7 @@ public interface IItemHandlerLong extends IItemHandlerModifiable {
 
     @Override
     default ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        IItemStackLong item = insertItemLong(slot, new ItemStackLongDelegate(stack), simulate);
+        IItemStackLong item = insertItemLong(slot, new ItemStackLong(stack), simulate);
         return item == null ? null : item.getAsItemStack();
     }
 
@@ -63,7 +63,7 @@ public interface IItemHandlerLong extends IItemHandlerModifiable {
 
     @Override
     default boolean isItemValid(int slot, ItemStack stack) {
-        return isItemValidLong(slot, new ItemStackLongDelegate(stack));
+        return isItemValidLong(slot, new ItemStackLong(stack));
     }
 
 }

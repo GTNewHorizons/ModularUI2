@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.future.IItemHandlerLong;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
+import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import akka.io.Inet;
 import net.minecraft.item.ItemStack;
@@ -37,7 +37,7 @@ public class ModularSlotLong extends ModularSlot {
 
     @Override
     public boolean isItemValid(@Nullable ItemStack stack) {
-        return isItemValidLong(stack == null ? null : new ItemStackLongDelegate(stack)) && super.isItemValid(stack);
+        return isItemValidLong(stack == null ? null : new ItemStackLong(stack)) && super.isItemValid(stack);
     }
 
     public IItemStackLong getStackLong() {
@@ -64,7 +64,7 @@ public class ModularSlotLong extends ModularSlot {
 
     @Override
     public int getItemStackLimit(@NotNull ItemStack stack) {
-        return saturatedCast(getItemStackLimitLong(new ItemStackLongDelegate(stack)));
+        return saturatedCast(getItemStackLimitLong(new ItemStackLong(stack)));
     }
 
     public void onSlotChangedRealLong(IItemStackLong stack, boolean onlyChangedAmount, boolean client, boolean init) {
@@ -73,7 +73,7 @@ public class ModularSlotLong extends ModularSlot {
 
     @Override
     public void onSlotChangedReal(ItemStack itemStack, boolean onlyChangedAmount, boolean client, boolean init) {
-        onSlotChangedRealLong(new ItemStackLongDelegate(itemStack), onlyChangedAmount,  client, init);
+        onSlotChangedRealLong(new ItemStackLong(itemStack), onlyChangedAmount,  client, init);
         super.onSlotChangedReal(itemStack, onlyChangedAmount, client, init);
     }
 
