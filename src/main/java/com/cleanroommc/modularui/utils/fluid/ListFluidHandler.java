@@ -24,8 +24,8 @@ public class ListFluidHandler implements IFluidTanksHandler {
     public int getTanks() {
         int tanks = 0;
 
-        for (int i = 0; i < fluidHandlers.size(); i++) {
-            tanks += fluidHandlers.get(i).getTanks();
+        for (IFluidTanksHandler handler : fluidHandlers) {
+            tanks += handler.getTanks();
         }
 
         return tanks;
