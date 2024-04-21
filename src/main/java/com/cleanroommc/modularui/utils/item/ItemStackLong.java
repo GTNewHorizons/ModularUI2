@@ -116,7 +116,7 @@ public class ItemStackLong implements IItemStackLong {
     }
 
     @Override
-    public @Nonnull NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    public @Nonnull NBTTagCompound writeToNBT(@Nonnull NBTTagCompound nbt) {
         nbt.setInteger("type", 1);
         ItemStack itemStack = getAsItemStack();
         itemStack.setTagCompound(getTagCompound());
@@ -126,7 +126,7 @@ public class ItemStackLong implements IItemStackLong {
         return nbt;
     }
 
-    public static @Nonnull ItemStackLong loadFromNBT(NBTTagCompound nbt) {
+    public static @Nonnull ItemStackLong loadFromNBT(@Nonnull NBTTagCompound nbt) {
         ItemStack itemStack = ItemStack.loadItemStackFromNBT(nbt);
         ItemStackLong item = new ItemStackLong(itemStack.getItem(), nbt.getLong("maxStackSizeLong"), itemStack.getItemDamage(), nbt.getLong("stackSizeLong"), itemStack.getTagCompound());
         return item;

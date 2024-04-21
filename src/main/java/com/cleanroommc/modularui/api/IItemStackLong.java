@@ -1,5 +1,8 @@
 package com.cleanroommc.modularui.api;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 
@@ -9,7 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public interface IItemStackLong {
 
-    public static IItemStackLong loadItemStackFromNBT(NBTTagCompound nbt) {
+    public static @Nullable IItemStackLong loadItemStackFromNBT(@Nonnull NBTTagCompound nbt) {
         int type = nbt.getInteger("type");
         return switch(type) {
             case 1 -> ItemStackLong.loadFromNBT(nbt);
@@ -18,7 +21,7 @@ public interface IItemStackLong {
         };
     }
 
-    public static boolean areItemStacksEqual(IItemStackLong a, IItemStackLong b) {
+    public static boolean areItemStacksEqual(@Nullable IItemStackLong a, @Nullable IItemStackLong b) {
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
         if (a.getItem() != b.getItem()) return false;
@@ -52,7 +55,7 @@ public interface IItemStackLong {
     /**
      * @return NBT data the item holds
      */
-    NBTTagCompound getTagCompound();
+    @Nullable NBTTagCompound getTagCompound();
 
     /**
      * @param newStackSize The new stacksize the itemstack should have
@@ -62,9 +65,9 @@ public interface IItemStackLong {
     /**
      * @return The current ItemStackLong as a ItemStack, this stack shouldn't be edited as it won't reflect upon the real one
      */
-    ItemStack getAsItemStack();
+    @Nonnull ItemStack getAsItemStack();
 
-    boolean isItemEqual(IItemStackLong other);
+    boolean isItemEqual(@Nullable IItemStackLong other);
 
     boolean hasTagCompound();
 
@@ -72,9 +75,9 @@ public interface IItemStackLong {
 
     boolean getHasSubtypes();
 
-    IItemStackLong copy();
+    @Nonnull IItemStackLong copy();
 
-    IItemStackLong splitStack(long toSplit);
+    @Nonnull IItemStackLong splitStack(long toSplit);
 
-    NBTTagCompound writeToNBT(NBTTagCompound nbt);
+    @Nonnull NBTTagCompound writeToNBT(@Nonnull NBTTagCompound nbt);
 }
