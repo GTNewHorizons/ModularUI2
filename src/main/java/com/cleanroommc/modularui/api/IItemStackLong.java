@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
-import com.cleanroommc.modularui.utils.item.ItemStackLongDelegate;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,7 +15,6 @@ public interface IItemStackLong {
         int type = nbt.getInteger("type");
         return switch(type) {
             case 1 -> ItemStackLong.loadFromNBT(nbt);
-            case 2 -> ItemStackLongDelegate.loadFromNBT(nbt);
             default -> null;
         };
     }
