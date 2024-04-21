@@ -128,7 +128,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
 
     @Override
     public int getSlotLimit(int slot) {
-        return getStackInSlot(slot) != null ? getStackInSlot(slot).getMaxStackSize() : 64;
+        return 64;
     }
 
     protected int getStackLimit(int slot, @Nullable ItemStack stack) {
