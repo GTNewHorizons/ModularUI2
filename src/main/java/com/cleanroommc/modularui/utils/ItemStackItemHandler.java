@@ -66,7 +66,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
             if (existing == null) {
                 setStackInSlot(slot, reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack);
             } else {
-                existing.stackSize = existing.stackSize + (reachedLimit ? limit :stack.stackSize);
+                existing.stackSize += reachedLimit ? limit : stack.stackSize;
             }
             onContentsChanged(slot);
         }

@@ -54,8 +54,7 @@ public interface IFluidTankLong extends IFluidTank {
     @Override
     default FluidStack getFluid() {
         if (getRealFluid() == null) return null;
-        final FluidStack fluid = new FluidStack(getRealFluid(), getFluidAmount());
-        return fluid;
+        return new FluidStack(getRealFluid(), getFluidAmount());
     }
 
     @Override
@@ -65,8 +64,7 @@ public interface IFluidTankLong extends IFluidTank {
 
     @Override
     default FluidTankInfo getInfo() {
-        final FluidTankInfo info = new FluidTankInfo(getFluid(), getCapacity());
-        return info;
+        return new FluidTankInfo(getFluid(), getCapacity());
     }
 
     IFluidTankLong copy();

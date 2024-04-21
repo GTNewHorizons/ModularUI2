@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.utils.fluid;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -29,13 +32,13 @@ public class ListFluidHandler implements IFluidTanksHandler {
     }
 
     @Override
-    public IFluidTankLong getTank(int tankSlot) {
+    public @Nonnull IFluidTankLong getTank(int tankSlot) {
         Pair<? extends IFluidTanksHandler, Integer> result = findFluidHandler(tankSlot);
         return result.getLeft().getTank(result.getRight());
     }
 
     @Override
-    public void setFluidInTank(int tankSlot, Fluid fluid, long amount) {
+    public void setFluidInTank(int tankSlot, @Nullable Fluid fluid, long amount) {
         Pair<? extends IFluidTanksHandler, Integer> result = findFluidHandler(tankSlot);
         result.getLeft().setFluidInTank(result.getRight(), fluid, amount);
     }
@@ -43,8 +46,7 @@ public class ListFluidHandler implements IFluidTanksHandler {
     protected Pair<? extends IFluidTanksHandler, Integer> findFluidHandler(int tankSlot) {
         int searching = 0;
 
-        for (int i = 0; i < fluidHandlers.size(); i++) {
-            IFluidTanksHandler handler = fluidHandlers.get(i);
+        for (IFluidTanksHandler handler : fluidHandlers) {
 
             if (tankSlot >= searching  && tankSlot < searching + handler.getTanks()) {
                 return new ImmutablePair<>(handler, tankSlot - searching);

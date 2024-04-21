@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
+
 public class NetworkUtils {
 
     public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {
@@ -159,8 +161,7 @@ public class NetworkUtils {
         }
     }
 
-    @Nullable
-    public static IFluidTankLong readFluidTank(PacketBuffer buffer) {
+    public static @Nonnull IFluidTankLong readFluidTank(PacketBuffer buffer) {
         if (buffer.readBoolean()) {
             return null;
         }
@@ -179,7 +180,7 @@ public class NetworkUtils {
             return tank;
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
-            return null;
+            return new FluidTankLong();
         }
     }
 

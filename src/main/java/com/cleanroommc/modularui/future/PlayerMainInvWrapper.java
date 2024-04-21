@@ -25,9 +25,7 @@ public class PlayerMainInvWrapper extends RangedWrapper {
             ItemStack inSlot = getStackInSlot(slot);
             if (inSlot != null) {
                 if (getInventoryPlayer().player.worldObj.isRemote) {
-                    if (inSlot != null && inSlot != null) {
-                        inSlot.animationsToGo = 5;
-                    }
+                    inSlot.animationsToGo = 5;
                 } else if (getInventoryPlayer().player instanceof EntityPlayerMP) {
                     getInventoryPlayer().player.openContainer.detectAndSendChanges();
                 }

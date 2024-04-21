@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.cleanroommc.modularui.api.IFluidTankLong;
 
 import net.minecraftforge.fluids.Fluid;
@@ -39,7 +41,7 @@ public class FluidTanksHandler implements IFluidTanksHandler {
     }
 
     @Override
-    public void setFluidInTank(int tankSlot, Fluid fluid, long amount) {
+    public void setFluidInTank(int tankSlot, @Nullable Fluid fluid, long amount) {
         IFluidTankLong tank = getTank(tankSlot);
         tank.setFluid(fluid, amount);
     }

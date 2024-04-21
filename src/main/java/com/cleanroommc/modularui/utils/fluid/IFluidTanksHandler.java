@@ -39,9 +39,9 @@ public interface IFluidTanksHandler {
         return true;
     }
 
-    void setFluidInTank(int tankSlot, @Nonnull Fluid fluid, long amount);
+    void setFluidInTank(int tankSlot, @Nullable Fluid fluid, long amount);
 
-    default void setFluidInTank(int tankSlot, @Nonnull Fluid fluid) {
+    default void setFluidInTank(int tankSlot, @Nullable Fluid fluid) {
         setFluidInTank(tankSlot, fluid, 0);
     }
 

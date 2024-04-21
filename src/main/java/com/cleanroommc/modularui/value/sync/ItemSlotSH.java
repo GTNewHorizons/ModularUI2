@@ -48,7 +48,7 @@ public class ItemSlotSH extends SyncHandler {
                 (onlyAmountChanged = itemStack.stackSize != this.lastStoredItem.stackSize)) {
             getSlot().onSlotChangedReal(itemStack, onlyAmountChanged, false, init);
             if (onlyAmountChanged) {
-                this.lastStoredItem.stackSize = (itemStack.stackSize);
+                this.lastStoredItem.stackSize = itemStack.stackSize;
             } else {
                 this.lastStoredItem = itemStack == null ? null : itemStack.copy();
             }
@@ -92,7 +92,7 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
         if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack((cursorStack), slotStack)) {
-            stackToPut = (cursorStack.copy());
+            stackToPut = cursorStack.copy();
             if (mouseData.mouseButton == 1) {
                 stackToPut.stackSize = 1;
             }

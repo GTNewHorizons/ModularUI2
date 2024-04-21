@@ -12,12 +12,12 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 
 public class FluidInteractions {
-        /**
+    /**
      * Gets fluid actually stored in item. Used for transferring fluid.
      */
     public static FluidStack getFluidForRealItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
-        if (fluidStack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
         }
         if (fluidStack == null) {
@@ -37,7 +37,7 @@ public class FluidInteractions {
      */
     public static FluidStack getFluidForPhantomItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
-        if (fluidStack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack.copy());
         }
         if (fluidStack == null) {
@@ -73,9 +73,8 @@ public class FluidInteractions {
     }
 
     public static ItemStack fillFluidContainerWithIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (itemStack.getItem() instanceof IFluidContainerItem) {
-            IFluidContainerItem tContainerItem = (IFluidContainerItem) itemStack.getItem();
-            int tFilledAmount = tContainerItem.fill(itemStack, fluidStack, true);
+        if (itemStack.getItem() instanceof IFluidContainerItem itemContainer) {
+            int tFilledAmount = itemContainer.fill(itemStack, fluidStack, true);
             if (tFilledAmount > 0) {
                 fluidStack.amount -= tFilledAmount;
                 return itemStack;
@@ -104,8 +103,8 @@ public class FluidInteractions {
     }
 
     public static int getRealCapacity(IFluidTank fluidTank) {
-        if (fluidTank instanceof IOverflowableTank) {
-            return ((IOverflowableTank) fluidTank).getRealCapacity();
+        if (fluidTank instanceof IOverflowableTank overflowable) {
+            return overflowable.getRealCapacity();
         }
         return fluidTank.getCapacity();
     }

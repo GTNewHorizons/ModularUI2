@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
 import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
 import com.cleanroommc.modularui.value.sync.FluidSlotLongSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;

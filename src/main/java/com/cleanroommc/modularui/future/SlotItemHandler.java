@@ -94,8 +94,7 @@ public class SlotItemHandler extends Slot {
     @Override
     @Nullable
     public ItemStack decrStackSize(int amount) {
-        ItemStack item = getItemHandler().extractItem(this.index, amount, false);
-        return item;
+        return getItemHandler().extractItem(this.index, amount, false);
     }
 
     public IItemHandler getItemHandler() {

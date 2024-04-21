@@ -27,7 +27,7 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
     @NotNull
     private final IFluidTanksHandler handler;
     private final int index;
-    @Nullable
+    @NotNull
     private IFluidTankLong cache;
     private boolean canFillSlot = true, canDrainSlot = true, controlsAmount = true, phantom = false;
     @Nullable
@@ -40,6 +40,7 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
     public FluidSlotLongSyncHandler(IFluidTanksHandler handler, int index) {
         this.handler = handler;
         this.index = index;
+        this.cache = handler.getTank(index).copy();
     }
 
     @Override
@@ -65,7 +66,7 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
         IFluidTankLong current = handler.getTank(index);
         if (current == this.cache)
             return false;
-        if (current == null || this.cache == null)
+        if (this.cache == null)
             return true;
         if (current.getRealFluid() == null || cache.getRealFluid() == null)
             return true;

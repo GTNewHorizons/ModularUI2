@@ -84,8 +84,7 @@ public class ItemStackLong implements IItemStackLong {
 
     @Override
     public boolean isItemEqual(IItemStackLong other) {
-        if (getItem() != other.getItem()) return false;
-        return true;
+        return getItem() == other.getItem();
     }
 
     @Override
@@ -104,7 +103,7 @@ public class ItemStackLong implements IItemStackLong {
     }
 
     @Override
-    public IItemStackLong copy() {
+    public @Nonnull IItemStackLong copy() {
         return new ItemStackLong(item, maxStackSize, damage, stackSize, nbt);
     }
 
@@ -127,8 +126,7 @@ public class ItemStackLong implements IItemStackLong {
 
     public static @Nonnull ItemStackLong loadFromNBT(@Nonnull NBTTagCompound nbt) {
         ItemStack itemStack = ItemStack.loadItemStackFromNBT(nbt);
-        ItemStackLong item = new ItemStackLong(itemStack.getItem(), nbt.getLong("maxStackSizeLong"), itemStack.getItemDamage(), nbt.getLong("stackSizeLong"), itemStack.getTagCompound());
-        return item;
+        return new ItemStackLong(itemStack.getItem(), nbt.getLong("maxStackSizeLong"), itemStack.getItemDamage(), nbt.getLong("stackSizeLong"), itemStack.getTagCompound());
     }
 
     public static boolean areItemStacksEqual(@Nullable IItemStackLong a, @Nullable IItemStackLong b) {
