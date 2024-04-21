@@ -66,8 +66,6 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
         IFluidTankLong current = handler.getTank(index);
         if (current == this.cache)
             return false;
-        if (this.cache == null)
-            return true;
         if (current.getRealFluid() == null || cache.getRealFluid() == null)
             return true;
         if (current.getFluidAmountLong() != cache.getFluidAmountLong())
