@@ -3,15 +3,14 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.api.inventory.ClickType;
 import com.cleanroommc.modularui.future.ItemHandlerHelper;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -181,6 +180,41 @@ public class ContainerCustomizer {
                 }
             }
             container.detectAndSendChanges(); // Added
+            return returnable; // Added
+        } else if (clickTypeIn == ClickType.PICKUP_ALL && slotId >= 0) {
+            Slot slot = container.inventorySlots.get(slotId);
+            ItemStack itemstack1 = inventoryplayer.getItemStack();
+
+            if (itemstack1 != null && (slot == null || !slot.getHasStack() || !slot.canTakeStack(player))) {
+                int i = mouseButton == 0 ? 0 : container.inventorySlots.size() - 1;
+                int j = mouseButton == 0 ? 1 : -1;
+
+                for (int k = 0; k < 2; ++k) {
+                    for (int l = i; l >= 0 && l < container.inventorySlots.size() && itemstack1.stackSize < itemstack1.getMaxStackSize(); l += j) {
+                        Slot slot1 = container.inventorySlots.get(l);
+                        if (slot1 instanceof ModularSlot modularSlot && modularSlot.isPhantom()) continue; // Added
+
+                        // func_94527_a: canAddItemToSlot
+                        if (slot1.getHasStack() && Container.func_94527_a(slot1, itemstack1, true) && slot1.canTakeStack(player) && canMergeSlot(itemstack1, slot1)) { // Replaced: canMergeSlot
+                            ItemStack itemstack2 = slot1.getStack();
+
+                            if (k != 0 || itemstack2.stackSize != itemstack2.getMaxStackSize()) { // Moved condition from previous if
+                                int i1 = Math.min(itemstack1.getMaxStackSize() - itemstack1.stackSize, itemstack2.stackSize);
+                                ItemStack itemstack3 = slot1.decrStackSize(i1);
+                                itemstack1.stackSize += i1;
+
+                                if (itemstack3 == null || itemstack3.stackSize <= 0) { // Added null check
+                                    slot1.putStack(null);
+                                }
+
+                                slot1.onPickupFromSlot(player, itemstack3);
+                            }
+                        }
+                    }
+                }
+            }
+
+            container.detectAndSendChanges();
             return returnable; // Added
         }
         return container.superSlotClick(slotId, mouseButton, clickTypeIn, player);
