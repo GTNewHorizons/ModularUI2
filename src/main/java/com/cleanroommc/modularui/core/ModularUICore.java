@@ -16,7 +16,7 @@ import java.util.Set;
 @IFMLLoadingPlugin.MCVersion("1.7.10")
 public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
-    public static final Logger LOGGER = LogManager.getLogger("modularui");
+    public static final Logger LOGGER = LogManager.getLogger("modularui2");
     private static Boolean isDevEnv;
 
     public static boolean isDevEnv() {
