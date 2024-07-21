@@ -25,7 +25,7 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public String getMixinConfig() {
-        return "mixins.modularui.early.json";
+        return "mixins.modularui2.early.json";
     }
 
     @Override
