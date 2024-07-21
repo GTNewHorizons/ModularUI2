@@ -1,7 +1,0 @@
-{
-  "vanilla": "modularui:vanilla",
-  "vanilla_dark": "modularui:vanilla_dark",
-  "screens": {
-    "modularui:test": "vanilla_dark"
-  }
-}
