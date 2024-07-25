@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.future;
 
 import com.google.common.base.Preconditions;
 
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -84,5 +85,10 @@ public class RangedWrapper implements IItemHandlerModifiable {
 
     public IItemHandlerModifiable getCompose() {
         return compose;
+    }
+
+    @Override
+    public boolean isSlotFromInventory(int index, IInventory inventory, int invIndex) {
+        return compose.isSlotFromInventory(index + minSlot, inventory, invIndex);
     }
 }
