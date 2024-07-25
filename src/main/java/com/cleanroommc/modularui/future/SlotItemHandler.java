@@ -104,4 +104,9 @@ public class SlotItemHandler extends Slot {
     public boolean isSameInventory(Slot other) {
         return other instanceof SlotItemHandler slotHand && slotHand.getItemHandler() == this.itemHandler;
     }
+
+    @Override
+    public boolean isSlotInInventory(IInventory inventory, int invIndex) {
+        return itemHandler.isSlotFromInventory(this.index, inventory, invIndex);
+    }
 }

@@ -116,4 +116,15 @@ public interface IItemHandler {
         }
         return ret;
     }
+
+    /**
+     * Checks if the given slot index corresponds to the given slot in an IInventory.
+     * @param index The index of the slot in this item handler.
+     * @param inventory The Minecraft inventory to check for correspondence.
+     * @param invIndex The index of the slot in the Minecraft inventory to check.
+     * @return True if index in this and invIndex in inventory point to the same slot.
+     */
+    default boolean isSlotFromInventory(int index, IInventory inventory, int invIndex) {
+        return false;
+    }
 }

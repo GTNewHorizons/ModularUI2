@@ -144,4 +144,9 @@ public class InvWrapper implements IItemHandlerModifiable {
     public IInventory getInv() {
         return inv;
     }
+
+    @Override
+    public boolean isSlotFromInventory(int index, IInventory inventory, int invIndex) {
+        return inventory == this.inv && index == invIndex && invIndex >= 0 && invIndex < inv.getSizeInventory();
+    }
 }
