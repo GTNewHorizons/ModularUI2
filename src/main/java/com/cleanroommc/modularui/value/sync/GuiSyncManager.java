@@ -177,11 +177,19 @@ public class GuiSyncManager {
         return registerSlotGroup(new SlotGroup(name, rowSize, 100, true));
     }
 
+    /**
+     * @param listener The function to run whenever the gui {@link net.minecraft.inventory.Container} is open, ran on both the server and client threads.
+     * @return {@code this} for chaining
+     */
     public GuiSyncManager addOpenListener(Consumer<EntityPlayer> listener) {
         this.openListener.add(listener);
         return this;
     }
 
+    /**
+     * @param listener The function to run whenever the gui {@link net.minecraft.inventory.Container} is closed, ran on both the server and client threads.
+     * @return {@code this} for chaining
+     */
     public GuiSyncManager addCloseListener(Consumer<EntityPlayer> listener) {
         this.closeListener.add(listener);
         return this;

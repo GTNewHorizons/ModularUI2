@@ -47,6 +47,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidTank;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,6 +56,7 @@ import java.util.function.Function;
 
 public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
 
+    private static final Logger LOGGER = LogManager.getLogger("MUI2-Test");
     private final FluidTank fluidTank = new FluidTank(10000);
     private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
     private long time = 0;
@@ -81,6 +84,12 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
 
     @Override
     public ModularPanel buildUI(PosGuiData guiData, GuiSyncManager guiSyncManager) {
+        guiSyncManager.addOpenListener(player -> {
+            LOGGER.info("Test Tile panel open by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
+        });
+        guiSyncManager.addCloseListener(player -> {
+            LOGGER.info("Test Tile panel closed by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
+        });
         guiSyncManager.registerSlotGroup("item_inv", 3);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 

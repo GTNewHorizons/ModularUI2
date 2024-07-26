@@ -96,6 +96,7 @@ public class GuiManager {
         guiScreenWrapper.inventorySlots.windowId = windowId;
         Minecraft.getMinecraft().displayGuiScreen(guiScreenWrapper);
         player.openContainer = guiScreenWrapper.inventorySlots;
+        syncManager.onOpen();
     }
 
     @SideOnly(Side.CLIENT)

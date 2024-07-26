@@ -64,14 +64,4 @@ public class CommonProxy {
             ModularUIConfig.syncConfig();
         }
     }
-
-    @SubscribeEvent
-    public final void onCloseContainer(PlayerOpenContainerEvent event) {
-        if (event.entityPlayer.openContainer instanceof ModularContainer container) {
-            GuiSyncManager syncManager = container.getSyncManager();
-            if (syncManager != null) {
-                syncManager.onOpen();
-            }
-        }
-    }
 }
