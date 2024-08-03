@@ -4,8 +4,11 @@ import com.cleanroommc.modularui.api.IFluidTankLong;
 
 import net.minecraftforge.fluids.Fluid;
 
+import org.jetbrains.annotations.Nullable;
+
 public class FluidTankLong implements IFluidTankLong {
 
+    @Nullable
     private Fluid fluid;
     private long amount;
     private long capacity;
@@ -15,11 +18,11 @@ public class FluidTankLong implements IFluidTankLong {
         this(null, 0, 0);
     }
 
-    public FluidTankLong(Fluid fluid) {
+    public FluidTankLong(@Nullable Fluid fluid) {
         this(fluid, 0 ,0);
     }
 
-    public FluidTankLong(Fluid fluid, long capacity) {
+    public FluidTankLong(@Nullable Fluid fluid, long capacity) {
         this(fluid, capacity, 0);
     }
 
@@ -27,7 +30,7 @@ public class FluidTankLong implements IFluidTankLong {
         this(null, capacity, 0);
     }
 
-    public FluidTankLong(Fluid fluid, long capacity, long amount) {
+    public FluidTankLong(@Nullable Fluid fluid, long capacity, long amount) {
         this.fluid = fluid;
         this.capacity = capacity;
         this.amount = amount;
