@@ -7,9 +7,6 @@ import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
 import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,15 +17,17 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.Nullable;
-
-import static com.google.common.primitives.Ints.saturatedCast;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
-
 import javax.annotation.Nonnull;
+
+import static com.google.common.primitives.Ints.saturatedCast;
 
 public class NetworkUtils {
 
@@ -172,8 +171,14 @@ public class NetworkUtils {
             long cap = nbt.getLong("cap");
             long amt = nbt.getLong("amt");
             IFluidTankLong tank;
+
             if (type == 1) {
-                tank = new FluidTankLongDelegate(new FluidTank(fluid, saturatedCast(cap), saturatedCast(amt)));
+                FluidStack fluidStack = null;
+                if (fluid != null) {
+                    fluidStack = new FluidStack(fluid, saturatedCast(cap));
+                }
+
+                tank = new FluidTankLongDelegate(new FluidTank(fluidStack, saturatedCast(amt)));
             } else {
                 tank = new FluidTankLong(fluid, cap, amt);
             }
