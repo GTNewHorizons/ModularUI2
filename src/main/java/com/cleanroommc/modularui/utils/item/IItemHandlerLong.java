@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.future;
+package com.cleanroommc.modularui.utils.item;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 
@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cleanroommc.modularui.api.IItemStackLong;
-import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import net.minecraft.item.ItemStack;
 

@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.future;
+package com.cleanroommc.modularui.utils.item;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
