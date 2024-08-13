@@ -1,11 +1,10 @@
 package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPanelSyncManager;
-import com.cleanroommc.modularui.future.IItemHandler;
-import com.cleanroommc.modularui.future.PlayerInvWrapper;
-import com.cleanroommc.modularui.future.PlayerMainInvWrapper;
-import com.cleanroommc.modularui.future.SlotItemHandler;
+import com.cleanroommc.modularui.utils.item.IItemHandler;
+import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
+import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
+import com.cleanroommc.modularui.utils.item.SlotItemHandler;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 

@@ -1,10 +1,9 @@
-package com.cleanroommc.modularui.future;
+package com.cleanroommc.modularui.utils.item;
 
 import java.util.Arrays;
 import java.util.List;
 
 import com.cleanroommc.modularui.api.IItemStackLong;
-import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

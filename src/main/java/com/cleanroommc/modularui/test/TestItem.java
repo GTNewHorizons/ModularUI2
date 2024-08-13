@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.future.IItemHandlerModifiable;
+import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;

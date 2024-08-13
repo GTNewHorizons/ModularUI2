@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
-import com.cleanroommc.modularui.future.IItemHandlerModifiable;
-import com.cleanroommc.modularui.future.ItemHandlerHelper;
+import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
+import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

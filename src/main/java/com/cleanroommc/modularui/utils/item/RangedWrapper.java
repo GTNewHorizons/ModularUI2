@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.future;
+package com.cleanroommc.modularui.utils.item;
 
 import com.google.common.base.Preconditions;
 

@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.inventory.ClickType;
-import com.cleanroommc.modularui.future.ItemHandlerHelper;
+import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
