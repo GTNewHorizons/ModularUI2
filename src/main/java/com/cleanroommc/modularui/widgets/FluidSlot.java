@@ -37,7 +37,7 @@ import org.lwjgl.opengl.GL11;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
-public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
 
@@ -133,22 +133,22 @@ public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Inte
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = getFluidStack();
         if (content != null) {
-            int y = getContentOffsetY();
+            int y = this.contentOffsetY;
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
                 float newHeight = height * content.amount * 1f / fluidTank.getCapacity();
                 y += (int) (height - newHeight);
                 height = newHeight;
             }
-            GuiDraw.drawFluidTexture(content, getContentOffsetX(), y, getArea().width - getContentOffsetX() * 2, height, 0);
+            GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
         }
         if (this.overlayTexture != null) {
             this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
         if (content != null && this.syncHandler.controlsAmount()) {
             String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(content.amount)) + getBaseUnit();
-            this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - getContentOffsetX() - 1f);
-            this.textRenderer.setPos((int) (getContentOffsetX() + 0.5f), (int) (getArea().height - 5.5f));
+            this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
+            this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
         }
         if (isHovering()) {
@@ -156,26 +156,6 @@ public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Inte
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getWidgetTheme(context.getTheme()).getSlotHoverColor());
             GL11.glColorMask(true, true, true, true);
         }
-    }
-
-    protected int getContentOffsetX() {
-        return contentOffsetX;
-    }
-
-    protected int getContentOffsetY() {
-        return contentOffsetY;
-    }
-
-    protected boolean showFull() {
-        return alwaysShowFull;
-    }
-
-    protected TextRenderer getTextRenderer() {
-        return textRenderer;
-    }
-
-    protected IDrawable getOverlayTexture() {
-        return overlayTexture;
     }
 
     @Override
@@ -242,7 +222,7 @@ public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Inte
      * @param x x offset
      * @param y y offset
      */
-    public W contentOffset(int x, int y) {
+    public FluidSlot contentOffset(int x, int y) {
         this.contentOffsetX = x;
         this.contentOffsetY = y;
         return getThis();
@@ -251,7 +231,7 @@ public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Inte
     /**
      * @param alwaysShowFull if the fluid should be rendered as full or as the partial amount.
      */
-    public W alwaysShowFull(boolean alwaysShowFull) {
+    public FluidSlot alwaysShowFull(boolean alwaysShowFull) {
         this.alwaysShowFull = alwaysShowFull;
         return getThis();
     }
@@ -259,16 +239,16 @@ public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Inte
     /**
      * @param overlayTexture texture that is rendered on top of the fluid
      */
-    public W overlayTexture(@Nullable IDrawable overlayTexture) {
+    public FluidSlot overlayTexture(@Nullable IDrawable overlayTexture) {
         this.overlayTexture = overlayTexture;
         return getThis();
     }
 
-    public W syncHandler(IFluidTank fluidTank) {
+    public FluidSlot syncHandler(IFluidTank fluidTank) {
         return syncHandler(new FluidSlotSyncHandler(fluidTank));
     }
 
-    public W syncHandler(FluidSlotSyncHandler syncHandler) {
+    public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
         this.syncHandler = syncHandler;
         return getThis();
