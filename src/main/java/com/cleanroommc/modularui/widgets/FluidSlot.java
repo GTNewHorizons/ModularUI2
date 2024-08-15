@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
 import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -276,6 +277,11 @@ public class FluidSlot<W extends FluidSlot<W>> extends Widget<W> implements Inte
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
         if (!this.syncHandler.isPhantom()) return false;
+        MouseData mouseData = MouseData.create(button);
+        this.syncHandler.syncToServer(4, buffer -> {
+            mouseData.writeToPacket(buffer);
+            NetworkUtils.writeItemStack(buffer, draggedStack);
+        });
         draggedStack.stackSize = 0;
         return true;
     }

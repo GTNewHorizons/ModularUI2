@@ -118,6 +118,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
+        } else if (id == 4) {
+            MouseData mouseData = MouseData.readPacket(buf);
+            ItemStack draggedStack = NetworkUtils.readItemStack(buf);
+            if (this.phantom && draggedStack != null) {
+                tryClickPhantom(mouseData, draggedStack);
+            }
         }
     }
 
@@ -167,8 +173,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     private void tryClickPhantom(MouseData mouseData) {
-        FluidStack currentFluid = fluidTank.getFluid();
         ItemStack cursorStack = getSyncManager().getCursorItem();
+        tryClickPhantom(mouseData, cursorStack);
+    }
+
+    private void tryClickPhantom(MouseData mouseData, ItemStack cursorStack) {
+        FluidStack currentFluid = fluidTank.getFluid();
 
         if (mouseData.mouseButton == 0) {
             if (cursorStack == null) {
