@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.utils.Color;
+
+import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -340,10 +343,14 @@ public class GuiDraw {
         }
         Fluid fluid = content.getFluid();
         IIcon fluidStill = fluid.getIcon(content);
-        TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluidStill.toString());
+        if (ModularUI.isHodgepodgeLoaded && fluidStill instanceof IPatchedTextureAtlasSprite) {
+            ((IPatchedTextureAtlasSprite) fluidStill).markNeedsAnimationUpdate();
+        }
         int fluidColor = fluid.getColor(content);
-        GL11.glColor4f(Color.getRedF(fluidColor), Color.getGreenF(fluidColor), Color.getBlueF(fluidColor), Color.getAlphaF(fluidColor));
-        drawTiledTexture(TextureMap.locationBlocksTexture, x0, y0, width, height, sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), sprite.getIconWidth(), sprite.getIconHeight(), z);
+        float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
+        a = a == 0f ? 1f : a;
+        GL11.glColor4f(r, g, b, a);
+        drawTiledTexture(TextureMap.locationBlocksTexture, x0, y0, width, height, fluidStill.getMinU(), fluidStill.getMinV(), fluidStill.getMaxU(), fluidStill.getMaxV(), fluidStill.getIconWidth(), fluidStill.getIconHeight(), z);
         GL11.glColor4f(1f, 1f, 1f, 1f);
     }
 
