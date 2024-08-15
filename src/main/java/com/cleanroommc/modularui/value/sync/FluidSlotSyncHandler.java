@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.FluidTankHandler;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.fluid.FluidInteractions;
 
@@ -10,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.NotNull;
@@ -190,17 +188,14 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 heldItemSizedOne.stackSize = 1;
                 FluidStack heldFluid = FluidInteractions.getFluidForPhantomItem(heldItemSizedOne);
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
-                    if (canFillSlot) {
-                        if (!controlsAmount) {
-                            heldFluid.amount = 1;
-                        }
-                        if (fluidTank.fill(heldFluid, true) > 0) {
-                            lastStoredPhantomFluid = heldFluid.copy();
-                        }
-                    }
+                    fillPhantom(heldFluid);
                 } else {
                     if (canDrainSlot) {
                         fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
+                        // "Swap" fluid
+                        if (!controlsAmount && heldFluid != null && fluidTank.getFluidAmount() <= 0) {
+                            fillPhantom(heldFluid);
+                        }
                     }
                 }
             }
@@ -220,6 +215,17 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             }
         } else if (mouseData.mouseButton == 2 && currentFluid != null && canDrainSlot) {
             fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
+        }
+    }
+
+    private void fillPhantom(@NotNull FluidStack heldFluid) {
+        if (canFillSlot) {
+            if (!controlsAmount) {
+                heldFluid.amount = 1;
+            }
+            if (fluidTank.fill(heldFluid, true) > 0) {
+                lastStoredPhantomFluid = heldFluid.copy();
+            }
         }
     }
 

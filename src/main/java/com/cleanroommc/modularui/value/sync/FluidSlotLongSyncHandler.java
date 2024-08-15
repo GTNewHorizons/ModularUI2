@@ -196,17 +196,14 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
                 heldItemSizedOne.stackSize = 1;
                 FluidStack heldFluid = FluidInteractions.getFluidForPhantomItem(heldItemSizedOne);
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
-                    if (canFillSlot) {
-                        if (!controlsAmount) {
-                            heldFluid.amount = 1;
-                        }
-                        if (handler.fill(index, heldFluid.getFluid(), heldFluid.amount, true) > 0) {
-                            lastStoredPhantomFluid = heldFluid.getFluid();
-                        }
-                    }
+                    fillPhantom(heldFluid);
                 } else {
                     if (canDrainSlot) {
                         handler.drain(index, mouseData.shift ? Long.MAX_VALUE : 1000, true);
+                        // "Swap" fluid
+                        if (!controlsAmount && heldFluid != null && handler.getTankAmount(index) <= 0) {
+                            fillPhantom(heldFluid);
+                        }
                     }
                 }
             }
@@ -224,6 +221,17 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
             }
         } else if (mouseData.mouseButton == 2 && currentFluid != null && canDrainSlot) {
             handler.drain(index, mouseData.shift ? Long.MAX_VALUE : 1000, true);
+        }
+    }
+
+    private void fillPhantom(FluidStack heldFluid) {
+        if (canFillSlot) {
+            if (!controlsAmount) {
+                heldFluid.amount = 1;
+            }
+            if (handler.fill(index, heldFluid.getFluid(), heldFluid.amount, true) > 0) {
+                lastStoredPhantomFluid = heldFluid.getFluid();
+            }
         }
     }
 
