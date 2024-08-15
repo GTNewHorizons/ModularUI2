@@ -184,7 +184,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                         if (!controlsAmount) {
                             heldFluid.amount = 1;
                         }
-                        if (fluidTank.fill(heldFluid, false) > 0) {
+                        if (fluidTank.fill(heldFluid, true) > 0) {
                             lastStoredPhantomFluid = heldFluid.copy();
                         }
                     }

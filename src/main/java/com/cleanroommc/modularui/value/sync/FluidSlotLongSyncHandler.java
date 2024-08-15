@@ -190,7 +190,7 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
                         if (!controlsAmount) {
                             heldFluid.amount = 1;
                         }
-                        if (handler.fill(index, heldFluid.getFluid(), heldFluid.amount, false) > 0) {
+                        if (handler.fill(index, heldFluid.getFluid(), heldFluid.amount, true) > 0) {
                             lastStoredPhantomFluid = heldFluid.getFluid();
                         }
                     }
