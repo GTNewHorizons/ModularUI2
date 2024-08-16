@@ -154,6 +154,7 @@ public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanil
         return this.syncHandler;
     }
 
+    @SideOnly(Side.CLIENT)
     protected List<String> getItemTooltip(ItemStack stack) {
         if (!isNEILoaded) {
             return stack.getTooltip(
