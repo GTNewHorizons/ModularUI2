@@ -9,13 +9,15 @@ import com.cleanroommc.modularui.api.IItemStackLong;
 
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nullable;
+
 public interface IItemHandlerLong extends IItemHandlerModifiable {
 
     void setStackInSlotLong(int slot, IItemStackLong stack);
 
     @Override
-    default void setStackInSlot(int slot, ItemStack stack) {
-        setStackInSlotLong(slot, new ItemStackLong(stack));
+    default void setStackInSlot(int slot, @Nullable ItemStack stack) {
+        setStackInSlotLong(slot, stack == null ? null : new ItemStackLong(stack));
     }
 
     IItemStackLong extractItemLong(int slot, long amount, boolean simulate);
@@ -51,8 +53,8 @@ public interface IItemHandlerLong extends IItemHandlerModifiable {
     IItemStackLong insertItemLong(int slot, IItemStackLong stack, boolean simulate);
 
     @Override
-    default ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        IItemStackLong item = insertItemLong(slot, new ItemStackLong(stack), simulate);
+    default ItemStack insertItem(int slot, @Nullable ItemStack stack, boolean simulate) {
+        IItemStackLong item = insertItemLong(slot, stack == null ? null : new ItemStackLong(stack), simulate);
         return item == null ? null : item.getAsItemStack();
     }
 
@@ -61,8 +63,8 @@ public interface IItemHandlerLong extends IItemHandlerModifiable {
     }
 
     @Override
-    default boolean isItemValid(int slot, ItemStack stack) {
-        return isItemValidLong(slot, new ItemStackLong(stack));
+    default boolean isItemValid(int slot, @Nullable ItemStack stack) {
+        return isItemValidLong(slot, stack == null ? null : new ItemStackLong(stack));
     }
 
 }

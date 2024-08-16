@@ -4,6 +4,7 @@ import static com.google.common.primitives.Ints.saturatedCast;
 
 import com.cleanroommc.modularui.api.IFluidTankLong;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -55,5 +56,21 @@ public class FluidTankLongDelegate implements IFluidTankLong {
     @Override
     public IFluidTankLong copy() {
         return new FluidTankLongDelegate(new FluidTank(delegate.getFluid(), delegate.getCapacity()));
+    }
+
+    @Override
+    public IFluidTankLong readFromNBT(NBTTagCompound fluidTag) {
+        delegate.drain(Integer.MAX_VALUE, true);
+        delegate.fill(FluidStack.loadFluidStackFromNBT(fluidTag), true);
+        return this;
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound fluidTag) {
+        if (delegate.getFluid() == null) {
+            return fluidTag;
+        }
+        delegate.getFluid().writeToNBT(fluidTag);
+        return fluidTag;
     }
 }

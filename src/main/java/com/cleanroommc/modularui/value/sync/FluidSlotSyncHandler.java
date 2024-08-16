@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.utils.FluidTankHandler;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.fluid.FluidInteractions;
 
@@ -10,12 +9,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// Changes made here probably should also be made to FluidSlotLongSyncHandler
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
@@ -118,6 +117,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
+        } else if (id == 4) {
+            MouseData mouseData = MouseData.readPacket(buf);
+            ItemStack draggedStack = NetworkUtils.readItemStack(buf);
+            if (this.phantom && draggedStack != null) {
+                tryClickPhantom(mouseData, draggedStack);
+            }
         }
     }
 
@@ -167,8 +172,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     private void tryClickPhantom(MouseData mouseData) {
-        FluidStack currentFluid = fluidTank.getFluid();
         ItemStack cursorStack = getSyncManager().getCursorItem();
+        tryClickPhantom(mouseData, cursorStack);
+    }
+
+    private void tryClickPhantom(MouseData mouseData, ItemStack cursorStack) {
+        FluidStack currentFluid = fluidTank.getFluid();
 
         if (mouseData.mouseButton == 0) {
             if (cursorStack == null) {
@@ -180,17 +189,14 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 heldItemSizedOne.stackSize = 1;
                 FluidStack heldFluid = FluidInteractions.getFluidForPhantomItem(heldItemSizedOne);
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
-                    if (canFillSlot) {
-                        if (!controlsAmount) {
-                            heldFluid.amount = 1;
-                        }
-                        if (fluidTank.fill(heldFluid, false) > 0) {
-                            lastStoredPhantomFluid = heldFluid.copy();
-                        }
-                    }
+                    fillPhantom(heldFluid);
                 } else {
                     if (canDrainSlot) {
                         fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
+                        // "Swap" fluid
+                        if (!controlsAmount && heldFluid != null && fluidTank.getFluidAmount() <= 0) {
+                            fillPhantom(heldFluid);
+                        }
                     }
                 }
             }
@@ -210,6 +216,17 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             }
         } else if (mouseData.mouseButton == 2 && currentFluid != null && canDrainSlot) {
             fluidTank.drain(mouseData.shift ? Integer.MAX_VALUE : 1000, true);
+        }
+    }
+
+    private void fillPhantom(@NotNull FluidStack heldFluid) {
+        if (canFillSlot) {
+            if (!controlsAmount) {
+                heldFluid.amount = 1;
+            }
+            if (fluidTank.fill(heldFluid, true) > 0) {
+                lastStoredPhantomFluid = heldFluid.copy();
+            }
         }
     }
 

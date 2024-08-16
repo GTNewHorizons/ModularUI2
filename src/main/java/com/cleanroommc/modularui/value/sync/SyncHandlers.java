@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.IFluidTankLong;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.utils.BooleanConsumer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -50,6 +51,10 @@ public class SyncHandlers {
 
     public static FluidSlotSyncHandler fluidSlot(IFluidTank fluidTank) {
         return new FluidSlotSyncHandler(fluidTank);
+    }
+
+    public static FluidSlotLongSyncHandler fluidSlotLong(IFluidTankLong fluidTank) {
+        return new FluidSlotLongSyncHandler(fluidTank);
     }
 
     public static <T extends Enum<T>> EnumSyncValue<T> enumValue(Class<T> clazz, Supplier<T> getter, Consumer<T> setter) {

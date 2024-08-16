@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlotLong;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
+// Changes made here probably should also be made to ItemSlotSH
 public class ItemSlotLongSH extends SyncHandler {
 
     private final ModularSlotLong slot;

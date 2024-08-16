@@ -1,7 +1,27 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
+import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MouseData;
+
+import com.cleanroommc.modularui.widget.Widget;
+
+import gregtech.api.util.GT_Utility;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidTank;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.cleanroommc.modularui.api.IFluidTankLong;
@@ -22,11 +42,31 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 
-public class FluidSlotLong extends FluidSlot<FluidSlotLong> {
+import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
+// Changes made here probably should also be made to FluidSlot
+public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+
+    public static final int DEFAULT_SIZE = 18;
+
+    private static final String UNIT_BUCKET = "B";
+    private static final String UNIT_LITER = "L";
+
+    private static final IFluidTankLong EMPTY = new FluidTankLong(0);
+
+    private final TextRenderer textRenderer = new TextRenderer();
     private FluidSlotLongSyncHandler syncHandler;
+    private int contentOffsetX = 1, contentOffsetY = 1;
+    private boolean alwaysShowFull = true;
+    @Nullable
+    private IDrawable overlayTexture = null;
 
-    @Override
+    public FluidSlotLong() {
+        size(DEFAULT_SIZE);
+        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
+        tooltipBuilder(this::addToolTip);
+    }
+
     protected void addToolTip(Tooltip tooltip) {
         IFluidTankLong fluidTank = getFluidTankLong();
         FluidStack fluid = fluidTank.getFluid();
@@ -70,28 +110,56 @@ public class FluidSlotLong extends FluidSlot<FluidSlotLong> {
         }
     }
 
+    public void addAdditionalFluidInfo(Tooltip tooltip, FluidStack fluidStack) {
+    }
+
+    public String formatFluidAmount(double amount) {
+        NumberFormat.FORMAT.setMaximumFractionDigits(3);
+        return NumberFormat.FORMAT.format(getBaseUnitAmount(amount));
+    }
+
+    protected double getBaseUnitAmount(double amount) {
+        return amount;
+    }
+
+    protected String getBaseUnit() {
+        return UNIT_LITER;
+    }
+
+    @Override
+    public void onInit() {
+        textRenderer.setShadow(true);
+        textRenderer.setScale(0.5f);
+        this.textRenderer.setColor(Color.WHITE.main);
+    }
+
+    @Override
+    public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotLongSyncHandler.class);
+        return this.syncHandler != null;
+    }
+
     @Override
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         IFluidTankLong fluidTank = getFluidTankLong();
         if (fluidTank.getFluid() != null) {
-            int y = getContentOffsetY();
+            int y = this.contentOffsetY;
             float height = getArea().height - y * 2;
-            if (!showFull()) {
+            if (!this.alwaysShowFull) {
                 float newHeight = height * fluidTank.getFluidAmountLong() * 1f / fluidTank.getCapacityLong();
                 y += (int) (height - newHeight);
                 height = newHeight;
             }
-            GuiDraw.drawFluidTexture(fluidTank.getFluid(), getContentOffsetX(), y, getArea().width - getContentOffsetX() * 2, height, 0);
+            GuiDraw.drawFluidTexture(fluidTank.getFluid(), this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
         }
-        if (getOverlayTexture() != null) {
-            getOverlayTexture().drawAtZero(context, getArea(), widgetTheme);
+        if (this.overlayTexture != null) {
+            this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
         if (fluidTank.getFluid() != null && this.syncHandler.controlsAmount()) {
             String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(fluidTank.getFluidAmountLong())) + getBaseUnit();
-            TextRenderer textRenderer = getTextRenderer();
-            textRenderer.setAlignment(Alignment.CenterRight, getArea().width - getContentOffsetX() - 1f);
-            textRenderer.setPos((int) (getContentOffsetX() + 0.5f), (int) (getArea().height - 5.5f));
-            textRenderer.draw(s);
+            this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
+            this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
+            this.textRenderer.draw(s);
         }
         if (isHovering()) {
             GL11.glColorMask(true, true, true, false);
@@ -100,31 +168,93 @@ public class FluidSlotLong extends FluidSlot<FluidSlotLong> {
         }
     }
 
+    @Override
+    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+        return theme.getFluidSlotTheme();
+    }
+
     @NotNull
-    protected IFluidTankLong getFluidTankLong() {
-        return syncHandler.getValue();
+    @Override
+    public Result onMouseTapped(int mouseButton) {
+        if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
+            return Result.IGNORE;
+        }
+        ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+        if (this.syncHandler.isPhantom() || cursorStack != null) {
+            MouseData mouseData = MouseData.create(mouseButton);
+            this.syncHandler.syncToServer(1, mouseData::writeToPacket);
+        }
+        return Result.SUCCESS;
     }
 
     @Override
-    public IFluidTank getFluidTank() {
-        return getFluidTankLong();
+    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+        if (this.syncHandler.isPhantom()) {
+            if ((scrollDirection.isUp() && !this.syncHandler.canFillSlot()) || (scrollDirection.isDown() && !this.syncHandler.canDrainSlot())) {
+                return false;
+            }
+            MouseData mouseData = MouseData.create(scrollDirection.modifier);
+            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public @Nullable FluidStack getFluidStack() {
+    public @NotNull Result onKeyPressed(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
+            markTooltipDirty();
+        }
+        return Interactable.super.onKeyPressed(typedChar, keyCode);
+    }
+
+    @Override
+    public boolean onKeyRelease(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_LSHIFT || keyCode == Keyboard.KEY_RSHIFT) {
+            markTooltipDirty();
+        }
+        return Interactable.super.onKeyRelease(typedChar, keyCode);
+    }
+
+    @Nullable
+    public FluidStack getFluidStack() {
         return getFluidTankLong().getFluid();
     }
 
-    @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (!(syncHandler instanceof FluidSlotLongSyncHandler fluidSlotSyncHandler)) {
-            return false;
-        }
-        this.syncHandler = fluidSlotSyncHandler;
-        return true;
+    @NotNull
+    public IFluidTankLong getFluidTankLong() {
+        return this.syncHandler == null ? EMPTY : syncHandler.getValue();
     }
 
-    @Override
+    /**
+     * Set the offset in x and y (on both sides) at which the fluid should be rendered.
+     * Default is 1 for both.
+     *
+     * @param x x offset
+     * @param y y offset
+     */
+    public FluidSlotLong contentOffset(int x, int y) {
+        this.contentOffsetX = x;
+        this.contentOffsetY = y;
+        return this;
+    }
+
+    /**
+     * @param alwaysShowFull if the fluid should be rendered as full or as the partial amount.
+     */
+    public FluidSlotLong alwaysShowFull(boolean alwaysShowFull) {
+        this.alwaysShowFull = alwaysShowFull;
+        return this;
+    }
+
+    /**
+     * @param overlayTexture texture that is rendered on top of the fluid
+     */
+    public FluidSlotLong overlayTexture(@Nullable IDrawable overlayTexture) {
+        this.overlayTexture = overlayTexture;
+        return this;
+    }
+
     public FluidSlotLong syncHandler(IFluidTank fluidTank) {
         if (!(fluidTank instanceof IFluidTankLong fluidTankLong)) {
             return syncHandler(new FluidTankLongDelegate(fluidTank));
@@ -137,9 +267,32 @@ public class FluidSlotLong extends FluidSlot<FluidSlotLong> {
     }
 
     public FluidSlotLong syncHandler(FluidSlotLongSyncHandler syncHandler) {
-        this.syncHandler = syncHandler;
         setSyncHandler(syncHandler);
-        return getThis();
+        this.syncHandler = syncHandler;
+        return this;
     }
 
+    @Override
+    public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
+        if (!this.syncHandler.isPhantom()) return false;
+        MouseData mouseData = MouseData.create(button);
+        this.syncHandler.syncToServer(4, buffer -> {
+            mouseData.writeToPacket(buffer);
+            NetworkUtils.writeItemStack(buffer, draggedStack);
+        });
+        draggedStack.stackSize = 0;
+        return true;
+    }
+
+    protected void setPhantomValue(@NotNull ItemStack draggedStack) {
+        this.syncHandler.setValue(new FluidTankLongDelegate(new FluidTank(FluidContainerRegistry.getFluidForFilledItem(draggedStack), 1)));
+    }
+
+    @Override
+    public @Nullable ItemStack getStackForNEI() {
+        if (isGT5ULoaded) {
+            return GT_Utility.getFluidDisplayStack(getFluidStack(), false);
+        }
+        return null;
+    }
 }

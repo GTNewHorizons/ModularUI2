@@ -22,6 +22,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 
+// Changes made here probably should also be made to FluidSlotSyncHandler
 public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
 
     @NotNull
@@ -125,6 +126,12 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
             }
         } else if (id == 3) {
             this.controlsAmount = buf.readBoolean();
+        } else if (id == 4) {
+            MouseData mouseData = MouseData.readPacket(buf);
+            ItemStack draggedStack = NetworkUtils.readItemStack(buf);
+            if (this.phantom && draggedStack != null) {
+                tryClickPhantom(mouseData, draggedStack);
+            }
         }
     }
 
@@ -173,8 +180,12 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
     }
 
     private void tryClickPhantom(MouseData mouseData) {
-        FluidStack currentFluid = handler.getTank(index).getFluid();
         ItemStack heldItem = getSyncManager().getCursorItem();
+        tryClickPhantom(mouseData, heldItem);
+    }
+
+    private void tryClickPhantom(MouseData mouseData, ItemStack heldItem) {
+        FluidStack currentFluid = handler.getTank(index).getFluid();
 
         if (mouseData.mouseButton == 0) {
             if (heldItem == null) {
@@ -186,17 +197,14 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
                 heldItemSizedOne.stackSize = 1;
                 FluidStack heldFluid = FluidInteractions.getFluidForPhantomItem(heldItemSizedOne);
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
-                    if (canFillSlot) {
-                        if (!controlsAmount) {
-                            heldFluid.amount = 1;
-                        }
-                        if (handler.fill(index, heldFluid.getFluid(), heldFluid.amount, false) > 0) {
-                            lastStoredPhantomFluid = heldFluid.getFluid();
-                        }
-                    }
+                    fillPhantom(heldFluid);
                 } else {
                     if (canDrainSlot) {
                         handler.drain(index, mouseData.shift ? Long.MAX_VALUE : 1000, true);
+                        // "Swap" fluid
+                        if (!controlsAmount && heldFluid != null && handler.getTankAmount(index) <= 0) {
+                            fillPhantom(heldFluid);
+                        }
                     }
                 }
             }
@@ -214,6 +222,17 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
             }
         } else if (mouseData.mouseButton == 2 && currentFluid != null && canDrainSlot) {
             handler.drain(index, mouseData.shift ? Long.MAX_VALUE : 1000, true);
+        }
+    }
+
+    private void fillPhantom(FluidStack heldFluid) {
+        if (canFillSlot) {
+            if (!controlsAmount) {
+                heldFluid.amount = 1;
+            }
+            if (handler.fill(index, heldFluid.getFluid(), heldFluid.amount, true) > 0) {
+                lastStoredPhantomFluid = heldFluid.getFluid();
+            }
         }
     }
 

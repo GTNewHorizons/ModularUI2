@@ -1,5 +1,21 @@
 package com.cleanroommc.modularui.widgets;
 
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerTooltipHandler;
+
+import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.widget.IVanillaSlot;
+import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
+import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.utils.MouseData;
+import com.cleanroommc.modularui.widget.Widget;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -7,7 +23,6 @@ import com.cleanroommc.modularui.api.IItemStackLong;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.utils.item.IItemHandlerLong;
-import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.GuiScreenWrapper;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -18,7 +33,6 @@ import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 import com.cleanroommc.modularui.value.sync.ItemSlotLongSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
-import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlotLong;
 
 import cpw.mods.fml.relauncher.Side;
@@ -30,24 +44,55 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
-public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
+import java.util.List;
 
+import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
+
+// Changes made here probably should also be made to ItemSlot
+public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+
+    public static final int SIZE = 18;
+
+    private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotLongSH syncHandler;
+
+    public ItemSlotLong() {
+        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
+        tooltipBuilder(this::addToolTip);
+    }
+
+    protected void addToolTip(Tooltip tooltip) {
+        if (!isSynced()) return;
+        ItemStack stack = getSlot().getStack();
+        if (stack == null) return;
+        tooltip.addStringLines(getItemTooltip(stack));
+    }
+
+    @Override
+    public void onInit() {
+        size(SIZE, SIZE);
+    }
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof ItemSlotLongSH itemSlotSH) {
-            this.syncHandler = itemSlotSH;
-            return true;
+        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotLongSH.class);
+        return this.syncHandler != null;
+    }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        boolean shouldBeEnabled = areAncestorsEnabled();
+        if (shouldBeEnabled != getSlot().func_111238_b()) {
+            this.syncHandler.setEnabled(shouldBeEnabled, true);
         }
-        return false;
     }
 
     @Override
     public void draw(GuiContext context, WidgetTheme widgetTheme) {
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
-        drawSlot(getSlotLong());
+        drawSlot(getSlot());
         RenderHelper.disableStandardItemLighting();
         if (isHovering()) {
             GL11.glDisable(GL11.GL_LIGHTING);
@@ -59,13 +104,90 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
         }
     }
 
-    public ModularSlotLong getSlotLong() {
+    @Override
+    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+        return theme.getItemSlotTheme();
+    }
+
+    @Override
+    public @NotNull Result onMousePressed(int mouseButton) {
+        if (this.syncHandler.isPhantom()) {
+            MouseData mouseData = MouseData.create(mouseButton);
+            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+        } else {
+            getScreen().getScreenWrapper().clickSlot();
+        }
+        return Result.SUCCESS;
+    }
+
+    @Override
+    public boolean onMouseRelease(int mouseButton) {
+        if (!this.syncHandler.isPhantom()) {
+            getScreen().getScreenWrapper().releaseSlot();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+        if (this.syncHandler.isPhantom()) {
+            MouseData mouseData = MouseData.create(scrollDirection.modifier);
+            this.syncHandler.syncToServer(3, mouseData::writeToPacket);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onMouseDrag(int mouseButton, long timeSinceClick) {
+        getScreen().getScreenWrapper().dragSlot(timeSinceClick);
+    }
+
+    public ModularSlotLong getSlot() {
         return this.syncHandler.getSlot();
     }
 
     @Override
     public Slot getVanillaSlot() {
         return this.syncHandler.getSlot();
+    }
+
+    @Override
+    public @NotNull ItemSlotLongSH getSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("Widget is not initialised!");
+        }
+        return this.syncHandler;
+    }
+
+    @SideOnly(Side.CLIENT)
+    protected List<String> getItemTooltip(ItemStack stack) {
+        if (!isNEILoaded) {
+            return stack.getTooltip(
+                    Minecraft.getMinecraft().thePlayer,
+                    Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+        }
+
+        List<String> tooltips = GuiContainerManager.itemDisplayNameMultiline(stack, getScreen().getScreenWrapper(), true);
+
+        GuiContainerManager.applyItemCountDetails(tooltips, stack);
+
+        if (GuiContainerManager.getManager() != null && GuiContainerManager.shouldShowTooltip(getScreen().getScreenWrapper())) {
+            for (IContainerTooltipHandler handler : GuiContainerManager.getManager().instanceTooltipHandlers)
+                tooltips = handler.handleItemTooltip(getScreen().getScreenWrapper(), stack, getContext().getMouseX(), getContext().getMouseY(), tooltips);
+        }
+
+        return tooltips;
+    }
+
+    public ItemSlotLong slot(ModularSlotLong slot) {
+        this.syncHandler = new ItemSlotLongSH(slot);
+        setSyncHandler(this.syncHandler);
+        return this;
+    }
+
+    public ItemSlotLong slot(IItemHandlerLong itemHandler, int index) {
+        return slot(new ModularSlotLong(itemHandler, index));
     }
 
     @SideOnly(Side.CLIENT)
@@ -78,7 +200,6 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
         ItemStack itemstack2 = guiScreen.mc.thePlayer.inventory.getItemStack();
         IItemStackLong itemstack1 = itemstack2 == null ? null : new ItemStackLong(itemstack2);
         long amount = -1;
-        TextRenderer textRenderer = getTextRenderer();
         String format = null;
 
         if (slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && accessor.getIsRightMouseClick() && itemstack != null) {
@@ -170,29 +291,16 @@ public class ItemSlotLong extends ItemSlot<ItemSlotLong> {
         guiScreen.setZ(0f);
     }
 
-    /**
-     * Made to do nothign as we are not able to handle a slot, which is not a ModularSlotLong
-     */
     @Override
-    public ItemSlotLong slot(ModularSlot slot) {
-        return this;
+    public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
+        if (!this.syncHandler.isPhantom()) return false;
+        this.syncHandler.updateFromClient(new ItemStackLong(draggedStack));
+        draggedStack.stackSize = 0;
+        return true;
     }
 
-    /**
-     *  Made to do nothing as we are not able to handle a handler, which doesn't use IItemHandlerLong
-     */
     @Override
-    public ItemSlotLong slot(IItemHandlerModifiable itemHandler, int index) {
-        return this;
-    }
-
-    public ItemSlotLong slot(IItemHandlerLong itemHandler, int index) {
-        return slot(new ModularSlotLong(itemHandler, index));
-    }
-
-    public ItemSlotLong slot(ModularSlotLong slot) {
-        this.syncHandler = new ItemSlotLongSH(slot);
-        setSyncHandler(this.syncHandler);
-        return this;
+    public @Nullable ItemStack getStackForNEI() {
+        return this.syncHandler.getSlot().getStack();
     }
 }

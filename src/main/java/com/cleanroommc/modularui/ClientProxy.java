@@ -42,7 +42,6 @@ public class ClientProxy extends CommonProxy {
         }
 
         FMLCommonHandler.instance().bus().register(new ClientEventHandler());
-        FMLCommonHandler.instance().bus().register(new GuiManager());
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(new EventHandler());

@@ -4,6 +4,7 @@ import static com.google.common.primitives.Ints.saturatedCast;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
@@ -31,6 +32,14 @@ public interface IFluidTankLong extends IFluidTank {
     long getFluidAmountLong();
 
     Fluid getRealFluid();
+
+    default void setFluid(@Nullable FluidStack fluidStack) {
+        if (fluidStack == null) {
+            setFluid(null, 0);
+        } else {
+            setFluid(fluidStack.getFluid(), fluidStack.amount);
+        }
+    }
 
     void setFluid(@Nullable Fluid fluid, long amount);
 
@@ -69,4 +78,7 @@ public interface IFluidTankLong extends IFluidTank {
 
     IFluidTankLong copy();
 
+    IFluidTankLong readFromNBT(NBTTagCompound fluidTag);
+
+    NBTTagCompound writeToNBT(NBTTagCompound fluidTag);
 }
