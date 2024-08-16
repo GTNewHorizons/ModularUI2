@@ -24,6 +24,7 @@ public class CommonProxy {
 
     void preInit(FMLPreInitializationEvent event) {
         ModularUIConfig.init(event.getSuggestedConfigurationFile());
+        FMLCommonHandler.instance().bus().register(new GuiManager());
         MinecraftForge.EVENT_BUS.register(new GuiManager());
 
         FMLCommonHandler.instance().bus().register(this);
