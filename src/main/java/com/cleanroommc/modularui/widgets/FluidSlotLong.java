@@ -44,6 +44,7 @@ import net.minecraftforge.fluids.IFluidTank;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
+// Changes made here probably should also be made to FluidSlot
 public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
@@ -235,7 +236,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     public FluidSlotLong contentOffset(int x, int y) {
         this.contentOffsetX = x;
         this.contentOffsetY = y;
-        return getThis();
+        return this;
     }
 
     /**
@@ -243,7 +244,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
      */
     public FluidSlotLong alwaysShowFull(boolean alwaysShowFull) {
         this.alwaysShowFull = alwaysShowFull;
-        return getThis();
+        return this;
     }
 
     /**
@@ -251,7 +252,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
      */
     public FluidSlotLong overlayTexture(@Nullable IDrawable overlayTexture) {
         this.overlayTexture = overlayTexture;
-        return getThis();
+        return this;
     }
 
     public FluidSlotLong syncHandler(IFluidTank fluidTank) {
@@ -268,7 +269,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     public FluidSlotLong syncHandler(FluidSlotLongSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
         this.syncHandler = syncHandler;
-        return getThis();
+        return this;
     }
 
     @Override

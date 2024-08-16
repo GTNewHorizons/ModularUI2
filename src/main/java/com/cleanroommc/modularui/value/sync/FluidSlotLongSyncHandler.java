@@ -22,6 +22,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 
+// Changes made here probably should also be made to FluidSlotSyncHandler
 public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
 
     @NotNull

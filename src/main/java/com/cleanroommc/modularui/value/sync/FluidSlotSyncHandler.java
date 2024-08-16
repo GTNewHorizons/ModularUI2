@@ -14,6 +14,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// Changes made here probably should also be made to FluidSlotLongSyncHandler
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {

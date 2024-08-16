@@ -43,7 +43,8 @@ import java.util.List;
 
 import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 
-public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+// Changes made here probably should also be made to ItemSlotLong
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -174,13 +175,13 @@ public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanil
         return tooltips;
     }
 
-    public W slot(ModularSlot slot) {
+    public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
-        return getThis();
+        return this;
     }
 
-    public W slot(IItemHandlerModifiable itemHandler, int index) {
+    public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
         return slot(new ModularSlot(itemHandler, index));
     }
 
@@ -192,7 +193,7 @@ public class ItemSlot<W extends ItemSlot<W>> extends Widget<W> implements IVanil
         boolean flag = false;
         boolean flag1 = slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && !accessor.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
-        long amount = -1;
+        int amount = -1;
         String format = null;
 
         if (slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && accessor.getIsRightMouseClick() && itemstack != null) {

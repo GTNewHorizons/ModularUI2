@@ -37,6 +37,7 @@ import org.lwjgl.opengl.GL11;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
+// Changes made here probably should also be made to FluidSlotLong
 public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
@@ -225,7 +226,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     public FluidSlot contentOffset(int x, int y) {
         this.contentOffsetX = x;
         this.contentOffsetY = y;
-        return getThis();
+        return this;
     }
 
     /**
@@ -233,7 +234,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
      */
     public FluidSlot alwaysShowFull(boolean alwaysShowFull) {
         this.alwaysShowFull = alwaysShowFull;
-        return getThis();
+        return this;
     }
 
     /**
@@ -241,7 +242,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
      */
     public FluidSlot overlayTexture(@Nullable IDrawable overlayTexture) {
         this.overlayTexture = overlayTexture;
-        return getThis();
+        return this;
     }
 
     public FluidSlot syncHandler(IFluidTank fluidTank) {
@@ -251,7 +252,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
         this.syncHandler = syncHandler;
-        return getThis();
+        return this;
     }
 
     @Override
