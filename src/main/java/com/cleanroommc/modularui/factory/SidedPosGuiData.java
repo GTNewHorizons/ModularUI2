@@ -1,18 +1,18 @@
 package com.cleanroommc.modularui.factory;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class SidedPosGuiData extends PosGuiData {
 
-    private final EnumFacing side;
+    private final ForgeDirection side;
 
-    public SidedPosGuiData(EntityPlayer player, int x, int y, int z, EnumFacing side) {
+    public SidedPosGuiData(EntityPlayer player, int x, int y, int z, ForgeDirection side) {
         super(player, x, y, z);
         this.side = side;
     }
 
-    public EnumFacing getSide() {
+    public ForgeDirection getSide() {
         return this.side;
     }
 }
