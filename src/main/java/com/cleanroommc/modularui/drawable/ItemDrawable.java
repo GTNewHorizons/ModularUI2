@@ -6,6 +6,8 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.JsonHelper;
+import com.cleanroommc.modularui.widget.Widget;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import cpw.mods.fml.relauncher.Side;
@@ -37,6 +39,11 @@ public class ItemDrawable implements IDrawable {
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         GuiDraw.drawItem(this.item, x, y, width, height);
+    }
+
+    @Override
+    public Widget<?> asWidget() {
+        return IDrawable.super.asWidget().size(16);
     }
 
     @Override
