@@ -169,7 +169,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     }
 
     @Override
-    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getFluidSlotTheme();
     }
 

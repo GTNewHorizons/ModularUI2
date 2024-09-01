@@ -292,6 +292,7 @@ public class ThemeManager implements IResourceManagerReloadListener {
                 widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, widgetThemeJson, jsonBuilder.getJson()));
             }
             Theme theme = new Theme(this.id, parent, widgetThemes);
+            // TODO: bad implementation
             if (jsonBuilder.getJson().has("openCloseAnimation")) {
                 theme.setOpenCloseAnimationOverride(jsonBuilder.getJson().get("openCloseAnimation").getAsInt());
             }

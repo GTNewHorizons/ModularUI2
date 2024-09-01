@@ -115,7 +115,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
     }
 
     @Override
-    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getItemSlotTheme();
     }
 

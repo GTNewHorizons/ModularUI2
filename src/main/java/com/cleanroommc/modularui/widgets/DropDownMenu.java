@@ -233,7 +233,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     public static class DropDownItem extends ButtonWidget<DropDownItem> {
 
         @Override
-        public WidgetTheme getWidgetTheme(ITheme theme) {
+        public WidgetTheme getWidgetThemeInternal(ITheme theme) {
             return theme.getFallback();
         }
     }

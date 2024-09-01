@@ -160,7 +160,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     @Override
-    public WidgetSlotTheme getWidgetTheme(ITheme theme) {
+    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getFluidSlotTheme();
     }
 

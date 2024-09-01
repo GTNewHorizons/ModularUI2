@@ -1,11 +1,9 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.drawable.keys.StringKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.theme.Theme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
@@ -20,7 +18,6 @@ public class TextWidget extends Widget<TextWidget> {
     private float scale = 1f;
 
     public boolean colorChanged = false, shadowChanged = false;
-    private String widgetTheme = Theme.FALLBACK;
 
     public TextWidget(IKey key) {
         this.key = key;
@@ -40,11 +37,6 @@ public class TextWidget extends Widget<TextWidget> {
         renderer.setScale(this.scale);
         renderer.setSimulate(false);
         renderer.draw(this.key.get());
-    }
-
-    @Override
-    public WidgetTheme getWidgetTheme(ITheme theme) {
-        return theme.getWidgetTheme(this.widgetTheme);
     }
 
     private TextRenderer simulate(float maxWidth) {
@@ -123,11 +115,6 @@ public class TextWidget extends Widget<TextWidget> {
     public TextWidget shadow(boolean shadow) {
         this.shadowChanged = true;
         this.shadow = shadow;
-        return this;
-    }
-
-    public TextWidget widgetTheme(String widgetTheme) {
-        this.widgetTheme = widgetTheme;
         return this;
     }
 }
