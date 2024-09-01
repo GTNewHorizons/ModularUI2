@@ -1,0 +1,15 @@
+[
+  {
+    "modid":"MUI-tests",
+    "name":"MUI Dev Tests",
+    "description":"MUI Tests to run in the development environment",
+    "version":"1.0",
+    "mcversion":"1.7.10",
+    "url":"https://github.com/GTNewHorizons/ModularUI2",
+    "updateUrl":"",
+    "authorList":[],
+    "credits":"",
+    "logoFile":"",
+    "screenshots":[]
+  }
+]

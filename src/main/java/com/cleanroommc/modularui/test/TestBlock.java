@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.test;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -38,7 +39,7 @@ public class TestBlock extends Block implements ITileEntityProvider {
     @Override
     public boolean onBlockActivated(World worldIn, int x, int y, int z, EntityPlayer playerIn, int side, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
-            TileEntityGuiFactory.open(playerIn, x, y, z);
+            GuiFactories.tileEntity().open(playerIn, x, y, z);
         }
         return true;
     }

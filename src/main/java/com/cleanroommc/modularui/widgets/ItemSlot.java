@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
@@ -11,8 +12,9 @@ import com.cleanroommc.modularui.drawable.TextRenderer;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
 import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.Tooltip;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -29,7 +31,10 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -65,6 +70,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onInit() {
+        if (getScreen().isOverlay()) {
+            throw new IllegalStateException("Overlays can't have slots!");
+        }
         size(SIZE, SIZE);
     }
 
@@ -110,7 +118,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(2, mouseData::writeToPacket);
         } else {
-            getScreen().getScreenWrapper().clickSlot();
+            ClientScreenHandler.clickSlot();
+            //getScreen().getScreenWrapper().clickSlot();
         }
         return Result.SUCCESS;
     }
@@ -118,7 +127,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public boolean onMouseRelease(int mouseButton) {
         if (!this.syncHandler.isPhantom()) {
-            getScreen().getScreenWrapper().releaseSlot();
+            ClientScreenHandler.releaseSlot();
+            //getScreen().getScreenWrapper().releaseSlot();
         }
         return true;
     }
@@ -135,7 +145,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
-        getScreen().getScreenWrapper().dragSlot(timeSinceClick);
+        //getScreen().getScreenWrapper().dragSlot(timeSinceClick);
+        ClientScreenHandler.dragSlot(timeSinceClick);
     }
 
     public ModularSlot getSlot() {
@@ -157,19 +168,19 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @SideOnly(Side.CLIENT)
     protected List<String> getItemTooltip(ItemStack stack) {
-        if (!isNEILoaded) {
+        if (!isNEILoaded || !(getScreen().getScreenWrapper() instanceof GuiContainer guiContainer)) {
             return stack.getTooltip(
                     Minecraft.getMinecraft().thePlayer,
                     Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
         }
 
-        List<String> tooltips = GuiContainerManager.itemDisplayNameMultiline(stack, getScreen().getScreenWrapper(), true);
+        List<String> tooltips = GuiContainerManager.itemDisplayNameMultiline(stack, guiContainer, true);
 
         GuiContainerManager.applyItemCountDetails(tooltips, stack);
 
-        if (GuiContainerManager.getManager() != null && GuiContainerManager.shouldShowTooltip(getScreen().getScreenWrapper())) {
+        if (GuiContainerManager.getManager() != null && GuiContainerManager.shouldShowTooltip(guiContainer)) {
             for (IContainerTooltipHandler handler : GuiContainerManager.getManager().instanceTooltipHandlers)
-                tooltips = handler.handleItemTooltip(getScreen().getScreenWrapper(), stack, getContext().getMouseX(), getContext().getMouseY(), tooltips);
+                tooltips = handler.handleItemTooltip(guiContainer, stack, getContext().getMouseX(), getContext().getMouseY(), tooltips);
         }
 
         return tooltips;
@@ -187,29 +198,32 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @SideOnly(Side.CLIENT)
     private void drawSlot(ModularSlot slotIn) {
-        GuiScreenWrapper guiScreen = getScreen().getScreenWrapper();
-        GuiContainerAccessor accessor = guiScreen.getAccessor();
+        GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
+        if (!(guiScreen instanceof GuiContainer))
+            throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
+        GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
+        RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
-        boolean flag1 = slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && !accessor.getIsRightMouseClick();
+        boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
         int amount = -1;
         String format = null;
 
-        if (slotIn == accessor.getClickedSlot() && accessor.getDraggedStack() != null && accessor.getIsRightMouseClick() && itemstack != null) {
+        if (slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && acc.getIsRightMouseClick() && itemstack != null) {
             itemstack = itemstack.copy();
             itemstack.stackSize /= 2;
-        } else if (guiScreen.isDragSplitting() && guiScreen.getDragSlots().contains(slotIn) && itemstack1 != null) {
-            if (guiScreen.getDragSlots().size() == 1) {
+        } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().contains(slotIn) && itemstack1 != null) {
+            if (acc.getDragSplittingSlots().size() == 1) {
                 return;
             }
 
             // canAddItemToSlot
-            if (Container.func_94527_a(slotIn, itemstack1, true) && guiScreen.inventorySlots.canDragIntoSlot(slotIn)) {
+            if (Container.func_94527_a(slotIn, itemstack1, true) && getScreen().getContainer().canDragIntoSlot(slotIn)) {
                 itemstack = itemstack1.copy();
                 flag = true;
                 // computeStackSize
-                Container.func_94525_a(guiScreen.getDragSlots(), accessor.getDragSplittingLimit(), itemstack, slotIn.getStack() == null ? 0 : slotIn.getStack().stackSize);
+                Container.func_94525_a(acc.getDragSplittingSlots(), acc.getDragSplittingLimit(), itemstack, slotIn.getStack() == null ? 0 : slotIn.getStack().stackSize);
                 int k = Math.min(itemstack.getMaxStackSize(), slotIn.getSlotStackLimit());
 
                 if (itemstack.stackSize > k) {
@@ -218,13 +232,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     itemstack.stackSize = k;
                 }
             } else {
-                guiScreen.getDragSlots().remove(slotIn);
-                accessor.invokeUpdateDragSplitting();
+                acc.getDragSplittingSlots().remove(slotIn);
+                acc.invokeUpdateDragSplitting();
             }
         }
 
-        guiScreen.setZ(100f);
-        GuiScreenWrapper.getItemRenderer().zLevel = 100.0F;
+        ((GuiAccessor) guiScreen).setZLevel(100f);
+        renderItem.zLevel = 100.0F;
 
         if (!flag1) {
             if (flag) {
@@ -238,7 +252,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 // render the item itself
-                GuiScreenWrapper.getItemRenderer().renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
+                renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
                 GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack);
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                 if (amount < 0) {
@@ -275,14 +289,14 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 int cachedCount = itemstack.stackSize;
                 itemstack.stackSize = 1; // required to not render the amount overlay
                 // render other overlays like durability bar
-                GuiScreenWrapper.getItemRenderer().renderItemOverlayIntoGUI(guiScreen.getFontRenderer(), Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1, null);
+                renderItem.renderItemOverlayIntoGUI(((GuiScreenAccessor) guiScreen).getFontRenderer(), Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1, null);
                 itemstack.stackSize = cachedCount;
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
             }
         }
 
-        GuiScreenWrapper.getItemRenderer().zLevel = 0.0F;
-        guiScreen.setZ(0f);
+        ((GuiAccessor) guiScreen).setZLevel(0f);
+        renderItem.zLevel = 0f;
     }
 
     @Override

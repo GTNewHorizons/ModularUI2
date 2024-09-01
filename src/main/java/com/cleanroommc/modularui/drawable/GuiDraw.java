@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.utils.Color;
 
 import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
@@ -327,7 +327,7 @@ public class GuiDraw {
         RenderHelper.enableGUIStandardItemLighting();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glScalef(width / 16f, height / 16f, 1);
-        RenderItem renderItem = GuiScreenWrapper.getItemRenderer();
+        RenderItem renderItem = ((GuiScreenAccessor) Minecraft.getMinecraft().currentScreen).getItemRender();
         renderItem.zLevel = 200;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, x, y);
         renderItem.zLevel = 0;

@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.mixins.early.minecraft;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.utils.Animator;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,12 +21,8 @@ public class MinecraftMixin {
     public void modularui$onRender(CallbackInfo ci) {
         if (ModularUI.proxy == null || ModularUI.proxy.getTimer60Fps() == null) return;
         ModularUI.proxy.getTimer60Fps().updateTimer();
-        ModularScreen screen = ModularScreen.getCurrent();
-        if (screen != null) {
-            for (int j = 0; j < Math.min(20, ModularUI.proxy.getTimer60Fps().elapsedTicks); ++j) {
-                screen.onFrameUpdate();
-                Animator.advance();
-            }
+        for (int j = 0; j < Math.min(20, ModularUI.proxy.getTimer60Fps().elapsedTicks); ++j) {
+            ClientScreenHandler.onFrameUpdate();
         }
     }
 }

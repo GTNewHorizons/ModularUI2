@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.factory.GuiData;
+import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.ItemGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -47,7 +48,7 @@ public class TestItem extends Item implements IGuiHolder<GuiData> {
     @Override
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer player) {
         if (!worldIn.isRemote) {
-            ItemGuiFactory.open((EntityPlayerMP) player);
+            GuiFactories.item().open(player);
         }
         return super.onItemRightClick(itemStackIn, worldIn, player);
     }

@@ -15,7 +15,7 @@ public class SidedTileEntityGuiFactory extends AbstractUIFactory<SidedPosGuiData
 
     public static final SidedTileEntityGuiFactory INSTANCE = new SidedTileEntityGuiFactory();
 
-    public static <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void open(EntityPlayer player, T tile, ForgeDirection side) {
+    public <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void open(EntityPlayer player, T tile, ForgeDirection side) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(tile);
         Objects.requireNonNull(side);
@@ -26,14 +26,14 @@ public class SidedTileEntityGuiFactory extends AbstractUIFactory<SidedPosGuiData
             throw new IllegalArgumentException("TileEntity must be in same dimension as the player!");
         }
         SidedPosGuiData data = new SidedPosGuiData(player, tile.xCoord, tile.yCoord, tile.zCoord, side);
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
-    public static void open(EntityPlayer player, int x, int y, int z, ForgeDirection side) {
+    public void open(EntityPlayer player, int x, int y, int z, ForgeDirection side) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(side);
         SidedPosGuiData data = new SidedPosGuiData(player, x, y, z, side);
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
     private SidedTileEntityGuiFactory() {

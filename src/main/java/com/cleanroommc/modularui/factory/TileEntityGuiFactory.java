@@ -14,10 +14,10 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
     public static final TileEntityGuiFactory INSTANCE = new TileEntityGuiFactory();
 
     private TileEntityGuiFactory() {
-        super("mui:tile");
+        super("mui:tile_entity");
     }
 
-    public static <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
+    public <T extends TileEntity & IGuiHolder<PosGuiData>> void open(EntityPlayer player, T tile) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(tile);
         if (tile.isInvalid()) {
@@ -27,13 +27,13 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
             throw new IllegalArgumentException("TileEntity must be in same dimension as the player!");
         }
         PosGuiData data = new PosGuiData(player, tile.xCoord, tile.yCoord, tile.zCoord);
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
-    public static void open(EntityPlayer player, int x, int y, int z) {
+    public void open(EntityPlayer player, int x, int y, int z) {
         Objects.requireNonNull(player);
         PosGuiData data = new PosGuiData(player, x, y, z);
-        GuiManager.open(INSTANCE, data, (EntityPlayerMP) player);
+        GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.factory.GuiManager;
-import com.cleanroommc.modularui.factory.ItemGuiFactory;
-import com.cleanroommc.modularui.factory.SidedTileEntityGuiFactory;
-import com.cleanroommc.modularui.factory.TileEntityGuiFactory;
+import com.cleanroommc.modularui.factory.*;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.test.ItemEditorGui;
@@ -39,9 +36,7 @@ public class CommonProxy {
 
         NetworkHandler.init();
 
-        GuiManager.registerFactory(TileEntityGuiFactory.INSTANCE);
-        GuiManager.registerFactory(SidedTileEntityGuiFactory.INSTANCE);
-        GuiManager.registerFactory(ItemGuiFactory.INSTANCE);
+        GuiFactories.init();
     }
 
     void postInit(FMLPostInitializationEvent event) {

@@ -1,18 +1,23 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.overlay.ScreenWrapper;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -20,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
@@ -45,7 +51,7 @@ import java.util.function.Function;
 public class ModularScreen {
 
     public static boolean isScreen(@Nullable GuiScreen guiScreen, String owner, String name) {
-        if (guiScreen instanceof GuiScreenWrapper screenWrapper) {
+        if (guiScreen instanceof GuiContainerWrapper screenWrapper) {
             ModularScreen screen = screenWrapper.getScreen();
             return screen.getOwner().equals(owner) && screen.getName().equals(name);
         }
@@ -58,7 +64,7 @@ public class ModularScreen {
 
     @Nullable
     public static ModularScreen getCurrent() {
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiScreenWrapper screenWrapper) {
+        if (MCHelper.getCurrentScreen() instanceof GuiContainerWrapper screenWrapper) {
             return screenWrapper.getScreen();
         }
         return null;
@@ -73,7 +79,8 @@ public class ModularScreen {
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
 
     private ITheme currentTheme;
-    private GuiScreenWrapper screenWrapper;
+    private IMuiScreen screenWrapper;
+    private boolean overlay = false;
 
     /**
      * Creates a new screen with a ModularUI as its owner and a given {@link ModularPanel}.
@@ -129,14 +136,28 @@ public class ModularScreen {
     }
 
     @MustBeInvokedByOverriders
-    void construct(GuiScreenWrapper wrapper) {
+    public void construct(IMuiScreen wrapper) {
         if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
         if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
         this.screenWrapper = wrapper;
-        this.screenWrapper.updateArea(this.panelManager.getMainPanel().getArea());
+        this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
+        this.overlay = false;
     }
 
+    @ApiStatus.Internal
+    @MustBeInvokedByOverriders
+    public void constructOverlay(GuiScreen screen) {
+        if (this.screenWrapper != null) throw new IllegalStateException("ModularScreen is already constructed!");
+        if (screen == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
+        this.screenWrapper = new ScreenWrapper(screen, this);
+        this.overlay = true;
+    }
+
+    @MustBeInvokedByOverriders
     public void onResize(int width, int height) {
+        if (this.panelManager.tryInit()) {
+            onOpen();
+        }
         this.screenArea.set(0, 0, width, height);
         this.screenArea.z(0);
 
@@ -146,16 +167,23 @@ public class ModularScreen {
         }
 
         this.context.popViewport(null);
-        this.screenWrapper.updateArea(this.panelManager.getMainPanel().getArea());
+        if (!isOverlay()) {
+            this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
+        }
     }
 
+    public final void onCloseParent() {
+        if (this.panelManager.closeAll()) {
+            onClose();
+        }
+    }
+
+    @ApiStatus.OverrideOnly
     public void onOpen() {
-        this.panelManager.init();
     }
 
-    @MustBeInvokedByOverriders
+    @ApiStatus.OverrideOnly
     public void onClose() {
-        this.panelManager.closeAll();
     }
 
     public void close() {
@@ -165,7 +193,7 @@ public class ModularScreen {
     public void close(boolean force) {
         if (isActive()) {
             if (force) {
-                this.context.mc.thePlayer.closeScreen();
+                MCHelper.closeScreen();
                 return;
             }
             getMainPanel().closeIfOpen(true);
@@ -388,6 +416,10 @@ public class ModularScreen {
         return new ResourceLocation(this.owner, this.name);
     }
 
+    public boolean isOverlay() {
+        return overlay;
+    }
+
     public GuiContext getContext() {
         return this.context;
     }
@@ -404,7 +436,7 @@ public class ModularScreen {
         return this.panelManager.getMainPanel();
     }
 
-    public GuiScreenWrapper getScreenWrapper() {
+    public IMuiScreen getScreenWrapper() {
         return this.screenWrapper;
     }
 
@@ -413,11 +445,17 @@ public class ModularScreen {
     }
 
     public boolean isClientOnly() {
-        return getContainer().isClientOnly();
+        return isOverlay() || !this.screenWrapper.isGuiContainer() || getContainer().isClientOnly();
     }
 
     public ModularContainer getContainer() {
-        return (ModularContainer) this.screenWrapper.inventorySlots;
+        if (isOverlay()) {
+            throw new IllegalStateException("Can't get ModularContainer for overlay");
+        }
+        if (this.screenWrapper.getGuiScreen() instanceof GuiContainer container) {
+            return (ModularContainer) container.inventorySlots;
+        }
+        throw new IllegalStateException("Screen does not extend GuiContainer!");
     }
 
     @SuppressWarnings("unchecked")

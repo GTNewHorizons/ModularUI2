@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.mixins.early.minecraft.EntityAccessor;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import cpw.mods.fml.relauncher.Side;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 @ApiStatus.Experimental
 public class HoloScreenEntity extends Entity {
 
-    private GuiScreenWrapper wrapper;
+    private GuiContainerWrapper wrapper;
     private ModularScreen screen;
     private final Plane3D plane3D;
     private static final int ORIENTATION = 16;
@@ -36,7 +36,7 @@ public class HoloScreenEntity extends Entity {
 
     public void setScreen(ModularScreen screen) {
         this.screen = screen;
-        this.wrapper = new GuiScreenWrapper(new ModularContainer(null), screen);
+        this.wrapper = new GuiContainerWrapper(new ModularContainer(null), screen);
         this.wrapper.setWorldAndResolution(Minecraft.getMinecraft(), (int) this.plane3D.getWidth(), (int) this.plane3D.getHeight());
     }
 
@@ -44,7 +44,7 @@ public class HoloScreenEntity extends Entity {
         return this.screen;
     }
 
-    public GuiScreenWrapper getWrapper() {
+    public GuiContainerWrapper getWrapper() {
         return this.wrapper;
     }
 

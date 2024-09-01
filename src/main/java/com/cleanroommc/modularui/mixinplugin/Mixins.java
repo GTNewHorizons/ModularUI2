@@ -14,8 +14,12 @@ public enum Mixins {
     // Vanilla client
     EntityAccessor("minecraft.EntityAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
     ForgeHooksClientMixin("forge.ForgeHooksClientMixin", Phase.EARLY, Side.CLIENT, VANILLA),
+    GuiAccessor("minecraft.GuiAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
+    GuiButtonMixin("minecraft.GuiButtonMixin", Phase.EARLY, Side.CLIENT, VANILLA),
     GuiContainerAccessor("minecraft.GuiContainerAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
     GuiContainerMixin("minecraft.GuiContainerMixin", Phase.EARLY, Side.CLIENT, VANILLA),
+    GuiScreenAccessor("minecraft.GuiScreenAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
+    GuiScreenMixin("minecraft.GuiScreenMixin", Phase.EARLY, Side.CLIENT, VANILLA),
     MinecraftMixin("minecraft.MinecraftMixin", Phase.EARLY, Side.CLIENT, VANILLA),
     SimpleResourceAccessor("minecraft.SimpleResourceAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
 

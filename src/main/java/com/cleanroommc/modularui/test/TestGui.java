@@ -33,7 +33,6 @@ public class TestGui extends CustomModularScreen {
 
     @Override
     public void onClose() {
-        super.onClose();
         ModularUI.LOGGER.info("New values: {}", this.configuredOptions);
     }
 

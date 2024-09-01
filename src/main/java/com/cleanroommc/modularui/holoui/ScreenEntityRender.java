@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
@@ -28,7 +28,7 @@ public class ScreenEntityRender extends Render {
     @Override
     public void doRender(@NotNull Entity e, double x, double y, double z, float entityYaw, float partialTicks) {
         HoloScreenEntity entity = (HoloScreenEntity) e;
-        GuiScreenWrapper screenWrapper = entity.getWrapper();
+        GuiContainerWrapper screenWrapper = entity.getWrapper();
         if (screenWrapper == null) return;
 
         Plane3D plane3D = entity.getPlane3D();

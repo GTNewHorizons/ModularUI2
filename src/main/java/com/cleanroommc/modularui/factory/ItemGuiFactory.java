@@ -16,10 +16,18 @@ public class ItemGuiFactory extends AbstractUIFactory<GuiData> {
         super("mui:item");
     }
 
-    public static void open(EntityPlayerMP player) {
+    public void open(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP entityPlayerMP) {
+            open(entityPlayerMP);
+            return;
+        }
+        throw new IllegalStateException("Synced GUIs must be opened from server side");
+    }
+
+    public void open(EntityPlayerMP player) {
         Objects.requireNonNull(player);
         GuiData guiData = new GuiData(player);
-        GuiManager.open(INSTANCE, guiData, player);
+        GuiManager.open(this, guiData, player);
     }
 
     @Override

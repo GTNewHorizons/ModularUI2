@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.integration.nei;
 
 import codechicken.nei.guihook.IContainerObjectHandler;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.screen.GuiScreenWrapper;
+import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 
@@ -19,8 +19,8 @@ public class ModularUIContainerObjectHandler implements IContainerObjectHandler 
 
     @Override
     public ItemStack getStackUnderMouse(GuiContainer gui, int mousex, int mousey) {
-        if (gui instanceof GuiScreenWrapper) {
-            IGuiElement hovered = ((GuiScreenWrapper) gui).getScreen().getContext().getHovered();
+        if (gui instanceof GuiContainerWrapper) {
+            IGuiElement hovered = ((GuiContainerWrapper) gui).getScreen().getContext().getHovered();
             if (hovered instanceof NEIIngredientProvider) {
                 return ((NEIIngredientProvider) hovered).getStackForNEI();
             }

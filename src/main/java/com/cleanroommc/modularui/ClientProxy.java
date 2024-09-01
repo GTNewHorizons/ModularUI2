@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui;
 
-import codechicken.nei.guihook.GuiContainerManager;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
-import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
-import com.cleanroommc.modularui.integration.nei.ModularUIContainerObjectHandler;
 import com.cleanroommc.modularui.mixins.early.forge.ForgeHooksClientMixin;
+import com.cleanroommc.modularui.overlay.OverlayManager;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.EventHandler;
+import com.cleanroommc.modularui.test.OverlayTest;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -24,9 +24,6 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
-import static com.cleanroommc.modularui.ModularUI.MODID_NEI;
-import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
-
 @SideOnly(Side.CLIENT)
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
@@ -37,14 +34,13 @@ public class ClientProxy extends CommonProxy {
     void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
 
-        if (isNEILoaded) {
-            registerNEIHandler();
-        }
-
         FMLCommonHandler.instance().bus().register(new ClientEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ClientScreenHandler());
+        MinecraftForge.EVENT_BUS.register(new OverlayManager());
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(new EventHandler());
+            OverlayTest.init();
         }
 
         DrawableSerialization.init();
@@ -66,10 +62,5 @@ public class ClientProxy extends CommonProxy {
     @Override
     public Timer getTimer60Fps() {
         return this.timer60Fps;
-    }
-
-    @Optional.Method(modid = MODID_NEI)
-    private void registerNEIHandler() {
-        GuiContainerManager.addObjectHandler(new ModularUIContainerObjectHandler());
     }
 }

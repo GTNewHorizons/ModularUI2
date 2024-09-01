@@ -4,6 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
+/**
+ * See {@link GuiData} for an explanation for what this is for.
+ */
 public class PosGuiData extends GuiData {
 
     private final int x, y, z;

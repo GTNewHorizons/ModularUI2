@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.screen;
 import codechicken.nei.ItemPanels;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
@@ -62,6 +63,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private final Input keyboard = new Input();
     private final Input mouse = new Input();
 
+    private boolean invisible = false;
     private Animator animator;
     private float scale = 1f;
     private float alpha = 1f;
@@ -179,6 +181,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getWidgetsAt(stack, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());
         stack.popViewport(this);
         stack.popViewport(null);
+    }
+
+    @Override
+    public boolean canHover() {
+        return !this.invisible && super.canHover();
     }
 
     @MustBeInvokedByOverriders
@@ -375,7 +382,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     private boolean isNEIWantToHandleDragAndDrop() {
-        return getContext().getNEISettings().isNEIEnabled(this.screen)
+        return !getContext().getScreen().isOverlay()
+            && getContext().getNEISettings().isNEIEnabled(this.screen)
             && (ItemPanels.itemPanel.draggedStack != null || ItemPanels.bookmarkPanel.draggedStack != null);
     }
 
@@ -586,7 +594,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     final void setPanelGuiContext(@NotNull GuiContext context) {
         setContext(context);
-        context.getNEISettings().addNEIExclusionArea(this);
+        if (!context.getScreen().isOverlay()) {
+            context.getNEISettings().addNEIExclusionArea(this);
+        }
     }
 
     public boolean isOpening() {
@@ -629,7 +639,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     public boolean shouldAnimate() {
-        return getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
+        return !getScreen().isOverlay() && getScreen().getCurrentTheme().getOpenCloseAnimationOverride() > 0;
     }
 
     public ModularPanel bindPlayerInventory() {
@@ -638,6 +648,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel bindPlayerInventory(int bottom) {
         return child(SlotGroupWidget.playerInventory(bottom));
+    }
+
+    public ModularPanel invisible() {
+        this.invisible = true;
+        return background(IDrawable.EMPTY);
     }
 
     @Override
