@@ -154,7 +154,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         }
         if (isHovering()) {
             GL11.glColorMask(true, true, true, false);
-            GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getSlotHoverColor());
             GL11.glColorMask(true, true, true, true);
         }
     }
@@ -162,6 +162,14 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     @Override
     public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getFluidSlotTheme();
+    }
+
+    public int getSlotHoverColor() {
+        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
+        if (theme instanceof WidgetSlotTheme slotTheme) {
+            return slotTheme.getSlotHoverColor();
+        }
+        return ITheme.getDefault().getFluidSlotTheme().getSlotHoverColor();
     }
 
     @NotNull

@@ -108,7 +108,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glColorMask(true, true, true, false);
-            GuiDraw.drawRect(1, 1, 16, 16, getWidgetTheme(context.getTheme()).getSlotHoverColor());
+            GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
             GL11.glColorMask(true, true, true, true);
             GL11.glDisable(GL11.GL_BLEND);
         }
@@ -117,6 +117,14 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
     @Override
     public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
         return theme.getItemSlotTheme();
+    }
+
+    public int getSlotHoverColor() {
+        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
+        if (theme instanceof WidgetSlotTheme slotTheme) {
+            return slotTheme.getSlotHoverColor();
+        }
+        return ITheme.getDefault().getItemSlotTheme().getSlotHoverColor();
     }
 
     @Override

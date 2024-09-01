@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
-    private ModularPanel mainPanel;
+    private final ModularPanel mainPanel;
     private final IPanelBuilder panelBuilder;
     private String panelName;
     private ModularPanel openedPanel;
@@ -122,6 +122,10 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         } else if (i == 2) {
             closePanelInternal();
         }
+    }
+
+    public ModularPanel getMainPanel() {
+        return mainPanel;
     }
 
     /**
