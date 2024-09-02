@@ -33,4 +33,9 @@ public class GuiContainerWrapper extends GuiContainer implements IMuiScreen {
     public @NotNull ModularScreen getScreen() {
         return this.screen;
     }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return this.screen != null && this.screen.doesPauseGame();
+    }
 }

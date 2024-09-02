@@ -31,6 +31,9 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import cpw.mods.fml.common.gameevent.TickEvent;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -58,6 +61,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
 
     private static ModularScreen currentScreen = null;
