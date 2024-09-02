@@ -43,6 +43,8 @@ public class ModularContainer extends Container {
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
     private ContainerCustomizer containerCustomizer;
 
+    private Optional<?> optionalScreen = Optional.empty();
+
     public ModularContainer(EntityPlayer player, PanelSyncManager panelSyncManager, String mainPanelName) {
         this.player = player;
         this.syncManager = new ModularSyncManager(this);
@@ -61,6 +63,16 @@ public class ModularContainer extends Container {
         this.syncManager = null;
         this.containerCustomizer = containerCustomizer != null ? containerCustomizer : new ContainerCustomizer();
         this.containerCustomizer.initialize(this);
+    }
+
+    @SideOnly(Side.CLIENT)
+    void construct(ModularScreen screen) {
+        this.optionalScreen = Optional.of(screen);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public ModularScreen getScreen() {
+        return (ModularScreen) optionalScreen.orElseThrow(() -> new NoSuchElementException("ModularScreen must not be null!"));
     }
 
     public ContainerAccessor acc() {
