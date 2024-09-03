@@ -22,7 +22,7 @@ import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
-import gregtech.api.util.GT_Utility;
+import gregtech.api.util.GTUtility;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -274,7 +274,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     @Override
     public @Nullable ItemStack getStackForNEI() {
         if (isGT5ULoaded) {
-            return GT_Utility.getFluidDisplayStack(getFluidStack(), false);
+            return GTUtility.getFluidDisplayStack(getFluidStack(), false);
         }
         return null;
     }

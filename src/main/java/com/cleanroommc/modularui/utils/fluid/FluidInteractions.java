@@ -4,7 +4,7 @@ import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 
 import codechicken.nei.recipe.StackInfo;
-import gregtech.api.util.GT_Utility;
+import gregtech.api.util.GTUtility;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -27,7 +27,7 @@ public class FluidInteractions {
             fluidStack = StackInfo.getFluid(itemStack);
         }
         if (isGT5ULoaded && fluidStack == null) {
-            fluidStack = GT_Utility.getFluidForFilledItem(itemStack, true);
+            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
         }
         return fluidStack;
     }
@@ -47,7 +47,7 @@ public class FluidInteractions {
             fluidStack = StackInfo.getFluid(itemStack.copy());
         }
         if (isGT5ULoaded && fluidStack == null) {
-            fluidStack = GT_Utility.getFluidForFilledItem(itemStack, true);
+            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
         }
         return fluidStack;
     }
@@ -67,7 +67,7 @@ public class FluidInteractions {
 
     public static ItemStack fillFluidContainerWithoutIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
         if (isGT5ULoaded) {
-            return GT_Utility.fillFluidContainer(fluidStack, itemStack, true, false);
+            return GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
         }
         return null;
     }
@@ -97,7 +97,7 @@ public class FluidInteractions {
 
     public static ItemStack getContainerForFilledItemWithoutIFluidContainerItem(ItemStack itemStack) {
         if (isGT5ULoaded) {
-            return GT_Utility.getContainerForFilledItem(itemStack, false);
+            return GTUtility.getContainerForFilledItem(itemStack, false);
         }
         return null;
     }
