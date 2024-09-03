@@ -337,6 +337,10 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break;
                     }
                     widget.unapplyMatrix(getContext());
+                    if (widget.getElement().canHover()) {
+                        result = true;
+                        break;
+                    }
                 }
             }
 
@@ -452,6 +456,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             break loop;
                         }
                     }
+                }
+                widget.unapplyMatrix(getContext());
+                if (widget.getElement().canHover()) {
+                    result = true;
+                    break;
                 }
             }
             if (!this.keyboard.held) {
