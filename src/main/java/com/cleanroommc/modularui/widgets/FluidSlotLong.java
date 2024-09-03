@@ -12,7 +12,7 @@ import com.cleanroommc.modularui.utils.MouseData;
 
 import com.cleanroommc.modularui.widget.Widget;
 
-import gregtech.api.util.GT_Utility;
+import gregtech.api.util.GTUtility;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -291,7 +291,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     @Override
     public @Nullable ItemStack getStackForNEI() {
         if (isGT5ULoaded) {
-            return GT_Utility.getFluidDisplayStack(getFluidStack(), false);
+            return GTUtility.getFluidDisplayStack(getFluidStack(), false);
         }
         return null;
     }
