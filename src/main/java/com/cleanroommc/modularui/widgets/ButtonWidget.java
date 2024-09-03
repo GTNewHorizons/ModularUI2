@@ -26,6 +26,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
                 });
     }
 
+    private boolean playClickSound = true;
     private IGuiAction.MousePressed mousePressed;
     private IGuiAction.MouseReleased mouseReleased;
     private IGuiAction.MousePressed mouseTapped;
@@ -47,12 +48,20 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
         return theme.getButtonTheme();
     }
 
+    public void playClickSound() {
+        if (this.playClickSound) {
+            Interactable.playButtonClickSound();
+        }
+    }
+
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         if (this.mousePressed != null && this.mousePressed.press(mouseButton)) {
+            playClickSound();
             return Result.SUCCESS;
         }
         if (this.syncHandler != null && this.syncHandler.onMousePressed(mouseButton)) {
+            playClickSound();
             return Result.SUCCESS;
         }
         return Result.ACCEPT;
@@ -68,9 +77,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     @Override
     public Result onMouseTapped(int mouseButton) {
         if (this.mouseTapped != null && this.mouseTapped.press(mouseButton)) {
+            playClickSound();
             return Result.SUCCESS;
         }
         if (this.syncHandler != null && this.syncHandler.onMouseTapped(mouseButton)) {
+            playClickSound();
             return Result.SUCCESS;
         }
         return Result.IGNORE;
@@ -149,6 +160,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     public W syncHandler(InteractionSyncHandler interactionSyncHandler) {
         this.syncHandler = interactionSyncHandler;
         setSyncHandler(interactionSyncHandler);
+        return getThis();
+    }
+
+    public W playClickSound(boolean play) {
+        this.playClickSound = play;
         return getThis();
     }
 }
