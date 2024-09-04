@@ -229,6 +229,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @MustBeInvokedByOverriders
     public void onClose() {
+        if (!getScreen().isOverlay()) {
+            getContext().getNEISettings().removeNEIExclusionArea(this);
+        }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
             this.panelHandler.closePanelInternal();
@@ -238,7 +241,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     @Override
     public void dispose() {
-        getContext().getNEISettings().removeNEIExclusionArea(this);
         if (this.state == State.DISPOSED) return;
         if (this.state != State.CLOSED && this.state != State.WAIT_DISPOSING) {
             throw new IllegalStateException("Panel must be closed before disposing!");
@@ -247,7 +249,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             this.state = State.WAIT_DISPOSING;
             return;
         }
-        getContext().getNEISettings().removeNEIExclusionArea(this);
         super.dispose();
         this.screen = null;
         this.state = State.DISPOSED;
