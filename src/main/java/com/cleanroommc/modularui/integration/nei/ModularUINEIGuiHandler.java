@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.integration.nei;
 import codechicken.nei.NEIClientUtils;
 import codechicken.nei.api.INEIGuiAdapter;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
@@ -17,10 +17,10 @@ public class ModularUINEIGuiHandler extends INEIGuiAdapter {
 
     @Override
     public boolean handleDragNDrop(GuiContainer gui, int mousex, int mousey, ItemStack draggedStack, int button) {
-        if (!(gui instanceof GuiContainerWrapper guiContainer) || NEIClientUtils.getHeldItem() != null) {
+        if (!(gui instanceof IMuiScreen muiScreen) || NEIClientUtils.getHeldItem() != null) {
             return false;
         }
-        IGuiElement hovered = guiContainer.getScreen().getContext().getHovered();
+        IGuiElement hovered = muiScreen.getScreen().getContext().getHovered();
         if (hovered instanceof NEIDragAndDropHandler) {
             return ((NEIDragAndDropHandler) hovered).handleDragAndDrop(draggedStack, button);
         }
@@ -29,10 +29,10 @@ public class ModularUINEIGuiHandler extends INEIGuiAdapter {
 
     @Override
     public boolean hideItemPanelSlot(GuiContainer gui, int x, int y, int w, int h) {
-        if (!(gui instanceof GuiContainerWrapper guiContainer)) {
+        if (!(gui instanceof IMuiScreen muiScreen)) {
             return false;
         }
-        ModularScreen screen = guiContainer.getScreen();
+        ModularScreen screen = muiScreen.getScreen();
         if (!screen.getContext().getNEISettings().isNEIEnabled(screen)) {
             return false;
         }
