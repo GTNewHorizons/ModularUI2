@@ -1,10 +1,9 @@
 package com.cleanroommc.modularui;
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.event.KeyboardInputEvent;
 import com.cleanroommc.modularui.api.event.MouseInputEvent;
 import com.cleanroommc.modularui.drawable.Stencil;
-
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -59,6 +58,6 @@ public class ClientEventHandler {
     }
 
     private static boolean hasDraggable(GuiScreenEvent event) {
-        return event.gui instanceof GuiContainerWrapper screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
+        return event.gui instanceof IMuiScreen screenWrapper && screenWrapper.getScreen().getContext().hasDraggable();
     }
 }

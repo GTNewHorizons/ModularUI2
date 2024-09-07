@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.mixins.early.minecraft;
 
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
+import com.cleanroommc.modularui.api.IMuiScreen;
 
 import com.llamalad7.mixinextras.sugar.Local;
 
@@ -27,7 +27,7 @@ public class GuiContainerMixin {
      */
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
     public void modularui$injectGetSlotAtPosition(int x, int y, CallbackInfoReturnable<Slot> cir) {
-        if (((Object) this).getClass() == GuiContainerWrapper.class) {
+        if (IMuiScreen.class.isAssignableFrom(this.getClass())) {
             cir.setReturnValue(this.theSlot);
         }
     }
