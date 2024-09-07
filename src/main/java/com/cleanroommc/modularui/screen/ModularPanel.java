@@ -26,6 +26,8 @@ import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -301,8 +303,33 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 loop:
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
+                    ItemStack dndTarget = getNEIDragAndDropTarget();
+                    if (dndTarget != null && widget.getElement() instanceof NEIDragAndDropHandler dndHandler) {
+                        // For reference: in 1.12 JEI handles drag-and-drop on MouseInputEvent.Pre event,
+                        // which is fired before GuiScreen#handleMouseInput call and able to dismiss it.
+                        // In contrast, NEI injects GuiContainerManager#mouseClicked at the start of GuiContainer#mouseClicked,
+                        // so at this point NEI has not handled drag-and-drop yet.
+                        // Also, we cannot rely on INEIGuiHandler, as root panel will always return true for interaction,
+                        // and click never gets propagated to NEI.
+                        if (dndHandler.handleDragAndDrop(dndTarget, mouseButton)) {
+                            // Replicate behavior of PanelWidget#handleDraggedClick
+                            if (ItemPanels.itemPanel.draggedStack != null && ItemPanels.itemPanel.draggedStack.stackSize == 0) {
+                                ItemPanels.itemPanel.draggedStack = null;
+                            }
+                            if (ItemPanels.bookmarkPanel.draggedStack != null && ItemPanels.bookmarkPanel.draggedStack.stackSize == 0) {
+                                ItemPanels.bookmarkPanel.draggedStack = null;
+                            }
+                            // SUCCESS, except that onMouseTapped should not be fired
+                            pressed = widget;
+                        } else {
+                            // STOP
+                            pressed = LocatedWidget.EMPTY;
+                        }
+                        result = true;
+                        widget.unapplyMatrix(getContext());
+                        break;
+                    }
                     if (widget.getElement() instanceof Interactable interactable) {
-                        if (shouldSkipClick(interactable)) continue;
                         switch (interactable.onMousePressed(mouseButton)) {
                             case IGNORE:
                                 break;
@@ -393,19 +420,17 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         });
     }
 
-    private boolean shouldSkipClick(Interactable interactable) {
-        // For reference: in 1.12 JEI handles drag-and-drop on MouseInputEvent.Pre event,
-        // which is fired before GuiScreen#handleMouseInput call and able to dismiss it.
-        // In contrast, NEI injects GuiContainerManager#mouseClicked at the start of GuiContainer#mouseClicked,
-        // so at this point NEI has not handled drag-and-drop yet.
-        // See also: PanelWidget#handleClickExt
-        return isNEIWantToHandleDragAndDrop() && interactable instanceof NEIDragAndDropHandler;
-    }
-
-    private boolean isNEIWantToHandleDragAndDrop() {
-        return !getContext().getScreen().isOverlay()
-            && getContext().getNEISettings().isNEIEnabled(this.screen)
-            && (ItemPanels.itemPanel.draggedStack != null || ItemPanels.bookmarkPanel.draggedStack != null);
+    private ItemStack getNEIDragAndDropTarget() {
+        if (getContext().getScreen().isOverlay() || !getContext().getNEISettings().isNEIEnabled(this.screen)) {
+            return null;
+        }
+        if (ItemPanels.itemPanel.draggedStack != null) {
+            return ItemPanels.itemPanel.draggedStack;
+        }
+        if (ItemPanels.bookmarkPanel.draggedStack != null) {
+            return ItemPanels.bookmarkPanel.draggedStack;
+        }
+        return null;
     }
 
     @ApiStatus.OverrideOnly

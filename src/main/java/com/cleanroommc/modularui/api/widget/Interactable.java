@@ -143,7 +143,7 @@ public interface Interactable {
         return keyID == Keyboard.KEY_C && hasControlDown() && !hasShiftDown() && !hasAltDown();
     }
 
-    public static boolean isKeyComboCtrlA(int keyID) {
+    static boolean isKeyComboCtrlA(int keyID) {
         return keyID == Keyboard.KEY_A && hasControlDown() && !hasShiftDown() && !hasAltDown();
     }
 
