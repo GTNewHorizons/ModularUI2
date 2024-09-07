@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.utils.fluid;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 

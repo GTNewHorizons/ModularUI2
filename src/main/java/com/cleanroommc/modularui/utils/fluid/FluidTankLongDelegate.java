@@ -2,8 +2,6 @@ package com.cleanroommc.modularui.utils.fluid;
 
 import static com.google.common.primitives.Ints.saturatedCast;
 
-import com.cleanroommc.modularui.api.IFluidTankLong;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;

@@ -2,11 +2,11 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.drawable.keys.StringKey;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Interactable {
-    private static final StringKey NONE = new StringKey("None");
+    private static final IKey NONE = IKey.str("None");
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
     private IDrawable arrowOpened;
@@ -71,7 +71,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     public DropDownMenu addChoice(ItemSelected onSelect, String text) {
-        return addChoice(onSelect, new StringKey(text));
+        return addChoice(onSelect, IKey.str(text));
     }
 
     public DropDownMenu setDropDownDirection(DropDownDirection direction) {
@@ -92,7 +92,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         super.draw(context, widgetTheme);
         Area area = getArea();
         int smallerSide = Math.min(area.width, area.height);

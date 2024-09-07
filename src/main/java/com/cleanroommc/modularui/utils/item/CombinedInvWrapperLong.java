@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.utils.item;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 public class CombinedInvWrapperLong implements IItemHandlerLong {
 
     protected final IItemHandlerLong[] itemHandler; // the handlers

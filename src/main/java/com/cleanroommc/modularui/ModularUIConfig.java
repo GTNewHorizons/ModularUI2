@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui;
 
-import com.cleanroommc.modularui.screen.Tooltip;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
@@ -12,7 +12,7 @@ public class ModularUIConfig {
     public static int defaultScrollSpeed = 30;
     public static boolean smoothProgressBar = true;
     public static int panelOpenCloseAnimationTime = 0;
-    public static Tooltip.Pos tooltipPos = Tooltip.Pos.NEXT_TO_MOUSE;
+    public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.NEXT_TO_MOUSE;
     public static boolean useDarkThemeByDefault = false;
 
     public static boolean guiDebugMode = ModularUI.isDevEnv;
@@ -70,7 +70,7 @@ public class ModularUIConfig {
             .setLanguageKey(LANG_PREFIX + CATEGORY_RENDERING + ".panelOpenCloseAnimationTime")
             .getInt();
 
-        tooltipPos = Tooltip.Pos.fromString(
+        tooltipPos = RichTooltip.Pos.fromString(
             config.get(
                 CATEGORY_RENDERING,
                 "tooltipPos",

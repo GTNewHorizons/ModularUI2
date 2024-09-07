@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.Tessellator;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.Rectangle;
+
 import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class Stencil {
@@ -36,15 +38,15 @@ public class Stencil {
         GL11.glStencilMask(0x00);
     }
 
-    public static void apply(Area area, @Nullable GuiContext context) {
+    public static void apply(Rectangle area, @Nullable GuiContext context) {
         apply(area.x, area.y, area.width, area.height, context);
     }
 
-    public static void applyAtZero(Area area, @Nullable GuiContext context) {
+    public static void applyAtZero(Rectangle area, @Nullable GuiContext context) {
         apply(0, 0, area.width, area.height, context);
     }
 
-    public static void applyTransformed(Area area) {
+    public static void applyTransformed(Rectangle area) {
         applyTransformed(area.x, area.y, area.width, area.height);
     }
 

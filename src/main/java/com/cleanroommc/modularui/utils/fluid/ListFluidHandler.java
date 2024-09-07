@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.cleanroommc.modularui.api.IFluidTankLong;
-
 import net.minecraftforge.fluids.Fluid;
 
 public class ListFluidHandler implements IFluidTanksHandler {

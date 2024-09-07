@@ -5,7 +5,7 @@ import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
@@ -81,7 +81,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public void preDraw(GuiContext context, boolean transformed) {
+    public void preDraw(ModularGuiContext context, boolean transformed) {
         if (transformed) {
             drawText(context);
         } else {
@@ -89,7 +89,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         }
     }
 
-    public void drawText(GuiContext context) {
+    public void drawText(ModularGuiContext context) {
         this.renderer.setSimulate(false);
         this.renderer.setScale(this.scale);
         this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
@@ -108,13 +108,13 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public void onFocus(GuiContext context) {
+    public void onFocus(ModularGuiContext context) {
         this.cursorTimer = 0;
         this.renderer.setCursor(true);
     }
 
     @Override
-    public void onRemoveFocus(GuiContext context) {
+    public void onRemoveFocus(ModularGuiContext context) {
         this.renderer.setCursor(false);
         this.cursorTimer = 0;
         this.scrollOffset = 0;
@@ -130,8 +130,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
         if (!isHovering()) {
             return Result.IGNORE;
         }
-        int x = getContext().unTransformMouseX() + getScrollX();
-        int y = getContext().unTransformMouseY() + getScrollY();
+        int x = getContext().getMouseX() + getScrollX();
+        int y = getContext().getMouseY() + getScrollY();
         this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
         return Result.SUCCESS;
     }
@@ -139,8 +139,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
         if (isFocused()) {
-            int x = getContext().unTransformMouseX() + getScrollX();
-            int y = getContext().unTransformMouseY() + getScrollY();
+            int x = getContext().getMouseX() + getScrollX();
+            int y = getContext().getMouseY() + getScrollY();
             this.handler.setMainCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
         }
     }

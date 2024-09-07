@@ -5,8 +5,6 @@ import static com.google.common.primitives.Ints.saturatedCast;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

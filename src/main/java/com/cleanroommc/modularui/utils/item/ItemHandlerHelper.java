@@ -12,8 +12,6 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 public class ItemHandlerHelper {
 
     public ItemHandlerHelper() {}

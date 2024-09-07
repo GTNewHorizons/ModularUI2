@@ -3,20 +3,20 @@ package com.cleanroommc.modularui.test;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.AnimatedText;
 import com.cleanroommc.modularui.drawable.Circle;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
-import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
-import com.cleanroommc.modularui.utils.item.ItemStackHandler;
+import com.cleanroommc.modularui.drawable.text.AnimatedText;
 import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
+import com.cleanroommc.modularui.utils.item.ItemStackHandler;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -45,6 +45,7 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -168,7 +169,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                             .asIcon()
                                                                             .size(20))
                                                                     .addLine(new ItemDrawable(new ItemStack(Items.diamond)).asIcon())
-                                                                    .pos(Tooltip.Pos.LEFT);
+                                                                    .pos(RichTooltip.Pos.LEFT);
                                                         })
                                                         .onMousePressed(mouseButton -> {
                                                             //panel.getScreen().close(true);
@@ -454,7 +455,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         }
 
         @Override
-        public void draw(GuiContext context, WidgetTheme widgetTheme) {
+        public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
             this.animatedKey.draw(context, 0, 0, getArea().w(), getArea().h(), widgetTheme);
         }
 

@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IFluidTankLong;
-import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.fluid.IFluidTankLong;
+import com.cleanroommc.modularui.utils.item.IItemStackLong;
 import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
 import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;

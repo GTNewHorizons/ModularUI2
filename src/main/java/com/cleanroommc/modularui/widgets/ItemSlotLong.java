@@ -1,59 +1,49 @@
 package com.cleanroommc.modularui.widgets;
 
-import codechicken.nei.guihook.GuiContainerManager;
-import codechicken.nei.guihook.IContainerTooltipHandler;
-
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.utils.item.IItemHandlerLong;
 import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
 import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.utils.MouseData;
-import com.cleanroommc.modularui.widget.Widget;
-
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-
-import net.minecraft.client.renderer.entity.RenderItem;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import com.cleanroommc.modularui.api.IItemStackLong;
-import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.TextRenderer;
-import com.cleanroommc.modularui.utils.item.IItemHandlerLong;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.utils.item.IItemStackLong;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 import com.cleanroommc.modularui.value.sync.ItemSlotLongSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
+import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.slot.ModularSlotLong;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
-import java.util.List;
-
-import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 // Changes made here probably should also be made to ItemSlot
 public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
@@ -64,15 +54,13 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
     private ItemSlotLongSH syncHandler;
 
     public ItemSlotLong() {
-        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
-        tooltipBuilder(this::addToolTip);
-    }
-
-    protected void addToolTip(Tooltip tooltip) {
-        if (!isSynced()) return;
-        ItemStack stack = getSlot().getStack();
-        if (stack == null) return;
-        tooltip.addStringLines(getItemTooltip(stack));
+        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
+        tooltipBuilder(tooltip -> {
+            if (!isSynced()) return;
+            ItemStack stack = getSlot().getStack();
+            if (stack == null) return;
+            tooltip.addFromItem(stack);
+        });
     }
 
     @Override
@@ -80,7 +68,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
         if (getScreen().isOverlay()) {
             throw new IllegalStateException("Overlays can't have slots!");
         }
-        size(SIZE, SIZE);
+        size(SIZE);
     }
 
     @Override
@@ -99,7 +87,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(getSlot());
@@ -111,6 +99,14 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
             GL11.glColorMask(true, true, true, true);
             GL11.glDisable(GL11.GL_BLEND);
+        }
+    }
+
+    @Override
+    public void drawForeground(ModularGuiContext context) {
+        RichTooltip tooltip = getTooltip();
+        if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
+            tooltip.draw(getContext(), getSlot().getStack());
         }
     }
 
@@ -179,26 +175,6 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
             throw new IllegalStateException("Widget is not initialised!");
         }
         return this.syncHandler;
-    }
-
-    @SideOnly(Side.CLIENT)
-    protected List<String> getItemTooltip(ItemStack stack) {
-        if (!isNEILoaded || !(getScreen().getScreenWrapper() instanceof GuiContainer guiContainer)) {
-            return stack.getTooltip(
-                    Minecraft.getMinecraft().thePlayer,
-                    Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
-        }
-
-        List<String> tooltips = GuiContainerManager.itemDisplayNameMultiline(stack, guiContainer, true);
-
-        GuiContainerManager.applyItemCountDetails(tooltips, stack);
-
-        if (GuiContainerManager.getManager() != null && GuiContainerManager.shouldShowTooltip(guiContainer)) {
-            for (IContainerTooltipHandler handler : GuiContainerManager.getManager().instanceTooltipHandlers)
-                tooltips = handler.handleItemTooltip(guiContainer, stack, getContext().getMouseX(), getContext().getMouseY(), tooltips);
-        }
-
-        return tooltips;
     }
 
     public ItemSlotLong slot(ModularSlotLong slot) {

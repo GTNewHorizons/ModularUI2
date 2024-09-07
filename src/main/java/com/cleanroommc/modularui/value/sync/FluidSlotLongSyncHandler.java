@@ -5,8 +5,7 @@ import static com.google.common.primitives.Ints.saturatedCast;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.IFluidTankLong;
+import com.cleanroommc.modularui.utils.fluid.IFluidTankLong;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.fluid.FluidInteractions;
@@ -18,9 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidContainerItem;
 
 // Changes made here probably should also be made to FluidSlotSyncHandler
 public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {

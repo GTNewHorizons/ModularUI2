@@ -2,14 +2,27 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
 import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MouseData;
-
+import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
+import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
+import com.cleanroommc.modularui.utils.fluid.IFluidTankLong;
+import com.cleanroommc.modularui.value.sync.FluidSlotLongSyncHandler;
+import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
 import gregtech.api.util.GTUtility;
@@ -17,30 +30,14 @@ import gregtech.api.util.GTUtility;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-
-import com.cleanroommc.modularui.api.IFluidTankLong;
-import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.drawable.TextRenderer;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.NumberFormat;
-import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
-import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
-import com.cleanroommc.modularui.value.sync.FluidSlotLongSyncHandler;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
-
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
@@ -63,11 +60,11 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
 
     public FluidSlotLong() {
         size(DEFAULT_SIZE);
-        tooltip().setAutoUpdate(true).setHasTitleMargin(true);
+        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
         tooltipBuilder(this::addToolTip);
     }
 
-    protected void addToolTip(Tooltip tooltip) {
+    protected void addToolTip(RichTooltip tooltip) {
         IFluidTankLong fluidTank = getFluidTankLong();
         FluidStack fluid = fluidTank.getFluid();
         if (this.syncHandler.isPhantom()) {
@@ -110,8 +107,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
         }
     }
 
-    public void addAdditionalFluidInfo(Tooltip tooltip, FluidStack fluidStack) {
-    }
+    public void addAdditionalFluidInfo(RichTooltip tooltip, FluidStack fluidStack) {}
 
     public String formatFluidAmount(double amount) {
         NumberFormat.FORMAT.setMaximumFractionDigits(3);
@@ -140,7 +136,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     }
 
     @Override
-    public void draw(GuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         IFluidTankLong fluidTank = getFluidTankLong();
         if (fluidTank.getFluid() != null) {
             int y = this.contentOffsetY;

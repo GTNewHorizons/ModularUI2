@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.IFluidTankLong;
+import com.cleanroommc.modularui.utils.fluid.IFluidTankLong;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.utils.BooleanConsumer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;

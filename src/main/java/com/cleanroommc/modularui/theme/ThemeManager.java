@@ -4,18 +4,9 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.FallbackableUITexture;
 import com.cleanroommc.modularui.mixins.early.minecraft.SimpleResourceAccessor;
-import com.cleanroommc.modularui.screen.Tooltip;
-import com.cleanroommc.modularui.utils.AssetHelper;
-import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.JsonBuilder;
-import com.cleanroommc.modularui.utils.JsonHelper;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.utils.ObjectList;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import it.unimi.dsi.fastutil.objects.*;
+import com.cleanroommc.modularui.utils.*;
 
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -23,6 +14,13 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.objects.*;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -301,7 +299,7 @@ public class ThemeManager implements IResourceManagerReloadListener {
             }
             if (jsonBuilder.getJson().has("tooltipPos")) {
                 String posName = jsonBuilder.getJson().get("tooltipPos").getAsString();
-                theme.setTooltipPosOverride(Tooltip.Pos.valueOf(posName));
+                theme.setTooltipPosOverride(RichTooltip.Pos.valueOf(posName));
             }
             return theme;
         }

@@ -3,8 +3,6 @@ package com.cleanroommc.modularui.utils.fluid;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IFluidTankLong;
-
 import net.minecraftforge.fluids.Fluid;
 
 public interface IFluidTanksHandler {

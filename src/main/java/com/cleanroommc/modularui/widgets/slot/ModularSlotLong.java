@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.item.IItemStackLong;
 import com.cleanroommc.modularui.utils.item.IItemHandlerLong;
 import com.cleanroommc.modularui.utils.item.ItemStackLong;
 

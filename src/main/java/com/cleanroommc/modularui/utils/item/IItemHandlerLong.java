@@ -5,8 +5,6 @@ import static com.google.common.primitives.Ints.saturatedCast;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nullable;

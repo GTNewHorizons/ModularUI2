@@ -3,8 +3,6 @@ package com.cleanroommc.modularui.utils.item;
 import java.util.Arrays;
 import java.util.List;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 

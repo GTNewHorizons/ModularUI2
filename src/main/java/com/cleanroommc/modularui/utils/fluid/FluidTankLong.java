@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.utils.fluid;
 
-import com.cleanroommc.modularui.api.IFluidTankLong;
-
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 

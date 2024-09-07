@@ -4,12 +4,13 @@ import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +73,7 @@ public interface IMuiScreen {
     }
 
     /**
-     * Hovering widget is handled by {@link com.cleanroommc.modularui.screen.viewport.GuiContext}.
+     * Hovering widget is handled by {@link ModularGuiContext}.
      * If it detects a slot, this method is called. Only affects {@link GuiContainer GuiContainers}.
      *
      * @param slot hovered slot

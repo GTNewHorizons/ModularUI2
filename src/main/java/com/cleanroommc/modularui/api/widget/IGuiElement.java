@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 /**
@@ -58,7 +58,7 @@ public interface IGuiElement {
      *
      * @param context gui context
      */
-    void draw(GuiContext context);
+    void draw(ModularGuiContext context);
 
     /**
      * Called when the mouse enters the area of this element

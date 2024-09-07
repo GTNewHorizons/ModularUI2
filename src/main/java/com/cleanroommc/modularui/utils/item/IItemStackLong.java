@@ -1,9 +1,7 @@
-package com.cleanroommc.modularui.api;
+package com.cleanroommc.modularui.utils.item;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

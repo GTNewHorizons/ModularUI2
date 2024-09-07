@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
+import com.cleanroommc.modularui.utils.item.IItemStackLong;
 
 public interface IOnSlotChangedLong {
 

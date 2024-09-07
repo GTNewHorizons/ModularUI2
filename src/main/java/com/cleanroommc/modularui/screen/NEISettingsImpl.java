@@ -11,8 +11,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 
@@ -123,10 +123,16 @@ public class NEISettingsImpl implements NEISettings {
     public List<Rectangle> getAllNEIExclusionAreas() {
         this.neiExclusionWidgets.removeIf(widget -> !widget.isValid());
         List<Rectangle> areas = new ArrayList<>(this.neiExclusionAreas);
-        areas.addAll(this.neiExclusionWidgets.stream()
-                .filter(IWidget::isEnabled)
-                .map(IWidget::getArea)
-                .collect(Collectors.toList()));
+        for (Iterator<IWidget> iterator = this.neiExclusionWidgets.iterator(); iterator.hasNext(); ) {
+            IWidget widget = iterator.next();
+            if (!widget.isValid()) {
+                iterator.remove();
+                continue;
+            }
+            if (widget.isEnabled()) {
+                areas.add(widget.getArea());
+            }
+        }
         return areas;
     }
 }

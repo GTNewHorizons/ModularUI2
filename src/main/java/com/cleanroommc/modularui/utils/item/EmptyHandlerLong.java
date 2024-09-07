@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.utils.item;
 
-import com.cleanroommc.modularui.api.IItemStackLong;
-
 public class EmptyHandlerLong implements IItemHandlerLong {
 
     public static final IItemHandlerLong INSTANCE = new EmptyHandlerLong();

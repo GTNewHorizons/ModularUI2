@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -326,10 +325,11 @@ public class GuiDraw {
         GL11.glPushMatrix();
         RenderHelper.enableGUIStandardItemLighting();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glTranslatef(x, y, 0);
         GL11.glScalef(width / 16f, height / 16f, 1);
         RenderItem renderItem = ((GuiScreenAccessor) Minecraft.getMinecraft().currentScreen).getItemRender();
         renderItem.zLevel = 200;
-        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, x, y);
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
         renderItem.zLevel = 0;
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         RenderHelper.enableStandardItemLighting();
@@ -556,7 +556,7 @@ public class GuiDraw {
         GL11.glEnable(GL11.GL_BLEND);
     }
 
-    public static void drawTooltipBackground(List<String> lines, int x, int y, int textWidth, int height) {
+    public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height) {
         // TODO theme color
         int backgroundColor = 0xF0100010;
         int borderColorStart = 0x505000FF;

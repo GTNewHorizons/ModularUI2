@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.cleanroommc.modularui.api.IFluidTankLong;
-
 import net.minecraftforge.fluids.Fluid;
 
 public class FluidTanksHandler implements IFluidTanksHandler {
