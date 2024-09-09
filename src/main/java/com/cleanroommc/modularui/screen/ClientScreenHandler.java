@@ -64,6 +64,8 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
+
 @SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
 
@@ -108,7 +110,7 @@ public class ClientScreenHandler {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
         // 1.7.10: NEI wants to process keyboard input first e.g. search bar
-        if (!(event.gui instanceof GuiContainer) && handleKeyboardInput(currentScreen, event.gui)) {
+        if (!(isNEILoaded && event.gui instanceof GuiContainer) && handleKeyboardInput(currentScreen, event.gui)) {
             event.setCanceled(true);
         }
     }
