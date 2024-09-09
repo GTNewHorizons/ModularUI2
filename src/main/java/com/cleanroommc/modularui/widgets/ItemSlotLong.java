@@ -239,10 +239,8 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
 
             if (itemstack != null) {
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                GL11.glEnable(GL11.GL_LIGHTING);
                 RenderHelper.enableGUIStandardItemLighting();
                 GL11.glEnable(GL11.GL_DEPTH_TEST);
-                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
                 // render the item itself
                 renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack.getAsItemStack(), 1, 1);
                 GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack.getAsItemStack());

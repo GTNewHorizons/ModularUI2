@@ -426,6 +426,7 @@ public class ClientScreenHandler {
         if (font == null) font = ((GuiScreenAccessor) mcScreen).getFontRenderer();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         ((GuiScreenAccessor) mcScreen).getItemRender().renderItemAndEffectIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y);
+        GuiDraw.afterRenderItemAndEffectIntoGUI(stack);
         ((GuiScreenAccessor) mcScreen).getItemRender().renderItemOverlayIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack() == null ? 0 : 8), altText);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         ((GuiAccessor) mcScreen).setZLevel(0f);

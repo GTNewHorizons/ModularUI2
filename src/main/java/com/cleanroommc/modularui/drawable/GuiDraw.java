@@ -21,6 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.util.List;
 
@@ -323,6 +324,7 @@ public class GuiDraw {
     public static void drawItem(ItemStack item, int x, int y, float width, float height) {
         if (item == null) return;
         GL11.glPushMatrix();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         RenderHelper.enableGUIStandardItemLighting();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glTranslatef(x, y, 0);
@@ -330,6 +332,8 @@ public class GuiDraw {
         RenderItem renderItem = ((GuiScreenAccessor) Minecraft.getMinecraft().currentScreen).getItemRender();
         renderItem.zLevel = 200;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
+        GuiDraw.afterRenderItemAndEffectIntoGUI(item);
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         renderItem.zLevel = 0;
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         RenderHelper.enableStandardItemLighting();
