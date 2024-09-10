@@ -354,9 +354,7 @@ public class ClientScreenHandler {
                 drawHandler.postRenderObjects(mcScreen, mouseX, mouseY);
             }
 
-//            if (!shouldRenderOurTooltip()) {
-            // nh todo?
-            if (true) {
+            if (shouldRenderNEITooltip(muiScreen)) {
                 GuiContainerManager.getManager().renderToolTips(mouseX, mouseY);
             }
         }
@@ -418,6 +416,10 @@ public class ClientScreenHandler {
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         RenderHelper.enableStandardItemLighting();
         Stencil.remove();
+    }
+
+    private static boolean shouldRenderNEITooltip(ModularScreen muiScreen) {
+        return !muiScreen.getContext().isHovered();
     }
 
     private static void drawItemStack(GuiContainer mcScreen, ItemStack stack, int x, int y, String altText) {
