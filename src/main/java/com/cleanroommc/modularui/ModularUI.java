@@ -11,7 +11,7 @@ import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ModularUI.ID, name = "Modular UI 2", version = Tags.VERSION, dependencies = ModularUI.DEPENDENCIES, guiFactory = "com.cleanroommc.modularui.config.GuiFactory")
+@Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = Tags.VERSION, dependencies = ModularUI.DEPENDENCIES, guiFactory = "com.cleanroommc.modularui.config.ModularUIGuiConfigFactory")
 public class ModularUI {
 
     static final String DEPENDENCIES = "required-after:gtnhmixins@[2.0.1,); "
@@ -21,6 +21,7 @@ public class ModularUI {
         + "before:gregtech";
 
     public static final String ID = "modularui2";
+    public static final String NAME = "Modular UI 2";
 
     public static final Logger LOGGER = LogManager.getLogger(ID);
 

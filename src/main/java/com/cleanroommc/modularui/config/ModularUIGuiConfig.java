@@ -2,35 +2,15 @@ package com.cleanroommc.modularui.config;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
+
+import com.gtnewhorizon.gtnhlib.config.ConfigException;
+import com.gtnewhorizon.gtnhlib.config.SimpleGuiConfig;
+
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.common.config.ConfigElement;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+public class ModularUIGuiConfig extends SimpleGuiConfig {
 
-@SuppressWarnings("rawtypes")
-public class ModularUIGuiConfig extends GuiConfig {
-
-    public ModularUIGuiConfig(GuiScreen parentScreen) {
-        super(
-                parentScreen,
-                getConfigElements(),
-                ModularUI.ID,
-                false,
-                false,
-                GuiConfig.getAbridgedConfigPath(ModularUIConfig.config.toString()));
-    }
-
-    private static List<IConfigElement> getConfigElements() {
-        List<IConfigElement> list = new ArrayList<>();
-
-        for (String category : ModularUIConfig.CATEGORIES) {
-            list.add(new ConfigElement(ModularUIConfig.config.getCategory(category.toLowerCase(Locale.US))));
-        }
-
-        return list;
+    public ModularUIGuiConfig(GuiScreen parent) throws ConfigException {
+        super(parent, ModularUI.ID, ModularUI.NAME, ModularUIConfig.class);
     }
 }

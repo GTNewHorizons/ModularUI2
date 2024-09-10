@@ -5,12 +5,13 @@ import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
-import cpw.mods.fml.client.event.ConfigChangedEvent;
+
+import com.gtnewhorizon.gtnhlib.config.ConfigException;
+import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,7 +21,12 @@ import net.minecraftforge.common.MinecraftForge;
 public class CommonProxy {
 
     void preInit(FMLPreInitializationEvent event) {
-        ModularUIConfig.init(event.getSuggestedConfigurationFile());
+        try {
+            ConfigurationManager.registerConfig(ModularUIConfig.class);
+        } catch (ConfigException e) {
+            throw new RuntimeException(e);
+        }
+
         FMLCommonHandler.instance().bus().register(new GuiManager());
         MinecraftForge.EVENT_BUS.register(new GuiManager());
 
@@ -49,12 +55,5 @@ public class CommonProxy {
     @SideOnly(Side.CLIENT)
     public Timer getTimer60Fps() {
         throw new UnsupportedOperationException();
-    }
-
-    @SubscribeEvent
-    public final void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.modID.equals(ModularUI.ID)) {
-            ModularUIConfig.syncConfig();
-        }
     }
 }
