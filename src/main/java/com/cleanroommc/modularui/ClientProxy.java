@@ -40,6 +40,8 @@ public class ClientProxy extends CommonProxy {
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(new EventHandler());
+        }
+        if (ModularUIConfig.enableTestOverlays) {
             OverlayTest.init();
         }
 

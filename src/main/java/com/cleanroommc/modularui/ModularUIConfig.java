@@ -31,4 +31,8 @@ public class ModularUIConfig {
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")
     public static boolean enableTestGuis = ModularUI.isDevEnv;
+
+    @Config.RequiresMcRestart
+    @Config.Comment("Enables a test overlay shown on title screen and watermark shown on every GuiContainer.")
+    public static boolean enableTestOverlays = false;
 }
