@@ -44,7 +44,7 @@ public class FluidSlotLongSyncHandler extends ValueSyncHandler<IFluidTankLong> {
     @Override
     public void setValue(IFluidTankLong value, boolean setSource, boolean sync) {
         cache = value.copy();
-        if (setSource && !NetworkUtils.isClient()) {
+        if (setSource) {
             handler.drain(index, Long.MAX_VALUE, true);
             if (value.getFluidAmountLong() == 0) {
                 handler.fill(index, value.getRealFluid(), value.getFluidAmountLong(), true);
