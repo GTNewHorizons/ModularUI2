@@ -3,6 +3,10 @@ package com.cleanroommc.modularui.api;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 
+import com.cleanroommc.modularui.api.widget.Interactable;
+
+import gregtech.common.items.ItemFluidDisplay;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -10,10 +14,17 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 import static com.cleanroommc.modularui.screen.ClientScreenHandler.getDefaultContext;
 
@@ -89,5 +100,45 @@ public class MCHelper {
         }
 
         return tooltips;
+    }
+
+    public static List<String> getFluidTooltip(FluidStack fluid) {
+        List<String> tooltip = new ArrayList<>();
+        tooltip.add(fluid.getLocalizedName());
+        if (isGT5ULoaded) {
+            String formula = ItemFluidDisplay.getChemicalFormula(fluid);
+            if (!formula.isEmpty()) {
+                tooltip.add(EnumChatFormatting.YELLOW + formula);
+            }
+        }
+        if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
+            tooltip.add(StatCollector.translateToLocalFormatted("modularui2.fluid.registry", fluid.getFluid().getName()));
+            if (Interactable.hasShiftDown()) {
+                tooltip.add(
+                        StatCollector.translateToLocalFormatted(
+                                "modularui2.fluid.unique_registry",
+                                FluidRegistry.getDefaultFluidName(fluid.getFluid())));
+            }
+        }
+        return tooltip;
+    }
+
+    public static List<String> getAdditionalFluidTooltip(FluidStack fluid) {
+        List<String> tooltip = new ArrayList<>();
+        if (Interactable.hasShiftDown()) {
+            tooltip.add(StatCollector.translateToLocalFormatted("modularui2.fluid.temperature", fluid.getFluid().getTemperature(fluid)));
+            tooltip.add(
+                    StatCollector.translateToLocalFormatted(
+                            "modularui2.fluid.state",
+                            fluid.getFluid().isGaseous(fluid) ? StatCollector.translateToLocal("modularui2.fluid.gas")
+                                    : StatCollector.translateToLocal("modularui2.fluid.liquid")));
+            if (isNEILoaded) {
+                String amountDetail = GuiContainerManager.fluidAmountDetails(fluid);
+                if (amountDetail != null) {
+                    tooltip.add(EnumChatFormatting.GRAY + amountDetail);
+                }
+            }
+        }
+        return tooltip;
     }
 }

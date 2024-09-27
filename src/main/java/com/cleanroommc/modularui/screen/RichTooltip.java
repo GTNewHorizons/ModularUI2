@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 
+import net.minecraftforge.fluids.FluidStack;
+
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -313,6 +315,23 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         add(lines.get(0)).spaceLine(2);
         for (int i = 1, n = lines.size(); i < n; i++) {
             add(lines.get(i)).newLine();
+        }
+        return this;
+    }
+
+    public RichTooltip addFromFluid(FluidStack fluid) {
+        List<String> lines = MCHelper.getFluidTooltip(fluid);
+        add(lines.get(0)).spaceLine(2);
+        for (int i = 1, n = lines.size(); i < n; i++) {
+            add(lines.get(i)).newLine();
+        }
+        return this;
+    }
+
+    public RichTooltip addAdditionalInfoFromFluid(FluidStack fluid) {
+        List<String> lines = MCHelper.getAdditionalFluidTooltip(fluid);
+        for (String line : lines) {
+            add(line).newLine();
         }
         return this;
     }

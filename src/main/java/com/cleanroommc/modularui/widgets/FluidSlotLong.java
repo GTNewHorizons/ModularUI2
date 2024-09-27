@@ -69,21 +69,24 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
         FluidStack fluid = fluidTank.getFluid();
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
-                tooltip.addLine(IKey.str(fluid.getLocalizedName()));
+                tooltip.addFromFluid(fluid);
                 if (this.syncHandler.controlsAmount()) {
                     tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount",
                             formatFluidAmount(fluidTank.getFluidAmountLong()),
                             getBaseUnit()));
                 }
+                addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
             }
             if (this.syncHandler.controlsAmount()) {
                 tooltip.addLine(IKey.lang("modularui2.fluid.phantom.control"));
+            } else {
+                tooltip.addLine(IKey.lang("modularui2.fluid.phantom.clear"));
             }
         } else {
             if (fluid != null) {
-                tooltip.addLine(IKey.str(fluid.getLocalizedName()));
+                tooltip.addFromFluid(fluid);
                 tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidAmount(fluidTank.getFluidAmountLong()),
                         formatFluidAmount(fluidTank.getCapacityLong()), getBaseUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);
@@ -107,7 +110,9 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
         }
     }
 
-    public void addAdditionalFluidInfo(RichTooltip tooltip, FluidStack fluidStack) {}
+    public void addAdditionalFluidInfo(RichTooltip tooltip, FluidStack fluidStack) {
+        tooltip.addAdditionalInfoFromFluid(fluidStack);
+    }
 
     public String formatFluidAmount(double amount) {
         NumberFormat.FORMAT.setMaximumFractionDigits(3);
