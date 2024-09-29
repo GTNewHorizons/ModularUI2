@@ -292,7 +292,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
         if (!this.syncHandler.isPhantom()) return false;
-        this.syncHandler.updateFromClient(new ItemStackLong(draggedStack));
+        this.syncHandler.updateFromClient(draggedStack, button);
         draggedStack.stackSize = 0;
         return true;
     }

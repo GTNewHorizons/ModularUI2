@@ -83,20 +83,23 @@ public class ItemSlotSH extends SyncHandler {
             setEnabled(buf.readBoolean(), false);
         } else if (id == 5) {
             if (!isPhantom()) return;
-            ItemStack stack = NetworkUtils.readItemStack(buf);
-            this.slot.putStack(stack);
+            phantomClick(MouseData.readPacket(buf), NetworkUtils.readItemStack(buf));
         }
     }
 
     protected void phantomClick(MouseData mouseData) {
-        ItemStack cursorStack = getSyncManager().getCursorItem();
+        phantomClick(mouseData, getSyncManager().getCursorItem());
+    }
+
+    protected void phantomClick(MouseData mouseData, ItemStack cursorStack) {
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
-        if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack((cursorStack), slotStack)) {
+        if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
             stackToPut = cursorStack.copy();
             if (mouseData.mouseButton == 1) {
                 stackToPut.stackSize = 1;
             }
+            stackToPut.stackSize = Math.min(stackToPut.stackSize, slot.getItemStackLimit(stackToPut));
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else if (slotStack == null) {
@@ -112,6 +115,7 @@ public class ItemSlotSH extends SyncHandler {
             if (mouseData.mouseButton == 1) {
                 stackToPut.stackSize = 1;
             }
+            stackToPut.stackSize = Math.min(stackToPut.stackSize, slot.getItemStackLimit(stackToPut));
             getSlot().putStack(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
@@ -178,8 +182,12 @@ public class ItemSlotSH extends SyncHandler {
         }
     }
 
-    public void updateFromClient(ItemStack stack) {
-        syncToServer(5, buf -> NetworkUtils.writeItemStack(buf, stack));
+    public void updateFromClient(ItemStack stack, int button) {
+        syncToServer(5, buf -> {
+            MouseData mouseData = MouseData.create(button);
+            mouseData.writeToPacket(buf);
+            NetworkUtils.writeItemStack(buf, stack);
+        });
     }
 
     public ModularSlot getSlot() {

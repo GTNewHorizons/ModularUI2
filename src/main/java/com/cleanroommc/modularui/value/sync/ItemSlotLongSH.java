@@ -81,21 +81,23 @@ public class ItemSlotLongSH extends SyncHandler {
             setEnabled(buf.readBoolean(), false);
         } else if (id == 5) {
             if (!isPhantom()) return;
-            ItemStack stack = NetworkUtils.readItemStack(buf);
-            this.slot.putStack(stack);
+            phantomClick(MouseData.readPacket(buf), NetworkUtils.readItemStack(buf));
         }
     }
 
     protected void phantomClick(MouseData mouseData) {
-        ItemStack cursorStackItem = getSyncManager().getCursorItem();
-        IItemStackLong cursorStack = cursorStackItem == null ? null : new ItemStackLong(cursorStackItem);
+        phantomClick(mouseData, getSyncManager().getCursorItem());
+    }
+
+    protected void phantomClick(MouseData mouseData, ItemStack cursorStack) {
         IItemStackLong slotStack = getSlot().getStackLong();
         IItemStackLong stackToPut;
-        if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack((cursorStack), slotStack)) {
-            stackToPut = (cursorStack.copy());
+        if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack.getAsItemStack())) {
+            stackToPut = new ItemStackLong(cursorStack.copy());
             if (mouseData.mouseButton == 1) {
                 stackToPut.setStackSize(1);
             }
+            stackToPut.setStackSize(Math.min(stackToPut.getStackSize(), slot.getItemStackLimitLong(stackToPut)));
             getSlot().putStackLong(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else if (slotStack == null) {
@@ -106,11 +108,12 @@ public class ItemSlotLongSH extends SyncHandler {
                     return;
                 }
             } else {
-                stackToPut = cursorStack.copy();
+                stackToPut = new ItemStackLong(cursorStack.copy());
             }
             if (mouseData.mouseButton == 1) {
                 stackToPut.setStackSize(1);
             }
+            stackToPut.setStackSize(Math.min(stackToPut.getStackSize(), slot.getItemStackLimitLong(stackToPut)));
             getSlot().putStackLong(stackToPut);
             this.lastStoredPhantomItem = stackToPut.copy();
         } else {
@@ -177,8 +180,12 @@ public class ItemSlotLongSH extends SyncHandler {
         }
     }
 
-    public void updateFromClient(IItemStackLong stack) {
-        syncToServer(5, buf -> NetworkUtils.writeItemStackLong(buf, stack));
+    public void updateFromClient(ItemStack stack, int button) {
+        syncToServer(5, buf -> {
+            MouseData mouseData = MouseData.create(button);
+            mouseData.writeToPacket(buf);
+            NetworkUtils.writeItemStack(buf, stack);
+        });
     }
 
     public ModularSlotLong getSlot() {
