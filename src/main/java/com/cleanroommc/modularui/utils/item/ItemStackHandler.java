@@ -7,6 +7,7 @@ package com.cleanroommc.modularui.utils.item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 
@@ -35,6 +36,9 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
         this.stacks = Arrays.asList(stacks);
     }
 
+    /**
+     * Clears current inventory and forcibly sets size of the inventory.
+     */
     public void setSize(int size) {
         ItemStack[] stacks = new ItemStack[size];
         Arrays.fill(stacks, null);
@@ -152,6 +156,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
                 NBTTagCompound itemTag = new NBTTagCompound();
                 itemTag.setInteger("Slot", i);
                 this.stacks.get(i).writeToNBT(itemTag);
+                itemTag.setInteger("Count", stacks.get(i).stackSize);
                 nbtTagList.appendTag(itemTag);
             }
         }
@@ -171,7 +176,11 @@ public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializabl
             NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
             int slot = itemTags.getInteger("Slot");
             if (slot >= 0 && slot < this.stacks.size()) {
-                this.stacks.set(slot, ItemStack.loadItemStackFromNBT(itemTags));
+                ItemStack loadedStack = ItemStack.loadItemStackFromNBT(itemTags);
+                if (loadedStack != null && itemTags.hasKey("Count", Constants.NBT.TAG_INT)) {
+                    loadedStack.stackSize = itemTags.getInteger("Count");
+                }
+                this.stacks.set(slot, loadedStack);
             }
         }
 
