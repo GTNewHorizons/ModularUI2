@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.utils.item;
 
+import cpw.mods.fml.common.Optional;
+
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -8,11 +10,11 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 import javax.annotation.Nullable;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-public interface IItemHandler {
+@Optional.Interface(iface = "com.gtnewhorizons.modularui.api.forge.IItemHandler", modid = "modularui")
+public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IItemHandler {
 
     /**
      * Returns the number of slots available

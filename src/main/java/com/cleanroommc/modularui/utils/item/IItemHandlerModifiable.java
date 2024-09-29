@@ -1,10 +1,13 @@
 package com.cleanroommc.modularui.utils.item;
 
+import cpw.mods.fml.common.Optional;
+
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-public interface IItemHandlerModifiable extends IItemHandler {
+@Optional.Interface(iface = "com.gtnewhorizons.modularui.api.forge.IItemHandlerModifiable", modid = "modularui")
+public interface IItemHandlerModifiable extends IItemHandler, com.gtnewhorizons.modularui.api.forge.IItemHandlerModifiable {
 
     /**
      * Overrides the stack in the given slot. This method is used by the
