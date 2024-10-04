@@ -191,7 +191,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (!(guiScreen instanceof GuiContainer))
             throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
-        RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
+        RenderItem renderItem = GuiScreenAccessor.getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean flag = false;
         boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();

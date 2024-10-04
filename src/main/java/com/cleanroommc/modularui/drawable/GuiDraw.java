@@ -329,7 +329,7 @@ public class GuiDraw {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glTranslatef(x, y, 0);
         GL11.glScalef(width / 16f, height / 16f, 1);
-        RenderItem renderItem = ((GuiScreenAccessor) Minecraft.getMinecraft().currentScreen).getItemRender();
+        RenderItem renderItem = GuiScreenAccessor.getItemRender();
         renderItem.zLevel = 200;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);

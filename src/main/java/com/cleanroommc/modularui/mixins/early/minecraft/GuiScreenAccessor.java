@@ -36,7 +36,9 @@ public interface GuiScreenAccessor {
     void setLastMouseEvent(long event);
 
     @Accessor
-    RenderItem getItemRender();
+    static RenderItem getItemRender() {
+        throw new UnsupportedOperationException("Mixin failed to inject!");
+    }
 
     @Accessor("fontRendererObj")
     FontRenderer getFontRenderer();

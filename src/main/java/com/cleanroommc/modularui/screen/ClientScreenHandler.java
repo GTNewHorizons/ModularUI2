@@ -425,16 +425,16 @@ public class ClientScreenHandler {
     private static void drawItemStack(GuiContainer mcScreen, ItemStack stack, int x, int y, String altText) {
         GL11.glTranslatef(0.0F, 0.0F, 32.0F);
         ((GuiAccessor) mcScreen).setZLevel(200f);
-        ((GuiScreenAccessor) mcScreen).getItemRender().zLevel = 200.0F;
+        GuiScreenAccessor.getItemRender().zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = ((GuiScreenAccessor) mcScreen).getFontRenderer();
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        ((GuiScreenAccessor) mcScreen).getItemRender().renderItemAndEffectIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y);
+        GuiScreenAccessor.getItemRender().renderItemAndEffectIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y);
         GuiDraw.afterRenderItemAndEffectIntoGUI(stack);
-        ((GuiScreenAccessor) mcScreen).getItemRender().renderItemOverlayIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack() == null ? 0 : 8), altText);
+        GuiScreenAccessor.getItemRender().renderItemOverlayIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack() == null ? 0 : 8), altText);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         ((GuiAccessor) mcScreen).setZLevel(0f);
-        ((GuiScreenAccessor) mcScreen).getItemRender().zLevel = 0.0F;
+        GuiScreenAccessor.getItemRender().zLevel = 0.0F;
     }
 
     private static void drawVanillaElements(GuiScreen mcScreen, int mouseX, int mouseY, float partialTicks) {

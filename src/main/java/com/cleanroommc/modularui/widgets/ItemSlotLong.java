@@ -193,7 +193,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
         if (!(guiScreen instanceof GuiContainer))
             throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
-        RenderItem renderItem = ((GuiScreenAccessor) guiScreen).getItemRender();
+        RenderItem renderItem = GuiScreenAccessor.getItemRender();
         IItemStackLong itemstack = slotIn.getStackLong();
         boolean flag = false;
         boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
