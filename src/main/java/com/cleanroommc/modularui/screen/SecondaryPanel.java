@@ -76,7 +76,7 @@ public class SecondaryPanel implements IPanelHandler {
             this.screen = this.parent.getScreen();
         }
         if (this.panel == null) {
-            this.panel = Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), Minecraft.getMinecraft().player));
+            this.panel = Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), Minecraft.getMinecraft().thePlayer));
             if (this.panel == this.screen.getMainPanel()) {
                 throw new IllegalArgumentException("Must not return main panel!");
             }
