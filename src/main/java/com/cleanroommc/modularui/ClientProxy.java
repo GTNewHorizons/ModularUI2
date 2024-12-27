@@ -35,8 +35,6 @@ public class ClientProxy extends CommonProxy {
     void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
 
-        FMLCommonHandler.instance().bus().register(new ClientEventHandler());
-
         ClientScreenHandler clientScreenHandler = new ClientScreenHandler();
         // registered to both buses since handled events are not bound to a single bus
         FMLCommonHandler.instance().bus().register(clientScreenHandler);

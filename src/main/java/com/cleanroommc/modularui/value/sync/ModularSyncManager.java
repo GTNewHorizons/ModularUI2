@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.api.IPanelSyncManager;
 import com.cleanroommc.modularui.utils.item.IItemHandler;
 import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
 import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
@@ -55,11 +54,11 @@ public class ModularSyncManager {
     }
 
     public void onClose() {
-        this.panelSyncManagerMap.values().forEach(IPanelSyncManager::onClose);
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onClose);
     }
 
     public void onOpen() {
-        this.panelSyncManagerMap.values().forEach(IPanelSyncManager::onOpen);
+        this.panelSyncManagerMap.values().forEach(PanelSyncManager::onOpen);
     }
 
     public PanelSyncManager getPanelSyncManager(String panelName) {
