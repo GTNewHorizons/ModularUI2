@@ -67,9 +67,11 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     protected void addToolTip(RichTooltip tooltip) {
         IFluidTankLong fluidTank = getFluidTankLong();
         FluidStack fluid = fluidTank.getFluid();
+        if (fluid != null) {
+            tooltip.addFromFluid(fluid);
+        }
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
-                tooltip.addFromFluid(fluid);
                 if (this.syncHandler.controlsAmount()) {
                     tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount",
                             formatFluidAmount(fluidTank.getFluidAmountLong()),
@@ -86,7 +88,6 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
             }
         } else {
             if (fluid != null) {
-                tooltip.addFromFluid(fluid);
                 tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidAmount(fluidTank.getFluidAmountLong()),
                         formatFluidAmount(fluidTank.getCapacityLong()), getBaseUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);

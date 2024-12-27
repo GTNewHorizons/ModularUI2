@@ -64,9 +64,11 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     protected void addToolTip(RichTooltip tooltip) {
         IFluidTank fluidTank = getFluidTank();
         FluidStack fluid = this.syncHandler.getValue();
+        if (fluid != null) {
+            tooltip.addFromFluid(fluid);
+        }
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
-                tooltip.addFromFluid(fluid);
                 if (this.syncHandler.controlsAmount()) {
                     tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
                 }
@@ -81,7 +83,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             }
         } else {
             if (fluid != null) {
-                tooltip.addFromFluid(fluid);
                 tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
