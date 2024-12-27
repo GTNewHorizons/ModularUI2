@@ -104,7 +104,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
                         tooltip.addLine(IKey.lang("modularui2.fluid.click_to_empty"));
                     }
                 } else {
-                    tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
+                    tooltip.addLine(IKey.lang("modularui2.tooltip.shift"));
                 }
             }
         }

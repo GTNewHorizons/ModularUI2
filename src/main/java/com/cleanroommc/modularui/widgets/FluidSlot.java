@@ -98,7 +98,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
                         tooltip.addLine(IKey.lang("modularui2.fluid.click_to_empty"));
                     }
                 } else {
-                    tooltip.addLine(IKey.lang("modularui.tooltip.shift"));
+                    tooltip.addLine(IKey.lang("modularui2.tooltip.shift"));
                 }
             }
         }
