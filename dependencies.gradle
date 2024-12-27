@@ -30,15 +30,15 @@
  */
 dependencies {
     api("org.jetbrains:annotations:24.0.1")
-    api("com.github.GTNewHorizons:GTNHLib:0.5.20:dev")
+    api("com.github.GTNewHorizons:GTNHLib:0.6.0:dev")
 
-    compileOnly("com.github.GTNewHorizons:NotEnoughItems:2.6.46-GTNH:dev")
-    compileOnly("com.github.GTNewHorizons:Hodgepodge:2.5.79:dev") { transitive = false }
-    compileOnly("com.github.GTNewHorizons:GT5-Unofficial:5.09.50.73:dev") { transitive = false }
-    compileOnly("com.github.GTNewHorizons:ModularUI:1.2.14:dev") { transitive = false }
+    compileOnly("com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev")
+    compileOnly("com.github.GTNewHorizons:Hodgepodge:2.6.6:dev") { transitive = false }
+    compileOnly("com.github.GTNewHorizons:GT5-Unofficial:5.09.51.33:dev") { transitive = false }
+    compileOnly("com.github.GTNewHorizons:ModularUI:1.2.17:dev") { transitive = false }
     compileOnly("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
 
-    //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.6.46-GTNH:dev")
+    //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev")
     // For Thaumcraft runtime
     //runtimeOnlyNonPublishable("com.github.GTNewHorizons:Baubles:1.0.4:dev")
 
