@@ -40,6 +40,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
     private Consumer<RichTooltip> tooltipBuilder;
     private int showUpTimer = 0;
     private boolean autoUpdate = false;
+    private int titleMargin = 0;
+    private boolean appliedMargin = true;
 
     private int x = 0, y = 0;
     private int maxWidth = Integer.MAX_VALUE;
@@ -70,6 +72,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         if (this.tooltipBuilder != null) {
             this.text.clearText();
             this.tooltipBuilder.accept(this);
+            this.appliedMargin = false;
         }
     }
 
@@ -83,6 +86,12 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         if (this.maxWidth <= 0) {
             this.maxWidth = Integer.MAX_VALUE;
+        }
+        if (!this.appliedMargin) {
+            if (this.titleMargin > 0) {
+                this.text.insertTitleMargin(this.titleMargin);
+            }
+            this.appliedMargin = true;
         }
         Area screen = context.getScreenArea();
         this.maxWidth = Math.min(this.maxWidth, screen.width);
@@ -333,6 +342,16 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         for (String line : lines) {
             add(line).newLine();
         }
+        return this;
+    }
+
+    public RichTooltip titleMargin() {
+        return titleMargin(0);
+    }
+
+    public RichTooltip titleMargin(int margin) {
+        this.titleMargin = margin;
+        this.appliedMargin = false;
         return this;
     }
 

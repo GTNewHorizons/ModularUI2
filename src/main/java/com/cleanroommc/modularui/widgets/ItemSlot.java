@@ -56,8 +56,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         tooltipBuilder(tooltip -> {
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
-            if (stack == null) return;
-            tooltip.addFromItem(stack);
+            buildTooltip(stack, tooltip);
         });
     }
 
@@ -106,6 +105,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer())) {
             tooltip.draw(getContext(), getSlot().getStack());
         }
+    }
+
+    public void buildTooltip(ItemStack stack, RichTooltip tooltip) {
+        if (stack == null) return;
+        tooltip.addFromItem(stack);
     }
 
     @Override
