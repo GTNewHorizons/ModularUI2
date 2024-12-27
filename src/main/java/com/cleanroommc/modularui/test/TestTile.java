@@ -21,7 +21,6 @@ import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
-import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
@@ -56,6 +55,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -153,6 +153,11 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                 .child(new ButtonWidget<>()
                                                         .size(60, 18)
                                                         .overlay(IKey.dynamic(() -> "Button " + this.val)))
+                                                .child(new Rectangle()
+                                                        .setColor(Color.RED.main)
+                                                        .asWidget()
+                                                        .size(32, 2)
+                                                        .setEnabledIf(widget -> this.val > 10))
                                                 .child(new FluidSlot()
                                                         .margin(2)
                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
@@ -188,7 +193,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                         .size(60, 20)
                                                         .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
                                                         .setNumbersDouble(Function.identity()))
-                                                .child(IKey.str("Test string").asWidget().padding(2).debugName("test string")))
+                                                .child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
+                                                .child(IKey.EMPTY.asWidget().debugName("Empty Ikey")))
                                         .child(new Column()
                                                 .debugName("button and slots test 2")
                                                 .coverChildren()
@@ -360,14 +366,17 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         return panel;
     }
 
-    public ModularPanel openSecondWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+    public ModularPanel openSecondWindow(PanelSyncManager syncManager, IPanelHandler syncHandler) {
         ModularPanel panel = new Dialog<>("second_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
         syncManager.registerSlotGroup(slotGroup);
-        IPanelHandler panelSyncHandler = syncManager.panel("other_panel_2", this::openThirdWindow, true);
+        AtomicInteger number = new AtomicInteger(0);
+        syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));
+        IPanelHandler panelSyncHandler = syncManager.panel("other_panel_2", (syncManager1, syncHandler1) ->
+                openThirdWindow(syncManager1, syncHandler1, number), true);
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
@@ -384,19 +393,31 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                         .row("II")
                         .key('I', i -> new ItemSlot().slot(new ModularSlot(smallInv, i).slotGroup(slotGroup)))
                         .build()
-                        .center());
+                        .center())
+                .child(new ButtonWidget<>()
+                        .bottom(5)
+                        .right(5)
+                        .tooltip(richTooltip -> richTooltip.textColor(Color.RED.main).add("WARNING! Very Dangerous"))
+                        .onMousePressed(mouseButton -> {
+                            if (!panelSyncHandler.isPanelOpen()) {
+                                panelSyncHandler.deleteCachedPanel();
+                                number.incrementAndGet();
+                            }
+                            return true;
+                        }));
         return panel;
     }
 
-    public ModularPanel openThirdWindow(PanelSyncManager syncManager, PanelSyncHandler syncHandler) {
+    public ModularPanel openThirdWindow(PanelSyncManager syncManager, IPanelHandler syncHandler, AtomicInteger integer) {
         ModularPanel panel = new Dialog<>("third_window", null)
                 .setDisablePanelsBelow(false)
                 .setCloseOnOutOfBoundsClick(false)
+                .setDraggable(true)
                 .size(50, 50);
         panel.child(ButtonWidget.panelCloseButton())
-                .child(IKey.str("3rd Panel")
+                .child(IKey.str("3rd Panel: " + integer.get())
                         .asWidget()
-                        .pos(5, 5));
+                        .pos(5, 17));
         return panel;
     }
 

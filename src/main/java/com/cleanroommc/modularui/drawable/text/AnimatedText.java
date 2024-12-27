@@ -9,6 +9,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 
+import org.jetbrains.annotations.Nullable;
+
 public class AnimatedText extends StyledText {
 
     private String fullString;
@@ -110,7 +112,7 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText color(int color) {
+    public AnimatedText color(@Nullable Integer color) {
         return (AnimatedText) super.color(color);
     }
 
@@ -120,7 +122,7 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText shadow(boolean shadow) {
+    public AnimatedText shadow(@Nullable Boolean shadow) {
         return (AnimatedText) super.shadow(shadow);
     }
 

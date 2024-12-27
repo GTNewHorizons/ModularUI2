@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
+import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -17,7 +18,7 @@ import java.util.Objects;
  * Register it in any {@link PanelSyncManager} (preferably the main one).
  * Then you can call {@link #openPanel()} and {@link #closePanel()} from any side.
  */
-public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
+public final class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
     private final IPanelBuilder panelBuilder;
     private final boolean subPanel;
@@ -46,6 +47,7 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
     }
 
     private void openPanel(boolean syncToServer) {
+        if (isPanelOpen()) return;
         boolean client = getSyncManager().isClient();
         if (syncToServer && client) {
             syncToServer(0);
@@ -58,7 +60,7 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
             this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
             this.panelName = this.openedPanel.getName();
             this.openedPanel.setSyncHandler(this);
-            WidgetTree.collectSyncValues(getSyncManager(), this.openedPanel);
+            WidgetTree.collectSyncValues(this.syncManager, this.openedPanel, false);
             if (!client) {
                 this.openedPanel = null;
             }
@@ -106,9 +108,29 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
 
     @Override
     public void deleteCachedPanel() {
+        if (openedPanel == null || isPanelOpen()) return;
+        boolean canDispose = WidgetTree.foreachChild(openedPanel, iWidget -> {
+            if (!iWidget.isValid()) return false;
+            if (iWidget instanceof ISynced<?>synced && synced.isSynced()) {
+                return !(synced.getSyncHandler() instanceof ItemSlotSH);
+            }
+            return true;
+        }, false);
+
         // This is because we can't guarantee that the sync handlers of the new panel are the same.
         // Dynamic sync handler changing is very error-prone.
-        throw new UnsupportedOperationException("Can't delete cached panel in synced panel handlers!");
+        if (!canDispose)
+            throw new UnsupportedOperationException("Can't delete cached panel if it's still open or has ItemSlot Sync Handlers!");
+
+        disposePanel();
+
+        sync(3);
+    }
+
+    private void disposePanel() {
+        this.panelName = null;
+        this.syncManager = null;
+        this.openedPanel = null;
     }
 
     @Override
@@ -116,6 +138,7 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
         return subPanel;
     }
 
+    @Override
     public boolean isPanelOpen() {
         return this.open;
     }
@@ -126,6 +149,8 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
             openPanel(false);
         } else if (i == 2) {
             closePanel();
+        } else if (i == 3) {
+            disposePanel();
         }
     }
 
@@ -136,6 +161,8 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
             syncToClient(1);
         } else if (i == 2) {
             closePanelInternal();
+        } else if (i == 3) {
+            disposePanel();
         }
     }
 
@@ -152,6 +179,6 @@ public class PanelSyncHandler extends SyncHandler implements IPanelHandler {
          * @return the created panel
          */
         @NotNull
-        ModularPanel buildUI(@NotNull PanelSyncManager syncManager, @NotNull PanelSyncHandler syncHandler);
+        ModularPanel buildUI(@NotNull PanelSyncManager syncManager, @NotNull IPanelHandler syncHandler);
     }
 }

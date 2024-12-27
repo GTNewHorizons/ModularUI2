@@ -74,6 +74,7 @@ public class ClientScreenHandler {
     private static ModularScreen currentScreen = null;
     private static Character lastChar = null;
     private static final FpsCounter fpsCounter = new FpsCounter();
+    private static long ticks = 0L;
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
@@ -159,7 +160,20 @@ public class ClientScreenHandler {
             if (checkGui()) {
                 currentScreen.onUpdate();
             }
+            ticks++;
         }
+    }
+
+    @SubscribeEvent
+    public void preDraw(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            GL11.glEnable(GL11.GL_STENCIL_TEST);
+        }
+        Stencil.reset();
+    }
+
+    public static long getTicks() {
+        return ticks;
     }
 
     public static void onFrameUpdate() {
