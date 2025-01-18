@@ -106,7 +106,7 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.gui.width, event.gui.height), false);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
@@ -116,7 +116,7 @@ public class ClientScreenHandler {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
