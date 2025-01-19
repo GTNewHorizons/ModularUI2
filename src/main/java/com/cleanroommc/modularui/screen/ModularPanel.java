@@ -296,6 +296,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean result = false;
 
             if (this.hovering.isEmpty()) {
+                // no element is hovered -> try close panel
                 if (closeOnOutOfBoundsClick()) {
                     animateClose();
                     result = true;
@@ -304,6 +305,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 loop:
                 for (LocatedWidget widget : this.hovering) {
                     widget.applyMatrix(getContext());
+                    // click widget and see how it reacts
                     ItemStack dndTarget = getNEIDragAndDropTarget();
                     if (dndTarget != null && widget.getElement() instanceof NEIDragAndDropHandler dndHandler) {
                         // For reference: in 1.12 JEI handles drag-and-drop on MouseInputEvent.Pre event,
@@ -359,6 +361,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                             }
                         }
                     }
+                    // see if widget can be dragged
                     if (getContext().onHoveredClick(mouseButton, widget)) {
                         pressed = LocatedWidget.EMPTY;
                         result = true;
@@ -366,7 +369,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break;
                     }
                     widget.unapplyMatrix(getContext());
-                    if (widget.getElement().canHover()) {
+                    // see if widgets below this can be interacted with
+                    if (!widget.getElement().canClickThrough()) {
                         result = true;
                         break;
                     }
@@ -485,7 +489,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     }
                     widget.unapplyMatrix(getContext());
                 }
-                if (widget.getElement().canHover()) break;
+                if (!widget.getElement().canClickThrough()) break;
             }
             if (!this.keyboard.held) {
                 this.keyboard.lastPressed = pressed;
