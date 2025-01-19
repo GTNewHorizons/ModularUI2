@@ -47,6 +47,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
@@ -61,6 +62,8 @@ import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -274,13 +277,23 @@ public class ClientScreenHandler {
         }
     }
 
-    public static void clickSlot() {
-        if (hasScreen() && getMCScreen() instanceof GuiScreenAccessor screen) {
-            ModularGuiContext ctx = currentScreen.getContext();
+    public static void clickSlot(ModularScreen ms, Slot slot) {
+        GuiScreen screen = ms.getScreenWrapper().getGuiScreen();
+        if (screen instanceof GuiScreenAccessor acc && screen instanceof IClickableGuiContainer clickableGuiContainer && checkGui(screen)) {
+            ModularGuiContext ctx = ms.getContext();
+            List<GuiButton> buttonList = acc.getButtonList();
             try {
-                screen.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getMouseY(), ctx.getMouseButton());
+                // remove buttons to make sure they are not clicked
+                acc.setButtonList(Collections.emptyList());
+                // set clicked slot to make sure the container clicks the desired slot
+                clickableGuiContainer.modularUI$setClickedSlot(slot);
+                acc.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getMouseY(), ctx.getMouseButton());
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } finally {
+                // undo modifications
+                clickableGuiContainer.modularUI$setClickedSlot(null);
+                acc.setButtonList(buttonList);
             }
         }
     }
