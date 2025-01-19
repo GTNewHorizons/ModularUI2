@@ -12,10 +12,8 @@ public abstract class BaseKey implements IKey {
     private EnumChatFormatting[] formatting;
 
     @Override
-    public String getFormatted() {
-        if (this.formatting == null) return get();
-        if (FontRenderHelper.isReset(this.formatting)) return EnumChatFormatting.RESET + get();
-        return FontRenderHelper.getFormatting(this.formatting, new StringBuilder()).append(get()).append(EnumChatFormatting.RESET).toString();
+    public String getFormatted(@Nullable EnumChatFormatting[] parentFormatting) {
+        return FontRenderHelper.format(this.formatting, parentFormatting, get());
     }
 
     @Override

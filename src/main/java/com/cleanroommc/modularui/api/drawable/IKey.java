@@ -31,6 +31,30 @@ public interface IKey extends IDrawable {
     IKey LINE_FEED = str("\n");
     IKey SPACE = str(" ");
 
+    // Formatting for convenience
+    EnumChatFormatting BLACK = EnumChatFormatting.BLACK;
+    EnumChatFormatting DARK_BLUE = EnumChatFormatting.DARK_BLUE;
+    EnumChatFormatting DARK_GREEN = EnumChatFormatting.DARK_GREEN;
+    EnumChatFormatting DARK_AQUA = EnumChatFormatting.DARK_AQUA;
+    EnumChatFormatting DARK_RED = EnumChatFormatting.DARK_RED;
+    EnumChatFormatting DARK_PURPLE = EnumChatFormatting.DARK_PURPLE;
+    EnumChatFormatting GOLD = EnumChatFormatting.GOLD;
+    EnumChatFormatting GRAY = EnumChatFormatting.GRAY;
+    EnumChatFormatting DARK_GRAY = EnumChatFormatting.DARK_GRAY;
+    EnumChatFormatting BLUE = EnumChatFormatting.BLUE;
+    EnumChatFormatting GREEN = EnumChatFormatting.GREEN;
+    EnumChatFormatting AQUA = EnumChatFormatting.AQUA;
+    EnumChatFormatting RED = EnumChatFormatting.RED;
+    EnumChatFormatting LIGHT_PURPLE = EnumChatFormatting.LIGHT_PURPLE;
+    EnumChatFormatting YELLOW = EnumChatFormatting.YELLOW;
+    EnumChatFormatting WHITE = EnumChatFormatting.WHITE;
+    EnumChatFormatting OBFUSCATED = EnumChatFormatting.OBFUSCATED;
+    EnumChatFormatting BOLD = EnumChatFormatting.BOLD;
+    EnumChatFormatting STRIKETHROUGH = EnumChatFormatting.STRIKETHROUGH;
+    EnumChatFormatting UNDERLINE = EnumChatFormatting.UNDERLINE;
+    EnumChatFormatting ITALIC = EnumChatFormatting.ITALIC;
+    EnumChatFormatting RESET = EnumChatFormatting.RESET;
+
     /**
      * Creates a translated text.
      *
@@ -140,10 +164,18 @@ public interface IKey extends IDrawable {
     String get();
 
     /**
+     * @param parentFormatting formatting of the parent in case of composite keys
+     * @return the current formatted string
+     */
+    default String getFormatted(@Nullable EnumChatFormatting[] parentFormatting) {
+        return get();
+    }
+
+    /**
      * @return the current formatted string
      */
     default String getFormatted() {
-        return get();
+        return getFormatted(null);
     }
 
     @SideOnly(Side.CLIENT)

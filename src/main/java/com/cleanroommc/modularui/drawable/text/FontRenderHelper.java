@@ -6,6 +6,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -70,16 +71,53 @@ public class FontRenderHelper {
 
     public static String getFormatting(EnumChatFormatting[] state) {
         if (isReset(state)) return EnumChatFormatting.RESET.toString();
-        StringBuilder builder = getFormatting(state, new StringBuilder());
+        StringBuilder builder = appendFormatting(state, new StringBuilder());
         return builder.length() == 0 ? StringUtils.EMPTY : builder.toString();
     }
 
-    public static StringBuilder getFormatting(EnumChatFormatting[] state, StringBuilder builder) {
+    public static StringBuilder appendFormatting(EnumChatFormatting[] state, StringBuilder builder) {
+        return appendFormatting(state, null, builder);
+    }
+
+    public static StringBuilder appendFormatting(EnumChatFormatting[] state, EnumChatFormatting @Nullable [] fallback, StringBuilder builder) {
         for (int i = 0, n = 6; i < n; i++) {
-            EnumChatFormatting formatting = state[i];
-            if (formatting != null) builder.append(formatting);
+            if (state[i] != null) {
+                builder.append(state[i]);
+            } else if (fallback != null && fallback[i] != null) {
+                builder.append(fallback[i]);
+            }
         }
         return builder;
+    }
+
+    public static String format(@Nullable EnumChatFormatting[] state, @Nullable EnumChatFormatting[] parentState, String text) {
+        if (state == null) {
+            if (parentState == null) return text;
+            return appendFormatting(parentState, new StringBuilder().append(EnumChatFormatting.RESET)).append(text).toString();
+        }
+        StringBuilder s = appendFormatting(state, parentState, new StringBuilder().append(EnumChatFormatting.RESET))
+                .append(text);
+        return s.toString();
+    }
+
+    public static EnumChatFormatting @NotNull [] mergeState(EnumChatFormatting @Nullable [] state1, EnumChatFormatting @Nullable [] state2) {
+        return mergeState(state1, state2, null);
+    }
+
+    public static EnumChatFormatting @NotNull [] mergeState(EnumChatFormatting @Nullable [] state1, EnumChatFormatting @Nullable [] state2, EnumChatFormatting @Nullable [] result) {
+        if (state1 == null) {
+            if (state2 == null) return createFormattingState();
+            return state2;
+        } else if (state2 == null) {
+            return state1;
+        }
+        if (isReset(state2)) return state2; // state2 has higher priority
+        if (result == null) result = Arrays.copyOf(state1, state1.length);
+        for (int i = 0, n = 6; i < n; i++) {
+            EnumChatFormatting formatting = state2[i];
+            if (formatting != null) addAfter(result, formatting);
+        }
+        return result;
     }
 
     public static boolean isReset(EnumChatFormatting[] state) {

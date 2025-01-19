@@ -14,13 +14,13 @@ import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
-
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumChatFormatting;
 
@@ -28,13 +28,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
-public class ResizerTest extends CustomModularScreen {
+public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildSortableListUI(context);
+        return buildRichTextUI(context);
     }
 
     public @NotNull ModularPanel buildSpriteUI(ModularGuiContext context) {
@@ -82,14 +81,24 @@ public class ResizerTest extends CustomModularScreen {
                                         }))
                                 .add(" you. ")
                                 .add(EnumChatFormatting.GREEN + "This is a long ")
-                                .add(IKey.str("string").format(EnumChatFormatting.DARK_PURPLE)
+                                .add(IKey.str("string").format(IKey.DARK_PURPLE)
                                         .asTextIcon()
                                         .asHoverable()
                                         .addTooltipLine("Text Tooltip"))
-                                .add(" of characters" + EnumChatFormatting.RESET)
+                                .add(" of characters" + IKey.RESET)
                                 .add(" and not numbers as some might think...")
                                 .newLine()
-                                .add("")
+                                .newLine()
+                                .add(IKey.comp(IKey.comp(
+                                                IKey.str("Underline all: "),
+                                                IKey.comp(
+                                                                IKey.str("Green Text, "),
+                                                                IKey.str("this is red").format(IKey.RED),
+                                                                IKey.str(" and this should be green again"))
+                                                        .format(IKey.GREEN),
+                                                IKey.str(". Still underlined, "))
+                                        .format(IKey.UNDERLINE), IKey.str("but not anymore.")))
+                                .newLine()
                                 .textShadow(false)
                         ));
     }
