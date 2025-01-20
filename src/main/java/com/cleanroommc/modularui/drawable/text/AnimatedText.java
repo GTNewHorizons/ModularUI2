@@ -4,10 +4,11 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -102,8 +103,8 @@ public class AnimatedText extends StyledText {
     }
 
     @Override
-    public AnimatedText format(EnumChatFormatting formatting) {
-        return (AnimatedText) super.format(formatting);
+    public AnimatedText style(EnumChatFormatting formatting) {
+        return (AnimatedText) super.style(formatting);
     }
 
     @Override

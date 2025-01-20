@@ -167,7 +167,7 @@ public interface IKey extends IDrawable {
      * @param parentFormatting formatting of the parent in case of composite keys
      * @return the current formatted string
      */
-    default String getFormatted(@Nullable EnumChatFormatting[] parentFormatting) {
+    default String getFormatted(@Nullable FormattingState parentFormatting) {
         return get();
     }
 
@@ -202,12 +202,32 @@ public interface IKey extends IDrawable {
         return new AnimatedText(this);
     }
 
-    IKey format(EnumChatFormatting formatting);
+    /**
+     * @return a formatting state of this key
+     */
+    default @Nullable FormattingState getFormatting() {
+        return null;
+    }
 
-    default IKey format(EnumChatFormatting... formatting) {
-        for (EnumChatFormatting tf : formatting) format(tf);
+    /**
+     * Set text formatting to this key. If {@link IKey#RESET} is used, then that's applied first and then all other formatting of this key.
+     * With {@link null}, you can remove a color formatting. No matter the parents color, the default color will be used.
+     *
+     * @param formatting a formatting rul
+     * @return this
+     */
+    IKey style(@Nullable EnumChatFormatting formatting);
+
+    default IKey style(EnumChatFormatting... formatting) {
+        for (EnumChatFormatting tf : formatting) style(tf);
         return this;
     }
+
+    default IKey removeFormatColor() {
+        return style((EnumChatFormatting) null);
+    }
+
+    IKey removeStyle();
 
     default StyledText alignment(Alignment alignment) {
         return withStyle().alignment(alignment);

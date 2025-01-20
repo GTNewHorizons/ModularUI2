@@ -118,8 +118,8 @@ public class TextWidget extends Widget<TextWidget> {
         return this;
     }
 
-    public TextWidget format(EnumChatFormatting formatting) {
-        this.key.format(formatting);
+    public TextWidget style(EnumChatFormatting formatting) {
+        this.key.style(formatting);
         return this;
     }
 }
