@@ -46,7 +46,7 @@ public class ModularUI {
 
     static {
         // confirm mXparser license
-        License.iConfirmNonCommercialUse("CleanroomMC");
+        License.iConfirmNonCommercialUse("GTNewHorizons");
     }
 
     @Mod.EventHandler
