@@ -53,10 +53,10 @@ public interface GuiScreenAccessor {
     List<GuiLabel> getLabelList();
 
     @Invoker
-    void invokeKeyTyped(char typedChar, int keyCode) throws IOException;
+    void invokeKeyTyped(char typedChar, int keyCode);
 
     @Invoker
-    void invokeMouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException;
+    void invokeMouseClicked(int mouseX, int mouseY, int mouseButton);
 
     @Invoker("mouseMovedOrUp")
     void invokeMouseReleased(int mouseX, int mouseY, int state);

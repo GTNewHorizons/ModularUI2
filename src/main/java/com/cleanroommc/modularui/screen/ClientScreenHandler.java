@@ -290,8 +290,6 @@ public class ClientScreenHandler {
                 // set clicked slot to make sure the container clicks the desired slot
                 clickableGuiContainer.modularUI$setClickedSlot(slot);
                 acc.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getMouseY(), ctx.getMouseButton());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             } finally {
                 // undo modifications
                 clickableGuiContainer.modularUI$setClickedSlot(null);
