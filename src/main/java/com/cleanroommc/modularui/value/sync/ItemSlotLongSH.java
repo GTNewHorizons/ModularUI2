@@ -97,6 +97,7 @@ public class ItemSlotLongSH extends SyncHandler {
         IItemStackLong slotStack = getSlot().getStackLong();
         IItemStackLong stackToPut;
         if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack.getAsItemStack())) {
+            if (!isItemValid(cursorStack)) return;
             stackToPut = new ItemStackLong(cursorStack.copy());
             if (mouseData.mouseButton == 1) {
                 stackToPut.setStackSize(1);
@@ -112,6 +113,7 @@ public class ItemSlotLongSH extends SyncHandler {
                     return;
                 }
             } else {
+                if (!isItemValid(cursorStack)) return;
                 stackToPut = new ItemStackLong(cursorStack.copy());
             }
             if (mouseData.mouseButton == 1) {
@@ -194,6 +196,10 @@ public class ItemSlotLongSH extends SyncHandler {
 
     public ModularSlotLong getSlot() {
         return this.slot;
+    }
+
+    public boolean isItemValid(ItemStack itemStack) {
+        return isItemValid(new ItemStackLong(itemStack));
     }
 
     public boolean isItemValid(IItemStackLong itemStack) {

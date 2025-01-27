@@ -99,6 +99,7 @@ public class ItemSlotSH extends SyncHandler {
         ItemStack slotStack = getSlot().getStack();
         ItemStack stackToPut;
         if (cursorStack != null && slotStack != null && !ItemHandlerHelper.canItemStacksStack(cursorStack, slotStack)) {
+            if (!isItemValid(cursorStack)) return;
             stackToPut = cursorStack.copy();
             if (mouseData.mouseButton == 1) {
                 stackToPut.stackSize = 1;
@@ -114,6 +115,7 @@ public class ItemSlotSH extends SyncHandler {
                     return;
                 }
             } else {
+                if (!isItemValid(cursorStack)) return;
                 stackToPut = cursorStack.copy();
             }
             if (mouseData.mouseButton == 1) {
