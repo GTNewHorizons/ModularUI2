@@ -62,8 +62,8 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public BaseKey format(EnumChatFormatting formatting) {
-        this.key.format(formatting);
+    public BaseKey style(EnumChatFormatting formatting) {
+        this.key.style(formatting);
         return this;
     }
 

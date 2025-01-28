@@ -24,8 +24,7 @@ public class ScrollArea extends Area {
         super(x, y, w, h);
     }
 
-    public ScrollArea() {
-    }
+    public ScrollArea() {}
 
     public void setScrollData(ScrollData data) {
         if (data instanceof HorizontalScrollData scrollData) {
@@ -91,7 +90,10 @@ public class ScrollArea extends Area {
      * This method should be invoked when mouse wheel is scrolling
      */
     public boolean mouseScroll(int x, int y, int scroll, boolean shift) {
-        if (!isInside(x, y)) return false;
+        if (!isInside(x, y)) {
+            // not hovering TODO: this shouldnt be required
+            return false;
+        }
 
         ScrollData data;
         if (this.scrollX != null) {
@@ -99,6 +101,7 @@ public class ScrollArea extends Area {
         } else if (this.scrollY != null) {
             data = this.scrollY;
         } else {
+            // no scroll data present -> cant be scrolled
             return false;
         }
 
@@ -119,9 +122,7 @@ public class ScrollArea extends Area {
             data.animateTo(this, scrollTo);
             return true;
         }
-
-        //return data.cancelScrollEdge;
-        return false;
+        return data.isCancelScrollEdge();
     }
 
     @SideOnly(Side.CLIENT)

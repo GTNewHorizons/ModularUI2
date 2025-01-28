@@ -2,23 +2,26 @@ package com.cleanroommc.modularui.mixins.early.minecraft;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
 
-import com.llamalad7.mixinextras.sugar.Local;
+import com.cleanroommc.modularui.screen.IClickableGuiContainer;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GuiContainer.class)
-public class GuiContainerMixin {
+public class GuiContainerMixin implements IClickableGuiContainer {
 
     @Shadow
     private Slot theSlot;
+
+    @Unique
+    private Slot modularUI$clickedSlot;
 
     /**
      * Mixin into ModularUI screen wrapper to return the true hovered slot.
@@ -26,25 +29,21 @@ public class GuiContainerMixin {
      * That's why we can just return the current hovered slot.
      */
     @Inject(method = "getSlotAtPosition", at = @At("HEAD"), cancellable = true)
-    public void modularui$injectGetSlotAtPosition(int x, int y, CallbackInfoReturnable<Slot> cir) {
-        if (IMuiScreen.class.isAssignableFrom(this.getClass())) {
+    public void getSlot(int x, int y, CallbackInfoReturnable<Slot> cir) {
+        if (this.modularUI$clickedSlot != null) {
+            cir.setReturnValue(this.modularUI$clickedSlot);
+        } else if (IMuiScreen.class.isAssignableFrom(this.getClass())) {
             cir.setReturnValue(this.theSlot);
         }
     }
 
-    // https://github.com/MinecraftForge/MinecraftForge/pull/2378
-
-    @ModifyVariable(method = "mouseClicked",
-            at = @At(value = "STORE"),
-            name = "flag1")
-    private boolean modularui$fixSlotClickOutsideBoundaryOnMouseClick(boolean flag1, @Local(name = "slot") Slot slot) {
-        return flag1 && slot == null;
+    @Override
+    public void modularUI$setClickedSlot(Slot slot) {
+        this.modularUI$clickedSlot = slot;
     }
 
-    @ModifyVariable(method = "mouseMovedOrUp",
-            at = @At(value = "STORE"),
-            name = "flag")
-    private boolean modularui$fixSlotClickOutsideBoundaryOnMouseRelease(boolean flag, @Local(name = "slot") Slot slot) {
-        return flag && slot == null;
+    @Override
+    public Slot modularUI$getClickedSlot() {
+        return modularUI$clickedSlot;
     }
 }

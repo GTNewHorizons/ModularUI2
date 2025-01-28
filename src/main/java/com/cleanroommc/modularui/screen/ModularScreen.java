@@ -290,6 +290,18 @@ public class ModularScreen {
         GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
+    public boolean handleDraggableInput(int button, boolean pressed) {
+        if (this.context.hasDraggable()) {
+            if (pressed) {
+                this.context.onMousePressed(button);
+            } else {
+                this.context.onMouseReleased(button);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public boolean onMousePressed(int mouseButton) {
         for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
             action.press(mouseButton);

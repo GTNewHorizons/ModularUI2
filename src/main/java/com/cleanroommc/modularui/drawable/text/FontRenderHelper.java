@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.drawable.IKey;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.EnumChatFormatting;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -38,20 +38,14 @@ public class FontRenderHelper {
         return formattingMap[c - min];
     }
 
-    // a formatting state keeps track of a color format and each of the fancy style options
-    // 0: color, 1 - 5: fancy style (random, bolt, italic, underline, strikethrough), 6: reset
-    public static EnumChatFormatting[] createFormattingState() {
-        return new EnumChatFormatting[7];
-    }
-
-    public static void addAfter(EnumChatFormatting[] state, EnumChatFormatting formatting) {
+    public static void addAfter(EnumChatFormatting[] state, EnumChatFormatting formatting, boolean removeAllOnReset) {
         if (formatting == EnumChatFormatting.RESET) {
-            Arrays.fill(state, null);
-            state[6] = formatting;
+            if (removeAllOnReset) Arrays.fill(state, null);
+            state[0] = formatting;
             return;
         }
         // remove reset
-        state[6] = null;
+        if (removeAllOnReset) state[6] = null;
         if (formatting.isFancyStyling()) {
             state[formatting.ordinal() - 15] = formatting;
             return;
@@ -60,30 +54,27 @@ public class FontRenderHelper {
         state[0] = formatting;
     }
 
-    public static void parseFormattingState(EnumChatFormatting[] state, String text) {
-        int i = -2;
-        while ((i = text.indexOf(167, i + 2)) >= 0 && i < text.length() - 1) {
-            EnumChatFormatting formatting = getForCharacter(text.charAt(i + 1));
-            if (formatting != null) addAfter(state, formatting);
+    public static String format(@Nullable FormattingState state, @Nullable FormattingState parentState, String text) {
+        if (state == null) {
+            if (parentState == null) return text;
+            return parentState.prependText(new StringBuilder().append(EnumChatFormatting.RESET)).append(text).toString();
         }
+        StringBuilder s = state.prependText(new StringBuilder().append(EnumChatFormatting.RESET), parentState)
+                .append(text);
+        return s.toString();
     }
 
-    public static String getFormatting(EnumChatFormatting[] state) {
-        if (isReset(state)) return EnumChatFormatting.RESET.toString();
-        StringBuilder builder = getFormatting(state, new StringBuilder());
-        return builder.length() == 0 ? StringUtils.EMPTY : builder.toString();
-    }
-
-    public static StringBuilder getFormatting(EnumChatFormatting[] state, StringBuilder builder) {
-        for (int i = 0, n = 6; i < n; i++) {
-            EnumChatFormatting formatting = state[i];
-            if (formatting != null) builder.append(formatting);
+    public static String formatArgs(Object[] args, @Nullable FormattingState parentState, String text) {
+        if (args == null || args.length == 0) return text;
+        args = Arrays.copyOf(args, args.length);
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] instanceof IKey key) {
+                // parent format + key format + key text + parent format
+                args[i] = FormattingState.appendFormat(new StringBuilder(key.getFormatted(parentState))
+                        .append(EnumChatFormatting.RESET), parentState).toString();
+            }
         }
-        return builder;
-    }
-
-    public static boolean isReset(EnumChatFormatting[] state) {
-        return state[6] != null;
+        return String.format(text, args);
     }
 
     public static int getDefaultTextHeight() {

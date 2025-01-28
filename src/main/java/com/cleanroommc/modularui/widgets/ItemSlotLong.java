@@ -133,7 +133,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(2, mouseData::writeToPacket);
         } else {
-            ClientScreenHandler.clickSlot();
+            ClientScreenHandler.clickSlot(getScreen(), getSlot());
             //getScreen().getScreenWrapper().clickSlot();
         }
         return Result.SUCCESS;

@@ -47,6 +47,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
@@ -61,6 +62,8 @@ import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -106,7 +109,7 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.gui.width, event.gui.height), false);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
@@ -116,7 +119,7 @@ public class ClientScreenHandler {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
@@ -201,6 +204,7 @@ public class ClientScreenHandler {
             }
             acc.setEventButton(button);
             acc.setLastMouseEvent(Minecraft.getSystemTime());
+            if (muiScreen != null && muiScreen.handleDraggableInput(button, true)) return true;
             return doAction(muiScreen, ms -> ms.onMousePressed(button));
         }
         if (button != -1) {
@@ -214,6 +218,7 @@ public class ClientScreenHandler {
                 }
             }
             acc.setEventButton(-1);
+            if (muiScreen != null && muiScreen.handleDraggableInput(button, false)) return true;
             return doAction(muiScreen, ms -> ms.onMouseRelease(button));
         }
         if (acc.getEventButton() != -1 && acc.getLastMouseEvent() > 0L) {
@@ -274,13 +279,21 @@ public class ClientScreenHandler {
         }
     }
 
-    public static void clickSlot() {
-        if (hasScreen() && getMCScreen() instanceof GuiScreenAccessor screen) {
-            ModularGuiContext ctx = currentScreen.getContext();
+    public static void clickSlot(ModularScreen ms, Slot slot) {
+        GuiScreen screen = ms.getScreenWrapper().getGuiScreen();
+        if (screen instanceof GuiScreenAccessor acc && screen instanceof IClickableGuiContainer clickableGuiContainer && checkGui(screen)) {
+            ModularGuiContext ctx = ms.getContext();
+            List<GuiButton> buttonList = acc.getButtonList();
             try {
-                screen.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getMouseY(), ctx.getMouseButton());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                // remove buttons to make sure they are not clicked
+                acc.setButtonList(Collections.emptyList());
+                // set clicked slot to make sure the container clicks the desired slot
+                clickableGuiContainer.modularUI$setClickedSlot(slot);
+                acc.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getMouseY(), ctx.getMouseButton());
+            } finally {
+                // undo modifications
+                clickableGuiContainer.modularUI$setClickedSlot(null);
+                acc.setButtonList(buttonList);
             }
         }
     }
@@ -529,7 +542,7 @@ public class ClientScreenHandler {
                     boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
                     GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, 1, color, false);
                 }
-            } else if(hovered instanceof RichTextWidget richTextWidget) {
+            } else if (hovered instanceof RichTextWidget richTextWidget) {
                 drawSegmentLine(lineY -= 4, color);
                 lineY -= 10;
                 Object hoveredElement = richTextWidget.getHoveredElement();

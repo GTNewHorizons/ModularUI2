@@ -10,6 +10,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mariuszgromada.math.mxparser.License;
 
 @Mod(modid = ModularUI.ID, name = ModularUI.NAME, version = Tags.VERSION, dependencies = ModularUI.DEPENDENCIES, guiFactory = "com.cleanroommc.modularui.config.ModularUIGuiConfigFactory")
 public class ModularUI {
@@ -42,6 +43,11 @@ public class ModularUI {
     public static ModularUI INSTANCE;
 
     public static final boolean isDevEnv = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+
+    static {
+        // confirm mXparser license
+        License.iConfirmNonCommercialUse("GTNewHorizons");
+    }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {

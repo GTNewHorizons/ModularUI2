@@ -9,10 +9,14 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
-import com.cleanroommc.modularui.widget.ScrollWidget;
+
+import com.cleanroommc.modularui.widgets.VoidWidget;
+
 import net.minecraft.client.gui.GuiScreen;
+
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
@@ -25,7 +29,7 @@ import java.util.regex.Pattern;
 /**
  * The base of a text input widget. Handles mouse/keyboard input and rendering.
  */
-public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends ScrollWidget<W> implements IFocusedWidget {
+public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends AbstractScrollWidget<VoidWidget, W> implements IFocusedWidget {
 
     public static final DecimalFormat format = new DecimalFormat("###.###");
 
@@ -52,7 +56,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     protected boolean changedTextColor = false;
 
     public BaseTextFieldWidget() {
-        super(new HorizontalScrollData());
+        super(new HorizontalScrollData(), null);
         this.handler.setRenderer(this.renderer);
         this.handler.setScrollArea(getScrollArea());
         padding(4, 0);
@@ -64,7 +68,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Scrol
     }
 
     @Override
-    public boolean addChild(IWidget child, int index) {
+    public boolean isChildValid(VoidWidget child) {
         return false;
     }
 
