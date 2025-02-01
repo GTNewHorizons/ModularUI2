@@ -5,11 +5,12 @@ import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.utils.GlStateManager;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,8 +126,8 @@ public class TextRenderer {
             width = Math.max(width, line.getWidth());
         }
         if (!this.simulate) {
-            GL11.glPushMatrix();
-            GL11.glScalef(this.scale, this.scale, 1f);
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(this.scale, this.scale, 1f);
         }
         int y0 = getStartY(height * this.scale);
         this.lastY = y0;
@@ -135,7 +136,7 @@ public class TextRenderer {
             if (!simulate) line.draw(context, getFontRenderer(), x0, y0, this.color, this.shadow);
             y0 += line.getHeight(getFontRenderer());
         }
-        if (!this.simulate) GL11.glPopMatrix();
+        if (!this.simulate) GlStateManager.popMatrix();
         this.lastWidth = this.maxWidth > 0 ? Math.min(width * this.scale, this.maxWidth) : width * this.scale;
         this.lastHeight = height * this.scale;
         this.lastWidth = Math.max(0, this.lastWidth - this.scale);
@@ -167,9 +168,9 @@ public class TextRenderer {
         String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
         Area.SHARED.set(this.x, Integer.MIN_VALUE, this.x + (int) this.maxWidth, Integer.MAX_VALUE);
         Stencil.apply(Area.SHARED, context);
-        GL11.glTranslatef(-scroll, 0, 0);
+        GlStateManager.translate(-scroll, 0, 0);
         drawMeasuredLines(Collections.singletonList(line(drawString)));
-        GL11.glTranslatef(scroll, 0, 0);
+        GlStateManager.translate(scroll, 0, 0);
         Stencil.remove();
     }
 
@@ -223,14 +224,14 @@ public class TextRenderer {
 
     protected void draw(String text, float x, float y) {
         if (this.simulate) return;
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glPushMatrix();
-        GL11.glScalef(this.scale, this.scale, 0f);
-        GL11.glDisable(GL11.GL_LIGHTING);
+        GlStateManager.disableBlend();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(this.scale, this.scale, 0f);
+        GlStateManager.disableLighting();
         getFontRenderer().drawString(text, (int) (x / this.scale), (int) (y / this.scale), this.color, this.shadow);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+        GlStateManager.enableBlend();
     }
 
     public float getFontHeight() {

@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 
 import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import cpw.mods.fml.relauncher.Side;
@@ -20,8 +21,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.List;
 
@@ -46,11 +47,11 @@ public class GuiDraw {
     }
 
     public static void drawRect(float x0, float y0, float w, float h, int colorTL, int colorTR, int colorBL, int colorBR) {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
         float x1 = x0 + w, y1 = y0 + h;
         Tessellator.instance.startDrawingQuads();
         bufferbuilder.pos(x0, y0, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
@@ -58,10 +59,10 @@ public class GuiDraw {
         bufferbuilder.pos(x1, y1, 0.0f).color(Color.getRed(colorBR), Color.getGreen(colorBR), Color.getBlue(colorBR), Color.getAlpha(colorBR)).endVertex();
         bufferbuilder.pos(x1, y0, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
         Tessellator.instance.draw();
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static void drawCircle(float x0, float y0, float diameter, int color, int segments) {
@@ -77,11 +78,11 @@ public class GuiDraw {
     }
 
     public static void drawEllipse(float x0, float y0, float w, float h, int centerColor, int outerColor, int segments) {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
         float x_2 = x0 + w / 2f, y_2 = y0 + h / 2f;
         Tessellator.instance.startDrawingQuads();
         // start at center
@@ -95,10 +96,10 @@ public class GuiDraw {
             bufferbuilder.pos(x, y, 0.0f).color(r, g, b, a).endVertex();
         }
         Tessellator.instance.draw();
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static void drawRoundedRect(float x0, float y0, float w, float h, int color, int cornerRadius, int segments) {
@@ -114,11 +115,11 @@ public class GuiDraw {
     }
 
     public static void drawRoundedRect(float x0, float y0, float w, float h, int colorTL, int colorTR, int colorBL, int colorBR, int cornerRadius, int segments) {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
         float x1 = x0 + w, y1 = y0 + h;
         Tessellator.instance.startDrawingQuads();
         int color = Color.average(colorBL, colorBR, colorTR, colorTL);
@@ -159,20 +160,20 @@ public class GuiDraw {
         }
         bufferbuilder.pos(x0, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
         Tessellator.instance.draw();
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static void drawTexture(ResourceLocation location, float x, float y, float w, float h, int u, int v, int textureWidth, int textureHeight) {
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         drawTexture(x, y, u, v, w, h, textureWidth, textureHeight);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
     }
 
     public static void drawTexture(float x, float y, int u, int v, float w, float h, int textureW, int textureH) {
@@ -222,13 +223,13 @@ public class GuiDraw {
     }
 
     public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
     }
 
     public static void drawTexture(float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
@@ -249,13 +250,13 @@ public class GuiDraw {
     }
 
     public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         drawTiledTexture(x, y, w, h, u, v, tileW, tileH, tw, th, z);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
     }
 
     public static void drawTiledTexture(float x, float y, float w, float h, int u, int v, int tileW, int tileH, int tw, int th, float z) {
@@ -281,13 +282,13 @@ public class GuiDraw {
     }
 
     public static void drawTiledTexture(ResourceLocation location, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int textureWidth, int textureHeight, float z) {
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(location);
         drawTiledTexture(x, y, w, h, u0, v0, u1, v1, textureWidth, textureHeight, z);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
     }
 
     public static void drawTiledTexture(float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
@@ -323,22 +324,22 @@ public class GuiDraw {
 
     public static void drawItem(ItemStack item, int x, int y, float width, float height) {
         if (item == null) return;
-        GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.pushMatrix();
+        GlStateManager.enableRescaleNormal();
         RenderHelper.enableGUIStandardItemLighting();
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glTranslatef(x, y, 0);
-        GL11.glScalef(width / 16f, height / 16f, 1);
+        GlStateManager.enableDepth();
+        GlStateManager.translate(x, y, 0);
+        GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
         renderItem.zLevel = 200;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.disableRescaleNormal();
         renderItem.zLevel = 0;
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableDepth();
         RenderHelper.enableStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glPopMatrix();
+        GlStateManager.disableLighting();
+        GlStateManager.popMatrix();
     }
 
     public static void drawFluidTexture(FluidStack content, float x0, float y0, float width, float height, float z) {
@@ -353,9 +354,9 @@ public class GuiDraw {
         int fluidColor = fluid.getColor(content);
         float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
         a = a == 0f ? 1f : a;
-        GL11.glColor4f(r, g, b, a);
+        GlStateManager.color(r, g, b, a);
         drawTiledTexture(TextureMap.locationBlocksTexture, x0, y0, width, height, fluidStill.getMinU(), fluidStill.getMinV(), fluidStill.getMaxU(), fluidStill.getMaxV(), fluidStill.getIconWidth(), fluidStill.getIconHeight(), z);
-        GL11.glColor4f(1f, 1f, 1f, 1f);
+        GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
     public static void drawOutlineCenter(int x, int y, int offset, int color) {
@@ -402,11 +403,11 @@ public class GuiDraw {
         float g2 = Color.getGreenF(shadow);
         float b2 = Color.getBlueF(shadow);
 
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
         Tessellator.instance.startDrawingQuads();
 
@@ -444,10 +445,10 @@ public class GuiDraw {
 
         Tessellator.instance.draw();
 
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static void drawDropCircleShadow(int x, int y, int radius, int segments, int opaque, int shadow) {
@@ -460,11 +461,11 @@ public class GuiDraw {
         float g2 = Color.getGreenF(shadow);
         float b2 = Color.getBlueF(shadow);
 
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
         Tessellator.instance.startDrawingQuads();
 
@@ -478,10 +479,10 @@ public class GuiDraw {
 
         Tessellator.instance.draw();
 
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static void drawDropCircleShadow(int x, int y, int radius, int offset, int segments, int opaque, int shadow) {
@@ -500,11 +501,11 @@ public class GuiDraw {
         float g2 = Color.getGreenF(shadow);
         float b2 = Color.getBlueF(shadow);
 
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
         Tessellator.instance.startDrawingQuads();
 
@@ -534,10 +535,10 @@ public class GuiDraw {
 
         Tessellator.instance.draw();
 
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     @SideOnly(Side.CLIENT)
@@ -551,13 +552,13 @@ public class GuiDraw {
     @SideOnly(Side.CLIENT)
     public static void drawText(String text, float x, float y, float scale, int color, boolean shadow) {
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glPushMatrix();
-        GL11.glScalef(scale, scale, 0f);
+        GlStateManager.disableBlend();
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(scale, scale, 0f);
         float sf = 1 / scale;
         fontRenderer.drawString(text, (int) (x * sf), (int) (y * sf), color, shadow);
-        GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.popMatrix();
+        GlStateManager.enableBlend();
     }
 
     public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height) {
@@ -590,7 +591,7 @@ public class GuiDraw {
         // asked by Forge :shrug:
         // see RenderItem#L627
         if (stack.hasEffect(0)) {
-            OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+            OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }

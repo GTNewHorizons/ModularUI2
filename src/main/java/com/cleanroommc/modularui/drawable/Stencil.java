@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.drawable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.utils.GlStateManager;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
@@ -105,21 +106,21 @@ public class Stencil {
 
         if (hideStencilShape) {
             // disable colors and depth
-            GL11.glColorMask(false, false, false, false);
-            GL11.glDepthMask(false);
+            GlStateManager.colorMask(false, false, false, false);
+            GlStateManager.depthMask(false);
         }
         stencilShape.run();
         if (hideStencilShape) {
             // Re-enable drawing to color buffer + depth buffer
-            GL11.glColorMask(true, true, true, true);
-            GL11.glDepthMask(true);
+            GlStateManager.colorMask(true, true, true, true);
+            GlStateManager.depthMask(true);
         }
     }
 
     private static void drawRectangleStencilShape(int x, int y, int w, int h) {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
         float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
         Tessellator.instance.startDrawingQuads();
         bufferbuilder.pos(x0, y0, 0.0f).endVertex();
@@ -127,9 +128,9 @@ public class Stencil {
         bufferbuilder.pos(x1, y1, 0.0f).endVertex();
         bufferbuilder.pos(x1, y0, 0.0f).endVertex();
         Tessellator.instance.draw();
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     /**

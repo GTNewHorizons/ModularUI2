@@ -3,13 +3,12 @@ package com.cleanroommc.modularui.overlay;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.utils.GlStateManager;
 
 import net.minecraft.client.renderer.RenderHelper;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,18 +56,18 @@ public class OverlayStack {
         ModularScreen fallback = null;
         for (ModularScreen screen : overlay) {
             screen.getContext().updateState(mouseX, mouseY, partialTicks);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glColor4f(1f, 1f, 1f, 1f);
+            GlStateManager.enableBlend();
+            GlStateManager.color(1f, 1f, 1f, 1f);
             screen.drawScreen(mouseX, mouseY, partialTicks);
-            GL11.glColor4f(1f, 1f, 1f, 1f);
+            GlStateManager.color(1f, 1f, 1f, 1f);
             screen.drawForeground(partialTicks);
             if (screen.getContext().getHovered() != null) hovered = screen;
             fallback = screen;
         }
         ClientScreenHandler.drawDebugScreen(hovered, fallback);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
     }
 

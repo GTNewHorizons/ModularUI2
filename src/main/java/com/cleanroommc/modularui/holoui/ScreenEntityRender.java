@@ -1,15 +1,17 @@
 package com.cleanroommc.modularui.holoui;
 
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
+import com.cleanroommc.modularui.utils.GlStateManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
 
 /**
  * Highly experimental
@@ -39,10 +41,10 @@ public class ScreenEntityRender extends Render {
             float zN = (float) (player.posZ - entity.posZ);
             plane3D.setNormal(xN, yN, zN);
         }
-        GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
         plane3D.transformRectangle();
         screenWrapper.drawScreen(0, 0, partialTicks);
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 }
