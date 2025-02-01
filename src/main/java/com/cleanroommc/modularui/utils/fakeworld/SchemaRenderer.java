@@ -4,25 +4,18 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.tileentity.TileEntity;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.MinecraftForgeClient;
 
-import org.joml.Vector3d;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -136,11 +129,11 @@ public class SchemaRenderer implements IDrawable {
         unbindFBO(lastFbo);
 
         // bind FBO as texture
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_LIGHTING);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableLighting();
         lastFbo = GL11.glGetInteger(GL11.GL_TEXTURE_2D);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.framebuffer.framebufferTexture);
-        GL11.glColor4f(1, 1, 1, 1);
+        GlStateManager.bindTexture(this.framebuffer.framebufferTexture);
+        GlStateManager.color(1, 1, 1, 1);
 
         // render rect with FBO texture
         Tessellator.instance.startDrawingQuads();
@@ -151,20 +144,20 @@ public class SchemaRenderer implements IDrawable {
         bufferbuilder.pos(x, y + height, 0).tex(0, 0).endVertex();
         Tessellator.instance.draw();
 
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, lastFbo);
+        GlStateManager.bindTexture(lastFbo);
     }
 
     private void renderWorld() {
 //        Minecraft mc = Minecraft.getMinecraft();
-//        GL11.glEnable(GL11.GL_CULL_FACE);
-//        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+//        GlStateManager.enableCull();;
+//        GlStateManager.enableRescaleNormal();
 //        RenderHelper.disableStandardItemLighting();
 //        mc.entityRenderer.disableLightmap(0);
 //        mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
 //        BlockRenderLayer oldRenderLayer = MinecraftForgeClient.getRenderLayer();
-//        GL11.glDisable(GL11.GL_LIGHTING);
-//        GL11.glEnable(GL11.GL_TEXTURE_2D);
-//        GL11.glEnable(GL11.GL_ALPHA_TEST);
+//        GlStateManager.disableLighting();
+//        GlStateManager.enableTexture2D();
+//        GlStateManager.enableAlpha();
 //
 //        try { // render block in each layer
 //            for (BlockRenderLayer layer : BlockRenderLayer.values()) {
@@ -189,14 +182,14 @@ public class SchemaRenderer implements IDrawable {
 //        }
 //
 //        RenderHelper.enableStandardItemLighting();
-//        GL11.glEnable(GL11.GL_LIGHTING);
+//        GlStateManager.enableLighting();
 //
 //        // render TESR
 //        if (disableTESR == null || !disableTESR.getAsBoolean()) {
 //            for (int pass = 0; pass < 2; pass++) {
 //                ForgeHooksClient.setRenderPass(pass);
 //                int finalPass = pass;
-//                GL11.glColor4f(1, 1, 1, 1);
+//                GlStateManager.color(1, 1, 1, 1);
 //                setDefaultPassRenderState(pass);
 //                this.schema.forEach(pair -> {
 //                    BlockPos pos = pair.getKey();
@@ -208,24 +201,24 @@ public class SchemaRenderer implements IDrawable {
 //            }
 //        }
 //        ForgeHooksClient.setRenderPass(-1);
-//        GL11.glEnable(GL11.GL_DEPTH_TEST);
-//        GL11.glDisable(GL11.GL_BLEND);
-//        GL11.glDepthMask(true);
+//        GlStateManager.enableDepth();
+//        GlStateManager.disableBlend();
+//        GlStateManager.depthMask(true);
 //        if (this.afterRender != null) {
 //            this.afterRender.accept(Projection.INSTANCE);
 //        }
     }
 
     private static void setDefaultPassRenderState(int pass) {
-        GL11.glColor4f(1, 1, 1, 1);
+        GlStateManager.color(1, 1, 1, 1);
         if (pass == 0) { // SOLID
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glDepthMask(true);
+            GlStateManager.enableDepth();
+            GlStateManager.disableBlend();
+            GlStateManager.depthMask(true);
         } else { // TRANSLUCENT
-            GL11.glEnable(GL11.GL_BLEND);
-            OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-            GL11.glDepthMask(false);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.depthMask(false);
         }
     }
 
@@ -233,19 +226,19 @@ public class SchemaRenderer implements IDrawable {
         //GlStateManager.pushAttrib();
 
         Minecraft.getMinecraft().entityRenderer.disableLightmap(0);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.disableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableBlend();
 
         // setup viewport and clear GL buffers
-        GL11.glViewport(0, 0, width, height);
+        GlStateManager.viewport(0, 0, width, height);
         Color.setGlColor(clearColor);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         // setup projection matrix to perspective
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glPushMatrix();
-        GL11.glLoadIdentity();
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.pushMatrix();
+        GlStateManager.loadIdentity();
 
         float near = this.isometric ? 1f : 0.1f;
         float far = 10000.0f;
@@ -262,11 +255,11 @@ public class SchemaRenderer implements IDrawable {
         }
 
         // setup modelview matrix
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glPushMatrix();
-        GL11.glLoadIdentity();
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.pushMatrix();
+        GlStateManager.loadIdentity();
         if (this.isometric) {
-            GL11.glScaled(0.1, 0.1, 0.1);
+            GlStateManager.scale(0.1, 0.1, 0.1);
         }
         var c = this.camera.getPos();
         var lookAt = this.camera.getLookAt();
@@ -278,18 +271,18 @@ public class SchemaRenderer implements IDrawable {
         this.cameraSetup = false;
         // reset viewport
         Minecraft minecraft = Minecraft.getMinecraft();
-        GL11.glViewport(0, 0, minecraft.displayWidth, minecraft.displayHeight);
+        GlStateManager.viewport(0, 0, minecraft.displayWidth, minecraft.displayHeight);
 
         // reset projection matrix
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glPopMatrix();
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.popMatrix();
 
         // reset modelview matrix
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glPopMatrix();
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.popMatrix();
 
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.disableDepth();
 
         // reset attributes
         // GlStateManager.popAttrib();
@@ -300,12 +293,12 @@ public class SchemaRenderer implements IDrawable {
         this.framebuffer.setFramebufferColor(0.0F, 0.0F, 0.0F, 0.0F);
         this.framebuffer.framebufferClear();
         this.framebuffer.bindFramebuffer(true);
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
         return lastID;
     }
 
     private void unbindFBO(int lastID) {
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
         this.framebuffer.unbindFramebufferTexture();
         OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, lastID); // glBindFramebuffer GL_FRAMEBUFFER
     }

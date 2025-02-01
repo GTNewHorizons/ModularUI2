@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
@@ -37,7 +38,6 @@ import net.minecraftforge.fluids.IFluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
@@ -164,9 +164,9 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
             this.textRenderer.draw(s);
         }
         if (isHovering()) {
-            GL11.glColorMask(true, true, true, false);
+            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getSlotHoverColor());
-            GL11.glColorMask(true, true, true, true);
+            GlStateManager.colorMask(true, true, true, true);
         }
     }
 

@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.utils.GuiUtils;
 
 import com.cleanroommc.modularui.utils.Matrix4f;
 
-import org.lwjgl.opengl.GL11;
+import com.cleanroommc.modularui.utils.GlStateManager;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -21,13 +21,13 @@ public class Plane3D {
 
     public void transformRectangle() {
         // translate to anchor
-        GL11.glTranslatef(-this.w * this.aX, -this.h * this.aY, 0);
+        GlStateManager.translate(-this.w * this.aX, -this.h * this.aY, 0);
         // translate for scale and rotation
-        GL11.glTranslatef(this.w / 2f, this.h / 2f, 0);
+        GlStateManager.translate(this.w / 2f, this.h / 2f, 0);
         // scale to size. 0.0625 is 1/16
-        GL11.glScaled(0.0625 * this.scale, 0.0625 * this.scale, 0.0625 * this.scale);
+        GlStateManager.scale(0.0625 * this.scale, 0.0625 * this.scale, 0.0625 * this.scale);
         // rotate 180 deg
-        GL11.glRotatef(180, 0, 0, 1);
+        GlStateManager.rotate(180, 0, 0, 1);
         // apply facing direction
         if (this.nX != 0 || this.nY != 0 || this.nZ != 1) {
             Matrix4f rotation = new Matrix4f();
@@ -43,7 +43,7 @@ public class Plane3D {
             GuiUtils.applyTransformationMatrix(rotation);
         }
         // un-translate for scale and rotation
-        GL11.glTranslatef(-(this.w / 2f), -(this.h / 2f), 0);
+        GlStateManager.translate(-(this.w / 2f), -(this.h / 2f), 0);
     }
 
     public void setSize(float w, float h) {

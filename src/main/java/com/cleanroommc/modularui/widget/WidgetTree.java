@@ -16,12 +16,10 @@ import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
-
-import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.utils.GlStateManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,14 +132,14 @@ public class WidgetTree {
         boolean canBeSeen = parent.canBeSeen(context);
 
         // apply transformations to opengl
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
         context.applyToOpenGl();
 
         if (canBeSeen) {
             // draw widget
-            GL11.glColorMask(true, true, true, true);
-            GL11.glColor4f(1f, 1f, 1f, alpha);
-            GL11.glEnable(GL11.GL_BLEND);
+            GlStateManager.colorMask(true, true, true, true);
+            GlStateManager.color(1f, 1f, 1f, alpha);
+            GlStateManager.enableBlend();
             WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
             parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
@@ -151,15 +149,15 @@ public class WidgetTree {
         if (viewport != null) {
             if (canBeSeen) {
                 // draw viewport without children transformation
-                GL11.glColor4f(1f, 1f, 1f, alpha);
-                GL11.glEnable(GL11.GL_BLEND);
+                GlStateManager.color(1f, 1f, 1f, alpha);
+                GlStateManager.enableBlend();
                 viewport.preDraw(context, false);
-                GL11.glPopMatrix();
+                GlStateManager.popMatrix();
                 // apply children transformation of the viewport
                 context.pushViewport(viewport, parent.getArea());
                 viewport.transformChildren(context);
                 // apply to opengl and draw with transformation
-                GL11.glPushMatrix();
+                GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.preDraw(context, true);
             } else {
@@ -169,7 +167,7 @@ public class WidgetTree {
             }
         }
         // remove all opengl transformations
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
 
         // render all children if there are any
         List<IWidget> children = parent.getChildren();
@@ -180,19 +178,19 @@ public class WidgetTree {
         if (viewport != null) {
             if (canBeSeen) {
                 // apply opengl transformations again and draw
-                GL11.glColor4f(1f, 1f, 1f, alpha);
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glPushMatrix();
+                GlStateManager.color(1f, 1f, 1f, alpha);
+                GlStateManager.enableBlend();
+                GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, true);
                 // remove children transformation of this viewport
                 context.popViewport(viewport);
-                GL11.glPopMatrix();
+                GlStateManager.popMatrix();
                 // apply transformation again to opengl and draw
-                GL11.glPushMatrix();
+                GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, false);
-                GL11.glPopMatrix();
+                GlStateManager.popMatrix();
             } else {
                 // only remove transformation
                 context.popViewport(viewport);
@@ -207,8 +205,8 @@ public class WidgetTree {
         context.pushMatrix();
         parent.transform(context);
 
-        GL11.glColor4f(1, 1, 1, 1);
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableBlend();
         parent.drawForeground(context);
 
         List<IWidget> children = parent.getChildren();

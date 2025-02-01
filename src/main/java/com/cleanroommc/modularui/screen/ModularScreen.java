@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.overlay.ScreenWrapper;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -32,10 +33,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
-import javax.annotation.Nonnegative;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -244,11 +242,11 @@ public class ModularScreen {
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.disableAlpha();
 
         this.context.reset();
         this.context.pushViewport(null, this.context.getScreenArea());
@@ -261,18 +259,18 @@ public class ModularScreen {
         this.context.popViewport(null);
 
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_LIGHTING);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.enableAlpha();
     }
 
     public void drawForeground(float partialTicks) {
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.disableAlpha();
 
         this.context.reset();
         this.context.pushViewport(null, this.context.getScreenArea());
@@ -284,10 +282,10 @@ public class ModularScreen {
         this.context.drawDraggable();
         this.context.popViewport(null);
 
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_LIGHTING);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableLighting();
         RenderHelper.enableStandardItemLighting();
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.enableAlpha();
     }
 
     public boolean handleDraggableInput(int button, boolean pressed) {

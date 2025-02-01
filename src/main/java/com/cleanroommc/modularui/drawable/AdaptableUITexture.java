@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.utils.GlStateManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 public class AdaptableUITexture extends UITexture {
 
@@ -46,9 +47,9 @@ public class AdaptableUITexture extends UITexture {
             super.draw(x, y, width, height);
             return;
         }
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(this.location);
 
         float uBl = this.bl * 1f / this.imageWidth, uBr = this.br * 1f / this.imageWidth;
@@ -92,8 +93,8 @@ public class AdaptableUITexture extends UITexture {
             // center
             GuiDraw.drawTexture(x + this.bl, y + this.bt, x1 - this.br, y1 - this.bb, uInnerStart, vInnerStart, uInnerEnd, vInnerEnd);
         }
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
     }
 
     public void drawTiled(float x, float y, float width, float height) {
@@ -101,9 +102,9 @@ public class AdaptableUITexture extends UITexture {
             GuiDraw.drawTiledTexture(this.location, x, y, width, height, this.u0, this.v0, this.u1, this.v1, this.imageWidth, this.imageHeight, 0);
             return;
         }
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.enableTexture2D();
         Minecraft.getMinecraft().renderEngine.bindTexture(this.location);
 
         float uBl = this.bl * 1f / this.imageWidth, uBr = this.br * 1f / this.imageWidth;
@@ -150,7 +151,7 @@ public class AdaptableUITexture extends UITexture {
             // center
             GuiDraw.drawTiledTexture(x + this.bl, y + this.bt, width - this.bl - this.br, height - this.bt - this.bb, uInnerStart, vInnerStart, uInnerEnd, vInnerEnd, tw - this.bl - this.br, th - this.bt - this.bb, 0);
         }
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
     }
 }

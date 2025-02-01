@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.gui.ScaledResolution;
@@ -20,8 +21,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.util.List;
@@ -108,15 +107,15 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         Rectangle area = determineTooltipArea(context, renderer, screenWidth, screenHeight, mouseX, mouseY);
 
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.disableBlend();
 
         GuiDraw.drawTooltipBackground(stack, textLines, area.x, area.y, area.width, area.height);
 
-        GL11.glColor4f(1f, 1f, 1f, 1f);
+        GlStateManager.color(1f, 1f, 1f, 1f);
 
         renderer.setPos(area.x, area.y);
         this.text.compileAndDraw(renderer, context, false);

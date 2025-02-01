@@ -23,6 +23,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Animator;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
@@ -58,7 +59,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.io.IOException;
@@ -332,17 +332,17 @@ public class ClientScreenHandler {
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
         muiScreen.drawScreen(mouseX, mouseY, partialTicks);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         RenderHelper.disableStandardItemLighting();
         muiScreen.drawForeground(partialTicks);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
         Stencil.remove();
     }
@@ -359,17 +359,17 @@ public class ClientScreenHandler {
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         muiScreen.drawScreen(mouseX, mouseY, partialTicks);
 
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
         // mainly for invtweaks compat
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
-        GL11.glPushMatrix();
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.pushMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
         acc.setHoveredSlot(null);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderHelper.enableGUIStandardItemLighting();
         if (muiScreen.getContext().getNEISettings().isNEIEnabled(muiScreen)) {
@@ -385,8 +385,8 @@ public class ClientScreenHandler {
                 GuiContainerManager.getManager().renderToolTips(mouseX, mouseY);
             }
         }
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableDepth();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderHelper.disableStandardItemLighting();
         acc.invokeDrawGuiContainerForegroundLayer(mouseX, mouseY);
@@ -399,11 +399,11 @@ public class ClientScreenHandler {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         InventoryPlayer inventoryplayer = Minecraft.getMinecraft().thePlayer.inventory;
         ItemStack itemstack = acc.getDraggedStack() == null ? inventoryplayer.getItemStack() : acc.getDraggedStack();
-        GL11.glTranslatef((float) x, (float) y, 0.0F);
+        GlStateManager.translate((float) x, (float) y, 0.0F);
         if (itemstack != null) {
             int k2 = acc.getDraggedStack() == null ? 8 : 16;
             String s = null;
@@ -437,10 +437,10 @@ public class ClientScreenHandler {
             int i2 = acc.getTouchUpY() + (int) ((float) i3 * f);
             drawItemStack(mcScreen, acc.getReturningStack(), l1, i2, null);
         }
-        GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.popMatrix();
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
         RenderHelper.enableStandardItemLighting();
         Stencil.remove();
     }
@@ -450,16 +450,16 @@ public class ClientScreenHandler {
     }
 
     private static void drawItemStack(GuiContainer mcScreen, ItemStack stack, int x, int y, String altText) {
-        GL11.glTranslatef(0.0F, 0.0F, 32.0F);
+        GlStateManager.translate(0.0F, 0.0F, 32.0F);
         ((GuiAccessor) mcScreen).setZLevel(200f);
         GuiScreenAccessor.getItemRender().zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = ((GuiScreenAccessor) mcScreen).getFontRenderer();
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GlStateManager.enableDepth();
         GuiScreenAccessor.getItemRender().renderItemAndEffectIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y);
         GuiDraw.afterRenderItemAndEffectIntoGUI(stack);
         GuiScreenAccessor.getItemRender().renderItemOverlayIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack() == null ? 0 : 8), altText);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableDepth();
         ((GuiAccessor) mcScreen).setZLevel(0f);
         GuiScreenAccessor.getItemRender().zLevel = 0.0F;
     }
@@ -484,9 +484,9 @@ public class ClientScreenHandler {
                 muiScreen = fallback;
             }
         }
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.disableDepth();
+        GlStateManager.disableLighting();
+        GlStateManager.enableBlend();
 
 
         ModularGuiContext context = muiScreen.getContext();
@@ -504,7 +504,7 @@ public class ClientScreenHandler {
 
             IGuiElement hovered = locatedHovered.getElement();
             locatedHovered.applyMatrix(context);
-            GL11.glPushMatrix();
+            GlStateManager.pushMatrix();
             context.applyToOpenGl();
 
             Area area = hovered.getArea();
@@ -514,7 +514,7 @@ public class ClientScreenHandler {
             if (hovered.hasParent()) {
                 GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), 1f);
             }
-            GL11.glPopMatrix();
+            GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);
             GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, 1, color, false);
             lineY -= 11;
@@ -551,7 +551,7 @@ public class ClientScreenHandler {
         }
         // dot at mouse pos
         GuiDraw.drawRect(mouseX, mouseY, 1, 1, Color.withAlpha(Color.GREEN.main, 0.8f));
-        GL11.glColor4f(1f, 1f, 1f, 1f);
+        GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
     private static void drawSegmentLine(int y, int color) {

@@ -19,6 +19,7 @@ import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.item.IItemStackLong;
@@ -42,8 +43,6 @@ import net.minecraft.util.EnumChatFormatting;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 // Changes made here probably should also be made to ItemSlot
 public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
@@ -92,12 +91,12 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
         drawSlot(getSlot());
         RenderHelper.disableStandardItemLighting();
         if (isHovering()) {
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glColorMask(true, true, true, false);
+            GlStateManager.disableLighting();
+            GlStateManager.enableBlend();
+            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
-            GL11.glColorMask(true, true, true, true);
-            GL11.glDisable(GL11.GL_BLEND);
+            GlStateManager.colorMask(true, true, true, true);
+            GlStateManager.disableBlend();
         }
     }
 
@@ -242,13 +241,13 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
             }
 
             if (itemstack != null) {
-                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+                GlStateManager.enableRescaleNormal();
                 RenderHelper.enableGUIStandardItemLighting();
-                GL11.glEnable(GL11.GL_DEPTH_TEST);
+                GlStateManager.enableDepth();
                 // render the item itself
                 renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack.getAsItemStack(), 1, 1);
                 GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack.getAsItemStack());
-                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                GlStateManager.disableRescaleNormal();
                 if (amount < 0) {
                     amount = itemstack.getStackSize();
                 }
@@ -271,13 +270,13 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
                     textRenderer.setColor(Color.WHITE.main);
                     textRenderer.setAlignment(Alignment.BottomRight, getArea().width - 1, getArea().height - 1);
                     textRenderer.setPos(1, 1);
-                    GL11.glDisable(GL11.GL_LIGHTING);
-                    GL11.glDisable(GL11.GL_DEPTH_TEST);
-                    GL11.glDisable(GL11.GL_BLEND);
+                    GlStateManager.disableLighting();
+                    GlStateManager.disableDepth();
+                    GlStateManager.disableBlend();
                     textRenderer.draw(amountText);
-                    GL11.glEnable(GL11.GL_LIGHTING);
-                    GL11.glEnable(GL11.GL_DEPTH_TEST);
-                    GL11.glEnable(GL11.GL_BLEND);
+                    GlStateManager.enableLighting();
+                    GlStateManager.enableDepth();
+                    GlStateManager.enableBlend();
                 }
 
                 long cachedCount = itemstack.getStackSize();
@@ -285,7 +284,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
                 // render other overlays like durability bar
                 renderItem.renderItemOverlayIntoGUI(((GuiScreenAccessor) guiScreen).getFontRenderer(), Minecraft.getMinecraft().getTextureManager(), itemstack.getAsItemStack(), 1, 1, null);
                 itemstack.setStackSize(cachedCount);
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GlStateManager.disableDepth();
             }
         }
 
