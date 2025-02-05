@@ -231,7 +231,7 @@ public class ContainerCustomizer {
             ItemStack hotbarStack = inventoryplayer.getStackInSlot(mouseButton);
             if (phantom.isPhantom()) {
                 // insert stack from hotbar slot into phantom slot
-                phantom.putStack(hotbarStack == null  ? null : hotbarStack.copy());
+                phantom.putStack(hotbarStack == null ? null : hotbarStack.copy());
                 container.detectAndSendChanges();
                 return returnable;
             }
