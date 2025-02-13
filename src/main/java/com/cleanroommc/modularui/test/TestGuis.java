@@ -69,7 +69,8 @@ public class TestGuis extends CustomModularScreen {
                                 .add(new ItemDrawable(new ItemStack(Blocks.grass))
                                         .asIcon()
                                         .asHoverable()
-                                        .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.grass))))
+                                        .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.grass))
+                                                .add(EnumChatFormatting.GRAY + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.")))
                                 .add(", nice to ")
                                 .add(new ItemDrawable(new ItemStack(Items.porkchop))
                                         .asIcon()
@@ -102,6 +103,10 @@ public class TestGuis extends CustomModularScreen {
                                         IKey.str("red").style(IKey.RED),
                                         IKey.str("underline").style(null, IKey.UNDERLINE)
                                 ).style(IKey.GREEN))
+                                .newLine()
+                                .add(EnumChatFormatting.RESET + "" + EnumChatFormatting.UNDERLINE + "Underlined" + EnumChatFormatting.RESET)
+                                .newLine()
+                                .add("A long line which should wrap around")
                                 .textShadow(false)
                         ));
     }
