@@ -236,7 +236,7 @@ public class ModularContainer extends Container {
     }
 
     public @Nullable ItemStack superTransferStackInSlot(@NotNull EntityPlayer playerIn, int index) {
-        return this.containerCustomizer.transferStackInSlot(playerIn, index);
+        return super.transferStackInSlot(playerIn, index);
     }
 
     @Override
