@@ -27,6 +27,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     private boolean playClickSound = true;
+    private Runnable clickSound;
     private IGuiAction.MousePressed mousePressed;
     private IGuiAction.MouseReleased mouseReleased;
     private IGuiAction.MousePressed mouseTapped;
@@ -50,7 +51,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     public void playClickSound() {
         if (this.playClickSound) {
-            Interactable.playButtonClickSound();
+            if (this.clickSound != null) {
+                this.clickSound.run();
+            } else {
+                Interactable.playButtonClickSound();
+            }
         }
     }
 
@@ -165,6 +170,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     public W playClickSound(boolean play) {
         this.playClickSound = play;
+        return getThis();
+    }
+
+    public W clickSound(Runnable clickSound) {
+        this.clickSound = clickSound;
         return getThis();
     }
 }
