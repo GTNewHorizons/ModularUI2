@@ -145,11 +145,11 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         IFluidTankLong fluidTank = getFluidTankLong();
         if (fluidTank.getFluid() != null) {
-            int y = this.contentOffsetY;
+            float y = this.contentOffsetY;
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
                 float newHeight = height * fluidTank.getFluidAmountLong() * 1f / fluidTank.getCapacityLong();
-                y += (int) (height - newHeight);
+                y += height - newHeight;
                 height = newHeight;
             }
             GuiDraw.drawFluidTexture(fluidTank.getFluid(), this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
