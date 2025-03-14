@@ -39,17 +39,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
+import java.text.DecimalFormat;
+
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
 // Changes made here probably should also be made to FluidSlot
 public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
-
-    private static final String UNIT_BUCKET = "B";
-    private static final String UNIT_LITER = "L";
-
+    public static final String UNIT_BUCKET = "B";
+    public static final String UNIT_LITER = "L";
+    private static final DecimalFormat TOOLTIP_FORMAT = new DecimalFormat("#.##");
     private static final IFluidTankLong EMPTY = new FluidTankLong(0);
+
+    static {
+        TOOLTIP_FORMAT.setGroupingUsed(true);
+        TOOLTIP_FORMAT.setGroupingSize(3);
+    }
 
     private final TextRenderer textRenderer = new TextRenderer();
     private FluidSlotLongSyncHandler syncHandler;
@@ -73,9 +79,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount",
-                            formatFluidAmount(fluidTank.getFluidAmountLong()),
-                            getBaseUnit()));
+                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getBaseUnit()));
                 }
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
@@ -88,8 +92,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
             }
         } else {
             if (fluid != null) {
-                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidAmount(fluidTank.getFluidAmountLong()),
-                        formatFluidAmount(fluidTank.getCapacityLong()), getBaseUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getBaseUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
@@ -115,9 +118,9 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
         tooltip.addAdditionalInfoFromFluid(fluidStack);
     }
 
-    public String formatFluidAmount(double amount) {
-        NumberFormat.FORMAT.setMaximumFractionDigits(3);
-        return NumberFormat.FORMAT.format(getBaseUnitAmount(amount));
+    public String formatFluidTooltipAmount(double amount) {
+        // the tooltip show the full number
+        return TOOLTIP_FORMAT.format(amount) + " " + getBaseUnitBaseSuffix();
     }
 
     protected double getBaseUnitAmount(double amount) {
@@ -126,6 +129,10 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
 
     protected String getBaseUnit() {
         return UNIT_LITER;
+    }
+
+    protected String getBaseUnitBaseSuffix() {
+        return "m";
     }
 
     @Override
@@ -158,7 +165,7 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
             this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
         if (fluidTank.getFluid() != null && this.syncHandler.controlsAmount()) {
-            String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(fluidTank.getFluidAmountLong())) + getBaseUnit();
+            String s = NumberFormat.format(getBaseUnitAmount(fluidTank.getFluid().amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
