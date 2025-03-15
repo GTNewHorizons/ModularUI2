@@ -70,6 +70,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         int separatorSize = getSeparatorSize();
         int p = getArea().getPadding().getStart(axis);
         for (IWidget widget : getChildren()) {
+            if (!widget.isEnabled()) continue;
             if (axis.isVertical() ?
                     widget.getFlex().hasYPos() || !widget.resizer().isHeightCalculated() :
                     widget.getFlex().hasXPos() || !widget.resizer().isWidthCalculated()) {
