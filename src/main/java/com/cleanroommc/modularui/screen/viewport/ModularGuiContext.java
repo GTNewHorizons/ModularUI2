@@ -41,7 +41,7 @@ public class ModularGuiContext extends GuiContext {
 
     public List<Consumer<ModularGuiContext>> postRenderCallbacks = new ArrayList<>();
 
-    private NEISettingsImpl neiSettings;
+    private UISettings settings;
 
     public ModularGuiContext(ModularScreen screen) {
         this.screen = screen;
@@ -326,7 +326,7 @@ public class ModularGuiContext extends GuiContext {
             this.timeHovered = 0;
             if (this.hovered != null) {
                 this.hovered.onMouseStartHover();
-                if (this.hovered instanceof IVanillaSlot vanillaSlot) {
+                if (this.hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
                     this.screen.getScreenWrapper().setHoveredSlot(vanillaSlot.getVanillaSlot());
                 } else {
                     this.screen.getScreenWrapper().setHoveredSlot(null);
@@ -351,22 +351,26 @@ public class ModularGuiContext extends GuiContext {
         return this;
     }
 
+    public UISettings getUISettings() {
+        if (this.settings == null) {
+            throw new IllegalStateException("The screen is not yet initialised!");
+        }
+        return this.settings;
+    }
+
     public NEISettingsImpl getNEISettings() {
         if (this.screen.isOverlay()) {
             throw new IllegalStateException("Overlays don't have NEI settings!");
         }
-        if (this.neiSettings == null) {
-            throw new IllegalStateException("The screen is not yet initialised!");
-        }
-        return this.neiSettings;
+        return (NEISettingsImpl) getUISettings().getNEISettings();
     }
 
     @ApiStatus.Internal
-    public void setNEISettings(NEISettingsImpl neiSettings) {
-        if (this.neiSettings != null) {
-            throw new IllegalStateException("Tried to set NEI settings twice");
+    public void setSettings(UISettings settings) {
+        if (this.settings != null) {
+            throw new IllegalStateException("Tried to set settings twice");
         }
-        this.neiSettings = neiSettings;
+        this.settings = settings;
     }
 
     private static class HoveredIterable implements Iterable<IGuiElement> {

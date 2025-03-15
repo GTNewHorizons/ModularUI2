@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.widgets;
+package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -197,7 +197,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
         if (this.syncHandler.isPhantom() || cursorStack != null) {
             MouseData mouseData = MouseData.create(mouseButton);
-            this.syncHandler.syncToServer(1, mouseData::writeToPacket);
+            this.syncHandler.syncToServer(FluidSlotSyncHandler.SYNC_CLICK, mouseData::writeToPacket);
         }
         return Result.SUCCESS;
     }
@@ -209,7 +209,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
                 return false;
             }
             MouseData mouseData = MouseData.create(scrollDirection.modifier);
-            this.syncHandler.syncToServer(2, mouseData::writeToPacket);
+            this.syncHandler.syncToServer(FluidSlotSyncHandler.SYNC_SCROLL, mouseData::writeToPacket);
             return true;
         }
         return false;

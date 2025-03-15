@@ -67,11 +67,13 @@ public class GuiManager {
         if (player instanceof FakePlayer || openedContainers.contains(player)) return;
         openedContainers.add(player);
         // create panel, collect sync handlers and create container
-        guiData.setNEISettings(NEISettings.DUMMY);
+        UISettings settings = new UISettings(NEISettings.DUMMY);
+        settings.defaultCanInteractWith(factory, guiData);
         PanelSyncManager syncManager = new PanelSyncManager();
-        ModularPanel panel = factory.createPanel(guiData, syncManager);
+        ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
-        ModularContainer container = new ModularContainer(player, syncManager, panel.getName(), guiData);
+        ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
+        container.construct(player, syncManager, settings, panel.getName(), guiData);
         // sync to client
         player.getNextWindowId();
         player.closeContainer();
@@ -88,14 +90,15 @@ public class GuiManager {
     @SideOnly(Side.CLIENT)
     public static <T extends GuiData> void open(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
         T guiData = factory.readGuiData(player, data);
-        NEISettingsImpl neiSettings = new NEISettingsImpl();
-        guiData.setNEISettings(neiSettings);
+        UISettings settings = new UISettings();
+        settings.defaultCanInteractWith(factory, guiData);
         PanelSyncManager syncManager = new PanelSyncManager();
-        ModularPanel panel = factory.createPanel(guiData, syncManager);
+        ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
-        screen.getContext().setNEISettings(neiSettings);
-        ModularContainer container = new ModularContainer(player, syncManager, panel.getName(), guiData);
+        screen.getContext().setSettings(settings);
+        ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();
+        container.construct(player, syncManager, settings, panel.getName(), guiData);
         IMuiScreen wrapper = factory.createScreenWrapper(container, screen);
         if (!(wrapper.getGuiScreen() instanceof GuiContainer guiContainer)) {
             throw new IllegalStateException("The wrapping screen must be a GuiContainer for synced GUIs!");
@@ -108,13 +111,15 @@ public class GuiManager {
     }
 
     @SideOnly(Side.CLIENT)
-    static void openScreen(ModularScreen screen, NEISettingsImpl neiSettings, ContainerCustomizer containerCustomizer) {
-        screen.getContext().setNEISettings(neiSettings);
+    static void openScreen(ModularScreen screen, UISettings settings) {
+        screen.getContext().setSettings(settings);
         GuiScreen guiScreen;
-        if (containerCustomizer == null) {
-            guiScreen = new GuiScreenWrapper(screen);
+        if (settings.hasContainer()) {
+            ModularContainer container = settings.createContainer();
+            container.constructClientOnly();
+            guiScreen = new GuiContainerWrapper(container, screen);
         } else {
-            guiScreen = new GuiContainerWrapper(new ModularContainer(containerCustomizer), screen);
+            guiScreen = new GuiScreenWrapper(screen);
         }
         MCHelper.displayScreen(guiScreen);
     }

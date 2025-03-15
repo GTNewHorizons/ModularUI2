@@ -5,12 +5,13 @@ import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
-import com.cleanroommc.modularui.widgets.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 
@@ -26,7 +27,7 @@ public class TestItem extends Item implements IGuiHolder<GuiData> {
     public static final TestItem testItem = new TestItem();
 
     @Override
-    public ModularPanel buildUI(GuiData guiData, PanelSyncManager guiSyncManager) {
+    public ModularPanel buildUI(GuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
         IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData.getMainHandItem(), 4);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
@@ -41,7 +42,7 @@ public class TestItem extends Item implements IGuiHolder<GuiData> {
                                         .slotGroup("mixer_items")))
                                 .build()
                                 .align(Alignment.Center)))
-                .child(SlotGroupWidget.playerInventory(0)));
+                .child(SlotGroupWidget.playerInventory(false)));
 
         return panel;
     }

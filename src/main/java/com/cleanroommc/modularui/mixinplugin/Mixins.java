@@ -12,7 +12,6 @@ import static com.cleanroommc.modularui.mixinplugin.TargetedMod.VANILLA;
 public enum Mixins {
 
     // Vanilla client
-    EntityAccessor("minecraft.EntityAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
     FontRendererAccessor("minecraft.FontRendererAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
     ForgeHooksClientMixin("forge.ForgeHooksClientMixin", Phase.EARLY, Side.CLIENT, VANILLA),
     GuiAccessor("minecraft.GuiAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
@@ -25,7 +24,9 @@ public enum Mixins {
     SimpleResourceAccessor("minecraft.SimpleResourceAccessor", Phase.EARLY, Side.CLIENT, VANILLA),
 
     // Vanilla server & client
+    EntityAccessor("minecraft.EntityAccessor", Phase.EARLY, Side.BOTH, VANILLA),
     ContainerAccessor("minecraft.ContainerAccessor", Phase.EARLY, Side.BOTH, VANILLA),
+    InventoryCraftingAccessor("minecraft.InventoryCraftingAccessor", Phase.EARLY, Side.BOTH, VANILLA),
     SimpleNetworkWrapperMixin("forge.SimpleNetworkWrapperMixin", Phase.EARLY, Side.BOTH, VANILLA),
 
     // Thaumcraft
