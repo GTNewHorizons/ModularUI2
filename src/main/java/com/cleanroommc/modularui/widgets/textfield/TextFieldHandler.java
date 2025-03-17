@@ -233,6 +233,14 @@ public class TextFieldHandler {
         return this.text;
     }
 
+    public boolean isTextEmpty() {
+        if (this.text.isEmpty()) return true;
+        for (String line : this.text) {
+            if (!line.isEmpty()) return false;
+        }
+        return true;
+    }
+
     public void onChanged() {
         this.textFieldWidget.markTooltipDirty();
     }
