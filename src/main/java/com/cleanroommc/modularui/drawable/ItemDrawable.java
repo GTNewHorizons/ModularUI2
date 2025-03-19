@@ -5,9 +5,11 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.GameObjectHelper;
 import com.cleanroommc.modularui.utils.JsonHelper;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -117,6 +119,7 @@ public class ItemDrawable implements IDrawable {
     public static ItemDrawable ofJson(JsonObject json) {
         String itemS = JsonHelper.getString(json, null, "item");
         if (itemS == null) throw new JsonParseException("Item property not found!");
+        if (itemS.isEmpty()) return new ItemDrawable();
         String[] parts = itemS.split(":");
         if (parts.length < 2)
             throw new JsonParseException("Item property must have be in the format 'mod:item_name:meta'");
@@ -127,6 +130,8 @@ public class ItemDrawable implements IDrawable {
             } catch (NumberFormatException e) {
                 throw new JsonParseException(e);
             }
+        } else {
+            meta = JsonHelper.getInt(json, 0, "meta");
         }
         ItemStack item;
         try {
@@ -143,5 +148,20 @@ public class ItemDrawable implements IDrawable {
             }
         }
         return new ItemDrawable(item);
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        if (Platform.isStackEmpty(this.item)) {
+            json.addProperty("item", "");
+            return true;
+        }
+        json.addProperty("item", Item.itemRegistry.getNameForObject(this.item.getItem()));
+        json.addProperty("meta", Items.diamond.getDamage(this.item));
+        if (this.item.hasTagCompound()) {
+            // TODO
+            json.addProperty("nbt", this.item.getTagCompound().toString());
+        }
+        return true;
     }
 }

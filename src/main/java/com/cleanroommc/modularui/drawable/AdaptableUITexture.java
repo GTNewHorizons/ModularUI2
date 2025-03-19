@@ -5,6 +5,8 @@ import com.cleanroommc.modularui.utils.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
+import com.google.gson.JsonObject;
+
 public class AdaptableUITexture extends UITexture {
 
     private final int imageWidth, imageHeight, bl, bt, br, bb;
@@ -153,5 +155,19 @@ public class AdaptableUITexture extends UITexture {
         }
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        super.saveToJson(json);
+        if (json.entrySet().size() == 1) return true;
+        json.addProperty("imageWidth", this.imageWidth);
+        json.addProperty("imageHeight", this.imageHeight);
+        json.addProperty("bl", this.bl);
+        json.addProperty("br", this.br);
+        json.addProperty("bt", this.bt);
+        json.addProperty("bb", this.bb);
+        json.addProperty("tiled", this.tiled);
+        return true;
     }
 }
