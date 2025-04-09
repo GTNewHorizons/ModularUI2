@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
 
+import com.gtnewhorizons.modularui.common.internal.network.NetworkUtils;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
@@ -30,19 +32,11 @@ public class ItemStackGuiFactory extends AbstractUIFactory<ItemStackGuiData> {
 
     @Override
     public void writeGuiData(ItemStackGuiData guiData, PacketBuffer buffer) {
-        try {
-            buffer.writeItemStackToBuffer(guiData.getItemStack());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        NetworkUtils.writeItemStack(buffer, guiData.getItemStack());
     }
 
     @Override
     public @NotNull ItemStackGuiData readGuiData(EntityPlayer player, PacketBuffer buffer) {
-        try {
-            return new ItemStackGuiData(player, buffer.readItemStackFromBuffer());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new ItemStackGuiData(player, NetworkUtils.readItemStack(buffer));
     }
 }
