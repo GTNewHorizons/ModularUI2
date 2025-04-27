@@ -244,23 +244,17 @@ public class WidgetTree {
     }
 
     private static boolean resizeWidget(IWidget widget, boolean init) {
-        boolean result = false, alreadyCalculated = false;
+        boolean alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
-        if (resizer != null) {
-            if (init) {
-                widget.beforeResize();
-                resizer.initResizing();
-            } else {
-                // if this is not the first time check if this widget is already resized
-                alreadyCalculated = resizer.isFullyCalculated();
-            }
-            result = alreadyCalculated || resizer.resize(widget);
-        } else if (!init) {
-            // weird case that is not supposed to happen
-            result = true;
-            alreadyCalculated = true;
+        if (init) {
+            widget.beforeResize();
+            resizer.initResizing();
+        } else {
+            // if this is not the first time check if this widget is already resized
+            alreadyCalculated = resizer.isFullyCalculated();
         }
+        boolean result = alreadyCalculated || resizer.resize(widget);
 
         GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
@@ -281,7 +275,7 @@ public class WidgetTree {
             }
 
             // post resize this widget if possible
-            if (resizer != null && !result) {
+            if (!result) {
                 result = resizer.postResize(widget);
             }
 
@@ -302,10 +296,7 @@ public class WidgetTree {
 
     public static void applyPos(IWidget parent) {
         WidgetTree.foreachChildBFS(parent, child -> {
-            IResizeable resizer = child.resizer();
-            if (resizer != null) {
-                resizer.applyPos(child);
-            }
+            child.resizer().applyPos(child);
             return true;
         }, true);
     }
