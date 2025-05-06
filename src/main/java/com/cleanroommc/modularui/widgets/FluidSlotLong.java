@@ -151,7 +151,8 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
     @Override
     public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
         IFluidTankLong fluidTank = getFluidTankLong();
-        if (fluidTank.getFluid() != null) {
+        FluidStack content = getFluidStack();
+        if (content != null) {
             float y = this.contentOffsetY;
             float height = getArea().height - y * 2;
             if (!this.alwaysShowFull) {
@@ -159,13 +160,13 @@ public class FluidSlotLong extends Widget<FluidSlotLong> implements Interactable
                 y += height - newHeight;
                 height = newHeight;
             }
-            GuiDraw.drawFluidTexture(fluidTank.getFluid(), this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
+            GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
         }
         if (this.overlayTexture != null) {
             this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
-        if (fluidTank.getFluid() != null && this.syncHandler.controlsAmount()) {
-            String s = NumberFormat.format(getBaseUnitAmount(fluidTank.getFluid().amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+        if (content != null && this.syncHandler.controlsAmount()) {
+            String s = NumberFormat.format(getBaseUnitAmount(fluidTank.getFluidAmountLong()), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
