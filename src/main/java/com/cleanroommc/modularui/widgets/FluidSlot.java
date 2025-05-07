@@ -117,7 +117,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
 
     public String formatFluidTooltipAmount(double amount) {
         // the tooltip show the full number
-        return TOOLTIP_FORMAT.format(amount) + " " + getBaseUnitBaseSuffix();
+        // 1.7.10 hardcoded to use UNIT_LITER for now, so no milli-buckets.
+        return TOOLTIP_FORMAT.format(amount);// + " " + getBaseUnitBaseSuffix();
     }
 
     protected double getBaseUnitAmount(double amount) {
