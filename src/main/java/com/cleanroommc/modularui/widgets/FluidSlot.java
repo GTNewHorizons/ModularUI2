@@ -36,17 +36,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
+import java.text.DecimalFormat;
+
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
 // Changes made here probably should also be made to FluidSlotLong
 public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
-
-    private static final String UNIT_BUCKET = "B";
-    private static final String UNIT_LITER = "L";
-
+    public static final String UNIT_BUCKET = "B";
+    public static final String UNIT_LITER = "L";
+    private static final DecimalFormat TOOLTIP_FORMAT = new DecimalFormat("#.##");
     private static final IFluidTank EMPTY = new FluidTank(0);
+
+    static {
+        TOOLTIP_FORMAT.setGroupingUsed(true);
+        TOOLTIP_FORMAT.setGroupingSize(3);
+    }
 
     private final TextRenderer textRenderer = new TextRenderer();
     private FluidSlotSyncHandler syncHandler;
@@ -70,7 +76,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidAmount(fluid.amount), getBaseUnit()));
+                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getBaseUnit()));
                 }
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
@@ -83,7 +89,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             }
         } else {
             if (fluid != null) {
-                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidAmount(fluid.amount), formatFluidAmount(fluidTank.getCapacity()), getBaseUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getBaseUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
@@ -109,9 +115,10 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         tooltip.addAdditionalInfoFromFluid(fluidStack);
     }
 
-    public String formatFluidAmount(double amount) {
-        NumberFormat.FORMAT.setMaximumFractionDigits(3);
-        return NumberFormat.FORMAT.format(getBaseUnitAmount(amount));
+    public String formatFluidTooltipAmount(double amount) {
+        // the tooltip show the full number
+        // 1.7.10 hardcoded to use UNIT_LITER for now, so no milli-buckets.
+        return TOOLTIP_FORMAT.format(amount);// + " " + getBaseUnitBaseSuffix();
     }
 
     protected double getBaseUnitAmount(double amount) {
@@ -120,6 +127,10 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
 
     protected String getBaseUnit() {
         return UNIT_LITER;
+    }
+
+    protected String getBaseUnitBaseSuffix() {
+        return "m";
     }
 
     @Override
@@ -153,7 +164,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
         }
         if (content != null && this.syncHandler.controlsAmount()) {
-            String s = NumberFormat.formatWithMaxDigits(getBaseUnitAmount(content.amount)) + getBaseUnit();
+            String s = NumberFormat.format(getBaseUnitAmount(content.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             this.textRenderer.setAlignment(Alignment.CenterRight, getArea().width - this.contentOffsetX - 1f);
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);

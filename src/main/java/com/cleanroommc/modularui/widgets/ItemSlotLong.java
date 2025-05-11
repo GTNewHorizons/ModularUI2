@@ -253,7 +253,7 @@ public class ItemSlotLong extends Widget<ItemSlotLong> implements IVanillaSlot, 
                 }
                 // render the amount overlay
                 if (amount > 1 || format != null) {
-                    String amountText = NumberFormat.formatWithMaxDigits(amount);
+                    String amountText = NumberFormat.format(amount, NumberFormat.AMOUNT_TEXT);
                     if (format != null) {
                         amountText = format + amountText;
                     }
