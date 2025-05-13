@@ -317,7 +317,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
 
     public W onUpdateListener(Consumer<W> listener, boolean merge) {
         if (merge && this.onUpdateListener != null) {
-            final Consumer<W> oldListener=this.onUpdateListener;
+            final Consumer<W> oldListener = this.onUpdateListener;
             if (listener != null) {
                 this.onUpdateListener = w -> {
                     oldListener.accept(w);
