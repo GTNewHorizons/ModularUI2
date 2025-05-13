@@ -251,7 +251,7 @@ public class ContainerCustomizer {
                     stack.stackSize = stack.getMaxStackSize();
                 }
                 ItemStack remainder = transferItem(slot, stack.copy());
-                if (base == 0 && remainder == null || remainder.stackSize < 1) stack = null;
+                if (base == 0 && (remainder == null || remainder.stackSize < 1)) stack = null;
                 else stack.stackSize = base + remainder.stackSize;
                 slot.putStack(stack);
                 return null;
