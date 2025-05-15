@@ -40,7 +40,6 @@ import java.text.DecimalFormat;
 
 import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
-// Changes made here probably should also be made to FluidSlotLong
 public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
