@@ -89,7 +89,7 @@ public interface IWidget extends IGuiElement {
     void drawForeground(ModularGuiContext context);
 
     default void transform(IViewportStack stack) {
-        stack.translate(getArea().rx, getArea().ry);
+        stack.translate(getArea().rx, getArea().ry, getArea().getPanelLayer() * 20);
     }
 
     default WidgetTheme getWidgetTheme(ITheme theme) {
@@ -214,6 +214,8 @@ public interface IWidget extends IGuiElement {
     /**
      * @return resizer of this widget
      */
+    @NotNull
+    @Override
     IResizeable resizer();
 
     /**

@@ -322,7 +322,7 @@ public class GuiDraw {
         Tessellator.instance.draw();
     }
 
-    public static void drawItem(ItemStack item, int x, int y, float width, float height) {
+    public static void drawItem(ItemStack item, int x, int y, float width, float height, int z) {
         if (item == null) return;
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();
@@ -331,7 +331,7 @@ public class GuiDraw {
         GlStateManager.translate(x, y, 0);
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
-        renderItem.zLevel = 200;
+        renderItem.zLevel = z + 100;
         renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);
         GlStateManager.disableRescaleNormal();
@@ -383,12 +383,13 @@ public class GuiDraw {
 
     /**
      * Draws a rectangular shadow
-     * @param x left of solid shadow part
-     * @param y top of solid shadow part
-     * @param w width of solid shadow part
-     * @param h height of solid shadow part
-     * @param oX shadow gradient size in x
-     * @param oY shadow gradient size in y
+     *
+     * @param x      left of solid shadow part
+     * @param y      top of solid shadow part
+     * @param w      width of solid shadow part
+     * @param h      height of solid shadow part
+     * @param oX     shadow gradient size in x
+     * @param oY     shadow gradient size in y
      * @param opaque solid shadow color
      * @param shadow gradient end color
      */

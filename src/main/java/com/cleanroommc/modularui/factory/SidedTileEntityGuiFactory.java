@@ -46,6 +46,11 @@ public class SidedTileEntityGuiFactory extends AbstractUIFactory<SidedPosGuiData
     }
 
     @Override
+    public boolean canInteractWith(EntityPlayer player, SidedPosGuiData guiData) {
+        return player == guiData.getPlayer() && guiData.getTileEntity() != null && guiData.getSquaredDistance(player) <= 64;
+    }
+
+    @Override
     public void writeGuiData(SidedPosGuiData guiData, PacketBuffer buffer) {
         buffer.writeVarIntToBuffer(guiData.getX());
         buffer.writeVarIntToBuffer(guiData.getY());

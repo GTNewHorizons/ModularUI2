@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -12,7 +13,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import java.util.function.IntConsumer;
 
-public class Rectangle implements IDrawable {
+public class Rectangle implements IDrawable, IJsonSerializable {
 
     public static final double PI_2 = Math.PI / 2;
 
@@ -115,6 +116,17 @@ public class Rectangle implements IDrawable {
         setColor(json, val -> this.colorBR = val, "colorBottomRight", "colorBR");
         this.cornerRadius = JsonHelper.getInt(json, 0, "cornerRadius");
         this.cornerSegments = JsonHelper.getInt(json, 10, "cornerSegments");
+    }
+
+    @Override
+    public boolean saveToJson(JsonObject json) {
+        json.addProperty("colorTL", this.colorTL);
+        json.addProperty("colorTR", this.colorTR);
+        json.addProperty("colorBL", this.colorBL);
+        json.addProperty("colorBR", this.colorBR);
+        json.addProperty("cornerRadius", this.cornerRadius);
+        json.addProperty("cornerSegments", this.cornerSegments);
+        return true;
     }
 
     private void setColor(JsonObject json, IntConsumer color, String... keys) {

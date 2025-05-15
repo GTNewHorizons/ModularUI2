@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui.screen;
 
+import codechicken.nei.LayoutManager;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerDrawHandler;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
@@ -25,8 +27,8 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widgets.ItemSlot;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
@@ -55,6 +57,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -67,8 +70,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
-
+@ApiStatus.Internal
 @SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
 
@@ -109,22 +111,48 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.gui.width, event.gui.height), false);
     }
 
+    // before NEI
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onGuiInputLow(KeyboardInputEvent.Pre event) throws IOException {
+    public void onGuiInputHigh(KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
+        inputEvent(event, InputPhase.EARLY);
+    }
+
+    // after NEI
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onGuiInputLow(KeyboardInputEvent.Pre event) throws IOException {
+        inputEvent(event, InputPhase.LATE);
+    }
+
+    private static void inputEvent(KeyboardInputEvent.Pre event, InputPhase phase) throws IOException {
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
-        // 1.7.10: NEI wants to process keyboard input first e.g. search bar
-        if (!(isNEILoaded && event.gui instanceof GuiContainer) && handleKeyboardInput(currentScreen, event.gui)) {
+        if (ModularUI.isNEILoaded) {
+            // manually handles NEI key input
+            // TODO is this a good way to do this?
+            char c0 = Keyboard.getEventCharacter();
+            int key = Keyboard.getEventKey();
+            if (LayoutManager.searchField.handleKeyPress(key, c0) || LayoutManager.quantity.handleKeyPress(key, c0)) {
+                event.setCanceled(true);
+                return;
+            }
+        }
+        if (handleKeyboardInput(currentScreen, event.gui, phase)) {
             event.setCanceled(true);
         }
     }
 
+    // before NEI
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
         // 1.7.10: In contrast to keyboard, MUI should process click first, otherwise ItemSlot causes infinite recursion
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.gui)) {
+            if (ModularUI.isNEILoaded) {
+                // remove NEI text field focus
+                LayoutManager.searchField.setFocus(false);
+                LayoutManager.quantity.setFocus(false);
+            }
             event.setCanceled(true);
             return;
         }
@@ -228,10 +256,14 @@ public class ClientScreenHandler {
         return false;
     }
 
+    public static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen) throws IOException {
+        return handleKeyboardInput(muiScreen, mcScreen, InputPhase.EARLY);
+    }
+
     /**
      * This replicates vanilla behavior while also injecting custom behavior for consistency
      */
-    public static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen) throws IOException {
+    private static boolean handleKeyboardInput(@Nullable ModularScreen muiScreen, GuiScreen mcScreen, InputPhase inputPhase) throws IOException {
         char c0 = Keyboard.getEventCharacter();
         int key = Keyboard.getEventKey();
         boolean state = Keyboard.getEventKeyState();
@@ -239,15 +271,17 @@ public class ClientScreenHandler {
         if (state) {
             // pressing a key
             lastChar = c0;
-            return doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) || keyTyped(mcScreen, c0, key);
+            return inputPhase.isEarly() ? doAction(muiScreen, ms -> ms.onKeyPressed(c0, key)) : keyTyped(mcScreen, c0, key);
         } else {
             // releasing a key
             // for some reason when you press E after joining a world the button will not trigger the press event,
             // but ony the release event, causing this to be null
             if (lastChar == null) return false;
             // when the key is released, the event char is empty
-            if (doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) return true;
-            if (key == 0 && c0 >= ' ') {
+            if (inputPhase.isEarly() && doAction(muiScreen, ms -> ms.onKeyRelease(lastChar, key))) {
+                return true;
+            }
+            if (inputPhase.isLate() && key == 0 && c0 >= ' ') {
                 return keyTyped(mcScreen, c0, key);
             }
         }
@@ -395,7 +429,7 @@ public class ClientScreenHandler {
 
         acc.setHoveredSlot(null);
         IGuiElement hovered = muiScreen.getContext().getHovered();
-        if (hovered instanceof IVanillaSlot vanillaSlot) {
+        if (hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }
 
@@ -487,7 +521,6 @@ public class ClientScreenHandler {
         GlStateManager.disableDepth();
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
-
 
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
@@ -604,5 +637,20 @@ public class ClientScreenHandler {
             return currentScreen.getContext();
         }
         return defaultContext;
+    }
+
+    private enum InputPhase {
+        // for mui interactions
+        EARLY,
+        // for mc interactions (like E and ESC)
+        LATE;
+
+        public boolean isEarly() {
+            return this == EARLY;
+        }
+
+        public boolean isLate() {
+            return this == LATE;
+        }
     }
 }

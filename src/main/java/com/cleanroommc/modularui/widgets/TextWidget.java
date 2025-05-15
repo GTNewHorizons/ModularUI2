@@ -55,9 +55,9 @@ public class TextWidget extends Widget<TextWidget> {
     @Override
     public int getDefaultHeight() {
         float maxWidth;
-        if (resizer() != null && resizer().isWidthCalculated()) {
+        if (resizer().isWidthCalculated()) {
             maxWidth = getArea().width + this.scale;
-        } else if (getParent().resizer() != null && getParent().resizer().isWidthCalculated()) {
+        } else if (getParent().resizer().isWidthCalculated()) {
             maxWidth = getParent().getArea().width + this.scale;
         } else {
             maxWidth = getScreen().getScreenArea().width;
@@ -70,7 +70,7 @@ public class TextWidget extends Widget<TextWidget> {
     @Override
     public int getDefaultWidth() {
         float maxWidth = getScreen().getScreenArea().width;
-        if (getParent().resizer() != null && getParent().resizer().isWidthCalculated()) {
+        if (getParent().resizer().isWidthCalculated()) {
             maxWidth = getParent().getArea().width;
         }
         TextRenderer renderer = simulate(maxWidth);
@@ -90,11 +90,11 @@ public class TextWidget extends Widget<TextWidget> {
         return this.scale;
     }
 
-    public int getColor() {
+    public @Nullable Integer getColor() {
         return this.color;
     }
 
-    public boolean isShadow() {
+    public @Nullable Boolean isShadow() {
         return this.shadow;
     }
 

@@ -1,8 +1,4 @@
 package com.cleanroommc.modularui.utils.item;
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

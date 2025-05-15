@@ -139,7 +139,7 @@ public class ModularScreen {
         if (wrapper == null) throw new NullPointerException("GuiScreenWrapper must not be null!");
         this.screenWrapper = wrapper;
         if (this.screenWrapper.getGuiScreen() instanceof GuiContainer container) {
-            ((ModularContainer) container.inventorySlots).construct(this);
+            ((ModularContainer) container.inventorySlots).initializeClient(this);
         }
         this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
         this.overlay = false;
@@ -251,11 +251,13 @@ public class ModularScreen {
         this.context.reset();
         this.context.pushViewport(null, this.context.getScreenArea());
         for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
+            this.context.updateZ(panel.getArea().getPanelLayer() * 20);
             if (panel.disablePanelsBelow()) {
                 GuiDraw.drawRect(0, 0, this.context.getScreenArea().w(), this.context.getScreenArea().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
         }
+        this.context.updateZ(0);
         this.context.popViewport(null);
 
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
