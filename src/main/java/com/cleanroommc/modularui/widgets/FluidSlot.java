@@ -190,14 +190,14 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
 
 	@Override
 	public @NotNull Result onMousePressed(int mouseButton) {
-			if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
-				return Result.ACCEPT;
-			}
-			ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
-			if (this.syncHandler.isPhantom() || cursorStack != null) {
-				MouseData mouseData = MouseData.create(mouseButton);
-				this.syncHandler.syncToServer(1, mouseData::writeToPacket);
-			}
+		if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
+			return Result.ACCEPT;
+		}
+		ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+		if (this.syncHandler.isPhantom() || cursorStack != null) {
+			MouseData mouseData = MouseData.create(mouseButton);
+			this.syncHandler.syncToServer(1, mouseData::writeToPacket);
+		}
 		return Result.SUCCESS;
 	}
 
