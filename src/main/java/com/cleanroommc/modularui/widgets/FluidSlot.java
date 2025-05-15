@@ -188,21 +188,20 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         return ITheme.getDefault().getFluidSlotTheme().getSlotHoverColor();
     }
 
-    @NotNull
-    @Override
-    public Result onMouseTapped(int mouseButton) {
-        if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
-            return Result.IGNORE;
-        }
-        ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
-        if (this.syncHandler.isPhantom() || cursorStack != null) {
-            MouseData mouseData = MouseData.create(mouseButton);
-            this.syncHandler.syncToServer(1, mouseData::writeToPacket);
-        }
-        return Result.SUCCESS;
-    }
+	@Override
+	public @NotNull Result onMousePressed(int mouseButton) {
+			if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
+				return Result.ACCEPT;
+			}
+			ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+			if (this.syncHandler.isPhantom() || cursorStack != null) {
+				MouseData mouseData = MouseData.create(mouseButton);
+				this.syncHandler.syncToServer(1, mouseData::writeToPacket);
+			}
+		return Result.SUCCESS;
+	}
 
-    @Override
+	@Override
     public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
         if (this.syncHandler.isPhantom()) {
             if ((scrollDirection.isUp() && !this.syncHandler.canFillSlot()) || (scrollDirection.isDown() && !this.syncHandler.canDrainSlot())) {
@@ -301,10 +300,5 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             return GTUtility.getFluidDisplayStack(getFluidStack(), false);
         }
         return null;
-    }
-
-    @Override
-    public Result onMousePressed(int mouseButton) {
-        return Result.SUCCESS;
     }
 }
