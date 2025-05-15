@@ -302,4 +302,9 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         }
         return null;
     }
+
+    @Override
+    public Result onMousePressed(int mouseButton) {
+        return Result.SUCCESS;
+    }
 }
