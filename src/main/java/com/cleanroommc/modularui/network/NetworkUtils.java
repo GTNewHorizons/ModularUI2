@@ -1,11 +1,6 @@
 package com.cleanroommc.modularui.network;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.utils.fluid.IFluidTankLong;
-import com.cleanroommc.modularui.utils.item.IItemStackLong;
-import com.cleanroommc.modularui.utils.fluid.FluidTankLong;
-import com.cleanroommc.modularui.utils.fluid.FluidTankLongDelegate;
-import com.cleanroommc.modularui.utils.item.ItemStackLong;
 
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -82,33 +77,6 @@ public class NetworkUtils {
         }
     }
 
-    public static void writeItemStackLong(PacketBuffer buffer, IItemStackLong itemStack) {
-        try {
-            NBTTagCompound nbt = new NBTTagCompound();
-            if (itemStack == null) {
-                nbt.setInteger("check", -1);
-            } else {
-                itemStack.writeToNBT(nbt);
-                nbt.setInteger("check", 1);
-            }
-            buffer.writeNBTTagCompoundToBuffer(nbt);
-        } catch (IOException e) {
-            ModularUI.LOGGER.catching(e);
-        }
-    }
-
-    public static IItemStackLong readItemStackLong(PacketBuffer buffer) {
-        try {
-            NBTTagCompound nbt = buffer.readNBTTagCompoundFromBuffer();
-            int check = nbt.getInteger("check");
-            if (check < 0) return null;
-            return ItemStackLong.loadFromNBT(nbt);
-        } catch (IOException e) {
-            ModularUI.LOGGER.catching(e);
-            return null;
-        }
-    }
-
     public static void writeFluidStack(PacketBuffer buffer, @Nullable FluidStack fluidStack) {
         if (fluidStack == null) {
             buffer.writeBoolean(true);
@@ -133,59 +101,6 @@ public class NetworkUtils {
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
             return null;
-        }
-    }
-
-    public static void writeFluidTank(PacketBuffer buffer, @Nullable IFluidTankLong tank) {
-        if (tank == null) {
-            buffer.writeBoolean(true);
-        } else {
-            buffer.writeBoolean(false);
-            NBTTagCompound fluidStackTag = new NBTTagCompound();
-            fluidStackTag.setLong("cap", tank.getCapacityLong());
-            fluidStackTag.setLong("amt", tank.getFluidAmountLong());
-            if (tank.getRealFluid() != null) {
-                fluidStackTag.setString("flu", tank.getRealFluid().getName());
-            }
-            if (tank instanceof FluidTankLongDelegate) {
-                fluidStackTag.setByte("type", (byte)1);
-            } else {
-                fluidStackTag.setByte("type", (byte)0);
-            }
-            try {
-                buffer.writeNBTTagCompoundToBuffer(fluidStackTag);
-            } catch (IOException e) {
-                ModularUI.LOGGER.catching(e);
-            }
-        }
-    }
-
-    public static @Nonnull IFluidTankLong readFluidTank(PacketBuffer buffer) {
-        if (buffer.readBoolean()) {
-            return null;
-        }
-        try {
-            NBTTagCompound nbt = buffer.readNBTTagCompoundFromBuffer();
-            byte type = nbt.getByte("type");
-            Fluid fluid = FluidRegistry.getFluid(nbt.getString("flu"));
-            long cap = nbt.getLong("cap");
-            long amt = nbt.getLong("amt");
-            IFluidTankLong tank;
-
-            if (type == 1) {
-                FluidStack fluidStack = null;
-                if (fluid != null) {
-                    fluidStack = new FluidStack(fluid, saturatedCast(cap));
-                }
-
-                tank = new FluidTankLongDelegate(new FluidTank(fluidStack, saturatedCast(amt)));
-            } else {
-                tank = new FluidTankLong(fluid, cap, amt);
-            }
-            return tank;
-        } catch (IOException e) {
-            ModularUI.LOGGER.catching(e);
-            return new FluidTankLong();
         }
     }
 

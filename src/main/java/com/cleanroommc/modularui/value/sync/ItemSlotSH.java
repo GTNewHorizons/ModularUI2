@@ -15,7 +15,6 @@ import java.io.IOException;
  * Wraps a slot and handles interactions for phantom slots.
  * Use {@link ModularSlot} directly.
  */
-// Changes made here probably should also be made to ItemSlotLongSH
 public class ItemSlotSH extends SyncHandler {
 
     private final ModularSlot slot;
