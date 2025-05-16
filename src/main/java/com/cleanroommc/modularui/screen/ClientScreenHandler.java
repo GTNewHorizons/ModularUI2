@@ -232,7 +232,7 @@ public class ClientScreenHandler {
             }
             acc.setEventButton(button);
             acc.setLastMouseEvent(Minecraft.getSystemTime());
-            if (muiScreen != null && muiScreen.handleDraggableInput(button, true)) return true;
+            if (muiScreen != null && muiScreen.onMouseInputPre(button, true)) return true;
             return doAction(muiScreen, ms -> ms.onMousePressed(button));
         }
         if (button != -1) {
@@ -246,7 +246,7 @@ public class ClientScreenHandler {
                 }
             }
             acc.setEventButton(-1);
-            if (muiScreen != null && muiScreen.handleDraggableInput(button, false)) return true;
+            if (muiScreen != null && muiScreen.onMouseInputPre(button, false)) return true;
             return doAction(muiScreen, ms -> ms.onMouseRelease(button));
         }
         if (acc.getEventButton() != -1 && acc.getLastMouseEvent() > 0L) {
@@ -365,7 +365,7 @@ public class ClientScreenHandler {
     public static void drawScreenInternal(ModularScreen muiScreen, GuiScreen mcScreen, int mouseX, int mouseY, float partialTicks) {
         Stencil.reset();
         Stencil.apply(muiScreen.getScreenArea(), null);
-        muiScreen.drawScreen(mouseX, mouseY, partialTicks);
+        muiScreen.drawScreen();
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
@@ -373,7 +373,7 @@ public class ClientScreenHandler {
         GlStateManager.enableRescaleNormal();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         RenderHelper.disableStandardItemLighting();
-        muiScreen.drawForeground(partialTicks);
+        muiScreen.drawForeground();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
@@ -391,7 +391,7 @@ public class ClientScreenHandler {
         int y = acc.getGuiTop();
 
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-        muiScreen.drawScreen(mouseX, mouseY, partialTicks);
+        muiScreen.drawScreen();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
@@ -424,7 +424,7 @@ public class ClientScreenHandler {
 
         RenderHelper.disableStandardItemLighting();
         acc.invokeDrawGuiContainerForegroundLayer(mouseX, mouseY);
-        muiScreen.drawForeground(partialTicks);
+        muiScreen.drawForeground();
         RenderHelper.enableGUIStandardItemLighting();
 
         acc.setHoveredSlot(null);
