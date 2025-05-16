@@ -39,6 +39,6 @@ public class ModularUIConfig {
     @Config.Comment("Enables a test overlay shown on title screen and watermark shown on every GuiContainer.")
     public static boolean enableTestOverlays = false;
 
-    @Config.Comment("If true, vanilla tooltip will be replaced with MUI's RichTooltip")
-    public static boolean replaceVanillaTooltips = false;
+    //@Config.Comment("If true, vanilla tooltip will be replaced with MUI's RichTooltip")
+    //public static boolean replaceVanillaTooltips = false;
 }

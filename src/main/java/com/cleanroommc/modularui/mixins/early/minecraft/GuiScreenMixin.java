@@ -68,21 +68,11 @@ public abstract class GuiScreenMixin {
         return (GuiScreen) (Object) this;
     }
 
+    /* TODO this currently doesnt work when NEI is installed
     @Inject(method = "renderToolTip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;drawHoveringText(Ljava/util/List;IILnet/minecraft/client/gui/FontRenderer;)V"), cancellable = true)
     public void drawItemTooltip(ItemStack stack, int x, int y, CallbackInfo ci, @Local List<String> textLines) {
         if (ModularUIConfig.replaceVanillaTooltips && !textLines.isEmpty()) {
-            RichTooltip tooltip = new RichTooltip();
-            tooltip.parent(area -> RichTooltip.findIngredientArea(area, x, y));
-            // Other positions don't really work due to the lack of GuiContext in non-modular uis
-            tooltip.add(textLines.get(0)).newLine();
-            if (!Platform.isStackEmpty(stack)) {
-                tooltip.spaceLine();
-            }
-            for (int i = 1, n = textLines.size(); i < n; i++) {
-                tooltip.add(textLines.get(i)).newLine();
-            }
-
-            tooltip.draw(GuiContext.getDefault(), stack);
+            RichTooltip.injectRichTooltip(stack, textLines, x, y);
             // Canceling vanilla tooltip rendering
             ci.cancel();
         }
@@ -91,17 +81,9 @@ public abstract class GuiScreenMixin {
     @Inject(method = "drawHoveringText", at = @At("HEAD"), cancellable = true, remap = false)
     public void drawTooltip(List<String> textLines, int x, int y, FontRenderer font, CallbackInfo ci) {
         if (ModularUIConfig.replaceVanillaTooltips && !textLines.isEmpty()) {
-            RichTooltip tooltip = new RichTooltip();
-            tooltip.parent(area -> RichTooltip.findIngredientArea(area, x, y));
-            // Other positions don't really work due to the lack of GuiContext in non-modular uis
-            tooltip.add(textLines.get(0)).newLine();
-            for (int i = 1, n = textLines.size(); i < n; i++) {
-                tooltip.add(textLines.get(i)).newLine();
-            }
-
-            tooltip.draw(GuiContext.getDefault(), null);
+            RichTooltip.injectRichTooltip(null, textLines, x, y);
             // Canceling vanilla tooltip rendering
             ci.cancel();
         }
-    }
+    }*/
 }
