@@ -86,7 +86,7 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
 
     @Override
     public void write(PacketBuffer buffer) throws IOException {
-        buffer.writeVarInt(this.cache.size());
+        buffer.writeVarIntToBuffer(this.cache.size());
         for (Map.Entry<K, V> entry : this.cache.entrySet()) {
             this.keySerializer.serialize(buffer, entry.getKey());
             this.valueSerializer.serialize(buffer, entry.getValue());
@@ -96,7 +96,7 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
     @Override
     public void read(PacketBuffer buffer) throws IOException {
         this.cache.clear();
-        for (int i = 0; i < buffer.readVarInt(); i++) {
+        for (int i = 0; i < buffer.readVarIntFromBuffer(); i++) {
             this.cache.put(this.keyDeserializer.deserialize(buffer), this.valueDeserializer.deserialize(buffer));
         }
         this.setter.accept(getValue());
