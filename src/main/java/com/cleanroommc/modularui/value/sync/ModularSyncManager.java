@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.utils.item.IItemHandler;
 import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
 import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
