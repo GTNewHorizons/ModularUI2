@@ -1,7 +1,11 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
+import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -20,5 +24,12 @@ public class EventHandler {
             //ClientGUI.open(new ResizerTest());
             ClientGUI.open(new TestGuis());
         }
+    }
+
+    @SubscribeEvent
+    public void onRichTooltip(RichTooltipEvent.Pre event) {
+        event.getTooltip()
+                .add(IKey.str("Powered By: ").style(IKey.GOLD, IKey.ITALIC))
+                .add(GuiTextures.MUI_LOGO.asIcon().size(18)).newLine();
     }
 }

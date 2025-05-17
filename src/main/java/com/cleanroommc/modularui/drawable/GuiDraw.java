@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
 
@@ -22,6 +25,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -562,7 +566,7 @@ public class GuiDraw {
         GlStateManager.enableBlend();
     }
 
-    public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height) {
+    public static void drawTooltipBackground(ItemStack stack, List<String> lines, int x, int y, int textWidth, int height, @Nullable RichTooltip tooltip) {
         // TODO theme color
         int backgroundColor = 0xF0100010;
         int borderColorStart = 0x505000FF;

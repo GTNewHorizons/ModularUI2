@@ -18,6 +18,8 @@ import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
 
+import com.cleanroommc.modularui.widgets.TextWidget;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -42,6 +44,7 @@ public class TestGuis extends CustomModularScreen {
         //SpriteHelper not ported SpriteHelper.getSpriteOfItem(new ItemStack(Items.DIAMOND));
         return ModularPanel.defaultPanel("main")
                 .size(150)
+                .child(new TextWidget(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
                 .child(new DraggableWidget<>()
                         //SpriteDrawable not ported .background(new SpriteDrawable(sprite))
                         .size(20)
