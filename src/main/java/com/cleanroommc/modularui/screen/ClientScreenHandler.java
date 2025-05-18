@@ -132,7 +132,8 @@ public class ClientScreenHandler {
             // TODO is this a good way to do this?
             char c0 = Keyboard.getEventCharacter();
             int key = Keyboard.getEventKey();
-            if (LayoutManager.searchField.handleKeyPress(key, c0) || LayoutManager.quantity.handleKeyPress(key, c0)) {
+            if ((LayoutManager.searchField != null && LayoutManager.searchField.handleKeyPress(key, c0)) ||
+                    (LayoutManager.quantity != null && LayoutManager.quantity.handleKeyPress(key, c0))) {
                 event.setCanceled(true);
                 return;
             }
