@@ -48,7 +48,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return phantom ? new PhantomItemSlot() : new ItemSlot();
     }
 
-    private static final TextRenderer textRenderer = new TextRenderer();
     private ItemSlotSH syncHandler;
 
     public ItemSlot() {
@@ -242,33 +241,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 if (amount < 0) {
                     amount = itemstack.stackSize;
                 }
-                // render the amount overlay
-                if (amount > 1 || format != null) {
-                    String amountText = NumberFormat.format(amount, NumberFormat.AMOUNT_TEXT);
-                    if (format != null) {
-                        amountText = format + amountText;
-                    }
-                    float scale = 1f;
-                    if (amountText.length() == 3) {
-                        scale = 0.8f;
-                    } else if (amountText.length() == 4) {
-                        scale = 0.6f;
-                    } else if (amountText.length() > 4) {
-                        scale = 0.5f;
-                    }
-                    textRenderer.setShadow(true);
-                    textRenderer.setScale(scale);
-                    textRenderer.setColor(Color.WHITE.main);
-                    textRenderer.setAlignment(Alignment.BottomRight, getArea().width - 1, getArea().height - 1);
-                    textRenderer.setPos(1, 1);
-                    GlStateManager.disableLighting();
-                    GlStateManager.disableDepth();
-                    GlStateManager.disableBlend();
-                    textRenderer.draw(amountText);
-                    GlStateManager.enableLighting();
-                    GlStateManager.enableDepth();
-                    GlStateManager.enableBlend();
-                }
+                GuiDraw.drawStandardSlotAmountText(amount, format, getArea());
 
                 int cachedCount = itemstack.stackSize;
                 itemstack.stackSize = 1; // required to not render the amount overlay
@@ -286,9 +259,5 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     @Override
     public @Nullable ItemStack getStackForNEI() {
         return this.syncHandler.getSlot().getStack();
-    }
-
-    protected TextRenderer getTextRenderer() {
-        return textRenderer;
     }
 }
