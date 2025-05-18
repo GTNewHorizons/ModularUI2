@@ -1,38 +1,34 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
 
-import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
-
-import static com.cleanroommc.modularui.drawable.BufferBuilder.buffer;
-import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class GuiDraw {
 
@@ -79,23 +75,20 @@ public class GuiDraw {
     public static void drawEllipse(float x0, float y0, float w, float h, int centerColor, int outerColor, int segments) {
         Platform.setupDrawColor();
         Platform.setupDrawGradient();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
         float x_2 = x0 + w / 2f, y_2 = y0 + h / 2f;
         Platform.startDrawing(Platform.DrawMode.TRIANGLE_FAN, Platform.VertexFormat.POS_COLOR, bufferBuilder -> {
             // start at center
-            bufferbuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(centerColor), Color.getGreen(centerColor), Color.getBlue(centerColor), Color.getAlpha(centerColor)).endVertex();
+            bufferBuilder.pos(x_2, y_2, 0.0f).color(Color.getRed(centerColor), Color.getGreen(centerColor), Color.getBlue(centerColor), Color.getAlpha(centerColor)).endVertex();
             int a = Color.getAlpha(outerColor), r = Color.getRed(outerColor), g = Color.getGreen(outerColor), b = Color.getBlue(outerColor);
             float incr = (float) (PI2 / segments);
             for (int i = 0; i <= segments; i++) {
                 float angle = incr * i;
                 float x = (float) (Math.sin(angle) * (w / 2) + x_2);
                 float y = (float) (Math.cos(angle) * (h / 2) + y_2);
-                bufferbuilder.pos(x, y, 0.0f).color(r, g, b, a).endVertex();
+                bufferBuilder.pos(x, y, 0.0f).color(r, g, b, a).endVertex();
             }
         });
         Platform.endDrawGradient();
-        //Platform.setupDrawTex();
     }
 
     public static void drawRoundedRect(float x0, float y0, float w, float h, int color, int cornerRadius, int segments) {
@@ -497,7 +490,7 @@ public class GuiDraw {
         int borderColorStart = 0x505000FF;
         int borderColorEnd = (borderColorStart & 0xFEFEFE) >> 1 | borderColorStart & 0xFF000000;
         if (tooltip != null) {
-            RenderTooltipEvent.Color colorEvent = new RichTooltipEvent.Color(stack, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd, tooltip);
+            RichTooltipEvent.Color colorEvent = new RichTooltipEvent.Color(stack, lines, x, y, TextRenderer.getFontRenderer(), backgroundColor, borderColorStart, borderColorEnd, tooltip);
             MinecraftForge.EVENT_BUS.post(colorEvent);
             backgroundColor = colorEvent.getBackground();
             borderColorStart = colorEvent.getBorderStart();
