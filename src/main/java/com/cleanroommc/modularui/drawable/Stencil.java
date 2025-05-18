@@ -2,18 +2,15 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.utils.GlStateManager;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
-import net.minecraft.client.renderer.Tessellator;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.Rectangle;
-
-import static com.cleanroommc.modularui.drawable.BufferBuilder.bufferbuilder;
 
 public class Stencil {
 
@@ -118,19 +115,14 @@ public class Stencil {
     }
 
     private static void drawRectangleStencilShape(int x, int y, int w, int h) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
-        Tessellator.instance.startDrawingQuads();
-        bufferbuilder.pos(x0, y0, 0.0f).endVertex();
-        bufferbuilder.pos(x0, y1, 0.0f).endVertex();
-        bufferbuilder.pos(x1, y1, 0.0f).endVertex();
-        bufferbuilder.pos(x1, y0, 0.0f).endVertex();
-        Tessellator.instance.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
+        Platform.setupDrawColor();
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS, bufferBuilder -> {
+            float x0 = x, x1 = x + w, y0 = y, y1 = y + h;
+            bufferBuilder.pos(x0, y0, 0.0f).endVertex();
+            bufferBuilder.pos(x0, y1, 0.0f).endVertex();
+            bufferBuilder.pos(x1, y1, 0.0f).endVertex();
+            bufferBuilder.pos(x1, y0, 0.0f).endVertex();
+        });
     }
 
     /**

@@ -65,10 +65,6 @@ public class OverlayStack {
             fallback = screen;
         }
         ClientScreenHandler.drawDebugScreen(hovered, fallback);
-        GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
-        GlStateManager.enableRescaleNormal();
-        RenderHelper.enableStandardItemLighting();
     }
 
     public static void open(ModularScreen screen) {

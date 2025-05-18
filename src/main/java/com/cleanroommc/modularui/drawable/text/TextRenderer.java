@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.utils.GlStateManager;
 
@@ -237,14 +238,13 @@ public class TextRenderer {
 
     protected void draw(String text, float x, float y) {
         if (this.simulate) return;
-        GlStateManager.disableBlend();
+        Platform.setupDrawFont();
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0f);
         GlStateManager.disableLighting();
         getFontRenderer().drawString(text, (int) (x / this.scale), (int) (y / this.scale), this.color, this.shadow);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
-        GlStateManager.enableBlend();
     }
 
     public int getColor() {
