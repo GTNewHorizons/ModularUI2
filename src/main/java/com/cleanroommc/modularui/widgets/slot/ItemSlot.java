@@ -23,6 +23,7 @@ import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
+import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.Widget;
 
 import cpw.mods.fml.relauncher.Side;
@@ -128,11 +129,45 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return ITheme.getDefault().getItemSlotTheme().getSlotHoverColor();
     }
 
-    @Override
-    public @NotNull Result onMousePressed(int mouseButton) {
-        ClientScreenHandler.clickSlot(getScreen(), getSlot());
-        return Result.SUCCESS;
-    }
+	@Override
+	public @NotNull Result onMousePressed(int mouseButton) {
+		Area originalArea = changeGuiArea(getArea());//temporarily set the area of GUI to the area of the slot
+		//or else clicking a slot outside the Area of main panel will toss the item inside the slot
+		//This fix only applies to 1.7.10
+		try{
+			ClientScreenHandler.clickSlot(getScreen(), getSlot());
+		}finally{
+			restoreGuiArea(originalArea);//then restore it
+		}
+		return Result.SUCCESS;
+	}
+
+	private Area changeGuiArea(Area newArea) {
+		GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
+		if (!(guiScreen instanceof GuiContainer))
+			throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
+		GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
+		int oldX = acc.getGuiLeft();
+		int oldY = acc.getGuiTop();
+		int oldW = acc.getXSize();
+		int oldH = acc.getYSize();
+		acc.setGuiLeft(newArea.x());
+		acc.setGuiTop(newArea.y());
+		acc.setXSize(newArea.w());
+		acc.setYSize(newArea.h());
+		return new Area(oldX, oldY, oldW, oldH);
+	}
+
+	private void restoreGuiArea(Area originalArea) {
+		GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
+		if (!(guiScreen instanceof GuiContainer))
+			throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
+		GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
+		acc.setGuiLeft(originalArea.x());
+		acc.setGuiTop(originalArea.y());
+		acc.setXSize(originalArea.w());
+		acc.setYSize(originalArea.h());
+	}
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
