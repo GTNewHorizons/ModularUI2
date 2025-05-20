@@ -127,7 +127,7 @@ public class ClientScreenHandler {
 
     private static void inputEvent(KeyboardInputEvent.Pre event, InputPhase phase) throws IOException {
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
-        if (ModularUI.isNEILoaded) {
+        if (ModularUI.isNEILoaded && phase == InputPhase.EARLY && Keyboard.getEventKeyState()) {
             // manually handles NEI key input
             // TODO is this a good way to do this?
             char c0 = Keyboard.getEventCharacter();
