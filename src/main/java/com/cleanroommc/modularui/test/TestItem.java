@@ -1,9 +1,13 @@
 package com.cleanroommc.modularui.test;
 
+import baubles.api.BaubleType;
+import baubles.api.IBauble;
+
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiFactories;
+import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -22,12 +26,12 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class TestItem extends Item implements IGuiHolder<GuiData> {
+public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>, IBauble {
 
     public static final TestItem testItem = new TestItem();
 
     @Override
-    public ModularPanel buildUI(GuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
+    public ModularPanel buildUI(PlayerInventoryGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
         IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData.getMainHandItem(), 4);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
@@ -50,7 +54,7 @@ public class TestItem extends Item implements IGuiHolder<GuiData> {
     @Override
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer player) {
         if (!worldIn.isRemote) {
-            GuiFactories.item().open(player);
+            GuiFactories.playerInventory().openFromHand(player, hand);
         }
         return super.onItemRightClick(itemStackIn, worldIn, player);
     }
@@ -59,5 +63,10 @@ public class TestItem extends Item implements IGuiHolder<GuiData> {
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean showDebugInfo) {
         super.addInformation(stack, player, tooltip, showDebugInfo);
         tooltip.add("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+    }
+
+    @Override
+    public BaubleType getBaubleType(ItemStack itemStack) {
+        return BaubleType.AMULET;
     }
 }

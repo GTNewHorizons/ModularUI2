@@ -39,6 +39,7 @@ dependencies {
     compileOnly("com.github.GTNewHorizons:ModularUI:1.2.18:dev") { transitive = false }
     compileOnly("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
     compileOnly("org.jetbrains:annotations:24.0.1")
+    //implementation(rfg.deobf("curse.maven:baubles-227083:2518667"))
 
     //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.44-GTNH:dev")
     // For Thaumcraft runtime
