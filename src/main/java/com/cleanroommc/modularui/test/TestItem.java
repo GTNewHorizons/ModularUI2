@@ -34,7 +34,7 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
 
     @Override
     public ModularPanel buildUI(PlayerInventoryGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
-        IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData.getUsedItemStack(), 4);
+        IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData, 4);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");

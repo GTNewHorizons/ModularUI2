@@ -310,4 +310,13 @@ public enum Interpolation implements IInterpolation {
     public @NotNull String getName() {
         return this.name;
     }
+
+    public static Interpolation getForName(String name) {
+        for (Interpolation interpolation : values()) {
+            if (interpolation.name.equals(name)) {
+                return interpolation;
+            }
+        }
+        return null;
+    }
 }

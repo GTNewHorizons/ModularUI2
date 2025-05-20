@@ -52,6 +52,16 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     }
 
     @Override
+    public boolean requiresResize() {
+        return this.parent.requiresResize();
+    }
+
+    @Override
+    public void scheduleResize() {
+        this.parent.scheduleResize();
+    }
+
+    @Override
     public boolean isXCalculated() {
         return this.x.isPosCalculated();
     }
@@ -73,43 +83,51 @@ public class Flex implements IResizeable, IPositioned<Flex> {
 
     public Flex coverChildrenWidth() {
         this.x.setCoverChildren(true, this.parent);
+        scheduleResize();
         return this;
     }
 
     public Flex coverChildrenHeight() {
         this.y.setCoverChildren(true, this.parent);
+        scheduleResize();
         return this;
     }
 
     public Flex cancelMovementX() {
         this.x.setCancelAutoMovement(true);
+        scheduleResize();
         return this;
     }
 
     public Flex cancelMovementY() {
         this.y.setCancelAutoMovement(true);
+        scheduleResize();
         return this;
     }
 
     public Flex expanded() {
         this.expanded = true;
+        scheduleResize();
         return this;
     }
 
     public Flex relative(Area guiElement) {
         this.relativeTo = guiElement;
         this.relativeToParent = false;
+        scheduleResize();
         return this;
     }
 
     public Flex relativeToScreen() {
         this.relativeTo = null;
         this.relativeToParent = false;
+        scheduleResize();
         return this;
     }
 
     public Flex relativeToParent() {
         this.relativeToParent = true;
+        scheduleResize();
         return this;
     }
 
@@ -159,6 +177,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         u.setOffset(offset);
         u.setAnchor(anchor);
         u.setAutoAnchor(autoAnchor);
+        scheduleResize();
         return this;
     }
 
@@ -168,6 +187,7 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         u.setOffset(offset);
         u.setAnchor(anchor);
         u.setAutoAnchor(autoAnchor);
+        scheduleResize();
         return this;
     }
 
@@ -190,50 +210,54 @@ public class Flex implements IResizeable, IPositioned<Flex> {
     private Flex unitSize(Unit u, float val, Unit.Measure measure) {
         u.setValue(val);
         u.setMeasure(measure);
+        scheduleResize();
         return this;
     }
 
     private Flex unitSize(Unit u, DoubleSupplier val, Unit.Measure measure) {
         u.setValue(val);
         u.setMeasure(measure);
+        scheduleResize();
         return this;
     }
 
     public Flex anchorLeft(float val) {
         getLeft().setAnchor(val);
         getLeft().setAutoAnchor(false);
+        scheduleResize();
         return this;
     }
 
     public Flex anchorRight(float val) {
         getRight().setAnchor(1 - val);
         getRight().setAutoAnchor(false);
+        scheduleResize();
         return this;
     }
 
     public Flex anchorTop(float val) {
         getTop().setAnchor(val);
         getTop().setAutoAnchor(false);
+        scheduleResize();
         return this;
     }
 
     public Flex anchorBottom(float val) {
         getBottom().setAnchor(1 - val);
         getBottom().setAutoAnchor(false);
+        scheduleResize();
         return this;
     }
 
     public Flex anchor(Alignment alignment) {
-        if (this.x.hasStart()) {
+        if (this.x.hasStart() || !this.x.hasEnd()) {
             anchorLeft(alignment.x);
-        }
-        if (this.x.hasEnd()) {
+        } else if (this.x.hasEnd()) {
             anchorRight(alignment.x);
         }
-        if (this.y.hasStart()) {
+        if (this.y.hasStart() || !this.y.hasEnd()) {
             anchorTop(alignment.y);
-        }
-        if (this.y.hasEnd()) {
+        } else if (this.y.hasEnd()) {
             anchorBottom(alignment.y);
         }
         return this;
@@ -482,8 +506,11 @@ public class Flex implements IResizeable, IPositioned<Flex> {
         if (parent instanceof IVanillaSlot vanillaSlot) {
             // special treatment for minecraft slots
             Slot slot = vanillaSlot.getVanillaSlot();
-            slot.xDisplayPosition = parent.getArea().x;
-            slot.yDisplayPosition = parent.getArea().y;
+            Area mainArea = parent.getScreen().getMainPanel().getArea();
+            // in vanilla uis the position is relative to the gui area and size is 16 x 16
+            // since our slots are 18 x 18 we need to offset by 1
+            slot.xDisplayPosition = parent.getArea().x - mainArea.x + 1;
+            slot.yDisplayPosition = parent.getArea().y - mainArea.y + 1;
         }
     }
 

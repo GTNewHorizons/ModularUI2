@@ -119,4 +119,8 @@ public interface IGuiElement {
     default int getDefaultHeight() {
         return 18;
     }
+
+    void scheduleResize();
+
+    boolean requiresResize();
 }

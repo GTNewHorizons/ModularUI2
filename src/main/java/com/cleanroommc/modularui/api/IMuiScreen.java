@@ -1,18 +1,20 @@
 package com.cleanroommc.modularui.api;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.neverenoughanimations.api.IAnimatedScreen;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +28,9 @@ import java.util.function.IntConsumer;
  * See {@link com.cleanroommc.modularui.screen.GuiScreenWrapper GuiScreenWrapper} and {@link com.cleanroommc.modularui.screen.GuiContainerWrapper GuiContainerWrapper}
  * for default implementations.
  */
+@Optional.Interface(modid = ModularUI.ModIds.NEA, iface = "com.cleanroommc.neverenoughanimations.api.IAnimatedScreen")
 @SideOnly(Side.CLIENT)
-public interface IMuiScreen {
+public interface IMuiScreen extends IAnimatedScreen {
 
     /**
      * Returns the {@link ModularScreen} that is being wrapped. This should return a final instance field.
@@ -98,5 +101,25 @@ public interface IMuiScreen {
      */
     default GuiScreen getGuiScreen() {
         return (GuiScreen) this;
+    }
+
+    @Override
+    default int nea$getX() {
+        return getScreen().getMainPanel().getArea().x;
+    }
+
+    @Override
+    default int nea$getY() {
+        return getScreen().getMainPanel().getArea().y;
+    }
+
+    @Override
+    default int nea$getWidth() {
+        return getScreen().getMainPanel().getArea().width;
+    }
+
+    @Override
+    default int nea$getHeight() {
+        return getScreen().getMainPanel().getArea().height;
     }
 }

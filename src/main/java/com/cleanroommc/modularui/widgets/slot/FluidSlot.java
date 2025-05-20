@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -37,8 +38,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
-
-import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
 
 public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
 
@@ -296,7 +295,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
 
     @Override
     public @Nullable ItemStack getStackForNEI() {
-        if (isGT5ULoaded) {
+        if (ModularUI.Mods.GT5U.isLoaded()) {
             return GTUtility.getFluidDisplayStack(getFluidStack(), false);
         }
         return null;

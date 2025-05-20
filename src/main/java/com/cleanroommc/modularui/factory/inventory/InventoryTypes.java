@@ -24,7 +24,7 @@ public class InventoryTypes {
 
         @Override
         public boolean isActive() {
-            return ModularUI.isBaublesLoaded;
+            return ModularUI.Mods.BAUBLES.isLoaded();
         }
 
         @Override

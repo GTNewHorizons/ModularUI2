@@ -41,13 +41,15 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class GuiManager {
 
     private static final Object2ObjectMap<String, UIFactory<?>> FACTORIES = new Object2ObjectOpenHashMap<>(16);
 
-    private static IMuiScreen lastMui;
     private static final List<EntityPlayer> openedContainers = new ArrayList<>(4);
 
     public static void registerFactory(UIFactory<?> factory) {
@@ -145,30 +147,6 @@ public class GuiManager {
     public void onTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             openedContainers.clear();
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void onGuiOpen(GuiOpenEvent event) {
-        if (lastMui != null && event.gui == null) {
-            if (lastMui.getScreen().getPanelManager().isOpen()) {
-                lastMui.getScreen().getPanelManager().closeAll();
-            }
-            lastMui.getScreen().getPanelManager().dispose();
-            lastMui = null;
-        } else if (event.gui instanceof IMuiScreen screenWrapper) {
-            if (lastMui == null) {
-                lastMui = screenWrapper;
-            } else if (lastMui == event.gui) {
-                lastMui.getScreen().getPanelManager().reopen();
-            } else {
-                if (lastMui.getScreen().getPanelManager().isOpen()) {
-                    lastMui.getScreen().getPanelManager().closeAll();
-                }
-                lastMui.getScreen().getPanelManager().dispose();
-                lastMui = screenWrapper;
-            }
         }
     }
 }

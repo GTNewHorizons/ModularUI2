@@ -228,20 +228,17 @@ public interface IWidget extends IGuiElement {
     /**
      * Called before a widget is resized.
      */
-    default void beforeResize() {
-    }
+    default void beforeResize(boolean onOpen) {}
 
     /**
      * Called after a widget is fully resized.
      */
-    default void onResized() {
-    }
+    default void onResized() {}
 
     /**
      * Called after the full widget tree is resized and the absolute positions are calculated.
      */
-    default void postResize() {
-    }
+    default void postResize() {}
 
     /**
      * @return flex of this widget
