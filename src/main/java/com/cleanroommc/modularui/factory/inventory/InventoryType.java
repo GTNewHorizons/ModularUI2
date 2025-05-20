@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.factory.inventory;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
-
 import com.cleanroommc.modularui.utils.Platform;
 
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
@@ -12,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collection;
@@ -34,11 +34,17 @@ public abstract class InventoryType {
 
     public InventoryType(String id) {
         this.id = id;
-        inventoryTypes.put(id, this);
+        if (isActive()) {
+            inventoryTypes.put(id, this);
+        }
     }
 
     public String getId() {
         return id;
+    }
+
+    public boolean isActive() {
+        return true;
     }
 
     public abstract ItemStack getStackInSlot(EntityPlayer player, int index);
