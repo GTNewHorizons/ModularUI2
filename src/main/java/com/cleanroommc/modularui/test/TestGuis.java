@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.animation.IAnimator;
 import com.cleanroommc.modularui.animation.Wait;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -22,6 +23,8 @@ import com.cleanroommc.modularui.utils.*;
 import com.cleanroommc.modularui.utils.fakeworld.ArraySchema;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.widget.DraggableWidget;
+import com.cleanroommc.modularui.widget.Widget;
+import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
@@ -48,7 +51,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildPostTheLogAnimationUI(context);
+        return buildListUi(context);
     }
 
     public @NotNull ModularPanel buildAnimationUI(ModularGuiContext context) {
@@ -254,5 +257,24 @@ public class TestGuis extends CustomModularScreen {
                         .left(1)
                         .size(16));
         return panel;
+    }
+
+    public ModularPanel buildListUi(ModularGuiContext context) {
+        Random rnd = new Random();
+        return ModularPanel.defaultPanel("list", 100, 150)
+                .padding(7)
+                .child(new ListWidget<>()
+                        .sizeRel(1f)
+                        .collapseDisabledChild()
+                        .children(12, i -> new Widget<>()
+                                .widthRel(1f)
+                                .height(16)
+                                .widgetTheme(IThemeApi.BUTTON)
+                                .overlay(IKey.str(String.valueOf(i + 1)))
+                                .onUpdateListener(w -> {
+                                    if (rnd.nextDouble() < 0.05) {
+                                        w.setEnabled(!w.isEnabled());
+                                    }
+                                })));
     }
 }
