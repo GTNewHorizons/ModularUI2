@@ -2,14 +2,14 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ClientProxy;
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
-import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ISimpleBauble;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
+import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
@@ -17,31 +17,24 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import baubles.api.expanded.BaubleExpandedSlots;
 
 import java.util.List;
 
-public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>, IBauble {
+public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>, ISimpleBauble {
 
     public static final TestItem testItem = new TestItem();
 
     @Override
     public ModularPanel buildUI(PlayerInventoryGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
-        IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData.getMainHandItem(), 4);
+        IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData.getUsedItemStack(), 4);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
         ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
@@ -63,7 +56,7 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
     @Override
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer player) {
         if (!worldIn.isRemote) {
-            GuiFactories.playerInventory().openFromHand(player, hand);
+            GuiFactories.playerInventory().openFromMainHand(player);
         }
         return super.onItemRightClick(itemStackIn, worldIn, player);
     }
@@ -72,11 +65,11 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean showDebugInfo) {
         super.addInformation(stack, player, tooltip, showDebugInfo);
         tooltip.add("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
-        tooltip.add(TextFormatting.GREEN + "Press " + ClientProxy.testKey.getDisplayName() + " to open GUI from Baubles");
+        tooltip.add(EnumChatFormatting.GREEN + "Press " + GameSettings.getKeyDisplayString(ClientProxy.testKey.getKeyCode()) + " to open GUI from Baubles");
     }
 
     @Override
-    public BaubleType getBaubleType(ItemStack itemStack) {
-        return BaubleType.AMULET;
+    public String[] getBaubleTypes(ItemStack itemstack) {
+        return new String[]{BaubleExpandedSlots.amuletType};
     }
 }

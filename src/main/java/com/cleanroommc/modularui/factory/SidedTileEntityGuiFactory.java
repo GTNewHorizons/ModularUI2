@@ -9,6 +9,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -17,34 +19,33 @@ public class SidedTileEntityGuiFactory extends AbstractUIFactory<SidedPosGuiData
 
     public static final SidedTileEntityGuiFactory INSTANCE = new SidedTileEntityGuiFactory();
 
-    public <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void open(EntityPlayer player, T tile, ForgeDirection side) {
+    public <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void open(EntityPlayer player, T tile, ForgeDirection facing) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(facing);
-        BlockPos pos = TileEntityGuiFactory.getPosFromTile(tile);
-        SidedPosGuiData data = new SidedPosGuiData(player, pos.getX(), pos.getY(), pos.getZ(), facing);
+        TileEntityGuiFactory.verifyTile(player, tile);
+        SidedPosGuiData data = new SidedPosGuiData(player, tile.xCoord, tile.yCoord, tile.zCoord, facing);
         GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
-    public void open(EntityPlayer player, int x, int y, int z, ForgeDirection side) {
+    public void open(EntityPlayer player, int x, int y, int z, ForgeDirection facing) {
         Objects.requireNonNull(player);
-        Objects.requireNonNull(side);
-        SidedPosGuiData data = new SidedPosGuiData(player, x, y, z, side);
+        Objects.requireNonNull(facing);
+        SidedPosGuiData data = new SidedPosGuiData(player, x, y, z, facing);
         GuiManager.open(this, data, (EntityPlayerMP) player);
     }
 
     @SideOnly(Side.CLIENT)
     public <T extends TileEntity & IGuiHolder<SidedPosGuiData>> void openClient(T tile, ForgeDirection facing) {
         Objects.requireNonNull(facing);
-        BlockPos pos = TileEntityGuiFactory.getPosFromTile(tile);
-        SidedPosGuiData data = new SidedPosGuiData(Platform.getClientPlayer(), pos.getX(), pos.getY(), pos.getZ(), facing);
+        TileEntityGuiFactory.verifyTile(Platform.getClientPlayer(), tile);
+        SidedPosGuiData data = new SidedPosGuiData(Platform.getClientPlayer(), tile.xCoord, tile.yCoord, tile.zCoord, facing);
         GuiManager.openFromClient(this, data);
     }
 
     @SideOnly(Side.CLIENT)
-    public void openClient(BlockPos pos, ForgeDirection facing) {
-        Objects.requireNonNull(pos);
+    public void openClient(int x, int y, int z, ForgeDirection facing) {
         Objects.requireNonNull(facing);
-        SidedPosGuiData data = new SidedPosGuiData(Platform.getClientPlayer(), pos.getX(), pos.getY(), pos.getZ(), facing);
+        SidedPosGuiData data = new SidedPosGuiData(Platform.getClientPlayer(), x, y, z, facing);
         GuiManager.openFromClient(this, data);
     }
 

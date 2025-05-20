@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.test.OverlayTest;
 import com.cleanroommc.modularui.test.TestItem;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
+import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -20,16 +21,17 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.Timer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
 import org.lwjgl.input.Keyboard;
 
 @SideOnly(Side.CLIENT)
@@ -51,7 +53,7 @@ public class ClientProxy extends CommonProxy {
 
         if (ModularUIConfig.enableTestGuis) {
             MinecraftForge.EVENT_BUS.register(new EventHandler());
-            testKey = new KeyBinding("key.test", KeyConflictContext.IN_GAME, Keyboard.KEY_NUMPAD4, "key.categories.modularui");
+            testKey = new KeyBinding("key.test", Keyboard.KEY_NUMPAD4, "key.categories.modularui");
             ClientRegistry.registerKeyBinding(testKey);
         }
         if (ModularUIConfig.enableTestOverlays) {
@@ -76,8 +78,8 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onKeyboard(InputEvent.KeyInputEvent event) {
-        if (testKey.isPressed() && ModularUI.isBaubleLoaded()) {
-            InventoryTypes.BAUBLES.visitAll(Minecraft.getMinecraft().player, (type, index, stack) -> {
+        if (testKey.isPressed() && ModularUI.isBaublesLoaded) {
+            InventoryTypes.BAUBLES.visitAll(Platform.getClientPlayer(), (type, index, stack) -> {
                 if (stack.getItem() instanceof TestItem) {
                     GuiFactories.playerInventory().openFromBaublesClient(index);
                     return true;

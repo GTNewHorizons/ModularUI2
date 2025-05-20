@@ -31,7 +31,7 @@ public class ModularUI {
     public static final boolean isNEILoaded = Loader.isModLoaded(MODID_NEI);
     public static final boolean isGT5ULoaded = Loader.isModLoaded(MODID_GT5U) && !Loader.isModLoaded(MODID_GT6);
     public static final boolean isHodgepodgeLoaded = Loader.isModLoaded("hodgepodge");
-    public static final boolean isBaublesLoaded = Loader.isModLoaded("baubles");
+    public static final boolean isBaublesLoaded = Loader.isModLoaded("Baubles");
 
     @SidedProxy(
         modId = ModularUI.ID,

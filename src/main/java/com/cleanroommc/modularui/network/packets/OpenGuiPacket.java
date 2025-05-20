@@ -55,8 +55,8 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
 
     @Override
     public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
-        T guiData = this.factory.readGuiData(handler.player, this.data);
-        GuiManager.open(this.factory, guiData, handler.player);
+        T guiData = this.factory.readGuiData(handler.playerEntity, this.data);
+        GuiManager.open(this.factory, guiData, handler.playerEntity);
         return null;
     }
 }
