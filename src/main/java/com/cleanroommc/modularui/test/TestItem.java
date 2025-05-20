@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ISimpleBauble;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandlers;
 import com.cleanroommc.modularui.widget.ParentWidget;
@@ -65,7 +66,7 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
     public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean showDebugInfo) {
         super.addInformation(stack, player, tooltip, showDebugInfo);
         tooltip.add("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
-        tooltip.add(EnumChatFormatting.GREEN + "Press " + GameSettings.getKeyDisplayString(ClientProxy.testKey.getKeyCode()) + " to open GUI from Baubles");
+        tooltip.add(EnumChatFormatting.GREEN + "Press " + Platform.getKeyDisplay(ClientProxy.testKey) + " to open GUI from Baubles");
     }
 
     @Override

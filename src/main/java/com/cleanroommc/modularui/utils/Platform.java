@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -27,6 +29,11 @@ public class Platform {
     @SideOnly(Side.CLIENT)
     public static @NotNull EntityPlayerSP getClientPlayer() {
         return Minecraft.getMinecraft().thePlayer;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static String getKeyDisplay(KeyBinding keyBinding) {
+        return GameSettings.getKeyDisplayString(keyBinding.getKeyCode());
     }
 
     public static boolean isStackEmpty(ItemStack stack) {
