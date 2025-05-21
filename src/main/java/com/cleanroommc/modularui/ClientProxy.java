@@ -82,7 +82,7 @@ public class ClientProxy extends CommonProxy {
     public void onKeyboard(InputEvent.KeyInputEvent event) {
         if (ModularUIConfig.enableTestGuis && testKey.isPressed() && ModularUI.Mods.BAUBLES.isLoaded()) {
             InventoryTypes.BAUBLES.visitAll(Platform.getClientPlayer(), (type, index, stack) -> {
-                if (stack.getItem() instanceof TestItem) {
+                if (stack != null && stack.getItem() instanceof TestItem) {
                     GuiFactories.playerInventory().openFromBaublesClient(index);
                     return true;
                 }
