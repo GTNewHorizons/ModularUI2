@@ -23,6 +23,8 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
+import com.cleanroommc.neverenoughanimations.animations.ItemMoveAnimation;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -225,10 +227,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
 
-            ItemStack virtualStack = NEAAnimationHandler.injectVirtualStack(guiContainer, slotIn);
-            if (virtualStack != null) { // TODO proper null check
-                itemstack = virtualStack;
-            }
+            itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
 
             if (itemstack != null) {
                 Platform.setupDrawItem();
