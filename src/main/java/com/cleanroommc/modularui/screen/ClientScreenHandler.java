@@ -529,7 +529,7 @@ public class ClientScreenHandler {
         GuiScreenAccessor.getItemRender().zLevel = 200.0F;
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = ((GuiScreenAccessor) mcScreen).getFontRenderer();
-        GlStateManager.enableDepth();
+        Platform.setupDrawItem();
         GuiScreenAccessor.getItemRender().renderItemAndEffectIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y);
         GuiDraw.afterRenderItemAndEffectIntoGUI(stack);
         GuiScreenAccessor.getItemRender().renderItemOverlayIntoGUI(font, Minecraft.getMinecraft().getTextureManager(), stack, x, y - (((GuiContainerAccessor) mcScreen).getDraggedStack() == null ? 0 : 8), altText);
