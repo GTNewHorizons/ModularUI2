@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TextFieldRenderer extends TextRenderer {
+    // 1.7.10 only until proper number groupings support
     private static final DecimalFormat INTEGER_FIELD_FORMAT = new DecimalFormat("#");
     private static final char groupingSeparator = INTEGER_FIELD_FORMAT.getDecimalFormatSymbols().getGroupingSeparator();
 
@@ -53,22 +54,26 @@ public class TextFieldRenderer extends TextRenderer {
         this.cursorColor = cursorColor;
     }
 
+    // 1.7.10 only until proper number groupings support
     @ApiStatus.Experimental
     public void setFormatAsInteger(boolean formatAsInteger) {
         this.formatAsInteger = formatAsInteger;
     }
 
+    // 1.7.10 only until proper number groupings support
     @Override
     public void draw(List<String> lines) {
         if (formatAsInteger) lines = decorateLines(lines);
         super.draw(lines);
     }
 
+    // 1.7.10 only until proper number groupings support
     private static @NotNull List<String> decorateLines(List<String> lines) {
         return lines.stream().map(TextFieldRenderer::tryFormatString)
                 .collect(Collectors.toList());
     }
 
+    // 1.7.10 only until proper number groupings support
     private static @NotNull String tryFormatString(String str) {
         try {
             return INTEGER_FIELD_FORMAT.format(Long.parseLong(str));
@@ -161,6 +166,7 @@ public class TextFieldRenderer extends TextRenderer {
         return new Point();
     }
 
+    // 1.7.10 only until proper number groupings support
     /**
      * Whether the given character should be ignored for cursor positioning purposes
      */
@@ -169,6 +175,7 @@ public class TextFieldRenderer extends TextRenderer {
         return formatAsInteger && c == groupingSeparator;
     }
 
+    // 1.7.10 only until proper number groupings support
     private int getRealLength(String text) {
         int length = text.length();
         if (formatAsInteger) length -= (int) text.chars().filter(this::isIgnoredChar).count();
@@ -184,6 +191,8 @@ public class TextFieldRenderer extends TextRenderer {
         return new Point2D.Float(getStartX(line.getWidth()) + getFontRenderer().getStringWidth(sub) * this.scale, getStartYOfLines(measuredLines.size()) + cursorPos.y * getFontHeight());
     }
 
+    // 1.7.10 only until proper number groupings support
+    @ApiStatus.Experimental()
     private @NotNull String getStringBeforeCursor(Line line, Point cursorPos) {
         String text = line.getText();
         String sub = text.substring(0, Math.min(text.length(), cursorPos.x));
