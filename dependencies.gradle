@@ -40,7 +40,7 @@ dependencies {
     implementation("com.github.GTNewHorizons:Baubles-Expanded:2.1.8-GTNH:dev")  { transitive = false }
     compileOnly("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
     //compileOnly rfg.deobf("curse.maven:neverenoughanimation-1062347:6552319")
-    implementation files("libs/neverenoughanimations-v1.0.6-1-7-10.7+6d5069e2ab-dirty-dev.jar")
+    compileOnly files("libs/neverenoughanimations-v1.0.6-1-7-10.8+91c551807b-dirty-dev.jar")
     compileOnly("org.jetbrains:annotations:24.0.1")
 
     //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.7.44-GTNH:dev")
