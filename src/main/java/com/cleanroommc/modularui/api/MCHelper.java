@@ -1,11 +1,7 @@
 package com.cleanroommc.modularui.api;
 
-import codechicken.nei.guihook.GuiContainerManager;
-import codechicken.nei.guihook.IContainerTooltipHandler;
-
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Interactable;
-
-import gregtech.common.items.ItemFluidDisplay;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -18,14 +14,14 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
-import org.jetbrains.annotations.NotNull;
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerTooltipHandler;
+import gregtech.common.items.ItemFluidDisplay;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
-import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 import static com.cleanroommc.modularui.screen.ClientScreenHandler.getDefaultContext;
 
 public class MCHelper {
@@ -77,7 +73,8 @@ public class MCHelper {
 
     public static List<String> getItemToolTip(ItemStack item) {
         if (!hasMc()) return Collections.emptyList();
-        if (isNEILoaded && getMc().currentScreen instanceof GuiContainer guiContainer) return getNEIItemTooltip(item, guiContainer);
+        if (ModularUI.Mods.NEI.isLoaded() && getMc().currentScreen instanceof GuiContainer guiContainer)
+            return getNEIItemTooltip(item, guiContainer);
         List<String> list = item.getTooltip(getPlayer(), getMc().gameSettings.advancedItemTooltips);
         for (int i = 0; i < list.size(); ++i) {
             if (i == 0) {
@@ -105,7 +102,7 @@ public class MCHelper {
     public static List<String> getFluidTooltip(FluidStack fluid) {
         List<String> tooltip = new ArrayList<>();
         tooltip.add(fluid.getLocalizedName());
-        if (isGT5ULoaded) {
+        if (ModularUI.Mods.GT5U.isLoaded()) {
             String formula = ItemFluidDisplay.getChemicalFormula(fluid);
             if (!formula.isEmpty()) {
                 tooltip.add(EnumChatFormatting.YELLOW + formula);
@@ -132,7 +129,7 @@ public class MCHelper {
                             "modularui2.fluid.state",
                             fluid.getFluid().isGaseous(fluid) ? StatCollector.translateToLocal("modularui2.fluid.gas")
                                     : StatCollector.translateToLocal("modularui2.fluid.liquid")));
-            if (isNEILoaded) {
+            if (ModularUI.Mods.NEI.isLoaded()) {
                 String amountDetail = GuiContainerManager.fluidAmountDetails(fluid);
                 if (amountDetail != null) {
                     tooltip.add(EnumChatFormatting.GRAY + amountDetail);

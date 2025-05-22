@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.NEISettings;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.nei.NEIState;
@@ -13,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
 
 /**
  * Keeps track of everything related to NEI in a Modular GUI.
@@ -60,7 +59,7 @@ public class NEISettingsImpl implements NEISettings {
      */
     @Override
     public boolean isNEIEnabled(ModularScreen screen) {
-        return isNEILoaded && this.neiState.test(screen);
+        return ModularUI.Mods.NEI.isLoaded() && this.neiState.test(screen);
     }
 
     /**

@@ -3,18 +3,38 @@ package com.cleanroommc.modularui.utils;
 import com.cleanroommc.modularui.drawable.BufferBuilder;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Consumer;
 
+/**
+ * Version specific code is supposed to go here.
+ * Ideally only the body of methods and value of fields should be changed and no signatures.
+ */
 public class Platform {
 
     public static final ItemStack EMPTY_STACK = null;
+
+    @SideOnly(Side.CLIENT)
+    public static @NotNull EntityPlayerSP getClientPlayer() {
+        return Minecraft.getMinecraft().thePlayer;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static String getKeyDisplay(KeyBinding keyBinding) {
+        return GameSettings.getKeyDisplayString(keyBinding.getKeyCode());
+    }
 
     public static boolean isStackEmpty(ItemStack stack) {
         return stack == null || stack.getItem() == null || stack.stackSize <= 0;

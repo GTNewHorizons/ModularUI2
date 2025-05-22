@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
+import com.cleanroommc.modularui.factory.PlayerInventoryGuiFactory;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import net.minecraft.item.ItemStack;
@@ -9,17 +11,25 @@ import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 // nh todo: this doesn't work due to `ItemStackItemHandler#container` being different object from actual item stored in inv
 public class ItemStackItemHandler implements IItemHandlerModifiable {
 
     private static final String KEY_ITEMS = "Items";
 
-    private final ItemStack container;
+    private final Supplier<ItemStack> container;
+    private final Consumer<ItemStack> containerUdater;
     private final int slots;
 
-    public ItemStackItemHandler(ItemStack container, int slots) {
+    public ItemStackItemHandler(PlayerInventoryGuiData data, int slots) {
+        this(data::getUsedItemStack, data::setUsedItemStack, slots);
+    }
+
+    public ItemStackItemHandler(Supplier<ItemStack> container, Consumer<ItemStack> containerUdater, int slots) {
         this.container = container;
+        this.containerUdater = containerUdater;
         this.slots = slots;
     }
 
@@ -41,6 +51,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
         validateSlotIndex(slot);
         NBTTagList list = getItemsNbt();
         list.func_150304_a(slot, stack == null ? new NBTTagCompound() : stack.writeToNBT(new NBTTagCompound()));
+        this.containerUdater.accept(this.container.get());
     }
 
     @Nullable
@@ -110,13 +121,16 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
     }
 
     protected void onContentsChanged(int slot) {
+        this.containerUdater.accept(this.container.get());
     }
 
     public NBTTagList getItemsNbt() {
-        NBTTagCompound nbt = this.container.getTagCompound();
+        ItemStack stack = this.container.get();
+        NBTTagCompound nbt = stack.getTagCompound();
         if (nbt == null) {
             nbt = new NBTTagCompound();
-            this.container.setTagCompound(nbt);
+            this.container.get().setTagCompound(nbt);
+            this.containerUdater.accept(stack);
         }
         if (!nbt.hasKey(KEY_ITEMS)) {
             NBTTagList list = new NBTTagList();
@@ -124,6 +138,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
                 list.appendTag(new NBTTagCompound());
             }
             nbt.setTag(KEY_ITEMS, list);
+            this.containerUdater.accept(stack);
         }
         return nbt.getTagList(KEY_ITEMS, Constants.NBT.TAG_COMPOUND);
     }

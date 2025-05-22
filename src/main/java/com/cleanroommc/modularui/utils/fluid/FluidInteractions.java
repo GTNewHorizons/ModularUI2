@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.utils.fluid;
 
-import static com.cleanroommc.modularui.ModularUI.isGT5ULoaded;
-import static com.cleanroommc.modularui.ModularUI.isNEILoaded;
-
 import codechicken.nei.recipe.StackInfo;
+
+import com.cleanroommc.modularui.ModularUI;
+
 import gregtech.api.util.GTUtility;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
@@ -23,10 +23,10 @@ public class FluidInteractions {
         if (fluidStack == null) {
             fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack);
         }
-        if (fluidStack == null && isNEILoaded) {
+        if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
             fluidStack = StackInfo.getFluid(itemStack);
         }
-        if (isGT5ULoaded && fluidStack == null) {
+        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
             fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
         }
         return fluidStack;
@@ -43,10 +43,10 @@ public class FluidInteractions {
         if (fluidStack == null) {
             fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack.copy());
         }
-        if (fluidStack == null && isNEILoaded) {
+        if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
             fluidStack = StackInfo.getFluid(itemStack.copy());
         }
-        if (isGT5ULoaded && fluidStack == null) {
+        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
             fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
         }
         return fluidStack;
@@ -66,7 +66,7 @@ public class FluidInteractions {
     }
 
     public static ItemStack fillFluidContainerWithoutIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (isGT5ULoaded) {
+        if (ModularUI.Mods.GT5U.isLoaded()) {
             return GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
         }
         return null;
@@ -96,7 +96,7 @@ public class FluidInteractions {
     }
 
     public static ItemStack getContainerForFilledItemWithoutIFluidContainerItem(ItemStack itemStack) {
-        if (isGT5ULoaded) {
+        if (ModularUI.Mods.GT5U.isLoaded()) {
             return GTUtility.getContainerForFilledItem(itemStack, false);
         }
         return null;

@@ -74,7 +74,7 @@ public class ModularContainer extends Container {
     @ApiStatus.Internal
     @SideOnly(Side.CLIENT)
     public void constructClientOnly() {
-        this.player = Minecraft.getMinecraft().thePlayer;
+        this.player = Platform.getClientPlayer();
         this.syncManager = null;
     }
 
@@ -133,12 +133,15 @@ public class ModularContainer extends Container {
 
     @ApiStatus.Internal
     public void registerSlot(String panelName, ModularSlot slot) {
-        if (this.inventorySlots.contains(slot)) {
-            throw new IllegalArgumentException("Tried to register slot which already exists!");
-        }
         if (slot.isPhantom()) {
+            if (this.phantomSlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
             this.phantomSlots.add(slot);
         } else {
+            if (this.inventorySlots.contains(slot)) {
+                throw new IllegalArgumentException("Tried to register slot which already exists!");
+            }
             addSlotToContainer(slot);
         }
         if (slot.getSlotGroupName() != null) {
@@ -235,42 +238,25 @@ public class ModularContainer extends Container {
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
                 (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
             if (slotId == DROP_TO_WORLD) {
-                if (inventoryplayer.getItemStack() != null) {
-                    if (mouseButton == LEFT_MOUSE) {
-                        player.dropPlayerItemWithRandomChoice(inventoryplayer.getItemStack(), true);
-                        inventoryplayer.setItemStack(null);
-                    }
-
-                    if (mouseButton == RIGHT_MOUSE) {
-                        player.dropPlayerItemWithRandomChoice(inventoryplayer.getItemStack().splitStack(1), true);
-
-                        if (inventoryplayer.getItemStack().stackSize == 0) {
-                            inventoryplayer.setItemStack(null);
-                        }
-                    }
-                }
-                return inventoryplayer.getItemStack(); // Added
+                return superSlotClick(slotId, mouseButton, mode, player);
             }
-            if (clickTypeIn == ClickType.QUICK_MOVE) {
-                if (slotId < 0) {
-                    return null;
-                }
 
+            // early return
+            if (slotId < 0) return Platform.EMPTY_STACK;
+
+            if (clickTypeIn == ClickType.QUICK_MOVE) {
                 Slot fromSlot = getSlot(slotId);
+
                 if (!fromSlot.canTakeStack(player)) {
                     return Platform.EMPTY_STACK;
                 }
-                // looping so that crafting works properly
-                ItemStack remainder;
-                do {
-                    remainder = transferStackInSlot(player, slotId);
-                    returnable = Platform.copyStack(remainder);
-                } while (!Platform.isStackEmpty(remainder) && ItemHandlerHelper.canItemStacksStack(fromSlot.getStack(), remainder));
-            } else {
-                if (slotId < 0) {
-                    return null;
-                }
 
+                if (NEAAnimationHandler.shouldHandleNEA(this)) {
+                    returnable = NEAAnimationHandler.injectQuickMove(this, player, slotId, fromSlot);
+                } else {
+                    returnable = handleQuickMove(player, slotId, fromSlot);
+                }
+            } else {
                 Slot clickedSlot = getSlot(slotId);
 
                 if (clickedSlot != null) {
@@ -358,54 +344,26 @@ public class ModularContainer extends Container {
                     clickedSlot.onSlotChanged();
                 }
             }
-            detectAndSendChanges(); // Added
-            return returnable; // Added
-        } else if (clickTypeIn == ClickType.PICKUP_ALL && slotId >= 0) {
-            Slot slot = inventorySlots.get(slotId);
-            ItemStack itemstack1 = inventoryplayer.getItemStack();
-
-            if (itemstack1 != null && (slot == null || !slot.getHasStack() || !slot.canTakeStack(player))) {
-                int i = mouseButton == 0 ? 0 : inventorySlots.size() - 1;
-                int j = mouseButton == 0 ? 1 : -1;
-
-                for (int k = 0; k < 2; ++k) {
-                    for (int l = i; l >= 0 && l < inventorySlots.size() && itemstack1.stackSize < itemstack1.getMaxStackSize(); l += j) {
-                        Slot slot1 = inventorySlots.get(l);
-                        if (slot1 instanceof ModularSlot modularSlot && modularSlot.isPhantom()) continue; // Added
-
-                        // func_94527_a: canAddItemToSlot
-                        if (slot1.getHasStack() && Container.func_94527_a(slot1, itemstack1, true) && slot1.canTakeStack(player) && func_94530_a(itemstack1, slot1)) { // Replaced: canMergeSlot
-                            ItemStack itemstack2 = slot1.getStack();
-
-                            if (k != 0 || itemstack2.stackSize != itemstack2.getMaxStackSize()) { // Moved condition from previous if
-                                int i1 = Math.min(itemstack1.getMaxStackSize() - itemstack1.stackSize, itemstack2.stackSize);
-                                ItemStack itemstack3 = slot1.decrStackSize(i1);
-                                itemstack1.stackSize += i1;
-
-                                if (itemstack3 == null || itemstack3.stackSize <= 0) { // Added null check
-                                    slot1.putStack(null);
-                                }
-
-                                slot1.onPickupFromSlot(player, itemstack3);
-                            }
-                        }
-                    }
-                }
-            }
-
             detectAndSendChanges();
-            return returnable; // Added
-        } else if (clickTypeIn == ClickType.SWAP && mouseButton >= 0 && mouseButton < 9) {
-            ModularSlot phantom = getModularSlot(slotId);
-            ItemStack hotbarStack = inventoryplayer.getStackInSlot(mouseButton);
-            if (phantom.isPhantom()) {
-                // insert stack from hotbar slot into phantom slot
-                phantom.putStack(hotbarStack == null ? null : hotbarStack.copy());
-                detectAndSendChanges();
-                return returnable;
-            }
+            return returnable;
         }
+
+        return superSlotClick(slotId, mouseButton, mode, player);
+    }
+
+    protected final @NotNull ItemStack superSlotClick(int slotId, int mouseButton, int mode, @NotNull EntityPlayer player) {
         return super.slotClick(slotId, mouseButton, mode, player);
+    }
+
+    public final ItemStack handleQuickMove(EntityPlayer player, int slotId, Slot fromSlot) {
+        // looping so that crafting works properly
+        ItemStack returnable;
+        ItemStack remainder;
+        do {
+            remainder = transferStackInSlot(player, slotId);
+            returnable = Platform.copyStack(remainder);
+        } while (!Platform.isStackEmpty(remainder) && ItemHandlerHelper.canItemStacksStack(fromSlot.getStack(), remainder));
+        return returnable;
     }
 
     @Override
@@ -422,6 +380,7 @@ public class ModularContainer extends Container {
                     stack.stackSize = stack.getMaxStackSize();
                 }
                 ItemStack remainder = transferItem(slot, stack.copy());
+                if (ItemStack.areItemStacksEqual(remainder, stack)) return Platform.EMPTY_STACK;
                 if (base == 0 && (remainder == null || remainder.stackSize < 1)) stack = null;
                 else stack.stackSize = base + remainder.stackSize;
                 slot.putStack(stack);
