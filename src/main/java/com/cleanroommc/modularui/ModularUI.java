@@ -24,7 +24,6 @@ public class ModularUI {
             + "after:NotEnoughItems@[2.3.27-GTNH,);"
             + "after:hodgepodge@[2.0.0,);"
             + "before:gregtech;";
-            //+ "after-client:neverenoughanimations@[1.0.6,)";
 
     public static final String ID = "modularui2";
     public static final String NAME = "Modular UI 2";
