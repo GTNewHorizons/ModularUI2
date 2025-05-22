@@ -7,11 +7,13 @@ import com.cleanroommc.modularui.screen.IClickableGuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
+import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GuiContainer.class)
@@ -45,5 +47,17 @@ public class GuiContainerMixin implements IClickableGuiContainer {
     @Override
     public Slot modularUI$getClickedSlot() {
         return modularUI$clickedSlot;
+    }
+	
+	/**
+     * Inject to {@link net.minecraft.client.gui.inventory.GuiContainer#mouseClicked} Line366
+     * Set flag1 to false if a slot is clicked, to fix the bug of tossing item when clicking slot outside the main panel area.
+     * This fix should only applies to 1.7.10, since such bug only appears in 1.7.10.
+     */	
+	@ModifyVariable(
+    method = "mouseClicked",
+    at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/inventory/Slot;slotNumber:I"),ordinal = 1)
+    protected boolean mouseClickedOnSlot(boolean flag1) {
+		return false;
     }
 }
