@@ -851,11 +851,11 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return getThis();
     }
 
-    public W excludeAreaInJei() {
-        return excludeAreaInJei(true);
+    public W excludeAreaInNEI() {
+        return excludeAreaInNEI(true);
     }
 
-    public W excludeAreaInJei(boolean val) {
+    public W excludeAreaInNEI(boolean val) {
         this.excludeAreaInJei = val;
         if (isValid()) {
             getContext().getNEISettings().addNEIExclusionArea(this);

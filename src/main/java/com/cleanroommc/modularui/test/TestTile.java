@@ -31,7 +31,6 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.ColorPickerDialog;
 import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.Dialog;
-import com.cleanroommc.modularui.widgets.DropDownMenu;
 import com.cleanroommc.modularui.widgets.Expandable;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.slot.FluidSlot;
@@ -147,7 +146,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                         .top(0)
                         .leftRelOffset(1f, 1)
                         .background(GuiTextures.MC_BACKGROUND)
-                        .excludeAreaInJei()
+                        .excludeAreaInNEI()
                         .stencilTransform((r, expanded) -> {
                             if (expanded) {
                                 r.width -= 5;
