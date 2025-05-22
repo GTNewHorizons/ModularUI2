@@ -156,8 +156,9 @@ public class TextFieldRenderer extends TextRenderer {
             char c = line.getText().charAt(i);
             float charWidth = getFontRenderer().getCharWidth(c) * this.scale;
             currentX += charWidth;
-            if (isIgnoredChar(c)) ignoredChars++;
-            if (currentX >= x) {
+            if (isIgnoredChar(c)) {
+                ignoredChars++;
+            } else if (currentX >= x) {
                 // dist with current letter < dist without current letter -> next letter pos
                 if (Math.abs(currentX - x) < Math.abs(currentX - charWidth - x)) i++;
                 return new Point(i - ignoredChars, index);
