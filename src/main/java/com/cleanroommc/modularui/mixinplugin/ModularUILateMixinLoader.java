@@ -1,28 +1,24 @@
 package com.cleanroommc.modularui.mixinplugin;
 
 import com.gtnewhorizon.gtnhmixins.ILateMixinLoader;
+import com.gtnewhorizon.gtnhmixins.LateMixin;
+import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@LateMixin
 @SuppressWarnings("unused")
 public class ModularUILateMixinLoader implements ILateMixinLoader {
 
     @Override
     public String getMixinConfig() {
-        return "mixins.modularui.late.json";
+        return "mixins.modularui2.late.json";
     }
 
     @Override
     public List<String> getMixins(Set<String> loadedMods) {
-        final List<String> mixins = new ArrayList<>();
-        for (Mixins mixin : Mixins.values()) {
-            if (mixin.phase == Mixins.Phase.LATE && mixin.shouldLoad(Collections.emptySet(), loadedMods)) {
-                mixins.add(mixin.mixinClass);
-            }
-        }
-        return mixins;
+        return IMixins.getLateMixins(Mixins.class, loadedMods);
     }
 }
+

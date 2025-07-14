@@ -1,13 +1,13 @@
 package com.cleanroommc.modularui.core;
 
 import com.cleanroommc.modularui.mixinplugin.Mixins;
+
 import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
+import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,13 +30,7 @@ public class ModularUICore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
-        final List<String> mixins = new ArrayList<>();
-        for (Mixins mixin : Mixins.values()) {
-            if (mixin.phase == Mixins.Phase.EARLY && mixin.shouldLoad(loadedCoreMods, Collections.emptySet())) {
-                mixins.add(mixin.mixinClass);
-            }
-        }
-        return mixins;
+        return IMixins.getEarlyMixins(Mixins.class, loadedCoreMods);
     }
 
     @Override
