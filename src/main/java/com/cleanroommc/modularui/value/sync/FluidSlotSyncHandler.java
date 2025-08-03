@@ -255,14 +255,19 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             if (filledAmount < 1) {
                 return;
             }
-            fluidTank.drain(filledAmount, true);
-            if (processFullStack) {
-                int additionalParallel = Math.min(heldItem.stackSize - 1, currentFluid.amount / filledAmount);
-                fluidTank.drain(filledAmount * additionalParallel, true);
-                filledContainer.stackSize += additionalParallel;
+            //Don't even try to complete if u can't drain the needed amount
+            if(fluidTank.drain(filledAmount,false).amount==filledAmount)
+            {
+                fluidTank.drain(filledAmount, true);
+                if (processFullStack) {
+                    int additionalParallel = Math.min(heldItem.stackSize - 1, currentFluid.amount / filledAmount);
+                    fluidTank.drain(filledAmount * additionalParallel, true);
+                    filledContainer.stackSize += additionalParallel;
+                }
+                replaceCursorItemStack(filledContainer);
+                playSound(currentFluid, false);
             }
-            replaceCursorItemStack(filledContainer);
-            playSound(currentFluid, false);
+
         }
     }
 
