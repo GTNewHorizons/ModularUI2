@@ -19,16 +19,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
+/*
+    Mixin to properly handle idents for modular uis
+*/
 @Mixin(RecipeInfo.class)
 public class ModularIdentMixin {
-  /*
-     Mixin to properly handle idents for modular uis
-  */
+
 
     @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false,cancellable = true, at=@At("HEAD"))
     private static void hasOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<Boolean> ci)
     {
-        if(gui instanceof GuiContainerWrapper muw) {
+        if (gui instanceof GuiContainerWrapper muw) {
             if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
                 if (Arrays.asList(tr.getIdents()).contains(ident)) {
                     ci.setReturnValue(true);
@@ -38,18 +39,17 @@ public class ModularIdentMixin {
         }
     }
 
-
     @Inject(method = "getStackPositioner", remap = false,cancellable = true, at=@At("HEAD"))
     private static void getStackPositioner(GuiContainer gui, String ident, CallbackInfoReturnable<IStackPositioner> ci)
     {
-        if(gui instanceof GuiContainerWrapper muw) {
-            if(gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-                if(Arrays.asList(tr.getIdents()).contains(ident)) {
+        if (gui instanceof GuiContainerWrapper muw) {
+            if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
+                if (Arrays.asList(tr.getIdents()).contains(ident)) {
                     //Hacky way around it, but should work
-                    GuiContainerWrapperStackPositioner positioner=(GuiContainerWrapperStackPositioner) NEIModularUIConfig.stackPositioner;
-                    positioner.Wrapper=muw;
-                    positioner.Container=muc;
-                    positioner.RecipeTransfer=tr;
+                    GuiContainerWrapperStackPositioner positioner=NEIModularUIConfig.stackPositioner;
+                    positioner.wrapper=muw;
+                    positioner.container=muc;
+                    positioner.recipeTransfer=tr;
                     ci.setReturnValue(positioner);
                     ci.cancel();
                     return;
@@ -58,13 +58,12 @@ public class ModularIdentMixin {
         }
     }
 
-
     @Inject(method = "getOverlayHandler", remap = false,cancellable = true, at=@At("HEAD"))
     private static void getOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<IOverlayHandler> ci)
     {
-        if(gui instanceof GuiContainerWrapper muw) {
-            if(gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-                if(Arrays.asList(tr.getIdents()).contains(ident)) {
+        if (gui instanceof GuiContainerWrapper muw) {
+            if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
+                if (Arrays.asList(tr.getIdents()).contains(ident)) {
                     ci.setReturnValue(NEIModularUIConfig.overlayHandler);
                     ci.cancel();
                     return;

@@ -7,15 +7,13 @@ import com.cleanroommc.modularui.screen.ModularContainer;
 import java.util.ArrayList;
 
 public class GuiContainerWrapperStackPositioner implements IStackPositioner {
-
     //Hacky way around not having much params passed here
-    public GuiContainerWrapper Wrapper;
-    public ModularContainer Container;
-    public INEIRecipeTransfer<?> RecipeTransfer;
-
+    public GuiContainerWrapper wrapper;
+    public ModularContainer container;
+    public INEIRecipeTransfer<?> recipeTransfer;
 
     @Override
     public ArrayList<PositionedStack> positionStacks(ArrayList<PositionedStack> ai) {
-        return RecipeTransfer.positionStacks(Wrapper,Container,ai);
+        return recipeTransfer.positionStacks(wrapper,container,ai);
     }
 }

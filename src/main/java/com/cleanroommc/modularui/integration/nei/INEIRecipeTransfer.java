@@ -15,17 +15,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface INEIRecipeTransfer<Self extends ModularContainer> {
-
     public String[] getIdents();
 
-    //IOverlayHandler
     public default void overlayRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer)
     {
         transferRecipe(gui,self, recipe, recipeIndex, maxTransfer ? Integer.MAX_VALUE : 1);
     }
 
     public int transferRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier);
-
 
     public default boolean canFillCraftingGrid(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex)
     {
@@ -68,14 +65,8 @@ public interface INEIRecipeTransfer<Self extends ModularContainer> {
 
         return itemPresenceSlots;
     }
-
-
-    //
-
-    //IStackPositioner
     public default ArrayList<PositionedStack> positionStacks(GuiContainerWrapper gui, ModularContainer self, ArrayList<PositionedStack> stacks)
     {
         return stacks;
     }
-    //
 }
