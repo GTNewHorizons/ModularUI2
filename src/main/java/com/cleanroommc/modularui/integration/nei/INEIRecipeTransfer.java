@@ -60,6 +60,7 @@ public interface INEIRecipeTransfer<Self extends ModularContainer> {
 
         return itemPresenceSlots;
     }
+
     public default ArrayList<PositionedStack> positionStacks(GuiContainerWrapper gui, ModularContainer self, ArrayList<PositionedStack> stacks)     {
         return stacks;
     }

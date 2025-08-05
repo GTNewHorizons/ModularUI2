@@ -25,7 +25,6 @@ import java.util.Objects;
 @Mixin(RecipeInfo.class)
 public class ModularIdentMixin {
 
-
     @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false,cancellable = true, at=@At("HEAD"))
     private static void hasOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<Boolean> ci) {
         if (gui instanceof GuiContainerWrapper muw) {

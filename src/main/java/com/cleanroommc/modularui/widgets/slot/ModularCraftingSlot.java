@@ -117,24 +117,19 @@ public class ModularCraftingSlot extends ModularSlot {
         FMLCommonHandler.instance()
                 .firePlayerCraftingEvent(player, stack, craftMatrix);
         onCrafting(stack);
-
         for (int i = 0; i < this.craftMatrix.getSizeInventory(); ++i) {
             ItemStack itemstack1 = this.craftMatrix.getStackInSlot(i);
-
             if (itemstack1 != null) {
                 this.craftMatrix.decrStackSize(i, 1);
-
                 if (itemstack1.getItem()
                         .hasContainerItem(itemstack1)) {
                     ItemStack itemstack2 = itemstack1.getItem()
                             .getContainerItem(itemstack1);
-
                     if (itemstack2 != null && itemstack2.isItemStackDamageable()
                             && itemstack2.getItemDamage() > itemstack2.getMaxDamage()) {
                         MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, itemstack2));
                         continue;
                     }
-
                     if (!itemstack1.getItem()
                             .doesContainerItemLeaveCraftingGrid(itemstack1)
                             || !player.inventory.addItemStackToInventory(itemstack2)) {
@@ -147,7 +142,6 @@ public class ModularCraftingSlot extends ModularSlot {
                 }
             }
         }
-
         this.craftMatrix.notifyContainer();
     }
 
