@@ -22,8 +22,8 @@ public class NEIModularUIConfig implements IConfigureNEI {
         //API.registerGuiOverlay(GuiContainerWrapper.class, "", new GuiContainerWrapperStackPositioner());
         //API.registerGuiOverlayHandler(GuiContainerWrapper.class,  new GuiContainerWrapperOverlayHandler(),"");
     }
-    public static final GuiContainerWrapperStackPositioner Positioner=new GuiContainerWrapperStackPositioner();
-    public static final GuiContainerWrapperOverlayHandler Handler=new GuiContainerWrapperOverlayHandler();
+    public static final GuiContainerWrapperStackPositioner stackPositioner=new GuiContainerWrapperStackPositioner();
+    public static final GuiContainerWrapperOverlayHandler overlayHandler=new GuiContainerWrapperOverlayHandler();
 
 
     @Override
