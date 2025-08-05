@@ -17,30 +17,25 @@ import java.util.stream.Collectors;
 public interface INEIRecipeTransfer<Self extends ModularContainer> {
     public String[] getIdents();
 
-    public default void overlayRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer)
-    {
+    public default void overlayRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer) {
         transferRecipe(gui,self, recipe, recipeIndex, maxTransfer ? Integer.MAX_VALUE : 1);
     }
 
     public int transferRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier);
 
-    public default boolean canFillCraftingGrid(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex)
-    {
+    public default boolean canFillCraftingGrid(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex) {
         return true;
     }
 
-    public default boolean craft(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier)
-    {
+    public default boolean craft(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier) {
         return false;
     }
 
-    public default boolean canCraft(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex)
-    {
+    public default boolean canCraft(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex) {
         return false;
     }
 
-    public default List<GuiOverlayButton.ItemOverlayState> presenceOverlay(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex)
-    {
+    public default List<GuiOverlayButton.ItemOverlayState> presenceOverlay(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex) {
         final List<GuiOverlayButton.ItemOverlayState> itemPresenceSlots = new ArrayList<>();
         final List<PositionedStack> ingredients = recipe.getIngredientStacks(recipeIndex);
         final List<ItemStack> invStacks = gui.inventorySlots.inventorySlots.stream()
@@ -65,8 +60,7 @@ public interface INEIRecipeTransfer<Self extends ModularContainer> {
 
         return itemPresenceSlots;
     }
-    public default ArrayList<PositionedStack> positionStacks(GuiContainerWrapper gui, ModularContainer self, ArrayList<PositionedStack> stacks)
-    {
+    public default ArrayList<PositionedStack> positionStacks(GuiContainerWrapper gui, ModularContainer self, ArrayList<PositionedStack> stacks)     {
         return stacks;
     }
 }
