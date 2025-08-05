@@ -13,7 +13,7 @@ public class GuiContainerWrapperOverlayHandler implements IOverlayHandler {
     @Override
     public void overlayRecipe(GuiContainer gui, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer) {
         if (gui instanceof GuiContainerWrapper muw && gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-            tr.overlayRecipe(muw,muc,recipe,recipeIndex,maxTransfer);
+            tr.overlayRecipe(muw, muc, recipe, recipeIndex, maxTransfer);
         }
     }
 
@@ -22,7 +22,7 @@ public class GuiContainerWrapperOverlayHandler implements IOverlayHandler {
         if (gui instanceof GuiContainerWrapper muw && gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
             return tr.transferRecipe(muw, muc, recipe, recipeIndex, multiplier);
         }
-        return IOverlayHandler.super.transferRecipe(gui,recipe,recipeIndex,multiplier);
+        return IOverlayHandler.super.transferRecipe(gui, recipe, recipeIndex, multiplier);
     }
 
     @Override

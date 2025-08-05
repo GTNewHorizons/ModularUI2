@@ -18,7 +18,7 @@ public interface INEIRecipeTransfer<Self extends ModularContainer> {
     public String[] getIdents();
 
     public default void overlayRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer) {
-        transferRecipe(gui,self, recipe, recipeIndex, maxTransfer ? Integer.MAX_VALUE : 1);
+        transferRecipe(gui, self, recipe, recipeIndex, maxTransfer ? Integer.MAX_VALUE : 1);
     }
 
     public int transferRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier);

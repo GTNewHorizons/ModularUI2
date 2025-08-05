@@ -15,6 +15,6 @@ public class GuiContainerWrapperStackPositioner implements IStackPositioner {
 
     @Override
     public ArrayList<PositionedStack> positionStacks(ArrayList<PositionedStack> ai) {
-        return recipeTransfer.positionStacks(wrapper,container,ai);
+        return recipeTransfer.positionStacks(wrapper, container, ai);
     }
 }

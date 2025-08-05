@@ -256,7 +256,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 return;
             }
             //Don't even try to complete if u can't drain the needed amount
-            FluidStack drainedStack = fluidTank.drain(filledAmount,false);
+            FluidStack drainedStack = fluidTank.drain(filledAmount, false);
             if (drainedStack != null && drainedStack.amount == filledAmount) {
                 fluidTank.drain(filledAmount, true);
                 if (processFullStack) {

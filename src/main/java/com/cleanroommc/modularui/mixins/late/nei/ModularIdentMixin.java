@@ -25,7 +25,7 @@ import java.util.Objects;
 @Mixin(RecipeInfo.class)
 public class ModularIdentMixin {
 
-    @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false,cancellable = true, at=@At("HEAD"))
+    @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false, cancellable = true, at=@At("HEAD"))
     private static void hasOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<Boolean> ci) {
         if (gui instanceof GuiContainerWrapper muw) {
             if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
@@ -37,7 +37,7 @@ public class ModularIdentMixin {
         }
     }
 
-    @Inject(method = "getStackPositioner", remap = false,cancellable = true, at=@At("HEAD"))
+    @Inject(method = "getStackPositioner", remap = false, cancellable = true, at=@At("HEAD"))
     private static void getStackPositioner(GuiContainer gui, String ident, CallbackInfoReturnable<IStackPositioner> ci) {
         if (gui instanceof GuiContainerWrapper muw) {
             if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
@@ -55,7 +55,7 @@ public class ModularIdentMixin {
         }
     }
 
-    @Inject(method = "getOverlayHandler", remap = false,cancellable = true, at=@At("HEAD"))
+    @Inject(method = "getOverlayHandler", remap = false, cancellable = true, at=@At("HEAD"))
     private static void getOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<IOverlayHandler> ci) {
         if (gui instanceof GuiContainerWrapper muw) {
             if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
