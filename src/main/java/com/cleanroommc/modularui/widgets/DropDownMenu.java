@@ -101,6 +101,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             menu.getSelectedItem().drawBackground(context, widgetTheme);
             menu.getSelectedItem().draw(context, widgetTheme);
             menu.getSelectedItem().drawForeground(context);
+            menu.getSelectedItem().drawOverlay(context, widgetTheme);
         } else {
             NONE.draw(context, 0, 0, area.width, area.height, getWidgetTheme(context.getTheme()));
         }
