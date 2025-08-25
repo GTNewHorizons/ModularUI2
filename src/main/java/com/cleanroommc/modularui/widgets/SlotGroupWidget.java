@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 
@@ -43,13 +45,13 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {
-            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot())
+            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot().background(GuiTextures.SLOT_ITEM_HOTBAR))
                     .syncHandler(key, i)
                     .pos(i * 18, 3 * 18 + 4)
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
-            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot())
+            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot().background(GuiTextures.SLOT_ITEM_PLAYER))
                     .syncHandler(key, i + 9)
                     .pos(i % 9 * 18, i / 9 * 18)
                     .debugName("slot_" + (i + 9)));

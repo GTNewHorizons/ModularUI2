@@ -158,6 +158,20 @@ public interface GuiTextures {
             .name("slot_item")
             .build();
 
+    UITexture SLOT_ITEM_PLAYER = UITexture.builder()
+            .location(ModularUI.ID, "gui/slot/item_player")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("slot_item_player")
+            .build();
+
+    UITexture SLOT_ITEM_HOTBAR = UITexture.builder()
+            .location(ModularUI.ID, "gui/slot/item_hotbar")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("slot_item_hotbar")
+            .build();
+
     UITexture SLOT_FLUID = UITexture.builder()
             .location(ModularUI.ID, "gui/slot/fluid")
             .imageSize(18, 18)
