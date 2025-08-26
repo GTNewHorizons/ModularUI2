@@ -29,7 +29,7 @@ public enum Mixins implements IMixins {
             .setPhase(Phase.LATE)
             .addRequiredMod(TargetedMod.THAUMCRAFT)),
     NEI(new MixinBuilder()
-            .addCommonMixins("nei.ModularIdentMixin")
+            .addCommonMixins("nei.RecipeInfoMixin")
             .setPhase(Phase.LATE)
             .addRequiredMod(TargetedMod.NEI));
 
