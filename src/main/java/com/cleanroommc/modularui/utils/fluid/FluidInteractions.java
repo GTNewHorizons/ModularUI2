@@ -59,6 +59,10 @@ public class FluidInteractions {
         }
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
+            if (filledContainer == null) {
+                //Null return was not possible, even thought it was expected
+                return filledContainer;
+            }
             FluidStack newFluid = getFluidForRealItem(filledContainer);
             fluidStack.amount -= newFluid.amount;
         }
