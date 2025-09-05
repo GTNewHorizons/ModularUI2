@@ -13,8 +13,11 @@ public class WidgetSlotTheme extends WidgetTheme {
     private final IDrawable inventorySlotBackground;
     private final IDrawable hotbarSlotBackground;
 
+    public WidgetSlotTheme(IDrawable background, int slotHoverColor) {
+        this(background, slotHoverColor, false, null, null);
+    }
 
-    public WidgetSlotTheme(IDrawable background, int slotHoverColor,boolean useCustomSlotTextures,IDrawable inventory,IDrawable hotbar) {
+    public WidgetSlotTheme(IDrawable background, int slotHoverColor, boolean useCustomSlotTextures, IDrawable inventory, IDrawable hotbar) {
         super(background, null, Color.WHITE.main, 0xFF404040, false);
         this.slotHoverColor = slotHoverColor;
         this.useCustomSlotTextures=useCustomSlotTextures;
