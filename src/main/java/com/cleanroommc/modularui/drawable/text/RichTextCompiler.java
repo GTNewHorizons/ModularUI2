@@ -28,6 +28,8 @@ public class RichTextCompiler {
 
     public static final RichTextCompiler INSTANCE = new RichTextCompiler();
 
+    private static final int MIN_TEXT_WIDTH = 10;
+
     private FontRenderer fr;
     private int maxWidth;
 
@@ -44,7 +46,7 @@ public class RichTextCompiler {
 
     public void reset(FontRenderer fr, int maxWidth) {
         this.fr = fr != null ? fr : Minecraft.getMinecraft().fontRenderer;
-        this.maxWidth = maxWidth > 0 ? maxWidth : Integer.MAX_VALUE;
+        this.maxWidth = maxWidth > MIN_TEXT_WIDTH ? maxWidth : Integer.MAX_VALUE;
         this.lines = new ArrayList<>();
         this.currentLine = new ArrayList<>();
         this.x = 0;
