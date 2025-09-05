@@ -33,6 +33,9 @@ public interface IThemeApi {
     String TEXT_COLOR = "textColor";
     String TEXT_SHADOW = "textShadow";
     String SLOT_HOVER_COLOR = "slotHoverColor";
+    String SLOT_CUSTOM_TEXTURES = "useCustomSlotTextures";
+    String SLOT_INVENTORY_BACKGROUND = "inventorySlotBackground";
+    String SLOT_HOTBAR_BACKGROUND = "hotbarSlotBackground";
     String MARKED_COLOR = "markedColor";
     String HINT_COLOR = "hintColor";
     String SELECTED_BACKGROUND = "selectedBackground";

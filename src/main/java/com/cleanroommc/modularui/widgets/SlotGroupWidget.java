@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 
@@ -11,6 +14,7 @@ import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,13 +49,27 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {
-            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot().background(GuiTextures.SLOT_ITEM_HOTBAR))
+            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot()
+                    {
+                        @Override
+                        public @Nullable IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
+                            if(widgetTheme instanceof WidgetSlotTheme slotTheme&& slotTheme.getUseCustomSlotTextures()) return slotTheme.getInventorySlotBackground();
+                            else return super.getCurrentBackground(theme, widgetTheme);
+                        }
+                    })
                     .syncHandler(key, i)
                     .pos(i * 18, 3 * 18 + 4)
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
-            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot().background(GuiTextures.SLOT_ITEM_PLAYER))
+            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot()
+                    {
+                        @Override
+                        public @Nullable IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
+                            if(widgetTheme instanceof WidgetSlotTheme slotTheme&& slotTheme.getUseCustomSlotTextures()) return slotTheme.getHotbarSlotBackground();
+                            else return super.getCurrentBackground(theme, widgetTheme);
+                        }
+                    })
                     .syncHandler(key, i + 9)
                     .pos(i % 9 * 18, i / 9 * 18)
                     .debugName("slot_" + (i + 9)));
