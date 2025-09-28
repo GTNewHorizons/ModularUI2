@@ -6,12 +6,8 @@ import com.cleanroommc.modularui.widgets.slot.InventoryCraftingWrapper;
 import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -51,16 +47,6 @@ public class CraftingModularContainer extends ModularContainer {
     @Override
     public void onCraftMatrixChanged(@NotNull IInventory inventoryIn) {
         if (!getGuiData().isClient()) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP) getPlayer();
-            ItemStack itemstack = ItemStack.EMPTY;
-            IRecipe irecipe = CraftingManager.findMatchingRecipe(this.inventoryCrafting, getPlayer().world);
-
-            if (irecipe != null && (irecipe.isDynamic() || !getPlayer().world.getGameRules().getBoolean("doLimitedCrafting") || entityplayermp.getRecipeBook().isUnlocked(irecipe))) {
-                this.craftingSlot.setRecipeUsed(irecipe);
-                itemstack = irecipe.getCraftingResult(this.inventoryCrafting);
-            }
-            // TODO
-            this.craftingSlot.updateResult(itemstack);
             this.craftingSlot.updateResult(CraftingManager.getInstance().findMatchingRecipe(this.inventoryCrafting, getPlayer().worldObj));
         }
     }

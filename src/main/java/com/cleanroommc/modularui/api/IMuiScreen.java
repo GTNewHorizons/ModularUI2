@@ -11,9 +11,9 @@ import com.cleanroommc.neverenoughanimations.api.IAnimatedScreen;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,8 @@ public interface IMuiScreen extends IAnimatedScreen {
      * @param focused if the screen should be focused
      */
     default void setFocused(boolean focused) {
-        getGuiScreen().setFocused(focused);
+        // doesn't exist in 1.7.10
+        //getGuiScreen().setFocused(focused);
     }
 
     /**

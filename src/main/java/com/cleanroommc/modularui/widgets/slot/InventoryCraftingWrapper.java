@@ -1,13 +1,11 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.mixins.early.minecraft.InventoryCraftingAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.InventoryCraftingAccessor;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.IItemHandler;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
-
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 
-import net.minecraft.client.util.RecipeItemHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -83,7 +81,6 @@ public class InventoryCraftingWrapper extends InventoryCrafting {
         return size;
     }
 
-    @Override
     public boolean isEmpty() {
         for (int i = 0; i < this.size; i++) {
             if (!Platform.isStackEmpty(getStackInSlot(i))) {
@@ -142,17 +139,9 @@ public class InventoryCraftingWrapper extends InventoryCrafting {
         return stack;
     }
 
-    @Override
     public void clear() {
         for (int i = 0; i < this.size; i++) {
             setSlot(i, Platform.EMPTY_STACK, false);
-        }
-    }
-
-    @Override
-    public void fillStackedContents(@NotNull RecipeItemHelper helper) {
-        for (int i = 0; i < this.size; i++) {
-            helper.accountStack(getStackInSlot(i));
         }
     }
 

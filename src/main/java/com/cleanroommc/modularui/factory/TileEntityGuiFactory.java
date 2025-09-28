@@ -7,9 +7,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -40,8 +40,6 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         verifyTile(Platform.getClientPlayer(), tile);
         PosGuiData data = new PosGuiData(Platform.getClientPlayer(), tile.xCoord, tile.yCoord, tile.zCoord);
         GuiManager.openFromClient(this, data);
-        BlockPos pos = tile.getPos();
-        GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
     }
 
     @SideOnly(Side.CLIENT)

@@ -16,9 +16,9 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.utils.item.ItemStackHandler;
-import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
@@ -33,8 +33,6 @@ import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.Expandable;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
-import com.cleanroommc.modularui.widgets.slot.FluidSlot;
-import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.PageButton;
 import com.cleanroommc.modularui.widgets.PagedWidget;
@@ -45,10 +43,12 @@ import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
-import com.cleanroommc.modularui.widgets.slot.*;
+import com.cleanroommc.modularui.widgets.slot.FluidSlot;
+import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
-
-import cpw.mods.fml.common.registry.GameData;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -57,6 +57,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidTank;
+import cpw.mods.fml.common.registry.GameData;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -156,7 +157,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                         })
                         .animationDuration(500)
                         .interpolation(Interpolation.BOUNCE_OUT)
-                        .normalView(new ItemDrawable(Blocks.crafting_table).asIcon().asWidget().size(20).pos(0, 0))
+                        .collapsedView(new ItemDrawable(Blocks.crafting_table).asIcon().asWidget().size(20).pos(0, 0))
                         .expandedView(new ParentWidget<>()
                                 .debugName("crafting tab")
                                 .coverChildren()
@@ -177,229 +178,229 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                 .expanded()
                                 .widthRel(1f)
                                 .child(new PagedWidget<>()
-                                        .debugName("root parent")
-                                        .sizeRel(1f)
-                                        .controller(tabController)
-                                        .addPage(new ParentWidget<>()
-                                                .debugName("page 1 parent")
-                                                .sizeRel(1f, 1f)
-                                                .padding(7)
-                                                .child(new Row()
-                                                        .debugName("buttons, slots and more tests")
-                                                        .height(137)
-                                                        .coverChildrenWidth()
-                                                        //.padding(7)
-                                                        .child(new Column()
-                                                                .debugName("buttons and slots test")
-                                                                .coverChildren()
-                                                                .marginRight(8)
-                                                                //.flex(flex -> flex.height(0.5f))
-                                                                //.widthRel(0.5f)
-                                                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .overlay(IKey.dynamic(() -> "Button " + this.val)))
-                                                                .child(new Rectangle()
-                                                                        .setColor(Color.RED.main)
-                                                                        .asWidget()
-                                                                        .size(32, 2)
-                                                                        .setEnabledIf(widget -> this.val > 10))
-                                                                .child(new FluidSlot()
-                                                                        .margin(2)
-                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
-                                                                .child(new ButtonWidget<>()
-                                                                        .size(60, 18)
-                                                                        .tooltip(tooltip -> {
-                                                                            tooltip.showUpTimer(10);
-                                                                            tooltip.addLine(IKey.str("Test Line g"));
-                                                                            tooltip.addLine(IKey.str("An image inside of a tooltip:"));
-                                                                            tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
-                                                                            tooltip.addLine(IKey.str("And here a circle:"));
-                                                                            tooltip.addLine(new Circle()
-                                                                                            .setColor(Color.RED.darker(2), Color.RED.brighter(2))
-                                                                                            .asIcon()
-                                                                                            .size(20))
-                                                                                    .addLine(new ItemDrawable(new ItemStack(Items.diamond)).asIcon())
-                                                                                    .pos(RichTooltip.Pos.LEFT);
-                                                                        })
-                                                                        .onMousePressed(mouseButton -> {
-                                                                            //panel.getScreen().close(true);
-                                                                            //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
-                                                                            //openSecondWindow(context).openIn(panel.getScreen());
-                                                                            panelSyncHandler.openPanel();
-                                                                            return true;
-                                                                        })
-                                                                        //.flex(flex -> flex.left(3)) // ?
-                                                                        .overlay(IKey.str("Button 2")))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 20)
-                                                                        .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
-                                                                        .margin(0, 3)
-                                                                        .hintText("hint"))
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 20)
-                                                                        .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
-                                                                        .setNumbersDouble(Function.identity())
-                                                                        .hintText("number"))
-                                                                .child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
-                                                                .child(IKey.EMPTY.asWidget().debugName("Empty Ikey")))
-                                                        .child(new Column()
-                                                                .debugName("button and slots test 2")
-                                                                .coverChildren()
-                                                                //.widthRel(0.5f)
-                                                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
-                                                                .child(new ProgressWidget()
-                                                                        .progress(() -> this.progress / (double) this.duration)
-                                                                        .texture(GuiTextures.PROGRESS_ARROW, 20))
-                                                                .child(new ProgressWidget()
-                                                                        .progress(() -> this.progress / (double) this.duration)
-                                                                        .texture(GuiTextures.PROGRESS_CYCLE, 20)
-                                                                        .direction(ProgressWidget.Direction.CIRCULAR_CW))
-                                                                .child(new Row().widthRel(1f).height(18)
-                                                                        .child(new ToggleButton()
-                                                                                .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
-                                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
-                                                                        .child(new ToggleButton()
-                                                                                .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 1, val -> cycleStateValue.setIntValue(1)))
-                                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 1 / 3f, 1, 2 / 3f)))
-                                                                        .child(new ToggleButton()
-                                                                                .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 2, val -> cycleStateValue.setIntValue(2)))
-                                                                                .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 2 / 3f, 1, 1))))
-                                                                /*.child(new CycleButtonWidget()
-                                                                        .length(3)
-                                                                        .texture(GuiTextures.CYCLE_BUTTON_DEMO)
-                                                                        .addTooltip(0, "State 1")
-                                                                        .addTooltip(1, "State 2")
-                                                                        .addTooltip(2, "State 3")
-                                                                        .background(GuiTextures.BUTTON)
-                                                                        .value(SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val)))*/
-                                                                .child(new ItemSlot()
-                                                                        .slot(SyncHandlers.itemSlot(this.inventory, 0).ignoreMaxStackSize(true).singletonSlotGroup()))
-                                                                .child(new FluidSlot()
-                                                                        .margin(2)
-                                                                        .width(30)
-                                                                        .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true))))
-                                                        .child(new Column()
-                                                                .debugName("button and slots test 3")
-                                                                .coverChildren()
-                                                                .alignY(Alignment.START)
-                                                                .child(new TextFieldWidget()
-                                                                        .size(60, 20)
-                                                                        .value(SyncHandlers.intNumber(() -> this.intValue, val -> this.intValue = val))
-                                                                        .setNumbers(0, 9999999)
-                                                                        .setFormatAsInteger(true)
-                                                                        .hintText("integer")))))
-                                        .addPage(new Column()
-                                                        .debugName("Slots test page")
-                                                        .coverChildren()
-                                                        //.height(120)
+                                                .debugName("root parent")
+                                                .sizeRel(1f)
+                                                .controller(tabController)
+                                                .addPage(new ParentWidget<>()
+                                                        .debugName("page 1 parent")
+                                                        .sizeRel(1f, 1f)
                                                         .padding(7)
-                                                        .alignX(0.5f)
-                                                        .mainAxisAlignment(Alignment.MainAxis.START)
-                                                        .childPadding(2)
-                                                        //.child(SlotGroupWidget.playerInventory().left(0))
-                                                        .child(SlotGroupWidget.builder()
-                                                                .matrix("III", "III", "III")
-                                                                .key('I', index -> {
-                                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
-                                                                    if (index == 4) {
-                                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
-                                                                    }
-                                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
-                                                                })
-                                                                .build()
-                                                                //.marginBottom(2)
-                                                                )
-                                                        .child(SlotGroupWidget.builder()
-                                                                .row("FII")
-                                                                .row("FII")
-                                                                .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
-                                                                .key('I', index -> ItemSlot.create(index >= 2).slot(new ModularSlot(this.mixerItems, index).slotGroup("mixer_items")))
-                                                                .build())
                                                         .child(new Row()
-                                                                .coverChildrenHeight()
-                                                                .child(new CycleButtonWidget()
-                                                                        .size(14, 14)
-                                                                        .stateCount(3)
-                                                                        .stateOverlay(GuiTextures.CYCLE_BUTTON_DEMO)
-                                                                        .value(new IntSyncValue(() -> this.val2, val -> this.val2 = val))
-                                                                        .margin(8, 0))
-                                                                .child(IKey.str("Hello World").asWidget().height(18)))
-                                                        .child(new SpecialButton(IKey.str("A very long string that looks cool when animated").withAnimation())
-                                                                .height(14)
-                                                                .widthRel(1f))
+                                                                .debugName("buttons, slots and more tests")
+                                                                .height(137)
+                                                                .coverChildrenWidth()
+                                                                //.padding(7)
+                                                                .child(new Column()
+                                                                        .debugName("buttons and slots test")
+                                                                        .coverChildren()
+                                                                        .marginRight(8)
+                                                                        //.flex(flex -> flex.height(0.5f))
+                                                                        //.widthRel(0.5f)
+                                                                        .crossAxisAlignment(Alignment.CrossAxis.CENTER)
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .overlay(IKey.dynamic(() -> "Button " + this.val)))
+                                                                        .child(new Rectangle()
+                                                                                .setColor(Color.RED.main)
+                                                                                .asWidget()
+                                                                                .size(32, 2)
+                                                                                .setEnabledIf(widget -> this.val > 10))
+                                                                        .child(new FluidSlot()
+                                                                                .margin(2)
+                                                                                .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
+                                                                        .child(new ButtonWidget<>()
+                                                                                .size(60, 18)
+                                                                                .tooltip(tooltip -> {
+                                                                                    tooltip.showUpTimer(10);
+                                                                                    tooltip.addLine(IKey.str("Test Line g"));
+                                                                                    tooltip.addLine(IKey.str("An image inside of a tooltip:"));
+                                                                                    tooltip.addLine(GuiTextures.MUI_LOGO.asIcon().size(50).alignment(Alignment.TopCenter));
+                                                                                    tooltip.addLine(IKey.str("And here a circle:"));
+                                                                                    tooltip.addLine(new Circle()
+                                                                                                    .setColor(Color.RED.darker(2), Color.RED.brighter(2))
+                                                                                                    .asIcon()
+                                                                                                    .size(20))
+                                                                                            .addLine(new ItemDrawable(new ItemStack(Items.diamond)).asIcon())
+                                                                                            .pos(RichTooltip.Pos.LEFT);
+                                                                                })
+                                                                                .onMousePressed(mouseButton -> {
+                                                                                    //panel.getScreen().close(true);
+                                                                                    //panel.getScreen().openDialog("dialog", this::buildDialog, ModularUI.LOGGER::info);
+                                                                                    //openSecondWindow(context).openIn(panel.getScreen());
+                                                                                    panelSyncHandler.openPanel();
+                                                                                    return true;
+                                                                                })
+                                                                                //.flex(flex -> flex.left(3)) // ?
+                                                                                .overlay(IKey.str("Button 2")))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 20)
+                                                                                .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
+                                                                                .margin(0, 3)
+                                                                                .hintText("hint"))
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 20)
+                                                                                .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                                                .setNumbersDouble(Function.identity())
+                                                                                .hintText("number"))
+                                                                        .child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
+                                                                        .child(IKey.EMPTY.asWidget().debugName("Empty Ikey")))
+                                                                .child(new Column()
+                                                                        .debugName("button and slots test 2")
+                                                                        .coverChildren()
+                                                                        //.widthRel(0.5f)
+                                                                        .crossAxisAlignment(Alignment.CrossAxis.CENTER)
+                                                                        .child(new ProgressWidget()
+                                                                                .progress(() -> this.progress / (double) this.duration)
+                                                                                .texture(GuiTextures.PROGRESS_ARROW, 20))
+                                                                        .child(new ProgressWidget()
+                                                                                .progress(() -> this.progress / (double) this.duration)
+                                                                                .texture(GuiTextures.PROGRESS_CYCLE, 20)
+                                                                                .direction(ProgressWidget.Direction.CIRCULAR_CW))
+                                                                        .child(new Row().widthRel(1f).height(18)
+                                                                                .child(new ToggleButton()
+                                                                                        .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
+                                                                                        .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
+                                                                                .child(new ToggleButton()
+                                                                                        .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 1, val -> cycleStateValue.setIntValue(1)))
+                                                                                        .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 1 / 3f, 1, 2 / 3f)))
+                                                                                .child(new ToggleButton()
+                                                                                        .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 2, val -> cycleStateValue.setIntValue(2)))
+                                                                                        .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 2 / 3f, 1, 1))))
+                                                                        /*.child(new CycleButtonWidget()
+                                                                                .length(3)
+                                                                                .texture(GuiTextures.CYCLE_BUTTON_DEMO)
+                                                                                .addTooltip(0, "State 1")
+                                                                                .addTooltip(1, "State 2")
+                                                                                .addTooltip(2, "State 3")
+                                                                                .background(GuiTextures.BUTTON)
+                                                                                .value(SyncHandlers.intNumber(() -> this.cycleState, val -> this.cycleState = val)))*/
+                                                                        .child(new ItemSlot()
+                                                                                .slot(SyncHandlers.itemSlot(this.inventory, 0).ignoreMaxStackSize(true).singletonSlotGroup()))
+                                                                        .child(new FluidSlot()
+                                                                                .margin(2)
+                                                                                .width(30)
+                                                                                .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true))))
+                                                                .child(new Column()
+                                                                        .debugName("button and slots test 3")
+                                                                        .coverChildren()
+                                                                        .alignY(Alignment.START)
+                                                                        .child(new TextFieldWidget()
+                                                                                .size(60, 20)
+                                                                                .value(SyncHandlers.intNumber(() -> this.intValue, val -> this.intValue = val))
+                                                                                .setNumbers(0, 9999999)
+                                                                                .setFormatAsInteger(true)
+                                                                                .hintText("integer")))))
+                                                .addPage(new Column()
+                                                                .debugName("Slots test page")
+                                                                .coverChildren()
+                                                                //.height(120)
+                                                                .padding(7)
+                                                                .alignX(0.5f)
+                                                                .mainAxisAlignment(Alignment.MainAxis.START)
+                                                                .childPadding(2)
+                                                                //.child(SlotGroupWidget.playerInventory().left(0))
+                                                                .child(SlotGroupWidget.builder()
+                                                                                .matrix("III", "III", "III")
+                                                                                .key('I', index -> {
+                                                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
+                                                                                    if (index == 4) {
+                                                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
+                                                                                    }
+                                                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
+                                                                                })
+                                                                                .build()
+                                                                        //.marginBottom(2)
+                                                                )
+                                                                .child(SlotGroupWidget.builder()
+                                                                        .row("FII")
+                                                                        .row("FII")
+                                                                        .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
+                                                                        .key('I', index -> ItemSlot.create(index >= 2).slot(new ModularSlot(this.mixerItems, index).slotGroup("mixer_items")))
+                                                                        .build())
+                                                                .child(new Row()
+                                                                        .coverChildrenHeight()
+                                                                        .child(new CycleButtonWidget()
+                                                                                .size(14, 14)
+                                                                                .stateCount(3)
+                                                                                .stateOverlay(GuiTextures.CYCLE_BUTTON_DEMO)
+                                                                                .value(new IntSyncValue(() -> this.val2, val -> this.val2 = val))
+                                                                                .margin(8, 0))
+                                                                        .child(IKey.str("Hello World").asWidget().height(18)))
+                                                                .child(new SpecialButton(IKey.str("A very long string that looks cool when animated").withAnimation())
+                                                                        .height(14)
+                                                                        .widthRel(1f))
                                 /*GuiTextures.LOGO.asIcon()
                                 .size(80, 80)
                                 .asWidget()
                                 .flex(flex -> flex.width(1f).height(1f))*/)
-                                        .addPage(new ParentWidget<>()
-                                                .debugName("page 3 parent")
-                                                .sizeRel(1f, 1f)
-                                                .padding(7)
-                                                //.child(SlotGroupWidget.playerInventory())
-                                                .child(new SliderWidget()
-                                                        .widthRel(1f).bottom(50).height(16) // test overwriting of units
-                                                        .top(7)
-                                                        .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
-                                                        .background(GuiTextures.SLOT_FLUID))
-                                                .child(new ButtonWidget<>()
-                                                        .debugName("color picker button")
-                                                        .top(25)
-                                                        .background(colorPickerBackground)
-                                                        .disableHoverBackground()
-                                                        .onMousePressed(mouseButton -> {
-                                                            colorPicker.openPanel();
-                                                            return true;
-                                                        }))
-                                                .child(new ListWidget<>()
-                                                        .widthRel(1f).top(50).bottom(2)
-                                                        /*.child(new Rectangle().setColor(0xFF606060).asWidget()
-                                                                .top(1)
-                                                                .left(32)
-                                                                .size(1, 40))*/
-                                                        .child(new Row()
-                                                                .debugName("bogo test config 1")
-                                                                .widthRel(1f).coverChildrenHeight()
-                                                                .crossAxisAlignment(Alignment.CrossAxis.CENTER)
-                                                                .childPadding(2)
-                                                                .child(new CycleButtonWidget()
-                                                                        .value(new BoolValue(false))
-                                                                        .stateOverlay(GuiTextures.CHECK_BOX)
-                                                                        .size(14, 14)
-                                                                        .margin(8, 4))
-                                                                .child(IKey.lang("bogosort.gui.enable_refill").asWidget()
-                                                                        .height(14)
-                                                                        .marginLeft(10)))
-                                                        .child(new Row()
-                                                                .debugName("bogo test config 2")
-                                                                .widthRel(1f).height(14)
-                                                                .childPadding(2)
-                                                                .child(new TextFieldWidget()
-                                                                        .value(new IntValue.Dynamic(() -> this.num, val -> this.num = val))
-                                                                        .setNumbers(1, Short.MAX_VALUE)
-                                                                        .setTextAlignment(Alignment.Center)
-                                                                        .background(new Rectangle().setColor(0xFFb1b1b1))
-                                                                        .setTextColor(IKey.TEXT_COLOR)
-                                                                        .size(30, 14))
-                                                                .child(IKey.lang("bogosort.gui.refill_threshold").asWidget()
-                                                                        .height(14)))
-                                                        .child(IKey.lang("bogosort.gui.hotbar_scrolling").asWidget()
-                                                                .color(0xFF404040)
-                                                                .alignment(Alignment.CenterLeft)
-                                                                .left(5).height(14)
-                                                                .tooltip(tooltip -> tooltip.showUpTimer(10)
-                                                                        .addLine(IKey.lang("bogosort.gui.hotbar_scrolling.tooltip"))))
-                                                        .child(new Row()
-                                                                .debugName("bogo test config 3")
-                                                                .widthRel(1f).height(14)
-                                                                .childPadding(2)
-                                                                .child(new CycleButtonWidget()
-                                                                        .value(new BoolValue(false))
-                                                                        .stateOverlay(GuiTextures.CHECK_BOX)
-                                                                        .size(14, 14))
-                                                                .child(IKey.lang("bogosort.gui.enabled").asWidget()
-                                                                        .height(14)))))
-                                       ))
+                                                .addPage(new ParentWidget<>()
+                                                        .debugName("page 3 parent")
+                                                        .sizeRel(1f, 1f)
+                                                        .padding(7)
+                                                        //.child(SlotGroupWidget.playerInventory())
+                                                        .child(new SliderWidget()
+                                                                .widthRel(1f).bottom(50).height(16) // test overwriting of units
+                                                                .top(7)
+                                                                .stopper(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+                                                                .background(GuiTextures.SLOT_FLUID))
+                                                        .child(new ButtonWidget<>()
+                                                                .debugName("color picker button")
+                                                                .top(25)
+                                                                .background(colorPickerBackground)
+                                                                .disableHoverBackground()
+                                                                .onMousePressed(mouseButton -> {
+                                                                    colorPicker.openPanel();
+                                                                    return true;
+                                                                }))
+                                                        .child(new ListWidget<>()
+                                                                .widthRel(1f).top(50).bottom(2)
+                                                                /*.child(new Rectangle().setColor(0xFF606060).asWidget()
+                                                                        .top(1)
+                                                                        .left(32)
+                                                                        .size(1, 40))*/
+                                                                .child(new Row()
+                                                                        .debugName("bogo test config 1")
+                                                                        .widthRel(1f).coverChildrenHeight()
+                                                                        .crossAxisAlignment(Alignment.CrossAxis.CENTER)
+                                                                        .childPadding(2)
+                                                                        .child(new CycleButtonWidget()
+                                                                                .value(new BoolValue(false))
+                                                                                .stateOverlay(GuiTextures.CHECK_BOX)
+                                                                                .size(14, 14)
+                                                                                .margin(8, 4))
+                                                                        .child(IKey.lang("bogosort.gui.enable_refill").asWidget()
+                                                                                .height(14)
+                                                                                .marginLeft(10)))
+                                                                .child(new Row()
+                                                                        .debugName("bogo test config 2")
+                                                                        .widthRel(1f).height(14)
+                                                                        .childPadding(2)
+                                                                        .child(new TextFieldWidget()
+                                                                                .value(new IntValue.Dynamic(() -> this.num, val -> this.num = val))
+                                                                                .setNumbers(1, Short.MAX_VALUE)
+                                                                                .setTextAlignment(Alignment.Center)
+                                                                                .background(new Rectangle().setColor(0xFFb1b1b1))
+                                                                                .setTextColor(IKey.TEXT_COLOR)
+                                                                                .size(30, 14))
+                                                                        .child(IKey.lang("bogosort.gui.refill_threshold").asWidget()
+                                                                                .height(14)))
+                                                                .child(IKey.lang("bogosort.gui.hotbar_scrolling").asWidget()
+                                                                        .color(0xFF404040)
+                                                                        .alignment(Alignment.CenterLeft)
+                                                                        .left(5).height(14)
+                                                                        .tooltip(tooltip -> tooltip.showUpTimer(10)
+                                                                                .addLine(IKey.lang("bogosort.gui.hotbar_scrolling.tooltip"))))
+                                                                .child(new Row()
+                                                                        .debugName("bogo test config 3")
+                                                                        .widthRel(1f).height(14)
+                                                                        .childPadding(2)
+                                                                        .child(new CycleButtonWidget()
+                                                                                .value(new BoolValue(false))
+                                                                                .stateOverlay(GuiTextures.CHECK_BOX)
+                                                                                .size(14, 14))
+                                                                        .child(IKey.lang("bogosort.gui.enabled").asWidget()
+                                                                                .height(14)))))
+                                ))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
@@ -422,8 +423,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                 .setDraggable(true)
                 .size(100, 100);
         SlotGroup slotGroup = new SlotGroup("small_inv", 2);
-        IntSyncValue timeSync = new IntSyncValue(() -> (int)java.lang.System.currentTimeMillis());
-        syncManager.syncValue(123456,timeSync);
+        IntSyncValue timeSync = new IntSyncValue(() -> (int) java.lang.System.currentTimeMillis());
+        syncManager.syncValue(123456, timeSync);
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));

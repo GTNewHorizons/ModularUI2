@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
-import com.cleanroommc.modularui.api.NEISettings;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.NEISettings;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
@@ -15,25 +15,17 @@ import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-
-import net.minecraftforge.client.event.GuiOpenEvent;
-
 import net.minecraftforge.common.util.FakePlayer;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -80,7 +72,7 @@ public class GuiManager {
         // create panel, collect sync handlers and create container
         UISettings settings = new UISettings(NEISettings.DUMMY);
         settings.defaultCanInteractWith(factory, guiData);
-        PanelSyncManager syncManager = new PanelSyncManager();
+        PanelSyncManager syncManager = new PanelSyncManager(false);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = settings.hasContainer() ? settings.createContainer() : factory.createContainer();

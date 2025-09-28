@@ -5,8 +5,8 @@ import com.cleanroommc.modularui.ModularUI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
+import baubles.common.lib.PlayerHandler;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,6 +70,7 @@ public class InventoryTypes {
     }
 
     public static class SlotFindResult {
+
         public final InventoryType type;
         public final int slot;
 

@@ -6,7 +6,13 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.value.IValue;
-import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.api.widget.IDragResizeable;
+import com.cleanroommc.modularui.api.widget.IGuiAction;
+import com.cleanroommc.modularui.api.widget.INotifyEnabled;
+import com.cleanroommc.modularui.api.widget.IPositioned;
+import com.cleanroommc.modularui.api.widget.ISynced;
+import com.cleanroommc.modularui.api.widget.ITooltip;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -45,7 +51,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     // other
     @Nullable private String debugName;
     private boolean enabled = true;
-    private boolean excludeAreaInJei = false;
+    private boolean excludeAreaInNEI = false;
     // gui context
     private boolean valid = false;
     private IWidget parent = null;
@@ -80,7 +86,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Called when a panel is opened. Use {@link #onInit()} and {@link #afterInit()} for custom logic.
      *
      * @param parent the parent this element belongs to
-     * @param late true if this is called some time after the widget tree of the parent has been initialised
+     * @param late   true if this is called some time after the widget tree of the parent has been initialised
      */
     @ApiStatus.Internal
     @Override
@@ -102,9 +108,9 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
         this.valid = true;
         if (!getScreen().isClientOnly()) {
-            initialiseSyncHandler(getScreen().getSyncManager());
+            initialiseSyncHandler(getScreen().getSyncManager(), late);
         }
-        if (isExcludeAreaInJei()) {
+        if (isExcludeAreaInNEI()) {
             getContext().getNEISettings().addNEIExclusionArea(this);
         }
         onInit();
@@ -161,7 +167,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
                     this.context.getScreen().removeGuiActionListener(action);
                 }
             }
-            if (isExcludeAreaInJei()) {
+            if (isExcludeAreaInNEI()) {
                 getContext().getNEISettings().removeNEIExclusionArea(this);
             }
         }
@@ -852,16 +858,16 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return null;
     }
 
-    public boolean isExcludeAreaInJei() {
-        return this.excludeAreaInJei;
+    public boolean isExcludeAreaInNEI() {
+        return this.excludeAreaInNEI;
     }
 
     public W excludeAreaInNEI() {
-        return excludeAreaInJei(true);
+        return excludeAreaInNEI(true);
     }
 
     public W excludeAreaInNEI(boolean val) {
-        this.excludeAreaInJei = val;
+        this.excludeAreaInNEI = val;
         if (isValid()) {
             getContext().getNEISettings().addNEIExclusionArea(this);
         }

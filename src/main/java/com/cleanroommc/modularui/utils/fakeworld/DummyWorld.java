@@ -1,13 +1,18 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
 import com.cleanroommc.modularui.ModularUI;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.world.*;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProviderSurface;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,11 +62,6 @@ public class DummyWorld extends World {
     @Override
     protected IChunkProvider createChunkProvider() {
         return new DummyChunkProvider(this);
-    }
-
-    @Override
-    protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
-        return chunkProvider.isChunkGeneratedAt(x, z);
     }
 
     @Override

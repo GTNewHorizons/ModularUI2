@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.drawable.BufferBuilder;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.settings.GameSettings;
@@ -11,9 +12,9 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
@@ -112,7 +113,7 @@ public class Platform {
      * @param y      y pos
      * @param w      the width of the area where the entity should be drawn
      * @param h      the height of the area where the entity should be drawn
-     * @param z      the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param z      the z layer ({@link com.cleanroommc.modularui.screen.viewport.GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
      */
     public static void setupDrawEntity(Entity entity, float x, float y, float w, float h, float z) {
         float size;
@@ -124,7 +125,7 @@ public class Platform {
             size = entity.width;
             scale = w / size;
         }
-        GlStateManager.enableColorMaterial();
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
         GlStateManager.enableDepth();
         GlStateManager.translate(x + w / 2, y + h / 2, z + 50.0F);
         GlStateManager.scale(-scale, scale, scale);
@@ -138,9 +139,9 @@ public class Platform {
     public static void endDrawEntity() {
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableRescaleNormal();
-        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GlStateManager.disableTexture2D();
-        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
         GlStateManager.disableDepth();
     }
 

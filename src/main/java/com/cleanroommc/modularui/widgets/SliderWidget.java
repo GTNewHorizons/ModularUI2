@@ -16,13 +16,10 @@ import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Unit;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.MathHelper;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-
-import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class SliderWidget extends Widget<SliderWidget> implements Interactable {

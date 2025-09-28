@@ -1,9 +1,5 @@
 package com.cleanroommc.modularui.screen;
 
-import codechicken.nei.LayoutManager;
-import codechicken.nei.guihook.GuiContainerManager;
-import codechicken.nei.guihook.IContainerDrawHandler;
-
 import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
@@ -14,9 +10,9 @@ import com.cleanroommc.modularui.api.event.MouseInputEvent;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.overlay.OverlayManager;
@@ -35,14 +31,6 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.neverenoughanimations.animations.OpeningAnimation;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
-import cpw.mods.fml.common.gameevent.TickEvent;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -59,7 +47,15 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+import codechicken.nei.LayoutManager;
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerDrawHandler;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -91,7 +87,7 @@ public class ClientScreenHandler {
     // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onGuiOpen(GuiOpenEvent event) {
-        GuiScreen newGui = event.getGui();
+        GuiScreen newGui = event.gui;
         guiIsClosing = newGui == null;
 
         defaultContext.reset();
@@ -481,12 +477,6 @@ public class ClientScreenHandler {
         if (hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }
-
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, 0);
-        MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(mcScreen, mouseX, mouseY));
-        GlStateManager.popMatrix();
 
         InventoryPlayer inventoryplayer = Minecraft.getMinecraft().thePlayer.inventory;
         ItemStack itemstack = acc.getDraggedStack() == null ? inventoryplayer.getItemStack() : acc.getDraggedStack();

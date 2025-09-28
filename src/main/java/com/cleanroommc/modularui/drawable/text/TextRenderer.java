@@ -4,14 +4,14 @@ import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.utils.GlStateManager;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -250,7 +250,7 @@ public class TextRenderer {
         Platform.setupDrawFont();
         GlStateManager.pushMatrix();
         GlStateManager.scale(this.scale, this.scale, 0f);
-        getFontRenderer().drawString(text, x / this.scale, y / this.scale, this.color, this.shadow);
+        getFontRenderer().drawString(text, (int) (x / this.scale), (int) (y / this.scale), this.color, this.shadow);
         GlStateManager.popMatrix();
     }
 

@@ -2,12 +2,10 @@ package com.cleanroommc.modularui.utils.fakeworld;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.IChunkLoader;
-import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
@@ -39,12 +37,6 @@ public class DummySaveHandler implements ISaveHandler, IPlayerFileData, IChunkLo
     @Override
     public IPlayerFileData getSaveHandler() {
         return this;
-    }
-
-    @NotNull
-    @Override
-    public TemplateManager getStructureTemplateManager() {
-        return new TemplateManager("", new DataFixer(0));
     }
 
     @Override
@@ -84,11 +76,6 @@ public class DummySaveHandler implements ISaveHandler, IPlayerFileData, IChunkLo
     public void flush() {}
 
     @Override
-    public boolean isChunkGeneratedAt(int x, int z) {
-        return false;
-    }
-
-    @Override
     public void writePlayerData(@NotNull EntityPlayer player) {}
 
     @Nullable
@@ -104,9 +91,7 @@ public class DummySaveHandler implements ISaveHandler, IPlayerFileData, IChunkLo
     }
 
     @Override
-    public void saveExtraData() {
-
-    }
+    public void saveExtraData() {}
 
     @Override
     public String getWorldDirectoryName() {

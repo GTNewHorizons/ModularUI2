@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.screen.ClientScreenHandler;
+import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.utils.item.IItemHandler;
 import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
 import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
 import com.cleanroommc.modularui.utils.item.SlotItemHandler;
-import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;

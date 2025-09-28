@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumHand;
 
 import org.jetbrains.annotations.NotNull;
 

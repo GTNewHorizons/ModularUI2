@@ -2,23 +2,18 @@ package com.cleanroommc.modularui.utils.fakeworld;
 
 import com.cleanroommc.modularui.ModularUI;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
-
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
-
-import it.unimi.dsi.fastutil.chars.CharArraySet;
-import it.unimi.dsi.fastutil.chars.CharSet;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 import com.google.common.collect.AbstractIterator;
-
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
+import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.chars.CharArraySet;
+import it.unimi.dsi.fastutil.chars.CharSet;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -142,14 +137,6 @@ public class ArraySchema implements ISchema {
 
         public Builder whereAir(char c) {
             return where(c, BlockInfo.EMPTY);
-        }
-
-        public Builder where(char c, IBlockState blockState) {
-            return where(c, new BlockInfo(blockState));
-        }
-
-        public Builder where(char c, IBlockState blockState, TileEntity tile) {
-            return where(c, new BlockInfo(blockState, tile));
         }
 
         public Builder where(char c, Block block) {

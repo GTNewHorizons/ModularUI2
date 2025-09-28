@@ -6,17 +6,13 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
-
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
-
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-
 import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -35,7 +31,7 @@ public class EventHandler {
     }.asIcon().height(3);
 
     @SubscribeEvent
-    public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
+    public void onItemUse(PlayerInteractEvent event) {
         ItemStack heldItem = event.entityPlayer.getHeldItem();
         if (event.entityPlayer.getEntityWorld().isRemote && heldItem != null && heldItem.getItem() == Items.diamond) {
             //GuiManager.openClientUI(Minecraft.getMinecraft().player, new TestGui());
@@ -49,16 +45,16 @@ public class EventHandler {
     }
 
     @SubscribeEvent
-    public static void onRichTooltip(RichTooltipEvent.Pre event) {
+    public void onRichTooltip(RichTooltipEvent.Pre event) {
         if (enabledRichTooltipEventTest) {
             event.getTooltip()
-                    .add(IKey.str("Powered By: ").style(TextFormatting.GOLD, TextFormatting.ITALIC))
+                    .add(IKey.str("Powered By: ").style(IKey.GOLD, IKey.ITALIC))
                     .add(GuiTextures.MUI_LOGO.asIcon().size(18)).newLine()
                     .moveCursorToStart()
                     .moveCursorToNextLine()
                     .addLine(tooltipLine)
                     // replaces the Minecraft mod name in JEI item tooltips
-                    .replace("Minecraft", key -> IKey.str("Chicken Jockey").style(TextFormatting.BLUE, TextFormatting.ITALIC))
+                    .replace("Minecraft", key -> IKey.str("Chicken Jockey").style(IKey.BLUE, IKey.ITALIC))
                     .moveCursorToEnd();
         }
     }

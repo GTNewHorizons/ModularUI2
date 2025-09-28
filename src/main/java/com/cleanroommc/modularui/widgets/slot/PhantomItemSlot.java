@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.MouseData;
@@ -10,7 +9,6 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import net.minecraft.item.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class PhantomItemSlot extends ItemSlot implements NEIDragAndDropHandler {
 
@@ -19,7 +17,6 @@ public class PhantomItemSlot extends ItemSlot implements NEIDragAndDropHandler {
     @Override
     public void onInit() {
         super.onInit();
-        getContext().getNEISettings().addNEIGhostIngredientSlot(this);
     }
 
     @Override

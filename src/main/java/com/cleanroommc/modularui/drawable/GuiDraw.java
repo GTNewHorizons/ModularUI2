@@ -1,16 +1,16 @@
 package com.cleanroommc.modularui.drawable;
 
+import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
-import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
@@ -18,17 +18,20 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-
-import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
+import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
@@ -581,17 +584,17 @@ public class GuiDraw {
 
     /**
      * Draws an entity. Note that this does NOT do any necessary setup for rendering the entity. Please see
-     * {@link #drawEntity(Entity, float, float, float, float, Consumer, Consumer)} for a full draw method.
+     * {@link #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)} for a full draw method.
      *
      * @param entity entity to draw.
-     * @see #drawEntity(Entity, float, float, float, float, Consumer, Consumer)
+     * @see #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)
      */
     public static void drawEntityRaw(Entity entity) {
-        RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
-        rendermanager.setPlayerViewY(180.0F);
-        rendermanager.setRenderShadow(false);
-        rendermanager.renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
-        rendermanager.setRenderShadow(true);
+        RenderManager rendermanager = RenderManager.instance;
+        rendermanager.playerViewY = 180.0F;
+        //rendermanager.setRenderShadow(false);
+        rendermanager.renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+        //rendermanager.setRenderShadow(true);
     }
 
     /**
@@ -623,14 +626,14 @@ public class GuiDraw {
     /**
      * Draws an entity which looks in the direction of the mouse like the player render in the player inventory does.
      * The code was copied from
-     * {@link net.minecraft.client.gui.inventory.GuiInventory#drawEntityOnScreen(int, int, int, float, float, EntityLivingBase) GuiInventory.drawEntityOnScreen}.
+     * {@link net.minecraft.client.gui.inventory.GuiInventory#func_147046_a(int, int, int, float, float, EntityLivingBase)  GuiInventory.drawEntityOnScreen}.
      *
      * @param entity entity to draw
      * @param x      x pos
      * @param y      y pos
-     * @param w        the width of the area where the entity should be drawn
-     * @param h        the height of the area where the entity should be drawn
-     * @param z        the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param w      the width of the area where the entity should be drawn
+     * @param h      the height of the area where the entity should be drawn
+     * @param z      the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
      * @param mouseX current x pos of the mouse
      * @param mouseY current y pos of the mouse
      */
@@ -650,6 +653,9 @@ public class GuiDraw {
         entity.rotationPitch = -((float) Math.atan(mouseY / 40.0F)) * 20.0F;
         entity.rotationYawHead = entity.rotationYaw;
         entity.prevRotationYawHead = entity.rotationYaw;
+
+        // TODO: is this needed? in 1.12 its just 0,0,0
+        GL11.glTranslatef(0.0F, entity.yOffset, 0.0F);
 
         drawEntityRaw(entity);
 

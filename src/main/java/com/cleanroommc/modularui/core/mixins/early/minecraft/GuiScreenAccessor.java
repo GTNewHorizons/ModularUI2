@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.RenderItem;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -17,10 +17,10 @@ import java.util.List;
 @Mixin(GuiScreen.class)
 public interface GuiScreenAccessor {
 
-    @Accessor
+    @Accessor("field_146298_h")
     int getTouchValue();
 
-    @Accessor
+    @Accessor("field_146298_h")
     void setTouchValue(int value);
 
     @Accessor
@@ -36,9 +36,11 @@ public interface GuiScreenAccessor {
     void setLastMouseEvent(long event);
 
     @Accessor
-    RenderItem getItemRender();
+    static RenderItem getItemRender() {
+        throw new UnsupportedOperationException("Mixin failed to inject!");
+    }
 
-    @Accessor
+    @Accessor("fontRendererObj")
     FontRenderer getFontRenderer();
 
     @Accessor
@@ -56,7 +58,7 @@ public interface GuiScreenAccessor {
     @Invoker
     void invokeMouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException;
 
-    @Invoker
+    @Invoker("mouseMovedOrUp")
     void invokeMouseReleased(int mouseX, int mouseY, int state);
 
     @Invoker

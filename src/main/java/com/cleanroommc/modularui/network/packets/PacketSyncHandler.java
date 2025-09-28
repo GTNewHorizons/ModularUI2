@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
-
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -19,8 +18,6 @@ import java.io.IOException;
 
 public class PacketSyncHandler implements IPacket {
 
-    private String panel;
-    private String key;
     private String panel;
     private String key;
     private boolean action;
@@ -70,7 +67,7 @@ public class PacketSyncHandler implements IPacket {
 
     private void execute(ModularSyncManager syncManager) {
         try {
-            int id = this.action ? 0 : this.packet.readVarInt();
+            int id = this.action ? 0 : this.packet.readVarIntFromBuffer();
             syncManager.receiveWidgetUpdate(this.panel, this.key, this.action, id, this.packet);
         } catch (IndexOutOfBoundsException e) {
             ModularUI.LOGGER.error("Failed to read packet for sync handler {} in panel {}", this.key, this.panel);

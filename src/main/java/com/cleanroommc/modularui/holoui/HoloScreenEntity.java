@@ -122,22 +122,7 @@ public class HoloScreenEntity extends Entity {
     }
 
     @Override
-    public boolean isImmuneToExplosions() {
-        return true;
-    }
-
-    @Override
     public boolean isCreatureType(@NotNull EnumCreatureType type, boolean forSpawnCount) {
-        return false;
-    }
-
-    @Override
-    public boolean canTrample(@NotNull World world, @NotNull Block block, @NotNull BlockPos pos, float fallDistance) {
-        return false;
-    }
-
-    @Override
-    protected boolean canBeRidden(@NotNull Entity entityIn) {
         return false;
     }
 
