@@ -4,6 +4,7 @@ import codechicken.nei.LayoutManager;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerDrawHandler;
 
+import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
@@ -85,19 +86,25 @@ public class ClientScreenHandler {
 
     private static IMuiScreen lastMui;
 
+    public static boolean guiIsClosing;
+
+    // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onGuiOpen(GuiOpenEvent event) {
+        GuiScreen newGui = event.getGui();
+        guiIsClosing = newGui == null;
+
         defaultContext.reset();
-        if (lastMui != null && event.gui == null) {
+        if (lastMui != null && newGui == null) {
             if (lastMui.getScreen().getPanelManager().isOpen()) {
                 lastMui.getScreen().getPanelManager().closeAll();
             }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
-        } else if (event.gui instanceof IMuiScreen screenWrapper) {
+        } else if (newGui instanceof IMuiScreen screenWrapper) {
             if (lastMui == null) {
                 lastMui = screenWrapper;
-            } else if (lastMui == event.gui) {
+            } else if (lastMui == newGui) {
                 lastMui.getScreen().getPanelManager().reopen();
             } else {
                 if (lastMui.getScreen().getPanelManager().isOpen()) {
@@ -108,7 +115,7 @@ public class ClientScreenHandler {
             }
         }
 
-        if (event.gui instanceof IMuiScreen muiScreen) {
+        if (newGui instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
                 if (hasScreen()) {
@@ -119,12 +126,12 @@ public class ClientScreenHandler {
                 currentScreen = muiScreen.getScreen();
                 fpsCounter.reset();
             }
-        } else if (hasScreen() && getMCScreen() != null && event.gui != getMCScreen()) {
+        } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
             currentScreen.onCloseParent();
             currentScreen = null;
             lastChar = null;
         }
-
+        GuiErrorHandler.INSTANCE.clear();
         OverlayManager.onGuiOpen(event);
     }
 
@@ -203,11 +210,13 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
+        Platform.setupDrawTex(); // NEI and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.mouseX, event.mouseY, event.renderPartialTicks);
+        Platform.setupDrawTex(); // NEI and other mods may expect this state
     }
 
     @SubscribeEvent
@@ -350,6 +359,8 @@ public class ClientScreenHandler {
                 // set clicked slot to make sure the container clicks the desired slot
                 clickableGuiContainer.modularUI$setClickedSlot(slot);
                 acc.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getAbsMouseY(), ctx.getMouseButton());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             } finally {
                 // undo modifications
                 clickableGuiContainer.modularUI$setClickedSlot(null);
@@ -472,6 +483,10 @@ public class ClientScreenHandler {
         }
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, 0);
+        MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(mcScreen, mouseX, mouseY));
+        GlStateManager.popMatrix();
 
         InventoryPlayer inventoryplayer = Minecraft.getMinecraft().thePlayer.inventory;
         ItemStack itemstack = acc.getDraggedStack() == null ? inventoryplayer.getItemStack() : acc.getDraggedStack();

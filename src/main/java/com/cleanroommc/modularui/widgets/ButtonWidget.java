@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.value.sync.InteractionSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
+
 import org.jetbrains.annotations.NotNull;
 
 public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W> implements Interactable {

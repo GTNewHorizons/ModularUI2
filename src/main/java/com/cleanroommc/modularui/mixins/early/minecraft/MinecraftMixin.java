@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.mixins.early.minecraft;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import net.minecraft.client.Minecraft;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

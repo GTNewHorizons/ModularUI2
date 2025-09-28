@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.AbstractParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

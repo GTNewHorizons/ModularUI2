@@ -50,7 +50,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         String key = "player";
         for (int i = 0; i < 9; i++) {
             slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot()
-                    {
+                    { // TODO: what da heeeell
                         @Override
                         public @Nullable IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
                             if(widgetTheme instanceof WidgetSlotTheme slotTheme&& slotTheme.getUseCustomSlotTextures()) return slotTheme.getInventorySlotBackground();

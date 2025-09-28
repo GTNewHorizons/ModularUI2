@@ -28,7 +28,6 @@ import gregtech.api.util.GTUtility;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
@@ -133,8 +132,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
 
     @Override
     public void onInit() {
-        textRenderer.setShadow(true);
-        textRenderer.setScale(0.5f);
+        this.textRenderer.setShadow(true);
+        this.textRenderer.setScale(0.5f);
         this.textRenderer.setColor(Color.WHITE.main);
     }
 
@@ -167,6 +166,10 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
         }
+    }
+
+    @Override
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getSlotHoverColor());
@@ -276,6 +279,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         this.syncHandler = syncHandler;
         return this;
     }
+
+    /* === NEI ghost slot === */
 
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {

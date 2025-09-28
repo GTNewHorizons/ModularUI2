@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import cpw.mods.fml.relauncher.Side;
@@ -27,7 +28,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         return UITexture.builder()
                 .location(ICONS_LOCATION)
                 .imageSize(256, 256)
-                .uv(x, y, w, h)
+                .xy(x, y, w, h)
                 .name(name)
                 .build();
     }
@@ -175,7 +176,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
             if (mode2) {
                 throw new JsonParseException("Tried to specify x, y, w, h and u0, v0, u1, v1!");
             }
-            builder.uv(JsonHelper.getInt(json, 0, "x"),
+            builder.xy(JsonHelper.getInt(json, 0, "x"),
                     JsonHelper.getInt(json, 0, "y"),
                     JsonHelper.getInt(json, builder.iw, "w", "width"),
                     JsonHelper.getInt(json, builder.ih, "h", "height"));
@@ -308,7 +309,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
          * @param w width in pixels
          * @param h height in pixels
          */
-        public Builder uv(int x, int y, int w, int h) {
+        public Builder xy(int x, int y, int w, int h) {
             this.mode = Mode.PIXEL;
             this.x = x;
             this.y = y;

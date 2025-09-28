@@ -1,11 +1,11 @@
-package com.cleanroommc.modularui.mixins.early.minecraft;
+package com.cleanroommc.modularui.core.mixin;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.RenderItem;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -17,10 +17,10 @@ import java.util.List;
 @Mixin(GuiScreen.class)
 public interface GuiScreenAccessor {
 
-    @Accessor("field_146298_h")
+    @Accessor
     int getTouchValue();
 
-    @Accessor("field_146298_h")
+    @Accessor
     void setTouchValue(int value);
 
     @Accessor
@@ -36,11 +36,9 @@ public interface GuiScreenAccessor {
     void setLastMouseEvent(long event);
 
     @Accessor
-    static RenderItem getItemRender() {
-        throw new UnsupportedOperationException("Mixin failed to inject!");
-    }
+    RenderItem getItemRender();
 
-    @Accessor("fontRendererObj")
+    @Accessor
     FontRenderer getFontRenderer();
 
     @Accessor
@@ -53,12 +51,12 @@ public interface GuiScreenAccessor {
     List<GuiLabel> getLabelList();
 
     @Invoker
-    void invokeKeyTyped(char typedChar, int keyCode);
+    void invokeKeyTyped(char typedChar, int keyCode) throws IOException;
 
     @Invoker
-    void invokeMouseClicked(int mouseX, int mouseY, int mouseButton);
+    void invokeMouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException;
 
-    @Invoker("mouseMovedOrUp")
+    @Invoker
     void invokeMouseReleased(int mouseX, int mouseY, int state);
 
     @Invoker

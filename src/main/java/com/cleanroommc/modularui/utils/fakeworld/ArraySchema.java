@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.chars.CharArraySet;
 import it.unimi.dsi.fastutil.chars.CharSet;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
@@ -141,6 +142,14 @@ public class ArraySchema implements ISchema {
 
         public Builder whereAir(char c) {
             return where(c, BlockInfo.EMPTY);
+        }
+
+        public Builder where(char c, IBlockState blockState) {
+            return where(c, new BlockInfo(blockState));
+        }
+
+        public Builder where(char c, IBlockState blockState, TileEntity tile) {
+            return where(c, new BlockInfo(blockState, tile));
         }
 
         public Builder where(char c, Block block) {

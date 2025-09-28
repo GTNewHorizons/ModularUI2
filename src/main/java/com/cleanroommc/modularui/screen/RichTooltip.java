@@ -109,7 +109,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         TextRenderer renderer = TextRenderer.SHARED;
         RichText copy = this.text.copy();
         // this only turns the text and not any drawables into strings
-        RichTooltipEvent.Pre event = new RichTooltipEvent.Pre(stack, null, mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer(), copy);
+        RichTooltipEvent.Pre event = new RichTooltipEvent.Pre(stack, copy.getAsStrings(), mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer(), copy);
         if (MinecraftForge.EVENT_BUS.post(event)) return; // canceled
         // we are supposed to now use the strings of the event, but we can't properly determine where to put them
         mouseX = event.getX();
@@ -136,7 +136,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         GuiDraw.drawTooltipBackground(stack, copy.getAsStrings(), area.x, area.y, area.width, area.height, this);
 
-        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostBackground(stack, null, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
+        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostBackground(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
 
         GlStateManager.color(1f, 1f, 1f, 1f);
 
@@ -144,7 +144,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         renderer.setSimulate(false);
         renderer.drawCompiled(context, compiledLines);
 
-        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, null, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
+        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
     }
 
     public Rectangle determineTooltipArea(RichText text, GuiContext context, TextRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {

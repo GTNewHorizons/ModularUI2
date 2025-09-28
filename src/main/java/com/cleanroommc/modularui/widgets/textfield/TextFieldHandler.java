@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
+
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
 
@@ -223,6 +224,11 @@ public class TextFieldHandler {
     public void markAll() {
         setOffsetCursor(0, 0);
         setMainCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length(), true);
+    }
+
+    public void markCurrentLine() {
+        setOffsetCursor(getMainCursor().y, 0);
+        setMainCursor(getMainCursor().y, this.text.get(getMainCursor().y).length(), true);
     }
 
     public String getTextAsString() {

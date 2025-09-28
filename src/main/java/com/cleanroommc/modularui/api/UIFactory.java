@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.api;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.screen.*;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;

@@ -6,12 +6,7 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.value.IValue;
-import com.cleanroommc.modularui.api.widget.IGuiAction;
-import com.cleanroommc.modularui.api.widget.INotifyEnabled;
-import com.cleanroommc.modularui.api.widget.IPositioned;
-import com.cleanroommc.modularui.api.widget.ISynced;
-import com.cleanroommc.modularui.api.widget.ITooltip;
-import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.api.widget.*;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -23,6 +18,7 @@ import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
 import com.cleanroommc.modularui.widget.sizer.IUnResizeable;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -84,10 +80,11 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Called when a panel is opened. Use {@link #onInit()} and {@link #afterInit()} for custom logic.
      *
      * @param parent the parent this element belongs to
+     * @param late true if this is called some time after the widget tree of the parent has been initialised
      */
     @ApiStatus.Internal
     @Override
-    public final void initialise(@NotNull IWidget parent) {
+    public final void initialise(@NotNull IWidget parent, boolean late) {
         if (!(this instanceof ModularPanel)) {
             this.parent = parent;
             this.panel = parent.getPanel();
@@ -113,7 +110,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         onInit();
         if (hasChildren()) {
             for (IWidget child : getChildren()) {
-                child.initialise(this);
+                child.initialise(this, false);
             }
         }
         afterInit();
@@ -137,7 +134,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Custom logic should be handled in {@link #isValidSyncHandler(SyncHandler)}.
      */
     @Override
-    public void initialiseSyncHandler(ModularSyncManager syncManager) {
+    public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
         if (this.syncKey != null) {
             this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
@@ -621,7 +618,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      */
     @Override
     public Flex flex() {
-        return this.flex;
+        return getFlex();
     }
 
     /**
@@ -837,10 +834,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         }
     }
 
-    public boolean isExcludeAreaInJei() {
-        return this.excludeAreaInJei;
-    }
-
     /**
      * Disables the widget from start. Useful inside widget tree creation, where widget references are usually not stored.
      *
@@ -851,8 +844,20 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
         return getThis();
     }
 
+    @Override
+    public Object getAdditionalHoverInfo(IViewportStack viewportStack, int mouseX, int mouseY) {
+        if (this instanceof IDragResizeable dragResizeable) {
+            return IDragResizeable.getDragResizeCorner(dragResizeable, getArea(), viewportStack, mouseX, mouseY);
+        }
+        return null;
+    }
+
+    public boolean isExcludeAreaInJei() {
+        return this.excludeAreaInJei;
+    }
+
     public W excludeAreaInNEI() {
-        return excludeAreaInNEI(true);
+        return excludeAreaInJei(true);
     }
 
     public W excludeAreaInNEI(boolean val) {

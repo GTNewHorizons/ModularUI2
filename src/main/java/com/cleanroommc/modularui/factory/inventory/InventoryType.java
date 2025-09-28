@@ -2,10 +2,7 @@ package com.cleanroommc.modularui.factory.inventory;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
-
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

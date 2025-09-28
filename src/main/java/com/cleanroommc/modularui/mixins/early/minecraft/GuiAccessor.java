@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixins.early.minecraft;
+package com.cleanroommc.modularui.core.mixin;
 
 import net.minecraft.client.gui.Gui;
 

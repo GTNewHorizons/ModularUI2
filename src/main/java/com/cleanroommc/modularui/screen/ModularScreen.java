@@ -518,6 +518,7 @@ public class ModularScreen {
      */
     @ApiStatus.Internal
     public void setFocused(boolean focus) {
+        // TODO: 1.12
         //this.screenWrapper.setFocused(focus);
     }
 

@@ -6,7 +6,9 @@ import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 import com.cleanroommc.modularui.utils.serialization.IEquals;
+
 import net.minecraft.network.PacketBuffer;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

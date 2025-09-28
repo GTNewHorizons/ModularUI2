@@ -104,7 +104,7 @@ public class GuiManager {
         T guiData = factory.readGuiData(player, data);
         UISettings settings = new UISettings();
         settings.defaultCanInteractWith(factory, guiData);
-        PanelSyncManager syncManager = new PanelSyncManager();
+        PanelSyncManager syncManager = new PanelSyncManager(true);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
@@ -119,7 +119,7 @@ public class GuiManager {
         guiContainer.inventorySlots.windowId = windowId;
         MCHelper.displayScreen(wrapper.getGuiScreen());
         player.openContainer = guiContainer.inventorySlots;
-        syncManager.onOpen();
+        syncManager.onOpen(); // TODO: not here in 1.12
     }
 
     @SideOnly(Side.CLIENT)

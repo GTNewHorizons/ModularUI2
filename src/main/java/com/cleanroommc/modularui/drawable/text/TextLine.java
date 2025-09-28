@@ -29,9 +29,9 @@ public class TextLine implements ITextLine {
     }
 
     @Override
-    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow) {
+    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow, int availableWidth, int availableHeight) {
         Platform.setupDrawFont();
-        fr.drawString(this.text, (int) x, (int) y, color, shadow);
+        fr.drawString(this.text, x, y, color, shadow);
         this.lastX = x;
         this.lastY = y;
     }

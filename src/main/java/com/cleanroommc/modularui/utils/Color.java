@@ -2,7 +2,8 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.MathHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

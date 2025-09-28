@@ -12,9 +12,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Structure {

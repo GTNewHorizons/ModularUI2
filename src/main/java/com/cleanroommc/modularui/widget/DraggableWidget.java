@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -78,7 +79,7 @@ public class DraggableWidget<W extends DraggableWidget<W>> extends Widget<W> imp
     @Override
     public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
         if (!isMoving() && isInside(stack, x, y)) {
-            widgets.add(this, stack.peek());
+            widgets.add(this, stack.peek(), getAdditionalHoverInfo(stack, x, y));
         }
     }
 

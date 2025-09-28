@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.JsonHelper;
+
 import com.google.gson.JsonObject;
 
 public class WidgetSlotTheme extends WidgetTheme {
@@ -28,7 +29,7 @@ public class WidgetSlotTheme extends WidgetTheme {
     public WidgetSlotTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
         super(parent, json, fallback);
         this.slotHoverColor = JsonHelper.getColorWithFallback(json, fallback, ((WidgetSlotTheme) parent).getSlotHoverColor(), IThemeApi.SLOT_HOVER_COLOR);
-        this.useCustomSlotTextures=JsonHelper.getBoolWithFallback(json, fallback, ((WidgetSlotTheme) parent).getUseCustomSlotTextures(), IThemeApi.SLOT_CUSTOM_TEXTURES);
+        this.useCustomSlotTextures = JsonHelper.getBoolWithFallback(json, fallback, ((WidgetSlotTheme) parent).getUseCustomSlotTextures(), IThemeApi.SLOT_CUSTOM_TEXTURES);
         this.inventorySlotBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, ((WidgetSlotTheme) parent).getInventorySlotBackground(), IThemeApi.SLOT_INVENTORY_BACKGROUND);
         this.hotbarSlotBackground = JsonHelper.deserializeWithFallback(json, fallback, IDrawable.class, ((WidgetSlotTheme) parent).getHotbarSlotBackground(), IThemeApi.SLOT_HOTBAR_BACKGROUND);
     }

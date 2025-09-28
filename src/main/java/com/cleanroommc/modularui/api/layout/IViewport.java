@@ -16,8 +16,7 @@ public interface IViewport {
      *
      * @param stack viewport stack
      */
-    default void transformChildren(IViewportStack stack) {
-    }
+    default void transformChildren(IViewportStack stack) {}
 
     /**
      * Gathers all children at a position. Transformations from this viewport are already applied.
@@ -38,8 +37,7 @@ public interface IViewport {
      * @param x       x position
      * @param y       y position
      */
-    default void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-    }
+    default void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {}
 
     /**
      * Called during drawing twice (before children are drawn). Once with transformation of this viewport and once without
@@ -73,7 +71,7 @@ public interface IViewport {
                 stack.pushMatrix();
                 child.transform(stack);
                 if (child.isInside(stack, x, y)) {
-                    widgetList.add(child, stack.peek());
+                    widgetList.add(child, stack.peek(), child.getAdditionalHoverInfo(stack, x, y));
                 }
                 if (child.hasChildren()) {
                     getChildrenAt(child, stack, widgetList, x, y);
@@ -119,6 +117,5 @@ public interface IViewport {
         return true;
     }
 
-    IViewport EMPTY = (viewports, widgets, x, y) -> {
-    };
+    IViewport EMPTY = (viewports, widgets, x, y) -> {};
 }

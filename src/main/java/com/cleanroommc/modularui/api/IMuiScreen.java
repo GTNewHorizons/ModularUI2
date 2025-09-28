@@ -8,9 +8,14 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.neverenoughanimations.api.IAnimatedScreen;
 
+import com.cleanroommc.modularui.utils.Platform;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
+import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
@@ -39,6 +44,16 @@ public interface IMuiScreen extends IAnimatedScreen {
      */
     @NotNull
     ModularScreen getScreen();
+
+    /**
+     * {@link GuiScreen GuiScreens} need to be focused when a text field is focused, to prevent key input from
+     * behaving unexpectedly.
+     *
+     * @param focused if the screen should be focused
+     */
+    default void setFocused(boolean focused) {
+        getGuiScreen().setFocused(focused);
+    }
 
     /**
      * This method decides how the gui background is drawn.

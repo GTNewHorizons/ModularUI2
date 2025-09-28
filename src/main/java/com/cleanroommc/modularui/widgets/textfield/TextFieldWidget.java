@@ -92,14 +92,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
-        this.renderer.setSimulate(false);
-        this.renderer.setPos(getArea().getPadding().left, 0);
-        this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
-    }
-
-    @Override
     public void drawForeground(ModularGuiContext context) {
         if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
             getTooltip().draw(getContext());
@@ -122,15 +114,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.handler.getText().add(text);
         } else {
             this.handler.getText().set(0, text);
-        }
-    }
-
-    @Override
-    public void onFocus(ModularGuiContext context) {
-        super.onFocus(context);
-        Point main = this.handler.getMainCursor();
-        if (main.x == 0) {
-            this.handler.setCursor(main.y, getText().length(), true, true);
         }
     }
 
@@ -231,6 +214,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     public TextFieldWidget setDefaultNumber(double defaultNumber) {
         this.defaultNumber = defaultNumber;
         return this;
+    }
+
+    public TextFieldWidget value(IStringValue<?> stringValue) {
+        this.stringValue = stringValue;
+        setValue(stringValue);
     }
 
     @ApiStatus.Experimental

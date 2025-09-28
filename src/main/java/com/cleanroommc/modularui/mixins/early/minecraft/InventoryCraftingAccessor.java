@@ -1,9 +1,10 @@
-package com.cleanroommc.modularui.mixins.early.minecraft;
+package com.cleanroommc.modularui.core.mixin;
 
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface InventoryCraftingAccessor {
 
     @Accessor
-    ItemStack[] getStackList();
+    NonNullList<ItemStack> getStackList();
 
     @Accessor
     Container getEventHandler();

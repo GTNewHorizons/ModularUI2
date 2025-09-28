@@ -5,9 +5,12 @@ import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.network.NetworkHandler;
+import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.test.ItemEditorGui;
 import com.cleanroommc.modularui.test.TestBlock;
+import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import com.gtnewhorizon.gtnhlib.config.ConfigException;
 import com.gtnewhorizon.gtnhlib.config.ConfigurationManager;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -56,5 +59,12 @@ public class CommonProxy {
     @SideOnly(Side.CLIENT)
     public Timer getTimer60Fps() {
         throw new UnsupportedOperationException();
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.PlayerTickEvent event) {
+        if (event.player.openContainer instanceof ModularContainer container) {
+            container.onUpdate();
+        }
     }
 }

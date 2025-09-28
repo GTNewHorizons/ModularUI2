@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void initialise(@NotNull IWidget parent) {
+    public void initialise(@NotNull IWidget parent, boolean late) {
         this.parent = parent;
     }
 

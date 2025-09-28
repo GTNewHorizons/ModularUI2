@@ -9,8 +9,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -116,7 +117,7 @@ public class ItemStackItemHandler implements IItemHandlerModifiable {
         return 64;
     }
 
-    protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
+    protected int getStackLimit(int slot, @NotNull ItemStack stack) {
         return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
     }
 

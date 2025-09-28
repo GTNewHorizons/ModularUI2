@@ -55,6 +55,7 @@ public class PosGuiData extends GuiData {
     }
 
     public TileEntity getTileEntity() {
+        // no blockpos needed
         return getWorld().getTileEntity(this.x, this.y, this.z);
     }
 }

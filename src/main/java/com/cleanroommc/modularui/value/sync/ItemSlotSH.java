@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
@@ -24,7 +25,6 @@ public class ItemSlotSH extends SyncHandler {
     private ItemStack lastStoredItem;
     private boolean registered = false;
 
-    @ApiStatus.Internal
     public ItemSlotSH(ModularSlot slot) {
         this.slot = slot;
     }
@@ -39,6 +39,12 @@ public class ItemSlotSH extends SyncHandler {
         }
         ItemStack currentStack = getSlot().getStack();
         this.lastStoredItem = currentStack != null ? currentStack.copy() : null;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        this.slot.dispose();
     }
 
     @Override

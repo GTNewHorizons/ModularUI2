@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.widget.WidgetTree;
+
 import net.minecraft.network.PacketBuffer;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -56,7 +57,7 @@ public final class PanelSyncHandler extends SyncHandler implements IPanelHandler
         if (this.syncManager != null && this.syncManager.getModularSyncManager() != getSyncManager().getModularSyncManager()) {
             throw new IllegalStateException("Can't reopen synced panel in another screen!");
         } else if (this.syncManager == null) {
-            this.syncManager = new PanelSyncManager();
+            this.syncManager = new PanelSyncManager(client);
             this.openedPanel = Objects.requireNonNull(createUI(this.syncManager));
             this.panelName = this.openedPanel.getName();
             this.openedPanel.setSyncHandler(this);

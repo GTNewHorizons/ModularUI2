@@ -36,22 +36,23 @@ public class ComposedLine implements ITextLine {
     }
 
     @Override
-    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow) {
+    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow, int availableWidth, int availableHeight) {
         this.lastX = x;
         this.lastY = y;
         for (Object o : this.elements) {
             if (o instanceof String s) {
                 float drawY = getHeight(fr) / 2f - fr.FONT_HEIGHT / 2f;
                 Platform.setupDrawFont();
-                fr.drawString(s, (int) x, (int) (y + drawY), color, shadow);
+                fr.drawString(s, x, (int) (y + drawY), color, shadow);
                 x += fr.getStringWidth(s);
             } else if (o instanceof IIcon icon) {
                 float drawY = getHeight(fr) / 2f - icon.getHeight() / 2f;
-                icon.draw(context, (int) x, (int) (y + drawY), icon.getWidth(), icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback());
+                int w = icon.getWidth() > 0  ? icon.getWidth() : availableWidth;
+                icon.draw(context, (int) x, (int) (y + drawY), w, icon.getHeight(), IThemeApi.get().getDefaultTheme().getFallback());
                 if (icon instanceof IHoverable hoverable) {
                     hoverable.setRenderedAt((int) x, (int) (y + drawY));
                 }
-                x += icon.getWidth();
+                x += w;
             }
         }
     }

@@ -16,9 +16,11 @@ import cpw.mods.fml.common.FMLCommonHandler;
 /**
  * Basically a copy of {@link net.minecraft.inventory.SlotCrafting} for {@link ModularSlot}.
  */
+// TODO: any changes from 1.12?
 public class ModularCraftingSlot extends ModularSlot {
 
     private InventoryCraftingWrapper craftMatrix;
+    private IRecipe recipeUsed;
     private int amountCrafted;
 
     public ModularCraftingSlot(IItemHandler itemHandler, int index) {
@@ -150,6 +152,10 @@ public class ModularCraftingSlot extends ModularSlot {
     public void updateResult(ItemStack stack) {
         putStack(stack);
         getSyncHandler().forceSyncItem();
+    }
+
+    public void setRecipeUsed(IRecipe recipeUsed) {
+        this.recipeUsed = recipeUsed;
     }
 
     public void setCraftMatrix(InventoryCraftingWrapper craftMatrix) {

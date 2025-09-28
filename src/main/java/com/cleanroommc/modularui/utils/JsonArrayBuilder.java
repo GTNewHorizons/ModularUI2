@@ -23,22 +23,22 @@ public class JsonArrayBuilder {
     }
 
     public JsonArrayBuilder add(boolean element) {
-        this.json.add(new JsonPrimitive(element));
+        this.json.add(element);
         return this;
     }
 
     public JsonArrayBuilder add(char element) {
-        this.json.add(new JsonPrimitive(element));
+        this.json.add(element);
         return this;
     }
 
     public JsonArrayBuilder add(Number element) {
-        this.json.add(new JsonPrimitive(element));
+        this.json.add(element);
         return this;
     }
 
     public JsonArrayBuilder add(String element) {
-        this.json.add(new JsonPrimitive(element));
+        this.json.add(element);
         return this;
     }
 

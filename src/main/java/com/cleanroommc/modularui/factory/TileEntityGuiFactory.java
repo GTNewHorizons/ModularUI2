@@ -40,6 +40,8 @@ public class TileEntityGuiFactory extends AbstractUIFactory<PosGuiData> {
         verifyTile(Platform.getClientPlayer(), tile);
         PosGuiData data = new PosGuiData(Platform.getClientPlayer(), tile.xCoord, tile.yCoord, tile.zCoord);
         GuiManager.openFromClient(this, data);
+        BlockPos pos = tile.getPos();
+        GuiManager.openFromClient(this, new PosGuiData(MCHelper.getPlayer(), pos.getX(), pos.getY(), pos.getZ()));
     }
 
     @SideOnly(Side.CLIENT)

@@ -174,6 +174,12 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return slot(new ModularSlot(itemHandler, index));
     }
 
+    public ItemSlot syncHandler(ItemSlotSH syncHandler) {
+        this.syncHandler = syncHandler;
+        setSyncHandler(this.syncHandler);
+        return this;
+    }
+
     @SideOnly(Side.CLIENT)
     private void drawSlot(ModularSlot slotIn) {
         GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
@@ -206,6 +212,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     int k = Math.min(itemstack.getMaxStackSize(), slotIn.getSlotStackLimit());
 
                     if (itemstack.stackSize > k) {
+                    if (itemstack.getCount() > k) {
                         amount = k;
                         format = EnumChatFormatting.YELLOW.toString();
                         itemstack.stackSize = k;

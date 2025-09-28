@@ -24,7 +24,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.NotNull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 
@@ -64,6 +64,10 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
 
     public ItemDrawable(@NotNull Block item, int meta, int amount) {
         setItem(new ItemStack(item, amount, meta));
+    }
+
+    public ItemStack getItem() {
+        return item;
     }
 
     @SideOnly(Side.CLIENT)

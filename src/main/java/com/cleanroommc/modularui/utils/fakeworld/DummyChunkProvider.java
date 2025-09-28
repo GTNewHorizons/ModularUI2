@@ -3,8 +3,6 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import com.gtnewhorizon.gtnhlib.util.CoordinatePacker;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.ChunkPosition;
@@ -13,6 +11,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
+import io.netty.util.collection.LongObjectHashMap;
+import io.netty.util.collection.LongObjectMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +42,14 @@ public class DummyChunkProvider implements IChunkProvider {
         Chunk chunk = new Chunk(world, x, z);
         loadedChunks.put(chunkKey, chunk);
         return chunk;
+    }
+
+    @Override
+    public boolean tick() {
+        for (Chunk chunk : loadedChunks.values()) {
+            chunk.onTick(false);
+        }
+        return !loadedChunks.isEmpty();
     }
 
     @NotNull

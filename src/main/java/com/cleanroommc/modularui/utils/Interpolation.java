@@ -4,10 +4,12 @@ import com.cleanroommc.modularui.api.drawable.IInterpolation;
 import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Check out <a href=https://easings.net/en>this website</a> to find your desired interpolation method.
  */
-public enum Interpolation implements IInterpolation {
+public enum Interpolation implements IInterpolation, IStringSerializable {
 
     LINEAR("linear") {
         @Override
