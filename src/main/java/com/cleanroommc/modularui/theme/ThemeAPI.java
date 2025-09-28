@@ -33,8 +33,8 @@ public class ThemeAPI implements IThemeApi {
     private ThemeAPI() {
         registerWidgetTheme(Theme.PANEL, new WidgetTheme(GuiTextures.MC_BACKGROUND, null, Color.WHITE.main, 0xFF404040, false), WidgetTheme::new);
         registerWidgetTheme(Theme.BUTTON, new WidgetTheme(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true), WidgetTheme::new);
-        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60),false,GuiTextures.SLOT_ITEM_PLAYER,GuiTextures.SLOT_ITEM_HOTBAR), WidgetSlotTheme::new);
-        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60),false,null,null), WidgetSlotTheme::new);
+        registerWidgetTheme(Theme.ITEM_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_ITEM, Color.withAlpha(Color.WHITE.main, 0x60), false, GuiTextures.SLOT_ITEM_PLAYER, GuiTextures.SLOT_ITEM_HOTBAR), WidgetSlotTheme::new);
+        registerWidgetTheme(Theme.FLUID_SLOT, new WidgetSlotTheme(GuiTextures.SLOT_FLUID, Color.withAlpha(Color.WHITE.main, 0x60), false, null, null), WidgetSlotTheme::new);
         registerWidgetTheme(Theme.TEXT_FIELD, new WidgetTextFieldTheme(0xFF2F72A8, 0xFF5F5F5F), (parent, json, fallback) -> new WidgetTextFieldTheme(parent, fallback, json));
         registerWidgetTheme(Theme.TOGGLE_BUTTON, new WidgetThemeSelectable(GuiTextures.MC_BUTTON, GuiTextures.MC_BUTTON_HOVERED, Color.WHITE.main, Color.WHITE.main, true,
                 GuiTextures.MC_BUTTON_DISABLED, IDrawable.NONE, Color.WHITE.main, Color.WHITE.main, true), WidgetThemeSelectable::new);

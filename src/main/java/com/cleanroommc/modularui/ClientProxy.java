@@ -2,12 +2,12 @@ package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.animation.AnimatorManager;
 import com.cleanroommc.modularui.api.widget.ResizeDragArea;
+import com.cleanroommc.modularui.core.mixins.early.forge.ForgeHooksClientMixin;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
-import com.cleanroommc.modularui.core.mixins.early.forge.ForgeHooksClientMixin;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.EventHandler;
@@ -24,7 +24,6 @@ import net.minecraft.util.Timer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
-
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -34,6 +33,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Keyboard;

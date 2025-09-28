@@ -4,9 +4,11 @@ import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Interpolation;
+
+import net.minecraft.util.MathHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.MathHelper;
+
 import org.jetbrains.annotations.Nullable;
 
 public abstract class ScrollData {
@@ -15,7 +17,7 @@ public abstract class ScrollData {
      * Creates scroll data which handles scrolling and scroll bar. Scrollbar is 4 pixel thick
      * and will be at the end of the cross axis (bottom/right).
      *
-     * @param axis      axis on which to scroll
+     * @param axis axis on which to scroll
      * @return new scroll data
      */
     public static ScrollData of(GuiAxis axis) {

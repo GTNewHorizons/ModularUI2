@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.world.World;
 
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;

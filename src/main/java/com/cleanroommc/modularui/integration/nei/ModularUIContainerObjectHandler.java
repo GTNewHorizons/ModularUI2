@@ -1,11 +1,12 @@
 package com.cleanroommc.modularui.integration.nei;
 
-import codechicken.nei.guihook.IContainerObjectHandler;
-
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+
+import codechicken.nei.guihook.IContainerObjectHandler;
 
 public class ModularUIContainerObjectHandler implements IContainerObjectHandler {
 

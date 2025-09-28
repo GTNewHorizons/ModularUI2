@@ -3,10 +3,10 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.world.World;
 
 import com.google.common.collect.AbstractIterator;
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;

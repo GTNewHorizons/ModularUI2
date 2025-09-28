@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
-import com.cleanroommc.modularui.widget.WidgetTree;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +16,7 @@ import java.util.function.Supplier;
  * Such a sync handler must be supplied or else this widget has no effect.
  * The dynamic child can be a widget tree of any size which can also contain {@link SyncHandler}s. These sync handlers MUST be registered
  * via {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#getOrCreateSyncHandler(String, Class, Supplier)}
+ *
  * @param <W>
  */
 public class DynamicSyncedWidget<W extends DynamicSyncedWidget<W>> extends Widget<W> {

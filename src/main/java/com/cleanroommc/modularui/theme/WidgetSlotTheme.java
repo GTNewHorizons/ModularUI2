@@ -21,9 +21,9 @@ public class WidgetSlotTheme extends WidgetTheme {
     public WidgetSlotTheme(IDrawable background, int slotHoverColor, boolean useCustomSlotTextures, IDrawable inventory, IDrawable hotbar) {
         super(background, null, Color.WHITE.main, 0xFF404040, false);
         this.slotHoverColor = slotHoverColor;
-        this.useCustomSlotTextures=useCustomSlotTextures;
-        this.inventorySlotBackground=inventory;
-        this.hotbarSlotBackground=hotbar;
+        this.useCustomSlotTextures = useCustomSlotTextures;
+        this.inventorySlotBackground = inventory;
+        this.hotbarSlotBackground = hotbar;
     }
 
     public WidgetSlotTheme(WidgetTheme parent, JsonObject json, JsonObject fallback) {
@@ -37,7 +37,10 @@ public class WidgetSlotTheme extends WidgetTheme {
     public int getSlotHoverColor() {
         return this.slotHoverColor;
     }
+
     public boolean getUseCustomSlotTextures() {return this.useCustomSlotTextures;}
+
     public IDrawable getInventorySlotBackground() {return this.inventorySlotBackground;}
+
     public IDrawable getHotbarSlotBackground() {return this.hotbarSlotBackground;}
 }

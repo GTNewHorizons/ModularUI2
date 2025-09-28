@@ -175,6 +175,6 @@ public class Platform {
         POS_NORMAL,
         POS_TEX_NORMAL,
         POS_TEX_COLOR_NORMAL,
-        POS_TEX_LMAP_COLOR;
+        POS_TEX_LMAP_COLOR
     }
 }

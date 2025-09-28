@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
+
 import net.minecraft.util.MathHelper;
 
 import java.util.function.DoubleSupplier;

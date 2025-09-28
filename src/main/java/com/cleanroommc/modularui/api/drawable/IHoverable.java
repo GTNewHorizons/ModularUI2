@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.screen.RichTooltip;
-
 import com.cleanroommc.modularui.widget.sizer.Area;
 
 import org.jetbrains.annotations.ApiStatus;

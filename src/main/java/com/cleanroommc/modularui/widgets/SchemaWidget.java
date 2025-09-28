@@ -11,6 +11,7 @@ import com.cleanroommc.modularui.utils.fakeworld.SchemaRenderer;
 import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.util.MathHelper;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.util.vector.Vector3f;

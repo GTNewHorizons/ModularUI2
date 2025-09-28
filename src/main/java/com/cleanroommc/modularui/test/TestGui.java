@@ -51,15 +51,15 @@ public class TestGui extends CustomModularScreen {
         for (String line : this.lines) {
             items.put(line, new SortableListWidget.Item<>(line)
                     .child(item -> new Row()
-                    .child(new Widget<>()
-                            .addTooltipLine(line)
-                            .widgetTheme(IThemeApi.BUTTON)
-                            .overlay(IKey.str(line))
-                            .expanded().heightRel(1f))
-                    .child(new ButtonWidget<>()
-                            .onMousePressed(button -> item.removeSelfFromList())
-                            .overlay(GuiTextures.CROSS_TINY.asIcon().size(10))
-                            .width(10).heightRel(1f))));
+                            .child(new Widget<>()
+                                    .addTooltipLine(line)
+                                    .widgetTheme(IThemeApi.BUTTON)
+                                    .overlay(IKey.str(line))
+                                    .expanded().heightRel(1f))
+                            .child(new ButtonWidget<>()
+                                    .onMousePressed(button -> item.removeSelfFromList())
+                                    .overlay(GuiTextures.CROSS_TINY.asIcon().size(10))
+                                    .width(10).heightRel(1f))));
         }
         SortableListWidget<String> sortableListWidget = new SortableListWidget<String>()
                 .children(configuredOptions, items::get)

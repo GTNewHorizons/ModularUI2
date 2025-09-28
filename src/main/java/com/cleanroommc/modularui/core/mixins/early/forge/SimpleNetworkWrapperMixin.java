@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.core.mixins.early.forge;
 
+import net.minecraft.network.INetHandler;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.SimpleChannelHandlerWrapper;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
+
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import net.minecraft.network.INetHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,8 +27,7 @@ public abstract class SimpleNetworkWrapperMixin {
             defaultChannelPipeline = Class.forName("io.netty.channel.DefaultChannelPipeline");
             generateName = defaultChannelPipeline.getDeclaredMethod("generateName", ChannelHandler.class);
             generateName.setAccessible(true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -57,9 +57,8 @@ public abstract class SimpleNetworkWrapperMixin {
 
     private String generateName(ChannelPipeline pipeline, ChannelHandler handler) {
         try {
-            return (String)generateName.invoke(defaultChannelPipeline.cast(pipeline), handler);
-        }
-        catch (Exception e) {
+            return (String) generateName.invoke(defaultChannelPipeline.cast(pipeline), handler);
+        } catch (Exception e) {
             throw new RuntimeException("It appears we somehow have a not-standard pipeline. Huh", e);
         }
     }

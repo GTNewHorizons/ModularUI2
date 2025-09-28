@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.theme.WidgetSlotTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.ParentWidget;
@@ -38,22 +37,22 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         return widget;
     }
 
-        /**
-         * Automatically creates and places the player inventory.
-         *
-         * @return player inventory group
-         */
+    /**
+     * Automatically creates and places the player inventory.
+     *
+     * @return player inventory group
+     */
     public static SlotGroupWidget playerInventory(SlotConsumer slotConsumer) {
         SlotGroupWidget slotGroupWidget = new SlotGroupWidget();
         slotGroupWidget.coverChildren();
         slotGroupWidget.debugName("player_inventory");
         String key = "player";
         for (int i = 0; i < 9; i++) {
-            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot()
-                    { // TODO: what da heeeell
+            slotGroupWidget.child(slotConsumer.apply(i, new ItemSlot() { // TODO: what da heeeell
                         @Override
                         public @Nullable IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
-                            if(widgetTheme instanceof WidgetSlotTheme slotTheme&& slotTheme.getUseCustomSlotTextures()) return slotTheme.getInventorySlotBackground();
+                            if (widgetTheme instanceof WidgetSlotTheme slotTheme && slotTheme.getUseCustomSlotTextures())
+                                return slotTheme.getInventorySlotBackground();
                             else return super.getCurrentBackground(theme, widgetTheme);
                         }
                     })
@@ -62,11 +61,11 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
                     .debugName("slot_" + i));
         }
         for (int i = 0; i < 27; i++) {
-            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot()
-                    {
+            slotGroupWidget.child(slotConsumer.apply(i + 9, new ItemSlot() {
                         @Override
                         public @Nullable IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
-                            if(widgetTheme instanceof WidgetSlotTheme slotTheme&& slotTheme.getUseCustomSlotTextures()) return slotTheme.getHotbarSlotBackground();
+                            if (widgetTheme instanceof WidgetSlotTheme slotTheme && slotTheme.getUseCustomSlotTextures())
+                                return slotTheme.getHotbarSlotBackground();
                             else return super.getCurrentBackground(theme, widgetTheme);
                         }
                     })
@@ -78,6 +77,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
     }
 
     public interface SlotConsumer {
+
         ItemSlot apply(int index, ItemSlot slot);
     }
 

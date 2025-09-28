@@ -1,10 +1,13 @@
 package com.cleanroommc.modularui.drawable.text;
 
-import com.cleanroommc.modularui.api.drawable.*;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.drawable.IIcon;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
+import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-
 import com.cleanroommc.modularui.utils.TooltipLines;
 
 import net.minecraft.client.gui.FontRenderer;

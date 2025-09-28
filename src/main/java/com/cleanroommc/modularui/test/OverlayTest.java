@@ -2,8 +2,8 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.overlay.OverlayHandler;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.screen.CustomModularScreen;

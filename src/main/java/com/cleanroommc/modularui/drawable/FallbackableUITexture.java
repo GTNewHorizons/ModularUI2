@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
+
 import net.minecraft.client.Minecraft;
 
 import java.io.IOException;

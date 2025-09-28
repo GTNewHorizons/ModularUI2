@@ -12,14 +12,12 @@ import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.block.Block;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -39,15 +37,15 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
     }
 
     public ItemDrawable(@NotNull Item item) {
-         setItem(item);
+        setItem(item);
     }
 
     public ItemDrawable(@NotNull Item item, int meta) {
-         setItem(item, meta);
+        setItem(item, meta);
     }
 
     public ItemDrawable(@NotNull Item item, int meta, int amount) {
-         setItem(item, meta, amount);
+        setItem(item, meta, amount);
     }
 
     public ItemDrawable(@NotNull Item item, int meta, int amount, @Nullable NBTTagCompound nbt) {
@@ -55,11 +53,11 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
     }
 
     public ItemDrawable(@NotNull Block item) {
-         setItem(item);
+        setItem(item);
     }
 
     public ItemDrawable(@NotNull Block item, int meta) {
-         setItem(item, meta);
+        setItem(item, meta);
     }
 
     public ItemDrawable(@NotNull Block item, int meta, int amount) {

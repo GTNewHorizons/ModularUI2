@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.widget.SingleChildWidget;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Interactable {
+
     private static final IKey NONE = IKey.str("None");
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
@@ -61,13 +63,13 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     public DropDownMenu addChoice(ItemSelected onSelect, IDrawable... drawable) {
         DropDownItem item = new DropDownItem();
         return addChoice(index ->
-            item.onMouseReleased(m -> {
-                menu.setOpened(false);
-                menu.setCurrentIndex(index);
-                onSelect.selected(this);
-                return true;
-                })
-            .overlay(drawable));
+                item.onMouseReleased(m -> {
+                            menu.setOpened(false);
+                            menu.setCurrentIndex(index);
+                            onSelect.selected(this);
+                            return true;
+                        })
+                        .overlay(drawable));
     }
 
     public DropDownMenu addChoice(ItemSelected onSelect, String text) {
@@ -108,9 +110,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
 
         int arrowSize = smallerSide / 2;
         if (menu.isOpen()) {
-            arrowOpened.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
+            arrowOpened.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
         } else {
-            arrowClosed.draw(context, area.width - arrowSize , arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
+            arrowClosed.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
         }
     }
 
@@ -142,6 +144,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     private static class DropDownWrapper extends ScrollWidget<DropDownWrapper> {
+
         private DropDownDirection direction = DropDownDirection.DOWN;
         private int maxItemsOnDisplay = 10;
         private final List<IWidget> children = new ArrayList<>();
@@ -197,8 +200,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         @Override
         public DropDownWrapper background(IDrawable... background) {
             for (IWidget child : getChildren()) {
-                if (!(child instanceof Widget<?>)) continue;
-                Widget<?> childAsWidget = (Widget<?>) child;
+                if (!(child instanceof Widget<?> childAsWidget)) continue;
                 childAsWidget.background(background);
             }
             return super.background();
@@ -241,6 +243,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
 
     @FunctionalInterface
     public interface ItemSelected {
+
         void selected(DropDownMenu menu);
     }
 }

@@ -4,12 +4,14 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.NEISettings;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.integration.nei.NEIState;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

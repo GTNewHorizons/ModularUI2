@@ -1,9 +1,9 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
-import com.cleanroommc.modularui.factory.PlayerInventoryGuiFactory;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

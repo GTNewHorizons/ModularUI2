@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.drawable.text.StringKey;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -11,8 +11,6 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
 import net.minecraft.util.EnumChatFormatting;
-
-import org.jetbrains.annotations.Nullable;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +32,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     }
 
     public TextWidget(String key) {
-         this(new StringKey(key));
+        this(new StringKey(key));
     }
 
     @Override

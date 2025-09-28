@@ -1,15 +1,14 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.MCHelper;
-import com.cleanroommc.modularui.screen.NEISettingsImpl;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
+import com.cleanroommc.modularui.screen.NEISettingsImpl;
 import com.cleanroommc.modularui.screen.UISettings;
 
+import net.minecraft.client.gui.GuiScreen;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,8 +63,8 @@ public class ClientGUI {
      * Opens a modular screen on the next client tick with custom NEI settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
-     * @param screen              new modular screen
-     * @param neiSettings         custom NEI settings
+     * @param screen      new modular screen
+     * @param neiSettings custom NEI settings
      * @param container   custom container
      */
     public static void open(@NotNull ModularScreen screen, @NotNull NEISettingsImpl neiSettings, @Nullable Supplier<ModularContainer> container) {

@@ -6,9 +6,9 @@ import com.cleanroommc.modularui.api.MCHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

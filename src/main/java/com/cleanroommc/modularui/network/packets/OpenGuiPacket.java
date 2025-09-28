@@ -1,18 +1,18 @@
 package com.cleanroommc.modularui.network.packets;
 
+import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.GuiManager;
-import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkUtils;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

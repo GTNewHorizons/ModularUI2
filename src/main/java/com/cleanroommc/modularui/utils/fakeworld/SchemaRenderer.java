@@ -40,7 +40,7 @@ public class SchemaRenderer implements IDrawable {
     private Consumer<IRayTracer> onRayTrace;
     private Consumer<Projection> afterRender;
     private BiConsumer<Camera, ISchema> cameraFunc;
-    private int clearColor = 0;
+    private final int clearColor = 0;
     private boolean isometric = false;
 
     public SchemaRenderer(ISchema schema, Framebuffer framebuffer) {

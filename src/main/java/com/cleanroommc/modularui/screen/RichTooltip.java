@@ -6,10 +6,10 @@ import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
@@ -22,9 +22,8 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
-
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -384,7 +383,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
     private static void findIngredientArea(Area area, int x, int y) {
         GuiScreen screen = MCHelper.getCurrentScreen();
         if (screen instanceof GuiContainer guiContainer) {
-            Slot slot = ((GuiContainerAccessor)guiContainer).getHoveredSlot();
+            Slot slot = ((GuiContainerAccessor) guiContainer).getHoveredSlot();
             if (slot != null) {
                 int sx = slot.xDisplayPosition + ((GuiContainerAccessor) guiContainer).getGuiLeft();
                 int sy = slot.yDisplayPosition + ((GuiContainerAccessor) guiContainer).getGuiTop();

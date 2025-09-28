@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.api;
 
-import io.netty.buffer.Unpooled;
-
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 

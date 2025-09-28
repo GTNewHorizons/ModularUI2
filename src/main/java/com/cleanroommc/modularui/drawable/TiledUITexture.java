@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.drawable;
 
-import com.google.gson.JsonObject;
-
 import net.minecraft.util.ResourceLocation;
+
+import com.google.gson.JsonObject;
 
 public class TiledUITexture extends UITexture {
 

@@ -18,7 +18,6 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
 
     private int progress = 0;
 
-
     @Override
     public void reset(boolean atEnd) {
         super.reset(atEnd);

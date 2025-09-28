@@ -5,10 +5,9 @@ import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
-import cpw.mods.fml.relauncher.Side;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
 
 import org.jetbrains.annotations.ApiStatus;
 

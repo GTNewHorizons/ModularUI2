@@ -106,7 +106,7 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
-    public  B toggleButtonSelectedBackground(IDrawable v) {
+    public B toggleButtonSelectedBackground(IDrawable v) {
         mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedBackground", DrawableSerialization.serialize(v)));
         return getThis();
     }
@@ -116,7 +116,7 @@ public class ThemeBuilder<B extends ThemeBuilder<B>> extends JsonBuilder {
         return getThis();
     }
 
-    public  B toggleButtonSelectedHoverBackground(IDrawable v) {
+    public B toggleButtonSelectedHoverBackground(IDrawable v) {
         mergeAdd(IThemeApi.TOGGLE_BUTTON, new JsonBuilder().add("selectedHoverBackground", DrawableSerialization.serialize(v)));
         return getThis();
     }

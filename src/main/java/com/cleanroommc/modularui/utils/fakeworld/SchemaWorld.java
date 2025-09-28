@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
 import com.google.common.collect.AbstractIterator;
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import org.apache.commons.lang3.tuple.MutablePair;

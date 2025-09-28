@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
@@ -9,6 +7,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.google.common.base.Preconditions;
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

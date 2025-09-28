@@ -9,9 +9,10 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
-import com.google.gson.JsonObject;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
+import com.google.gson.JsonObject;
 
 /**
  * A {@link IDrawable} wrapper with a fixed size and an alignment.

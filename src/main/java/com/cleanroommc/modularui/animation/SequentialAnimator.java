@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.animation;
 
-import com.cleanroommc.modularui.ModularUI;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

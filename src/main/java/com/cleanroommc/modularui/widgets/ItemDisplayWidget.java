@@ -58,7 +58,7 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
         return this;
     }
 
-    public ItemDisplayWidget item(ItemStack itemStack) {;
+    public ItemDisplayWidget item(ItemStack itemStack) {
         return item(new ObjectValue<>(itemStack));
     }
 

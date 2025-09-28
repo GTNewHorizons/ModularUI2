@@ -12,13 +12,14 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.text.DecimalFormat;
 import java.awt.geom.Point2D;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TextFieldRenderer extends TextRenderer {
+
     // 1.7.10 only until proper number groupings support
     private static final DecimalFormat INTEGER_FIELD_FORMAT = new DecimalFormat("#");
     private static final char groupingSeparator = INTEGER_FIELD_FORMAT.getDecimalFormatSymbols().getGroupingSeparator();
@@ -168,6 +169,7 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     // 1.7.10 only until proper number groupings support
+
     /**
      * Whether the given character should be ignored for cursor positioning purposes
      */
@@ -207,7 +209,7 @@ public class TextFieldRenderer extends TextRenderer {
                     i++;
                 }
             }
-            if (ignoredChars > 0)         {
+            if (ignoredChars > 0) {
                 sub = sub + text.substring(sub.length(), Math.min(text.length(), cursorPos.x + ignoredChars));
             }
         }

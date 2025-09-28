@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IJsonSerializable;
-import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -11,11 +10,12 @@ import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.ResourceLocation;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 public class UITexture implements IDrawable, IJsonSerializable {
 
@@ -434,7 +434,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
             if (this.mode == Mode.RELATIVE) {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
-                if (this.bl > 0 || this.bt > 0 || this.br > 0|| this.bb > 0) {
+                if (this.bl > 0 || this.bt > 0 || this.br > 0 || this.bb > 0) {
                     return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.canApplyTheme, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
                 }
                 if (this.tiled) {

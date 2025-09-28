@@ -10,7 +10,6 @@ import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.client.Minecraft;
-import org.jetbrains.annotations.NotNull;
 
 import org.jetbrains.annotations.NotNull;
 

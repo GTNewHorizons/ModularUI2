@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.event.MouseInputEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-
 import net.minecraftforge.common.MinecraftForge;
 
 import org.spongepowered.asm.mixin.Mixin;

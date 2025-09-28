@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.integration.nei;
 
 import net.minecraft.item.ItemStack;
+
 import org.jetbrains.annotations.NotNull;
 
 /**

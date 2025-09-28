@@ -1,9 +1,6 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-
-import com.cleanroommc.modularui.network.NetworkHandler;
-
 import com.cleanroommc.modularui.network.NetworkUtils;
 
 import org.apache.logging.log4j.Level;

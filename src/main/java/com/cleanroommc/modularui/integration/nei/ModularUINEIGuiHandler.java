@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.integration.nei;
 
-import codechicken.nei.api.INEIGuiAdapter;
-
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
+
+import codechicken.nei.api.INEIGuiAdapter;
 
 import java.awt.*;
 
