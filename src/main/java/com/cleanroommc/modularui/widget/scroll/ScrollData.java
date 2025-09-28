@@ -4,8 +4,8 @@ import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.MathUtils;
 
-import net.minecraft.util.MathHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -183,7 +183,7 @@ public abstract class ScrollData {
         if (this.scrollSize <= size) {
             this.scroll = 0;
         } else {
-            this.scroll = MathHelper.clamp_int(this.scroll, 0, this.scrollSize - size);
+            this.scroll = MathUtils.clamp(this.scroll, 0, this.scrollSize - size);
         }
         return old != this.scroll; // returns true if the area was clamped
     }

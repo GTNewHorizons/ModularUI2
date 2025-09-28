@@ -23,6 +23,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.utils.GlStateManager;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
@@ -44,7 +45,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -488,7 +488,7 @@ public class ClientScreenHandler {
 
             if (acc.getDraggedStack() != null && acc.getIsRightMouseClick()) {
                 itemstack = itemstack.copy();
-                itemstack.stackSize = MathHelper.ceiling_float_int((float) itemstack.stackSize / 2.0F);
+                itemstack.stackSize = MathUtils.ceil((float) itemstack.stackSize / 2.0F);
             } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().size() > 1) {
                 itemstack = itemstack.copy();
                 itemstack.stackSize = acc.getDragSplittingRemnant();
