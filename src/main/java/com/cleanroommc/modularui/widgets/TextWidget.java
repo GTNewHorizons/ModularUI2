@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.drawable.text.StringKey;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
@@ -32,7 +31,7 @@ public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
     }
 
     public TextWidget(String key) {
-        this(new StringKey(key));
+        this(IKey.str(key));
     }
 
     @Override
