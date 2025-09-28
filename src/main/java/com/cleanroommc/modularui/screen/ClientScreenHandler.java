@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.event.KeyboardInputEvent;
 import com.cleanroommc.modularui.api.event.MouseInputEvent;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
@@ -184,7 +185,7 @@ public class ClientScreenHandler {
         }
         int w = Mouse.getEventDWheel();
         if (w == 0) return;
-        ModularScreen.UpOrDown upOrDown = w > 0 ? ModularScreen.UpOrDown.UP : ModularScreen.UpOrDown.DOWN;
+        UpOrDown upOrDown = w > 0 ? UpOrDown.UP : UpOrDown.DOWN;
         checkGui(event.gui);
         if (doAction(currentScreen, ms -> ms.onMouseScroll(upOrDown, Math.abs(w)))) {
             event.setCanceled(true);
