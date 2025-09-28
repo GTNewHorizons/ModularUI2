@@ -1,10 +1,10 @@
-package com.cleanroommc.modularui.integration.nei;
+package com.cleanroommc.modularui.integration.recipeviewer;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
 import java.util.function.Predicate;
 
-public enum NEIState implements Predicate<ModularScreen> {
+public enum RecipeViewerState implements Predicate<ModularScreen> {
 
     ENABLED {
         @Override

@@ -141,14 +141,14 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.gui.width, event.gui.height), false);
     }
 
-    // before NEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputHigh(KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         inputEvent(event, InputPhase.EARLY);
     }
 
-    // after NEI
+    // after recipe viewer
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onGuiInputLow(KeyboardInputEvent.Pre event) throws IOException {
         inputEvent(event, InputPhase.LATE);
@@ -172,18 +172,13 @@ public class ClientScreenHandler {
         }
     }
 
-    // before NEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
-        // 1.7.10: In contrast to keyboard, MUI should process click first, otherwise ItemSlot causes infinite recursion
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.gui)) {
-            if (ModularUI.Mods.NEI.isLoaded()) {
-                // remove NEI text field focus
-                LayoutManager.searchField.setFocus(false);
-                LayoutManager.quantity.setFocus(false);
-            }
+            Platform.unFocusRecipeViewer();
             event.setCanceled(true);
             return;
         }
@@ -207,13 +202,13 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
-        Platform.setupDrawTex(); // NEI and other mods may expect this state
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.mouseX, event.mouseY, event.renderPartialTicks);
-        Platform.setupDrawTex(); // NEI and other mods may expect this state
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent
@@ -452,7 +447,7 @@ public class ClientScreenHandler {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderHelper.enableGUIStandardItemLighting();
-        if (muiScreen.getContext().getNEISettings().isNEIEnabled(muiScreen)) {
+        if (muiScreen.getContext().getRecipeViewerSettings().isRecipeViewerEnabled(muiScreen)) {
             // Copied from GuiContainerManager#renderObjects but without translation
             for (IContainerDrawHandler drawHandler : GuiContainerManager.drawHandlers) {
                 drawHandler.renderObjects(mcScreen, mouseX, mouseY);
@@ -574,7 +569,7 @@ public class ClientScreenHandler {
         int color = Color.argb(180, 40, 115, 220);
         float scale = 0.80f;
         int shift = (int) (11 * scale + 0.5f);
-        int lineY = screenH - shift - 2 - (!context.getScreen().isOverlay() && context.getNEISettings().isNEIEnabled(muiScreen) ? 20 : 0);
+        int lineY = screenH - shift - 2 - (!context.getScreen().isOverlay() && context.getRecipeViewerSettings().isRecipeViewerEnabled(muiScreen) ? 20 : 0);
         GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, color, true);
         lineY -= shift;
         GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, color, true);

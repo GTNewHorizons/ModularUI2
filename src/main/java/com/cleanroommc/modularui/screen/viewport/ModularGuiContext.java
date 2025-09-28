@@ -12,8 +12,8 @@ import com.cleanroommc.modularui.api.widget.ResizeDragArea;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.NEISettingsImpl;
 import com.cleanroommc.modularui.screen.PanelManager;
+import com.cleanroommc.modularui.screen.RecipeViewerSettingsImpl;
 import com.cleanroommc.modularui.screen.UISettings;
 
 import net.minecraft.client.Minecraft;
@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 
 /**
  * This class contains all the info from {@link GuiContext} and additional MUI specific info like the current {@link ModularScreen},
- * current hovered widget, current dragged widget, current focused widget and NEI settings.
+ * current hovered widget, current dragged widget, current focused widget and recipe viewer settings.
  * An instance can only be obtained from {@link ModularScreen#getContext()}. One instance is created every time a {@link ModularScreen}
  * is created.
  */
@@ -397,11 +397,11 @@ public class ModularGuiContext extends GuiContext {
         return this.settings;
     }
 
-    public NEISettingsImpl getNEISettings() {
+    public RecipeViewerSettingsImpl getRecipeViewerSettings() {
         if (this.screen.isOverlay()) {
-            throw new IllegalStateException("Overlays don't have NEI settings!");
+            throw new IllegalStateException("Overlays don't have recipe viewer settings!");
         }
-        return (NEISettingsImpl) getUISettings().getNEISettings();
+        return (RecipeViewerSettingsImpl) getUISettings().getRecipeViewerSettings();
     }
 
     @ApiStatus.Internal

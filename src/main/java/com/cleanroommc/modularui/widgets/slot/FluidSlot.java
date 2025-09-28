@@ -7,8 +7,8 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
-import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -39,7 +39,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
 
-public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+public class FluidSlot extends Widget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack>, RecipeViewerIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
     public static final String UNIT_BUCKET = "B";
@@ -281,7 +281,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         return this;
     }
 
-    /* === NEI ghost slot === */
+    /* === Recipe viewer ghost slot === */
 
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
@@ -300,7 +300,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     @Override
-    public @Nullable ItemStack getStackForNEI() {
+    public @Nullable ItemStack getStackForRecipeViewer() {
         if (ModularUI.Mods.GT5U.isLoaded()) {
             return GTUtility.getFluidDisplayStack(getFluidStack(), false);
         }

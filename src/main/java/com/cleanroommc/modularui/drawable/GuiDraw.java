@@ -297,7 +297,7 @@ public class GuiDraw {
         GlStateManager.scale(width / 16f, height / 16f, 1);
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
         renderItem.zLevel = z + 100;
-        renderItem.renderItemAndEffectIntoGUI(Platform.getClientPlayer(), Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), item, 0, 0);
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);
         GlStateManager.disableRescaleNormal();
         renderItem.zLevel = 0;

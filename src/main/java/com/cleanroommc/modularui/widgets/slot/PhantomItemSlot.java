@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
-import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
 
-public class PhantomItemSlot extends ItemSlot implements NEIDragAndDropHandler {
+public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngredientSlot<ItemStack> {
 
     private PhantomItemSlotSH syncHandler;
 

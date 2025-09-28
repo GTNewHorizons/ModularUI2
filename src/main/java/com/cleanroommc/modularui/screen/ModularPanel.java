@@ -13,7 +13,8 @@ import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.api.widget.ResizeDragArea;
-import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
+import com.cleanroommc.modularui.integration.nei.NEIUtil;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -22,7 +23,6 @@ import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.ObjectList;
-import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -36,7 +36,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
-import codechicken.nei.ItemPanels;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -259,7 +258,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     @MustBeInvokedByOverriders
     public void onClose() {
         if (!getScreen().isOverlay()) {
-            getContext().getNEISettings().removeNEIExclusionArea(this);
+            getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
         }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
@@ -326,7 +325,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     animateClose();
                     result = true;
                 }
-            } else if (checkNEIGhostIngredient(mouseButton)) {
+            } else if (checkRecipeViewerGhostIngredient(mouseButton)) {
                 return true;
             } else {
                 for (LocatedWidget widget : this.hovering) {
@@ -390,18 +389,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     /**
      * Called on mouse pressed. Similar logic on 1.7.10 and 1.12.2
      */
-    private boolean checkNEIGhostIngredient(int mouseButton) {
+    private boolean checkRecipeViewerGhostIngredient(int mouseButton) {
         // NEI injects GuiContainerManager#mouseClicked at the start of GuiContainer#mouseClicked,
         // so at this point NEI has not handled drag-and-drop yet.
         // Also, we cannot rely on INEIGuiHandler, as root panel will always return true for interaction,
         // and click never gets propagated to NEI.
         if (ModularUI.Mods.NEI.isLoaded()) {
-            ItemStack dndTarget = getNEIDragAndDropTarget();
+            ItemStack dndTarget = NEIUtil.getNEIDragAndDropTarget(getContext());
             if (dndTarget != null) {
                 for (LocatedWidget widget : this.hovering) {
-                    if (widget.getElement() instanceof NEIDragAndDropHandler dndHandler) {
+                    if (widget.getElement() instanceof RecipeViewerGhostIngredientSlot<?> dndHandler) {
                         if (dndHandler.handleDragAndDrop(dndTarget, mouseButton)) {
-                            stopNEIGhostDrag();
+                            NEIUtil.stopNEIGhostDrag();
                             // SUCCESS, except that onMouseTapped should not be fired
                             this.mouse.pressed(widget, mouseButton);
                             this.mouse.doRelease = false;
@@ -417,7 +416,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
                 // no target found -> tell nei to drop the ghost ingredient
                 // stop all further interaction since dropping the ingredient counts as an interaction
-                stopNEIGhostDrag();
+                NEIUtil.stopNEIGhostDrag();
                 this.mouse.pressed(LocatedWidget.EMPTY, mouseButton);
                 this.mouse.doRelease = false;
                 getContext().removeFocus();
@@ -463,7 +462,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
             // nothing worked, but since the pressed widget is still hovered we assume success
-            // otherwise JEI tries to pull some weird shit
+            // otherwise recipe viewer tries to pull some weird shit
             if (lastPressedIsHovered) {
                 this.mouse.reset();
                 return true;
@@ -492,29 +491,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             return true;
         }
         return false;
-    }
-
-    private ItemStack getNEIDragAndDropTarget() {
-        if (getContext().getScreen().isOverlay() || !getContext().getNEISettings().isNEIEnabled(this.screen)) {
-            return null;
-        }
-        if (ItemPanels.itemPanel.draggedStack != null) {
-            return ItemPanels.itemPanel.draggedStack;
-        }
-        if (ItemPanels.bookmarkPanel.draggedStack != null) {
-            return ItemPanels.bookmarkPanel.draggedStack;
-        }
-        return null;
-    }
-
-    private void stopNEIGhostDrag() {
-        // Replicate behavior of PanelWidget#handleDraggedClick
-        if (ItemPanels.itemPanel.draggedStack != null && ItemPanels.itemPanel.draggedStack.stackSize == 0) {
-            ItemPanels.itemPanel.draggedStack = null;
-        }
-        if (ItemPanels.bookmarkPanel.draggedStack != null && ItemPanels.bookmarkPanel.draggedStack.stackSize == 0) {
-            ItemPanels.bookmarkPanel.draggedStack = null;
-        }
     }
 
     public boolean onKeyPressed(char typedChar, int keyCode) {
@@ -583,7 +559,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
             // nothing worked, but since the pressed widget is still hovered we assume success
-            // otherwise JEI tries to pull some weird shit
+            // otherwise recipe viewer tries to pull some weird shit
             if (lastPressedIsHovered) {
                 this.keyboard.reset();
                 return true;
@@ -755,7 +731,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
         if (!context.getScreen().isOverlay()) {
-            context.getNEISettings().addNEIExclusionArea(this);
+            context.getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
         }
     }
 

@@ -8,7 +8,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.NEAAnimationHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -38,7 +38,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, NEIIngredientProvider {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, RecipeViewerIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -261,7 +261,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public @Nullable ItemStack getStackForNEI() {
+    public @Nullable ItemStack getStackForRecipeViewer() {
         return this.syncHandler.getSlot().getStack();
     }
 }

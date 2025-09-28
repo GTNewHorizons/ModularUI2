@@ -1,5 +1,8 @@
 package com.cleanroommc.modularui.utils;
 
+import codechicken.nei.LayoutManager;
+
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.drawable.BufferBuilder;
 
 import net.minecraft.client.Minecraft;
@@ -44,6 +47,14 @@ public class Platform {
 
     public static ItemStack copyStack(ItemStack stack) {
         return isStackEmpty(stack) ? EMPTY_STACK : stack.copy();
+    }
+
+    public static void unFocusRecipeViewer() {
+        if (ModularUI.Mods.NEI.isLoaded()) {
+            // remove NEI text field focus
+            if (LayoutManager.searchField != null) LayoutManager.searchField.setFocus(false);
+            if (LayoutManager.quantity != null) LayoutManager.quantity.setFocus(false);
+        }
     }
 
     public static void startDrawing(DrawMode drawMode, VertexFormat format, Consumer<BufferBuilder> bufferBuilder) {

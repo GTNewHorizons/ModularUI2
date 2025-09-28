@@ -2,7 +2,7 @@ package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
-import com.cleanroommc.modularui.api.NEISettings;
+import com.cleanroommc.modularui.api.RecipeViewerSettings;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.OpenGuiPacket;
@@ -70,7 +70,7 @@ public class GuiManager {
         if (player instanceof FakePlayer || openedContainers.contains(player)) return;
         openedContainers.add(player);
         // create panel, collect sync handlers and create container
-        UISettings settings = new UISettings(NEISettings.DUMMY);
+        UISettings settings = new UISettings(RecipeViewerSettings.DUMMY);
         settings.defaultCanInteractWith(factory, guiData);
         PanelSyncManager syncManager = new PanelSyncManager(false);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);

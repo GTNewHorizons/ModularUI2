@@ -82,7 +82,7 @@ public class HoloUI {
 
         public void open(ModularScreen screen) {
             UISettings settings = new UISettings();
-            settings.getNEISettings().disableNEI();
+            settings.getRecipeViewerSettings().defaultRecipeViewerState();
             screen.getContext().setSettings(settings);
             HoloScreenEntity holoScreenEntity = new HoloScreenEntity(Minecraft.getMinecraft().theWorld, this.plane3D);
             holoScreenEntity.setPosition(this.x, this.y, this.z);
