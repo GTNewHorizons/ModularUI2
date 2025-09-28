@@ -34,12 +34,11 @@ public class ModularUIContainerObjectHandler implements IContainerObjectHandler 
 
     @Override
     public boolean objectUnderMouse(GuiContainer gui, int mousex, int mousey) {
-        // TODO
-        return false;
+        return gui instanceof IMuiScreen muiScreen && muiScreen.getScreen().getContext().isHovered();
     }
 
     @Override
     public boolean shouldShowTooltip(GuiContainer gui) {
-        return true;
+        return !(gui instanceof IMuiScreen muiScreen) || !muiScreen.getScreen().getContext().hasDraggable();
     }
 }
