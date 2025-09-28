@@ -1,5 +1,5 @@
 {
-  "package": "com.cleanroommc.modularui.core.mixin.jei",
+  "package": "com.cleanroommc.modularui.core.mixins.jei",
   "refmap": "mixins.modularui.refmap.json",
   "target": "@env(DEFAULT)",
   "minVersion": "0.8",
@@ -8,7 +8,7 @@
   ],
   "mixins": [
     "GhostIngredientDragManagerAccessor",
-    "IngredientGridMixin",
-    "IngredientListOverlayAccessor"
+    "com.cleanroommc.modularui.core.mixin.early.minecraft.jei.IngredientGridMixin",
+    "com.cleanroommc.modularui.core.mixin.early.minecraft.jei.IngredientListOverlayAccessor"
   ]
 }

@@ -1,14 +1,12 @@
 package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.neverenoughanimations.api.IAnimatedScreen;
-
-import com.cleanroommc.modularui.utils.Platform;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -17,9 +15,6 @@ import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 

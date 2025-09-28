@@ -1,31 +1,18 @@
-package com.cleanroommc.modularui.mixins.early.minecraft;
+package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
-import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.event.KeyboardInputEvent;
 import com.cleanroommc.modularui.api.event.MouseInputEvent;
 
-import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.utils.Platform;
-
-import com.llamalad7.mixinextras.sugar.Local;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(GuiScreen.class)
 public abstract class GuiScreenMixin {

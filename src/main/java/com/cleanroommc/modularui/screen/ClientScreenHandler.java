@@ -15,7 +15,7 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;

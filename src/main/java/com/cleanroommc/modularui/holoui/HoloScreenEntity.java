@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.mixins.early.minecraft.EntityAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.EntityAccessor;
 import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;

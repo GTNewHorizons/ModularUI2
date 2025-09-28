@@ -7,9 +7,8 @@ import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
-import com.cleanroommc.modularui.mixins.early.forge.ForgeHooksClientMixin;
+import com.cleanroommc.modularui.core.mixins.early.forge.ForgeHooksClientMixin;
 import com.cleanroommc.modularui.overlay.OverlayManager;
-import com.cleanroommc.modularui.keybind.KeyBindHandler;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.OverlayTest;
@@ -24,7 +23,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.Timer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 
 import cpw.mods.fml.client.registry.ClientRegistry;

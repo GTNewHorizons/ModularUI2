@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
@@ -10,7 +9,7 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;

@@ -1,6 +1,6 @@
-package com.cleanroommc.modularui.mixins.late.thaumcraft;
+package com.cleanroommc.modularui.core.mixins.late.thaumcraft;
 
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;

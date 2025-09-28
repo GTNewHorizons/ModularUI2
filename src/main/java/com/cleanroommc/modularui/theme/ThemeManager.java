@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.drawable.FallbackableUITexture;
-import com.cleanroommc.modularui.mixins.early.minecraft.SimpleResourceAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.SimpleResourceAccessor;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.*;
@@ -23,7 +23,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.objects.*;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;

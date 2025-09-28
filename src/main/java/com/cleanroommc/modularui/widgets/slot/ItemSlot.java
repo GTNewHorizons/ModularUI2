@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.NEAAnimationHandler;
@@ -22,8 +22,6 @@ import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
-
-import com.cleanroommc.neverenoughanimations.animations.ItemMoveAnimation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -212,7 +210,6 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                     int k = Math.min(itemstack.getMaxStackSize(), slotIn.getSlotStackLimit());
 
                     if (itemstack.stackSize > k) {
-                    if (itemstack.getCount() > k) {
                         amount = k;
                         format = EnumChatFormatting.YELLOW.toString();
                         itemstack.stackSize = k;

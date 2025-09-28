@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixinplugin;
+package com.cleanroommc.modularui.core.mixinplugin;
 
 import com.gtnewhorizon.gtnhmixins.builders.ITargetMod;
 import com.gtnewhorizon.gtnhmixins.builders.TargetModBuilder;

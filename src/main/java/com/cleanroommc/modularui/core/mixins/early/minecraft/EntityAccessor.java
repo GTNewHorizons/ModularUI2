@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixins.early.minecraft;
+package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;

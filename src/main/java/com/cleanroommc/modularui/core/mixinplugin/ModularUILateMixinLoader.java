@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixinplugin;
+package com.cleanroommc.modularui.core.mixinplugin;
 
 import com.gtnewhorizon.gtnhmixins.ILateMixinLoader;
 import com.gtnewhorizon.gtnhmixins.LateMixin;

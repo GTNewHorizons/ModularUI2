@@ -1,4 +1,4 @@
-package com.cleanroommc.modularui.mixins.early.minecraft;
+package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
 import net.minecraft.client.resources.SimpleResource;
 import net.minecraft.util.ResourceLocation;

@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.core;
 
-import com.cleanroommc.modularui.mixinplugin.Mixins;
+import com.cleanroommc.modularui.core.mixinplugin.Mixins;
 
 import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
