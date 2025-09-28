@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.FluidStack;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 import gregtech.common.items.ItemFluidDisplay;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,11 +31,11 @@ public class MCHelper {
         return getMc() != null;
     }
 
-    public static Minecraft getMc() {
+    public static @Nullable Minecraft getMc() {
         return Minecraft.getMinecraft();
     }
 
-    public static EntityPlayerSP getPlayer() {
+    public static @Nullable EntityPlayerSP getPlayer() {
         if (hasMc()) {
             return getMc().thePlayer;
         }
@@ -43,7 +44,7 @@ public class MCHelper {
 
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayerSP player = getPlayer();
         if (player != null) {
             player.closeScreen();
             return true;

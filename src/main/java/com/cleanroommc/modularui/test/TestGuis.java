@@ -242,12 +242,12 @@ public class TestGuis extends CustomModularScreen {
         world.addBlock(new BlockPos(1, 0, 1), new BlockInfo(Blocks.GOLD_BLOCK.getDefaultState()));*/
 /*        return ModularPanel.defaultPanel("main")
                 .size(150)
-                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Minecraft.getMinecraft().player), 5))
+                .overlay(new SchemaRenderer(BoxSchema.of(Minecraft.getMinecraft().world, new BlockPos(Platform.getClientPlayer()), 5))
                         .cameraFunc((camera, schema) -> {
                             double pitch = Math.PI / 4;
                             double T = 4000D;
                             double yaw = Minecraft.getSystemTime() % T / T * Math.PI * 2;
-                            camera.setLookAt(new BlockPos(Minecraft.getMinecraft().player), 20, yaw, pitch);
+                            camera.setLookAt(new BlockPos(Platform.getClientPlayer()), 20, yaw, pitch);
                         })
                         .isometric(true)
                         .asIcon().size(140));*/

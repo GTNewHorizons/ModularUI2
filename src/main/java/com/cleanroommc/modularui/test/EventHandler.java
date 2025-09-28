@@ -34,9 +34,9 @@ public class EventHandler {
     public void onItemUse(PlayerInteractEvent event) {
         ItemStack heldItem = event.entityPlayer.getHeldItem();
         if (event.entityPlayer.getEntityWorld().isRemote && heldItem != null && heldItem.getItem() == Items.diamond) {
-            //GuiManager.openClientUI(Minecraft.getMinecraft().player, new TestGui());
+            //GuiManager.openClientUI(Platform.getClientPlayer(), new TestGui());
             /*HoloUI.builder()
-                    .inFrontOf(Minecraft.getMinecraft().thePlayer, 5, false)
+                    .inFrontOf(Platform.getClientPlayer(), 5, false)
                     .screenScale(0.5f)
                     .open(new TestGui());*/
             //ClientGUI.open(new ResizerTest());

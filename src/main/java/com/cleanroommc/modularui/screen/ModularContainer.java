@@ -23,6 +23,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,14 +97,7 @@ public class ModularContainer extends Container {
         return (ContainerAccessor) this;
     }
 
-    @Override
-    public void addCraftingToCrafters(ICrafting player) {
-        super.addCraftingToCrafters(player);
-        if (this.syncManager != null) {
-            this.syncManager.onOpen();
-        }
-    }
-
+    @MustBeInvokedByOverriders
     @Override
     public void onContainerClosed(@NotNull EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
@@ -112,6 +106,7 @@ public class ModularContainer extends Container {
         }
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
