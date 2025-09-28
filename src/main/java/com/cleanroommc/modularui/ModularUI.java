@@ -41,7 +41,8 @@ public class ModularUI {
     @Mod.Instance
     public static ModularUI INSTANCE;
 
-    public static final boolean isDevEnv = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+    public static final boolean isTestEnv = Launch.blackboard == null;
+    public static final boolean isDevEnv = isTestEnv || (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     static {
         // confirm mXparser license
