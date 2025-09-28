@@ -18,6 +18,7 @@ import com.cleanroommc.modularui.screen.UISettings;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -36,12 +37,10 @@ import java.util.function.Consumer;
  */
 public class ModularGuiContext extends GuiContext {
 
-    /* GUI elements */
-    @Deprecated
-    public final ModularScreen screen;
+    private final ModularScreen screen;
+    private @Nullable GuiScreen parent;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
-    @Nullable
-    private LocatedWidget hovered;
+    private @Nullable LocatedWidget hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
@@ -61,6 +60,18 @@ public class ModularGuiContext extends GuiContext {
 
     public ModularScreen getScreen() {
         return screen;
+    }
+
+    /**
+     * @return the screen that was open before when this screen was opened or null of none was open
+     */
+    public @Nullable GuiScreen getParentScreen() {
+        return parent;
+    }
+
+    @ApiStatus.Internal
+    public void setParentScreen(@Nullable GuiScreen parent) {
+        this.parent = parent;
     }
 
     /**

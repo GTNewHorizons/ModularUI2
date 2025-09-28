@@ -120,6 +120,7 @@ public class ClientScreenHandler {
                     lastChar = null;
                 }
                 currentScreen = muiScreen.getScreen();
+                currentScreen.getContext().setParentScreen(Minecraft.getMinecraft().currentScreen);
                 fpsCounter.reset();
             }
         } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {

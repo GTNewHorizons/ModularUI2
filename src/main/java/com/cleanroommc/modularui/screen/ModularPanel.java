@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
@@ -32,6 +33,7 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import codechicken.nei.ItemPanels;
@@ -129,7 +131,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         closeSubPanels();
         if (isMainPanel()) {
             // close screen and let NEA animation
-            Platform.getClientPlayer().closeScreen();
+            EntityPlayer player = MCHelper.getPlayer();
+            if (player != null) {
+                player.closeScreen();
+            } else {
+                // we are currently not in a world and want to display the previous screen
+                Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
+            }
             return;
         }
         if (!shouldAnimate()) {
