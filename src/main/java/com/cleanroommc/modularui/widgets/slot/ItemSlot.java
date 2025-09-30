@@ -240,6 +240,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
                 GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack);
                 GlStateManager.disableRescaleNormal();
+                Platform.endDrawItem();
 
                 if (amount < 0) {
                     amount = itemstack.stackSize;
@@ -253,6 +254,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 NEAAnimationHandler.endHoverScale();
                 itemstack.stackSize = cachedCount;
                 GlStateManager.disableDepth();
+                GlStateManager.disableLighting();
             }
         }
 

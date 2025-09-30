@@ -301,7 +301,7 @@ public class GuiDraw {
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);
         GlStateManager.disableRescaleNormal();
         renderItem.zLevel = 0;
-        GlStateManager.disableDepth();
+        Platform.endDrawItem();
         GlStateManager.popMatrix();
     }
 
@@ -346,8 +346,6 @@ public class GuiDraw {
             textRenderer.setAlignment(alignment, width, height);
             textRenderer.setPos(x, y);
             textRenderer.setHardWrapOnBorder(false);
-            GlStateManager.disableLighting();
-            GlStateManager.disableDepth();
             textRenderer.draw(amountText);
             textRenderer.setHardWrapOnBorder(true);
         }
