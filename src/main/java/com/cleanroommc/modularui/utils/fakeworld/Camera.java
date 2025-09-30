@@ -3,10 +3,8 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Vector3f;
 
-import net.minecraft.util.math.MathHelper;
-
-import org.joml.Vector3i;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3i;
 
 public class Camera {
 
@@ -77,7 +75,7 @@ public class Camera {
     }
 
     public Camera setLookAtAndAngle(Vector3i lookAt, float radius, float yaw, float pitch) {
-        return setLookAtAndAngle(lookAt.getX(), lookAt.getY(), lookAt.getZ(), radius, yaw, pitch);
+        return setLookAtAndAngle(lookAt.x, lookAt.y, lookAt.z, radius, yaw, pitch);
     }
 
     public Camera setLookAtAndAngle(float lookAtX, float lookAtY, float lookAtZ, float dist, float yaw, float pitch) {
@@ -86,7 +84,7 @@ public class Camera {
         this.pitch = pitch;
         this.dist = dist;
         Vector3f v = this.temp;
-        v.set(MathHelper.cos(yaw), 0, MathHelper.sin(yaw));
+        v.set(MathUtils.cos(yaw), 0, MathUtils.sin(yaw));
         v.y = MathUtils.tan(pitch) * v.length();
         v.normalise().scale(dist);
         this.pos.set(v.translate(lookAtX, lookAtY, lookAtZ));

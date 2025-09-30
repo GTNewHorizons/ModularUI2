@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.utils.fakeworld;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -30,18 +31,20 @@ public class BlockInfo {
         TileEntity tile = null;
         if (block.hasTileEntity(blockMeta)) {
             TileEntity realTile = world.getTileEntity(pos.x, pos.y, pos.z);
-            tile = fixRealTileWorldCorrupting(realTile, blockState);
+            tile = fixRealTileWorldCorrupting(realTile, block, blockMeta);
         }
         return new BlockInfo(block, blockMeta, tile);
     }
 
     @Nullable
-    private static TileEntity fixRealTileWorldCorrupting(TileEntity realTile, IBlockState blockState) {
+    private static TileEntity fixRealTileWorldCorrupting(TileEntity realTile, Block block, int meta) {
         TileEntity fakeTile = null;
         if (realTile != null) {
-            fakeTile = blockState.getBlock().createTileEntity(null, blockState);
+            fakeTile = block.createTileEntity(null, meta);
             if (fakeTile != null) {
-                fakeTile.deserializeNBT(realTile.serializeNBT());
+                NBTTagCompound nbt = new NBTTagCompound();
+                realTile.writeToNBT(nbt);
+                fakeTile.readFromNBT(nbt);
             }
         }
         return fakeTile;

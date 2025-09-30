@@ -54,7 +54,7 @@ public class BlockPosUtil {
     }
 
     public static Vector3d getCenterD(BlockPos origin, int xs, int ys, int zs) {
-        return new Vector3d(xs / 2.0 + origin.getX(), ys / 2.0 + origin.getY(), zs / 2.0 + origin.getz());
+        return new Vector3d(xs / 2.0 + origin.getX(), ys / 2.0 + origin.getY(), zs / 2.0 + origin.getZ());
     }
 
     public static Iterable<BlockPos> getAllInside(BlockPos p1, BlockPos p2, boolean includeBorder) {

@@ -14,9 +14,14 @@ import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.util.MovingObjectPosition;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 
+/**
+ * Schema renderer not working due to framebuffer issues
+ */
+@ApiStatus.Experimental
 public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
     public static final float PI = (float) Math.PI;
@@ -99,7 +104,6 @@ public class SchemaWidget extends Widget<SchemaWidget> implements Interactable {
 
     public SchemaWidget pitch(float pitch) {
         this.pitch = MathUtils.clamp(pitch, -PI_HALF + 0.001f, PI_HALF - 0.001f);
-        ;
         return this;
     }
 

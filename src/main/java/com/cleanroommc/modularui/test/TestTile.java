@@ -189,9 +189,9 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                         .child(new PageButton(3, tabController)
                                 .tab(GuiTextures.TAB_TOP, 0)
                                 .overlay(new ItemDrawable(Blocks.chest).asIcon()))
-                        .child(new PageButton(4, tabController)
+                        /*.child(new PageButton(4, tabController) // schema renderer not working
                                 .tab(GuiTextures.TAB_TOP, 0)
-                                .overlay(new ItemDrawable(Items.ender_eye).asIcon())))
+                                .overlay(new ItemDrawable(Items.ender_eye).asIcon()))*/)
                 .child(new Expandable()
                         .debugName("expandable")
                         .top(0)
@@ -463,7 +463,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                 .widthRel(1f)
                                                                 .syncHandler(dynamicSyncHandler)))
                                         )
-                                        .addPage(createSchemaPage(guiData))))
+                                        //.addPage(createSchemaPage(guiData)) // schema renderer not working
+                                ))
                         .child(SlotGroupWidget.playerInventory(false))
                 );
         /*panel.child(new ButtonWidget<>()
@@ -485,7 +486,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         page.sizeRel(1f);
         page.child(IKey.str("schema").asWidget());
         if (worldObj.isRemote)
-            page.child(new SchemaWidget(new SchemaRenderer(ArraySchema.of(data.getPlayer(), 5))
+            page.child(new SchemaWidget(new SchemaRenderer(ArraySchema.builder().layer("a").where('a', Blocks.diamond_ore).build())
                     .highlightRenderer(new BlockHighlight(Color.withAlpha(Color.GREEN.brighter(1), 0.9f), 1/32f)))
                     .pos(20, 20)
                     .size(100, 100));

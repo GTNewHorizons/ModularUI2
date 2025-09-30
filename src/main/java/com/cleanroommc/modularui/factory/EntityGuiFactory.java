@@ -29,7 +29,7 @@ public class EntityGuiFactory extends AbstractUIFactory<EntityGuiData> {
         Objects.requireNonNull(entity);
         if (!entity.isEntityAlive()) {
             throw new IllegalArgumentException("Can't open dead Entity GUI!");
-        } else if (player.world != entity.world) {
+        } else if (player.worldObj != entity.worldObj) {
             throw new IllegalArgumentException("Entity must be in same dimension as the player!");
         }
     }
@@ -46,7 +46,7 @@ public class EntityGuiFactory extends AbstractUIFactory<EntityGuiData> {
 
     @Override
     public @NotNull EntityGuiData readGuiData(EntityPlayer entityPlayer, PacketBuffer packetBuffer) {
-        return new EntityGuiData(entityPlayer, entityPlayer.world.getEntityByID(packetBuffer.readInt()));
+        return new EntityGuiData(entityPlayer, entityPlayer.worldObj.getEntityByID(packetBuffer.readInt()));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class EntityGuiFactory extends AbstractUIFactory<EntityGuiData> {
         return super.canInteractWith(player, guiData) &&
                 guiHolder != null &&
                 player.getDistanceSq(guiHolder.posX, guiHolder.posY, guiHolder.posZ) <= 64 &&
-                player.world == guiHolder.world &&
+                player.worldObj == guiHolder.worldObj &&
                 guiHolder.isEntityAlive();
     }
 }

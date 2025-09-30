@@ -78,7 +78,7 @@ public class ArraySchema implements ISchema {
         this.blocks = blocks;
         this.world = new DummyWorld();
         BlockPos current = new BlockPos();
-        BlockPos max = new BlockPos(BlockPosUtil.MIN.x, BlockPosUtil.MIN.y, BlockPosUtil.MAX.z);
+        BlockPos max = new BlockPos(BlockPosUtil.MIN.x, BlockPosUtil.MIN.y, BlockPosUtil.MIN.z);
         for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[x].length; y++) {
                 for (int z = 0; z < blocks[x][y].length; z++) {
