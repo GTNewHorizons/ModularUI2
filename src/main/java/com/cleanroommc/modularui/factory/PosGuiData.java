@@ -19,10 +19,6 @@ public class PosGuiData extends GuiData {
         this.z = z;
     }
 
-    public World getWorld() {
-        return getPlayer().worldObj;
-    }
-
     public int getX() {
         return this.x;
     }

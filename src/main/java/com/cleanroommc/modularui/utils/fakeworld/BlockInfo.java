@@ -29,9 +29,22 @@ public class BlockInfo {
         }
         TileEntity tile = null;
         if (block.hasTileEntity(blockMeta)) {
-            tile = world.getTileEntity(pos.x, pos.y, pos.z);
+            TileEntity realTile = world.getTileEntity(pos.x, pos.y, pos.z);
+            tile = fixRealTileWorldCorrupting(realTile, blockState);
         }
         return new BlockInfo(block, blockMeta, tile);
+    }
+
+    @Nullable
+    private static TileEntity fixRealTileWorldCorrupting(TileEntity realTile, IBlockState blockState) {
+        TileEntity fakeTile = null;
+        if (realTile != null) {
+            fakeTile = blockState.getBlock().createTileEntity(null, blockState);
+            if (fakeTile != null) {
+                fakeTile.deserializeNBT(realTile.serializeNBT());
+            }
+        }
+        return fakeTile;
     }
 
     private Block block;
