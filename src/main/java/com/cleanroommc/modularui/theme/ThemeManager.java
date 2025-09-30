@@ -31,19 +31,22 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @ApiStatus.Internal
 @SideOnly(Side.CLIENT)
 public class ThemeManager implements IResourceManagerReloadListener {
 
-    protected static final WidgetTheme defaultdefaultWidgetTheme = new WidgetTheme(null, null, Color.WHITE.main, 0xFF404040, false);
+    protected static final WidgetThemeEntry<WidgetTheme> defaultFallbackWidgetTheme = IThemeApi.get().getDefaultTheme().getWidgetTheme(IThemeApi.FALLBACK);
+    private static final JsonObject emptyJson = new JsonObject();
 
     public static void reload() {
         ModularUI.LOGGER.info("Reloading Themes...");
@@ -126,7 +129,7 @@ public class ThemeManager implements IResourceManagerReloadListener {
             iterator = themeMap.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, ThemeJson> entry = iterator.next();
-                if (ThemeAPI.DEFAULT.equals(entry.getValue().parent) || sortedThemes.containsKey(entry.getValue().parent)) {
+                if (ThemeAPI.DEFAULT_ID.equals(entry.getValue().parent) || sortedThemes.containsKey(entry.getValue().parent)) {
                     sortedThemes.put(entry.getKey(), entry.getValue());
                     iterator.remove();
                     changed = true;
@@ -152,7 +155,7 @@ public class ThemeManager implements IResourceManagerReloadListener {
             parents.add(theme);
             ThemeJson parent = theme;
             do {
-                if (ThemeAPI.DEFAULT.equals(parent.parent)) {
+                if (ThemeAPI.DEFAULT_ID.equals(parent.parent)) {
                     break;
                 }
                 parent = themeMap.get(parent.parent);
@@ -275,41 +278,89 @@ public class ThemeManager implements IResourceManagerReloadListener {
             }
 
             // parse fallback theme for widget themes
-            Map<String, WidgetTheme> widgetThemes = new Object2ObjectOpenHashMap<>();
-            WidgetTheme parentWidgetTheme = parent.getFallback();
-            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme, jsonBuilder.getJson(), jsonBuilder.getJson());
-            widgetThemes.put(Theme.FALLBACK, fallback);
+            WidgetThemeMap widgetThemes = new WidgetThemeMap();
+            WidgetThemeEntry<?> parentWidgetTheme = parent.getFallback(); // fallback theme of parent
+            WidgetTheme fallback = new WidgetTheme(parentWidgetTheme.getTheme(), jsonBuilder.getJson(), null); // fallback theme of new theme
+            WidgetTheme fallbackHover = fallback;
+            JsonObject hoverJson = getJson(jsonBuilder.getJson(), IThemeApi.HOVER_SUFFIX);
+            if (hoverJson == null) hoverJson = getJson(jsonBuilder.getJson(), IThemeApi.FALLBACK.getFullName() + IThemeApi.HOVER_SUFFIX);
+            if (hoverJson != null) {
+                fallbackHover = new WidgetTheme(fallback, hoverJson, null);
+            }
+            widgetThemes.putTheme(IThemeApi.FALLBACK, new WidgetThemeEntry<>(IThemeApi.FALLBACK, fallback, fallbackHover));
 
-            // parse all other widget themes
-            JsonObject emptyJson = new JsonObject();
-            for (Map.Entry<String, WidgetThemeParser> entry : ThemeAPI.INSTANCE.widgetThemeFunctions.entrySet()) {
-                JsonObject widgetThemeJson;
-                if (jsonBuilder.getJson().has(entry.getKey())) {
-                    JsonElement element = jsonBuilder.getJson().get(entry.getKey());
-                    if (element.isJsonObject()) {
-                        widgetThemeJson = element.getAsJsonObject();
-                    } else {
-                        widgetThemeJson = emptyJson;
+            // parse all main widget themes
+            for (WidgetThemeKey<?> key : ThemeAPI.INSTANCE.getWidgetThemeKeys()) {
+                if (key != IThemeApi.FALLBACK) {
+                    parse(widgetThemes, parent, key, jsonBuilder);
+                }
+            }
+            return new Theme(this.id, parent, widgetThemes);
+        }
+
+        private <T extends WidgetTheme> void parse(WidgetThemeMap map, ITheme parent, WidgetThemeKey<T> key, JsonBuilder json) {
+            WidgetThemeParser<T> parser = key.getParser();
+            boolean definedInTheme = true;
+            JsonObject widgetThemeJson = getJson(json.getJson(), key.getFullName());
+            if (widgetThemeJson == null) {
+                definedInTheme = false;
+            }
+
+            JsonObject widgetThemeHoverJson = getJson(json.getJson(), key.getFullName() + IThemeApi.HOVER_SUFFIX);
+            if (widgetThemeHoverJson == null) {
+                if (!definedInTheme) {
+                    // widget theme undefined -> copy from parent
+                    if (key.isSubWidgetTheme()) {
+                        // if it is a sub widget theme, we use the parent widget theme from this theme
+                        WidgetThemeEntry<T> entry = map.getTheme(key.getParent());
+                        map.putTheme(key, new WidgetThemeEntry<>(key, entry.getTheme(), entry.getHoverTheme()));
+                        return;
                     }
-                } else {
+                    // we still need to parse not inherited values (fallback)
                     widgetThemeJson = emptyJson;
                 }
-                parentWidgetTheme = parent.getWidgetTheme(entry.getKey());
-                widgetThemes.put(entry.getKey(), entry.getValue().parse(parentWidgetTheme, widgetThemeJson, jsonBuilder.getJson()));
             }
-            Theme theme = new Theme(this.id, parent, widgetThemes);
-            // TODO: bad implementation
-            if (jsonBuilder.getJson().has("openCloseAnimation")) {
-                theme.setOpenCloseAnimationOverride(jsonBuilder.getJson().get("openCloseAnimation").getAsInt());
+
+            JsonObject fallback = key.isSubWidgetTheme() ? null : json.getJson();
+            T widgetTheme = null;
+            if (widgetThemeJson != null) {
+                // widget theme defined
+                T parentWidgetTheme = key.isSubWidgetTheme() ? map.getTheme(key.getParent()).getTheme() : parent.getWidgetTheme(key).getTheme();
+                // sub widget themes strictly only inherit from their parent widget theme and not the parent theme
+                widgetTheme = parser.parse(parentWidgetTheme, widgetThemeJson, fallback);
             }
-            if (jsonBuilder.getJson().has("smoothProgressBar")) {
-                theme.setSmoothProgressBarOverride(jsonBuilder.getJson().get("smoothProgressBar").getAsBoolean());
+
+            T widgetThemeHover = null;
+            if (widgetThemeHoverJson != null) {
+                // hover widget theme defined
+                T parentWidgetTheme = widgetTheme != null ? widgetTheme : parent.getWidgetTheme(key).getHoverTheme();
+                widgetThemeHover = parser.parse(parentWidgetTheme, widgetThemeHoverJson, fallback);
             }
-            if (jsonBuilder.getJson().has("tooltipPos")) {
-                String posName = jsonBuilder.getJson().get("tooltipPos").getAsString();
-                theme.setTooltipPosOverride(RichTooltip.Pos.valueOf(posName));
+
+            if (widgetTheme != null) {
+                if (widgetThemeHover != null) {
+                    map.putTheme(key, new WidgetThemeEntry<>(key, widgetTheme, widgetThemeHover));
+                } else {
+                    map.putTheme(key, new WidgetThemeEntry<>(key, widgetTheme));
+                }
+            } else {
+                map.putTheme(key, new WidgetThemeEntry<>(key, parent.getWidgetTheme(key).getTheme(), widgetThemeHover));
             }
-            return theme;
+        }
+
+        private JsonObject getJson(JsonObject json, String key) {
+            if (json.has(key)) {
+                // theme has widget theme defined
+                JsonElement element = json.get(key);
+                if (element.isJsonObject()) {
+                    // widget theme is a json object
+                    return element.getAsJsonObject();
+                }
+                // incorrect data format
+                ModularUI.LOGGER.warn("WidgetTheme '{}' of theme '{}' with parent '{}' was found to have an incorrect data format.", key, this.id, this.parent);
+            }
+            // theme doesn't have widget theme defined
+            return null;
         }
     }
 }

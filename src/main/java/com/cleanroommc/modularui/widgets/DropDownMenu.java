@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -94,10 +95,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         super.draw(context, widgetTheme);
         Area area = getArea();
         int smallerSide = Math.min(area.width, area.height);
+        WidgetTheme wt = getActiveWidgetTheme(widgetTheme, isHovering());
         if (menu.getSelectedItem() != null) {
             menu.getSelectedItem().setEnabled(true);
             menu.getSelectedItem().drawBackground(context, widgetTheme);
@@ -105,14 +107,14 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             menu.getSelectedItem().drawForeground(context);
             menu.getSelectedItem().drawOverlay(context, widgetTheme);
         } else {
-            NONE.draw(context, 0, 0, area.width, area.height, getWidgetTheme(context.getTheme()));
+            NONE.draw(context, 0, 0, area.width, area.height, wt);
         }
 
         int arrowSize = smallerSide / 2;
         if (menu.isOpen()) {
-            arrowOpened.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
+            arrowOpened.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, wt);
         } else {
-            arrowClosed.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, getWidgetTheme(context.getTheme()));
+            arrowClosed.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, wt);
         }
     }
 
@@ -236,7 +238,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     public static class DropDownItem extends ButtonWidget<DropDownItem> {
 
         @Override
-        public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+        public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
             return theme.getFallback();
         }
     }

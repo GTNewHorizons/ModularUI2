@@ -30,7 +30,7 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     protected final TextFieldHandler handler;
-    protected int markedColor = 0x2F72A8;
+    protected int markedColor = 0xFF2F72A8;
     protected int cursorColor = 0xFFFFFFFF;
     protected boolean renderCursor = false;
     private boolean formatAsInteger = false;

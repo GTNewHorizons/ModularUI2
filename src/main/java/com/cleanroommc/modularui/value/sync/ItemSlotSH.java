@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
+import com.cleanroommc.modularui.widgets.slot.PlayerSlotType;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
@@ -21,11 +23,13 @@ public class ItemSlotSH extends SyncHandler {
     public static final int SYNC_ENABLED = 2;
 
     private final ModularSlot slot;
+    private final PlayerSlotType playerSlotType;
     private ItemStack lastStoredItem;
     private boolean registered = false;
 
     public ItemSlotSH(ModularSlot slot) {
         this.slot = slot;
+        this.playerSlotType = PlayerSlotType.getPlayerSlotType(slot);
     }
 
     @Override
@@ -129,6 +133,14 @@ public class ItemSlotSH extends SyncHandler {
 
     public boolean isPhantom() {
         return false;
+    }
+
+    public @Nullable PlayerSlotType getPlayerSlotType() {
+        return this.playerSlotType;
+    }
+
+    public boolean isPlayerSlot() {
+        return playerSlotType != null;
     }
 
     @Nullable
