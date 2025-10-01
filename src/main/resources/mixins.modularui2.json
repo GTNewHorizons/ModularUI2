@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8.5-GTNH",
-  "package": "com.cleanroommc.modularui.mixins",
+  "package": "com.cleanroommc.modularui.core.mixins",
   "refmap": "mixins.modularui2.refmap.json",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8",

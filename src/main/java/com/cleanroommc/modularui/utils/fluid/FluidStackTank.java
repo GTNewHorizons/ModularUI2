@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.utils.fluid;
 
-import java.util.function.Consumer;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
-
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidTank;
 
+import java.util.function.Consumer;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
+
 public class FluidStackTank implements IFluidTank, IOverflowableTank {
+
     private final Supplier<FluidStack> getter;
     private final Consumer<FluidStack> setter;
     private final IntSupplier capacityGetter;

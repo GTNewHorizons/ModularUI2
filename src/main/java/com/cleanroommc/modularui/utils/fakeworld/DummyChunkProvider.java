@@ -1,10 +1,5 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import com.gtnewhorizon.gtnhlib.util.CoordinatePacker;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.ChunkPosition;
@@ -13,8 +8,10 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
+import com.gtnewhorizon.gtnhlib.util.CoordinatePacker;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,9 +53,7 @@ public class DummyChunkProvider implements IChunkProvider {
     }
 
     @Override
-    public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_) {
-
-    }
+    public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_) {}
 
     @Override
     public boolean saveChunks(boolean p_73151_1_, IProgressUpdate p_73151_2_) {
@@ -91,12 +86,8 @@ public class DummyChunkProvider implements IChunkProvider {
     }
 
     @Override
-    public void recreateStructures(int p_82695_1_, int p_82695_2_) {
-
-    }
+    public void recreateStructures(int p_82695_1_, int p_82695_2_) {}
 
     @Override
-    public void saveExtraData() {
-
-    }
+    public void saveExtraData() {}
 }

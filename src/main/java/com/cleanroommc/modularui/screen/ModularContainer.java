@@ -2,8 +2,8 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.inventory.ClickType;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
-import com.cleanroommc.modularui.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
@@ -12,23 +12,28 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
+// TODO: any changes from 1.12?
 public class ModularContainer extends Container {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
@@ -92,14 +97,7 @@ public class ModularContainer extends Container {
         return (ContainerAccessor) this;
     }
 
-    @Override
-    public void addCraftingToCrafters(ICrafting player) {
-        super.addCraftingToCrafters(player);
-        if (this.syncManager != null) {
-            this.syncManager.onOpen();
-        }
-    }
-
+    @MustBeInvokedByOverriders
     @Override
     public void onContainerClosed(@NotNull EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
@@ -108,6 +106,7 @@ public class ModularContainer extends Container {
         }
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
@@ -115,6 +114,14 @@ public class ModularContainer extends Container {
             this.syncManager.detectAndSendChanges(this.init);
         }
         this.init = false;
+    }
+
+    @ApiStatus.Internal
+    public void onUpdate() {
+        // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
+        if (this.syncManager != null) {
+            this.syncManager.onUpdate();
+        }
     }
 
     private void sortShiftClickSlots() {

@@ -127,7 +127,7 @@ public class InvWrapper implements IItemHandlerModifiable {
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
-        getInv().setInventorySlotContents(slot, stack == null ? null : stack);
+        getInv().setInventorySlotContents(slot, stack);
     }
 
     @Override
