@@ -61,7 +61,7 @@ public class TestGuis extends CustomModularScreen {
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-        return buildToggleGridListUI(context);
+        return buildRichTextUI(context);
     }
 
     public @NotNull ModularPanel buildToggleGridListUI(ModularGuiContext context) {
