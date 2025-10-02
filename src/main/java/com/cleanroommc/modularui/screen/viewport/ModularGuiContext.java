@@ -1,24 +1,12 @@
 package com.cleanroommc.modularui.screen.viewport;
 
-import com.cleanroommc.modularui.ClientProxy;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
-import com.cleanroommc.modularui.api.widget.IDraggable;
-import com.cleanroommc.modularui.api.widget.IFocusedWidget;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
-import com.cleanroommc.modularui.api.widget.IVanillaSlot;
-import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.api.widget.ResizeDragArea;
-import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
-import com.cleanroommc.modularui.screen.ModularPanel;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.PanelManager;
-import com.cleanroommc.modularui.screen.RecipeViewerSettingsImpl;
-import com.cleanroommc.modularui.screen.UISettings;
+import com.cleanroommc.modularui.api.widget.*;
+import com.cleanroommc.modularui.screen.*;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -31,16 +19,18 @@ import java.util.function.Consumer;
 
 /**
  * This class contains all the info from {@link GuiContext} and additional MUI specific info like the current {@link ModularScreen},
- * current hovered widget, current dragged widget, current focused widget and recipe viewer settings.
+ * current hovered widget, current dragged widget, current focused widget and NEI settings.
  * An instance can only be obtained from {@link ModularScreen#getContext()}. One instance is created every time a {@link ModularScreen}
  * is created.
  */
 public class ModularGuiContext extends GuiContext {
 
-    private final ModularScreen screen;
-    private @Nullable GuiScreen parent;
+    /* GUI elements */
+    @Deprecated
+    public final ModularScreen screen;
     private LocatedWidget focusedWidget = LocatedWidget.EMPTY;
-    private @Nullable LocatedWidget hovered;
+    @Nullable
+    private IWidget hovered;
     private int timeHovered = 0;
     private final HoveredIterable hoveredWidgets;
 
@@ -63,18 +53,6 @@ public class ModularGuiContext extends GuiContext {
     }
 
     /**
-     * @return the screen that was open before when this screen was opened or null of none was open
-     */
-    public @Nullable GuiScreen getParentScreen() {
-        return parent;
-    }
-
-    @ApiStatus.Internal
-    public void setParentScreen(@Nullable GuiScreen parent) {
-        this.parent = parent;
-    }
-
-    /**
      * @return true if any widget is being hovered
      */
     public boolean isHovered() {
@@ -85,7 +63,7 @@ public class ModularGuiContext extends GuiContext {
      * @return true if the widget is directly below the mouse
      */
     public boolean isHovered(IGuiElement guiElement) {
-        return isHovered() && getHovered() == guiElement;
+        return isHovered() && this.hovered == guiElement;
     }
 
     /**
@@ -104,7 +82,7 @@ public class ModularGuiContext extends GuiContext {
      */
     @Nullable
     public IWidget getHovered() {
-        return this.hovered != null ? this.hovered.getElement() : null;
+        return this.hovered;
     }
 
     /**
@@ -282,7 +260,7 @@ public class ModularGuiContext extends GuiContext {
     @ApiStatus.Internal
     public void dropDraggable() {
         this.draggable.applyMatrix(this);
-        this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), getHovered()));
+        this.draggable.getElement().onDragEnd(this.draggable.getElement().canDropHere(getAbsMouseX(), getAbsMouseY(), this.hovered));
         this.draggable.getElement().setMoving(false);
         this.draggable.unapplyMatrix(this);
         this.draggable = null;
@@ -332,6 +310,7 @@ public class ModularGuiContext extends GuiContext {
 
     @ApiStatus.Internal
     public void onFrameUpdate() {
+        IWidget hovered = this.screen.getPanelManager().getTopWidget();
         if (hasDraggable() && (this.lastDragX != getAbsMouseX() || this.lastDragY != getAbsMouseY())) {
             this.lastDragX = getAbsMouseX();
             this.lastDragY = getAbsMouseY();
@@ -339,38 +318,20 @@ public class ModularGuiContext extends GuiContext {
             this.draggable.getElement().onDrag(this.lastButton, this.lastClickTime);
             this.draggable.unapplyMatrix(this);
         }
-        LocatedWidget locatedHovered = this.screen.getPanelManager().getTopWidgetLocated(false);
-        IWidget hovered = locatedHovered != null ? locatedHovered.getElement() : null;
-        IWidget oldHovered = getHovered();
-        if (oldHovered != hovered) {
-            if (this.hovered != null && oldHovered != null) {
-                if (this.hovered.getAdditionalHoverInfo() instanceof ResizeDragArea) {
-                    ClientProxy.resetCursorIcon();
-                }
-                oldHovered.onMouseEndHover();
+        if (this.hovered != hovered) {
+            if (this.hovered != null) {
+                this.hovered.onMouseEndHover();
             }
-            this.hovered = locatedHovered;
+            this.hovered = hovered;
             this.timeHovered = 0;
             if (this.hovered != null) {
-                if (locatedHovered.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
-                    // new cursor
-                    ClientProxy.setCursorResizeIcon(dragArea);
-                }
-                hovered.onMouseStartHover();
+                this.hovered.onMouseStartHover();
                 if (this.hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
                     this.screen.getScreenWrapper().setHoveredSlot(vanillaSlot.getVanillaSlot());
                 } else {
                     this.screen.getScreenWrapper().setHoveredSlot(null);
                 }
             }
-        } else if (this.hovered != null && locatedHovered != null && this.hovered.getAdditionalHoverInfo() != locatedHovered.getAdditionalHoverInfo()) {
-            if (locatedHovered.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
-                ClientProxy.setCursorResizeIcon(dragArea);
-            } else {
-                ClientProxy.resetCursorIcon();
-            }
-            // widget is unchanged, but additional info changed
-            this.hovered = locatedHovered;
         } else {
             this.timeHovered++;
         }
@@ -397,11 +358,11 @@ public class ModularGuiContext extends GuiContext {
         return this.settings;
     }
 
-    public RecipeViewerSettingsImpl getRecipeViewerSettings() {
+    public NEISettingsImpl getNEISettings() {
         if (this.screen.isOverlay()) {
-            throw new IllegalStateException("Overlays don't have recipe viewer settings!");
+            throw new IllegalStateException("Overlays don't have NEI settings!");
         }
-        return (RecipeViewerSettingsImpl) getUISettings().getRecipeViewerSettings();
+        return (NEISettingsImpl) getUISettings().getNEISettings();
     }
 
     @ApiStatus.Internal

@@ -2,14 +2,11 @@ package com.cleanroommc.modularui.api;
 
 import net.minecraft.network.PacketBuffer;
 
-import io.netty.buffer.Unpooled;
-
 import java.io.IOException;
 
 /**
  * A function that can write any data to an {@link PacketBuffer}.
  */
-@FunctionalInterface
 public interface IPacketWriter {
 
     /**
@@ -19,14 +16,4 @@ public interface IPacketWriter {
      * @throws IOException if data can not be written for some reason
      */
     void write(PacketBuffer buffer) throws IOException;
-
-    default PacketBuffer toPacket() {
-        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
-        try {
-            write(buffer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return buffer;
-    }
 }

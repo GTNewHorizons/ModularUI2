@@ -1,13 +1,12 @@
 package com.cleanroommc.modularui.network;
 
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.PacketBuffer;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -66,7 +65,7 @@ public interface IPacket extends IMessage {
     @Override
     default void toBytes(ByteBuf buf) {
         try {
-            write(buf instanceof PacketBuffer packetBuffer ? packetBuffer : new PacketBuffer(buf));
+            write(buf instanceof PacketBuffer packetBuffer ? packetBuffer: new PacketBuffer(buf));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

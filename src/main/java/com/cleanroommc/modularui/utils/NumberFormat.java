@@ -46,7 +46,6 @@ public class NumberFormat {
     }
 
     public static class Params {
-
         public final DecimalFormat format;
         public final int maxLength;
         public final boolean considerOnlyDecimalsForLength;

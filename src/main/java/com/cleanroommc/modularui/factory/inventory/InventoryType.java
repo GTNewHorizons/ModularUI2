@@ -2,7 +2,10 @@ package com.cleanroommc.modularui.factory.inventory;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
+
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
+
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -20,7 +23,6 @@ import java.util.Map;
  * It can also be used for bauble inventory if baubles is loaded.
  * An inventory type has an id assigned used for syncing. It is crucial, types are created in the same order on client and server.
  * Currently, the amount of types is limited to 16, but I don't think we will ever fill that.
- *
  * @see InventoryTypes InventoryTypes for default implementations
  */
 public abstract class InventoryType {
@@ -54,7 +56,7 @@ public abstract class InventoryType {
      * Returns the first stackable slot index for the given item
      *
      * @param player player of which inventory to visit
-     * @param stack  stack which should be checked stackability with
+     * @param stack stack which should be checked stackability with
      * @return index of slot with stackable item or -1 if none found
      */
     public int findFirstStackable(EntityPlayer player, ItemStack stack) {
@@ -77,8 +79,8 @@ public abstract class InventoryType {
      * Visits all slots which item is stackable with the given item in the inventory with the given visitor function.
      * Two empty items also count as stackable.
      *
-     * @param player  player of which inventory to visit
-     * @param stack   stack which should be checked stackability with
+     * @param player player of which inventory to visit
+     * @param stack stack which should be checked stackability with
      * @param visitor visit function
      * @return if the visitor function returned true on a slot
      */
@@ -105,7 +107,7 @@ public abstract class InventoryType {
     /**
      * Visits all slots in the inventory with the given visitor function.
      *
-     * @param player  player of which inventory to visit
+     * @param player player of which inventory to visit
      * @param visitor visit function
      * @return if the visitor function returned true on a slot
      */

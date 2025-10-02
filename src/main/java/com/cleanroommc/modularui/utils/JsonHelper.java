@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.DrawableSerialization;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -51,7 +50,6 @@ public class JsonHelper {
     }
 
     public static float getFloat(JsonObject json, float defaultValue, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -65,7 +63,6 @@ public class JsonHelper {
     }
 
     public static int getInt(JsonObject json, int defaultValue, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -84,7 +81,6 @@ public class JsonHelper {
     }
 
     public static boolean getBoolean(JsonObject json, boolean defaultValue, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -103,7 +99,6 @@ public class JsonHelper {
     }
 
     public static String getString(JsonObject json, String defaultValue, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -114,7 +109,6 @@ public class JsonHelper {
     }
 
     public static <T> T getObject(JsonObject json, T defaultValue, Function<JsonObject, T> factory, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -128,7 +122,6 @@ public class JsonHelper {
     }
 
     public static <T> T getElement(JsonObject json, T defaultValue, Function<JsonElement, T> factory, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -139,7 +132,6 @@ public class JsonHelper {
     }
 
     public static @Nullable Integer getBoxedInt(JsonObject json, Integer defaultValue, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -153,7 +145,6 @@ public class JsonHelper {
     }
 
     public static @Nullable Boolean getBoxedBool(JsonObject json, Boolean defaultValue, String @NotNull ... keys) {
-        if (json == null) return defaultValue;
         for (String key : keys) {
             if (json.has(key)) {
                 JsonElement jsonElement = json.get(key);
@@ -183,7 +174,6 @@ public class JsonHelper {
     }
 
     public static @Nullable JsonElement getJsonElement(JsonObject json, String @NotNull ... keys) {
-        if (json == null) return null;
         for (String key : keys) {
             if (json.has(key)) {
                 return json.get(key);

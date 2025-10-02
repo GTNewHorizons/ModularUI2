@@ -8,11 +8,9 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Box;
-
+import com.google.gson.JsonObject;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import com.google.gson.JsonObject;
 
 /**
  * A {@link IDrawable} wrapper with a fixed size and an alignment.
@@ -23,14 +21,10 @@ public class Icon implements IIcon, IJsonSerializable {
     private int width = 0, height = 0;
     private Alignment alignment = Alignment.Center;
     private final Box margin = new Box();
+    private int color = 0;
 
     public Icon(IDrawable drawable) {
         this.drawable = drawable;
-    }
-
-    @Override
-    public IDrawable getWrappedDrawable() {
-        return drawable;
     }
 
     @Override
@@ -51,8 +45,8 @@ public class Icon implements IIcon, IJsonSerializable {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
-        x += this.margin.getLeft();
-        y += this.margin.getTop();
+        x += this.margin.left;
+        y += this.margin.top;
         width -= this.margin.horizontal();
         height -= this.margin.vertical();
         if (this.width > 0) {
@@ -62,6 +56,9 @@ public class Icon implements IIcon, IJsonSerializable {
         if (this.height > 0) {
             y += (int) (height * this.alignment.y - this.height * this.alignment.y);
             height = this.height;
+        }
+        if (this.color != 0 && this.color != widgetTheme.getColor()) {
+            widgetTheme = widgetTheme.withColor(this.color);
         }
         this.drawable.draw(context, x, y, width, height, widgetTheme);
     }
@@ -95,6 +92,11 @@ public class Icon implements IIcon, IJsonSerializable {
 
     public Icon center() {
         return alignment(Alignment.Center);
+    }
+
+    public Icon color(int color) {
+        this.color = color;
+        return this;
     }
 
     public Icon margin(int left, int right, int top, int bottom) {
@@ -141,7 +143,19 @@ public class Icon implements IIcon, IJsonSerializable {
                 JsonHelper.getBoolean(json, true, "autoHeight", "autoSize") ? 0 :
                 JsonHelper.getInt(json, 0, "height", "h", "size");
         this.alignment = JsonHelper.deserialize(json, Alignment.class, Alignment.Center, "alignment", "align");
-        this.margin.fromJson(json);
+        this.margin.all(JsonHelper.getInt(json, 0, "margin"));
+        if (json.has("marginHorizontal")) {
+            this.margin.left = json.get("marginHorizontal").getAsInt();
+            this.margin.right = this.margin.left;
+        }
+        if (json.has("marginVertical")) {
+            this.margin.top = json.get("marginVertical").getAsInt();
+            this.margin.bottom = this.margin.top;
+        }
+        this.margin.top = JsonHelper.getInt(json, this.margin.top, "marginTop");
+        this.margin.bottom = JsonHelper.getInt(json, this.margin.bottom, "marginBottom");
+        this.margin.left = JsonHelper.getInt(json, this.margin.left, "marginLeft");
+        this.margin.right = JsonHelper.getInt(json, this.margin.right, "marginRight");
     }
 
     public static Icon ofJson(JsonObject json) {
@@ -154,7 +168,10 @@ public class Icon implements IIcon, IJsonSerializable {
         json.addProperty("width", this.width);
         json.addProperty("height", this.height);
         json.add("alignment", JsonHelper.serialize(this.alignment));
-        this.margin.toJson(json);
+        json.addProperty("marginTop", this.margin.top);
+        json.addProperty("marginBottom", this.margin.bottom);
+        json.addProperty("marginLeft", this.margin.left);
+        json.addProperty("marginRight", this.margin.right);
         return true;
     }
 

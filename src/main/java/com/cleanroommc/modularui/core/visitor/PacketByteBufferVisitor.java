@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.core.visitor;
 
 import com.cleanroommc.modularui.core.ModularUICore;
-
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -29,7 +28,7 @@ public class PacketByteBufferVisitor extends ClassVisitor implements Opcodes {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ((WRITE_ITEMSTACK_METHOD.equals(name) && WRITE_ITEMSTACK_DESC.equals(desc))
-                || (READ_ITEMSTACK_METHOD.equals(name) && READ_ITEMSTACK_DESC.equals(desc))) {
+            || (READ_ITEMSTACK_METHOD.equals(name) && READ_ITEMSTACK_DESC.equals(desc))) {
             ModularUICore.LOGGER.debug("Start patching " + name);
             return new ReadWriteItemStackVisitor(mv);
         }

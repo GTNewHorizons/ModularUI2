@@ -1,19 +1,24 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.utils.ICopy;
+import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
-
-import net.minecraft.network.PacketBuffer;
+import com.cleanroommc.modularui.utils.serialization.IEquals;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+
+import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 public class GenericSetSyncHandler<T> extends GenericCollectionSyncHandler<T, Set<T>> {

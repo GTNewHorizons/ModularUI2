@@ -8,11 +8,9 @@ import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
-
+import com.google.gson.JsonObject;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Contract;
 
 public class Circle implements IDrawable, IJsonSerializable, IAnimatable<Circle> {
@@ -70,7 +68,6 @@ public class Circle implements IDrawable, IJsonSerializable, IAnimatable<Circle>
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x0, int y0, int width, int height, WidgetTheme widgetTheme) {
-        applyColor(widgetTheme.getColor());
         GuiDraw.drawEllipse(x0, y0, width, height, this.colorInner, this.colorOuter, this.segments);
     }
 

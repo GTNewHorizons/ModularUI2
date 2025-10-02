@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import javax.annotation.Nullable;
 
 public class PlayerArmorInvWrapper extends RangedWrapper {
-
     private final InventoryPlayer inventoryPlayer;
 
     public PlayerArmorInvWrapper(InventoryPlayer inv) {

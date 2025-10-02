@@ -9,14 +9,15 @@ import java.util.function.Predicate;
 /**
  * A gui element which can transform its children f.e. a scrollable list.
  */
-public interface IViewport extends IWidget {
+public interface IViewport {
 
     /**
      * Apply shifts of this viewport.
      *
      * @param stack viewport stack
      */
-    default void transformChildren(IViewportStack stack) {}
+    default void transformChildren(IViewportStack stack) {
+    }
 
     /**
      * Gathers all children at a position. Transformations from this viewport are already applied.
@@ -26,11 +27,7 @@ public interface IViewport extends IWidget {
      * @param x       x position
      * @param y       y position
      */
-    default void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (hasChildren()) {
-            getChildrenAt(this, stack, widgets, x, y);
-        }
-    }
+    void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y);
 
     /**
      * Gathers all children at a position. Transformations from this viewport are not applied.
@@ -42,9 +39,6 @@ public interface IViewport extends IWidget {
      * @param y       y position
      */
     default void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (isInside(stack, x, y)) {
-            widgets.add(this, stack, getAdditionalHoverInfo(stack, x, y));
-        }
     }
 
     /**
@@ -79,7 +73,7 @@ public interface IViewport extends IWidget {
                 stack.pushMatrix();
                 child.transform(stack);
                 if (child.isInside(stack, x, y)) {
-                    widgetList.add(child, stack, child.getAdditionalHoverInfo(stack, x, y));
+                    widgetList.add(child, stack.peek());
                 }
                 if (child.hasChildren()) {
                     getChildrenAt(child, stack, widgetList, x, y);
@@ -124,4 +118,7 @@ public interface IViewport extends IWidget {
         }
         return true;
     }
+
+    IViewport EMPTY = (viewports, widgets, x, y) -> {
+    };
 }

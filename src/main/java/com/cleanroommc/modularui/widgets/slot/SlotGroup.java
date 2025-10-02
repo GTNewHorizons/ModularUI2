@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import net.minecraft.inventory.Slot;
-
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
  * A slot group is a group of slots that can be sorted (via Inventory BogoSorter)
  * and be shift clicked into. The slot group must exist on server and client side.
  * Slot groups must be registered via
- * {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#registerSlotGroup(String, int, boolean)}
+ * {@link com.cleanroommc.modularui.value.sync.GuiSyncManager#registerSlotGroup(String, int, boolean)}
  * or overloads of the method (except it's a singleton).
  */
 public class SlotGroup {

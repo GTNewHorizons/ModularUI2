@@ -3,15 +3,13 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.world.World;
 
 import com.google.common.collect.AbstractIterator;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
@@ -82,20 +80,17 @@ public class MapSchema implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
         return new AbstractIterator<>() {
 
             private final ObjectIterator<Object2ObjectMap.Entry<BlockPos, BlockInfo>> it = blocks.object2ObjectEntrySet().fastIterator();
-            private final MutablePair<BlockPos, BlockInfo> pair = new MutablePair<>(null, null);
 
             @Override
-            protected Pair<BlockPos, BlockInfo> computeNext() {
+            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
                 while (it.hasNext()) {
                     Map.Entry<BlockPos, BlockInfo> entry = it.next();
                     if (renderFilter == null || renderFilter.test(entry.getKey(), entry.getValue())) {
-                        pair.setLeft(entry.getKey());
-                        pair.setRight(entry.getValue());
-                        return pair;
+                        return entry;
                     }
                 }
                 return endOfData();

@@ -4,92 +4,52 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.utils.Matrix4f;
 import com.cleanroommc.modularui.utils.Vector3f;
 import com.cleanroommc.modularui.widget.sizer.Area;
-
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A single matrix in a matrix stack. Also has some other information.
  */
-@ApiStatus.Internal
 public class TransformationMatrix {
 
     public static final TransformationMatrix EMPTY = new TransformationMatrix(null);
 
-    private TransformationMatrix wrapped;
-    private IViewport viewport;
-    private Area area;
-    private final Matrix4f matrix = new Matrix4f();
+    private final TransformationMatrix wrapped;
+    private final IViewport viewport;
+    private final Area area;
+    private final Matrix4f matrix;
     private final Matrix4f invertedMatrix = new Matrix4f();
-    private boolean inUse = false;
 
-    public TransformationMatrix() {}
-
-    public TransformationMatrix(@Nullable Matrix4f parent) {
-        construct(parent);
-    }
-
-    public TransformationMatrix(TransformationMatrix parent, @Nullable Matrix4f parentMatrix) {
-        construct(parent, parentMatrix);
-    }
-
-    private boolean viewportMatrix;
+    private final boolean viewportMatrix;
     private boolean dirty = true;
 
-    TransformationMatrix construct(TransformationMatrix parent, @Nullable Matrix4f parentMatrix) {
-        checkInUse();
+    public TransformationMatrix(TransformationMatrix parent, @Nullable Matrix4f parentMatrix) {
         this.wrapped = parent;
         this.viewport = parent.viewport;
         this.area = parent.area;
-        if (parentMatrix == null) {
-            this.matrix.load(parent.getMatrix());
-        } else {
-            Matrix4f.mul(parentMatrix, parent.getMatrix(), this.matrix);
-        }
+        this.matrix = parentMatrix == null ? new Matrix4f(parent.getMatrix()) : Matrix4f.mul(parentMatrix, parent.getMatrix(), null);
         this.viewportMatrix = parent.viewportMatrix;
-        return this;
     }
 
-    TransformationMatrix construct(@Nullable Matrix4f parent) {
-        return construct(null, null, parent, false);
-    }
-
-    TransformationMatrix construct(IViewport viewport, Area area, @Nullable Matrix4f parent) {
-        return construct(viewport, area, parent, true);
-    }
-
-    private TransformationMatrix construct(IViewport viewport, Area area, @Nullable Matrix4f parent, boolean isViewport) {
-        checkInUse();
-        this.wrapped = null;
-        this.viewport = viewport;
-        this.area = area;
-        this.viewportMatrix = isViewport;
-        if (parent != null) {
-            this.matrix.load(parent);
-        } else {
-            this.matrix.setIdentity();
-        }
-        return this;
-    }
-
-    void dispose() {
+    public TransformationMatrix(@Nullable Matrix4f parent) {
         this.wrapped = null;
         this.viewport = null;
         this.area = null;
-        this.inUse = false;
+        this.matrix = new Matrix4f();
         this.viewportMatrix = false;
-    }
-
-    private void checkInUse() {
-        if (this.inUse) {
-            throw new IllegalStateException("Transformation matrix is already in use!");
+        if (parent != null) {
+            this.matrix.load(parent);
         }
-        this.inUse = true;
-        this.dirty = true;
     }
 
-    public boolean isInUse() {
-        return inUse;
+    public TransformationMatrix(IViewport viewport, Area area, @Nullable Matrix4f parent) {
+        this.wrapped = null;
+        this.viewport = viewport;
+        this.area = area;
+        this.matrix = new Matrix4f();
+        this.viewportMatrix = true;
+        if (parent != null) {
+            this.matrix.load(parent);
+        }
     }
 
     public TransformationMatrix getWrapped() {

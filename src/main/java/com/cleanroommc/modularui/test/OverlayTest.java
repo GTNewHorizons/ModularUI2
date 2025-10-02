@@ -2,8 +2,8 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
-import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiTextures;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.overlay.OverlayHandler;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
@@ -27,7 +27,7 @@ public class OverlayTest {
 
         OverlayManager.register(new OverlayHandler(screen -> screen instanceof GuiMainMenu, screen -> {
             GuiMainMenu gui = (GuiMainMenu) screen;
-            TextWidget<?> title = new TextWidget<>(IKey.str("ModularUI"));
+            TextWidget title = new TextWidget(IKey.str("ModularUI"));
             int[] colors = {Color.WHITE.main, Color.AMBER.main, Color.BLUE.main, Color.GREEN.main, Color.DEEP_PURPLE.main, Color.RED.main};
             AtomicInteger k = new AtomicInteger();
             return new ModularScreen(ModularPanel.defaultPanel("overlay").sizeRel(1f)

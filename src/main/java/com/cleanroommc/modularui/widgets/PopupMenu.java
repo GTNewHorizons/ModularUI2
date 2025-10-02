@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.Widget;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;

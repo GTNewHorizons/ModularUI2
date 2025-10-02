@@ -25,9 +25,4 @@ public class LocatedElement<T> {
     public void unapplyMatrix(GuiContext context) {
         context.pop(this.transformationMatrix);
     }
-
-    @Override
-    public String toString() {
-        return "LocatedElement[" + getElement() + "]";
-    }
 }

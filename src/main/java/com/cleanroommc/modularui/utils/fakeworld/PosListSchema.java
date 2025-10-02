@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.world.World;
 
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.BiPredicate;
 
 public abstract class PosListSchema implements ISchema {
@@ -40,7 +41,7 @@ public abstract class PosListSchema implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
         return new Iterator<>() {
 
             private final Iterator<? extends BlockPos> posIt = PosListSchema.this.posList.iterator();

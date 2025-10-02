@@ -1,15 +1,10 @@
 package com.cleanroommc.modularui.api;
 
-import com.cleanroommc.modularui.theme.SelectableTheme;
-import com.cleanroommc.modularui.theme.SlotTheme;
-import com.cleanroommc.modularui.theme.TextFieldTheme;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.theme.WidgetSlotTheme;
+import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
-import com.cleanroommc.modularui.theme.WidgetThemeEntry;
-import com.cleanroommc.modularui.theme.WidgetThemeKey;
-
-import org.jetbrains.annotations.UnmodifiableView;
-
-import java.util.Collection;
+import com.cleanroommc.modularui.theme.WidgetThemeSelectable;
 
 /**
  * A theme is parsed from json and contains style information like color or background texture.
@@ -41,22 +36,31 @@ public interface ITheme {
      */
     ITheme getParentTheme();
 
-    @UnmodifiableView
-    Collection<WidgetThemeEntry<?>> getWidgetThemes();
+    WidgetTheme getFallback();
 
-    WidgetThemeEntry<WidgetTheme> getFallback();
+    WidgetTheme getPanelTheme();
 
-    WidgetThemeEntry<WidgetTheme> getPanelTheme();
+    WidgetTheme getButtonTheme();
 
-    WidgetThemeEntry<WidgetTheme> getButtonTheme();
+    WidgetSlotTheme getItemSlotTheme();
 
-    WidgetThemeEntry<SlotTheme> getItemSlotTheme();
+    WidgetSlotTheme getFluidSlotTheme();
 
-    WidgetThemeEntry<SlotTheme> getFluidSlotTheme();
+    WidgetTextFieldTheme getTextFieldTheme();
 
-    WidgetThemeEntry<TextFieldTheme> getTextFieldTheme();
+    WidgetThemeSelectable getToggleButtonTheme();
 
-    WidgetThemeEntry<SelectableTheme> getToggleButtonTheme();
+    WidgetTheme getWidgetTheme(String id);
 
-    <T extends WidgetTheme> WidgetThemeEntry<T> getWidgetTheme(WidgetThemeKey<T> key);
+    default <T extends WidgetTheme> T getWidgetTheme(Class<T> clazz, String id) {
+        WidgetTheme theme = getWidgetTheme(id);
+        if (clazz.isInstance(theme)) {
+            return (T) theme;
+        }
+        return null;
+    }
+
+    boolean getSmoothProgressBarOverride();
+
+    RichTooltip.Pos getTooltipPosOverride();
 }

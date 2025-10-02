@@ -2,10 +2,9 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularScreen;
-
 import org.jetbrains.annotations.ApiStatus;
 
-import java.awt.*;
+import java.awt.Rectangle;
 
 
 /**

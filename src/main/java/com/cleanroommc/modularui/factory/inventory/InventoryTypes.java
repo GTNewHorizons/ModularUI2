@@ -70,7 +70,6 @@ public class InventoryTypes {
     }
 
     public static class SlotFindResult {
-
         public final InventoryType type;
         public final int slot;
 

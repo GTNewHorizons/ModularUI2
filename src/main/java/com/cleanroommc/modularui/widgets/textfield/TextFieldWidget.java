@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.value.IStringValue;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
@@ -13,6 +16,7 @@ import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Point;
 import java.text.ParsePosition;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -55,6 +59,14 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         }
     }
 
+    public int getMarkedColor() {
+        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
+        if (theme instanceof WidgetTextFieldTheme textFieldTheme) {
+            return textFieldTheme.getMarkedColor();
+        }
+        return ITheme.getDefault().getTextFieldTheme().getMarkedColor();
+    }
+
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
         if (syncHandler instanceof IStringValue<?> iStringValue && syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
@@ -80,6 +92,14 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
+    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+        this.renderer.setSimulate(false);
+        this.renderer.setPos(getArea().getPadding().left, 0);
+        this.renderer.setScale(this.scale);
+        this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
+    }
+
+    @Override
     public void drawForeground(ModularGuiContext context) {
         if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
             getTooltip().draw(getContext());
@@ -102,6 +122,15 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.handler.getText().add(text);
         } else {
             this.handler.getText().set(0, text);
+        }
+    }
+
+    @Override
+    public void onFocus(ModularGuiContext context) {
+        super.onFocus(context);
+        Point main = this.handler.getMainCursor();
+        if (main.x == 0) {
+            this.handler.setCursor(main.y, getText().length(), true, true);
         }
     }
 

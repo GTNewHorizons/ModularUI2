@@ -37,8 +37,7 @@ public class Spacer implements ITextLine {
     }
 
     @Override
-    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow, int availableWidth,
-                     int availableHeight) {}
+    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow) {}
 
     @Override
     public Object getHoveringElement(FontRenderer fr, int x, int y) {

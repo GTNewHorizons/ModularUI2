@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,9 +23,8 @@ public interface ISynced<W extends IWidget> {
      * Called when this widget gets initialised or when this widget is added to the gui
      *
      * @param syncManager sync manager
-     * @param late
      */
-    void initialiseSyncHandler(ModularSyncManager syncManager, boolean late);
+    void initialiseSyncHandler(ModularSyncManager syncManager);
 
     /**
      * Checks if the received sync handler is valid for this widget.

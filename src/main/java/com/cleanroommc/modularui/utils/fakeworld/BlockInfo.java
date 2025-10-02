@@ -1,14 +1,14 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.google.common.base.Preconditions;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,24 +30,9 @@ public class BlockInfo {
         }
         TileEntity tile = null;
         if (block.hasTileEntity(blockMeta)) {
-            TileEntity realTile = world.getTileEntity(pos.x, pos.y, pos.z);
-            tile = fixRealTileWorldCorrupting(realTile, block, blockMeta);
+            tile = world.getTileEntity(pos.x, pos.y, pos.z);
         }
         return new BlockInfo(block, blockMeta, tile);
-    }
-
-    @Nullable
-    private static TileEntity fixRealTileWorldCorrupting(TileEntity realTile, Block block, int meta) {
-        TileEntity fakeTile = null;
-        if (realTile != null) {
-            fakeTile = block.createTileEntity(null, meta);
-            if (fakeTile != null) {
-                NBTTagCompound nbt = new NBTTagCompound();
-                realTile.writeToNBT(nbt);
-                fakeTile.readFromNBT(nbt);
-            }
-        }
-        return fakeTile;
     }
 
     private Block block;

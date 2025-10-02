@@ -4,11 +4,9 @@ import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.utils.Interpolation;
-import com.cleanroommc.modularui.utils.MathUtils;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
+import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class ScrollData {
@@ -17,7 +15,7 @@ public abstract class ScrollData {
      * Creates scroll data which handles scrolling and scroll bar. Scrollbar is 4 pixel thick
      * and will be at the end of the cross axis (bottom/right).
      *
-     * @param axis axis on which to scroll
+     * @param axis      axis on which to scroll
      * @return new scroll data
      */
     public static ScrollData of(GuiAxis axis) {
@@ -132,8 +130,7 @@ public abstract class ScrollData {
     }
 
     protected final int getRawVisibleSize(ScrollArea area) {
-        // the scroll area doesn't contribute to the visible size in this case
-        return Math.max(0, getRawFullVisibleSize(area) - area.getPadding().getTotal(this.axis) + area.getScrollPadding().getTotalScrollPadding(this.axis));
+        return Math.max(0, getRawFullVisibleSize(area) - area.getPadding().getTotal(this.axis));
     }
 
     protected final int getRawFullVisibleSize(ScrollArea area) {
@@ -183,7 +180,7 @@ public abstract class ScrollData {
         if (this.scrollSize <= size) {
             this.scroll = 0;
         } else {
-            this.scroll = MathUtils.clamp(this.scroll, 0, this.scrollSize - size);
+            this.scroll = MathHelper.clamp_int(this.scroll, 0, this.scrollSize - size);
         }
         return old != this.scroll; // returns true if the area was clamped
     }

@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.screen.NEISettingsImpl;
 import com.cleanroommc.modularui.screen.ModularContainer;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.RecipeViewerSettingsImpl;
 import com.cleanroommc.modularui.screen.UISettings;
 
-import net.minecraft.client.gui.GuiScreen;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
+import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,7 @@ public class ClientGUI {
     }
 
     /**
-     * Opens a modular screen on the next client tick with default recipe viewer settings.
+     * Opens a modular screen on the next client tick with default NEI settings.
      *
      * @param screen new modular screen
      */
@@ -36,18 +37,18 @@ public class ClientGUI {
     }
 
     /**
-     * Opens a modular screen on the next client tick with custom recipe viewer settings.
+     * Opens a modular screen on the next client tick with custom NEI settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
-     * @param screen               new modular screen
-     * @param recipeViewerSettings custom recipe viewer settings
+     * @param screen      new modular screen
+     * @param neiSettings custom NEI settings
      */
-    public static void open(@NotNull ModularScreen screen, @NotNull RecipeViewerSettingsImpl recipeViewerSettings) {
-        GuiManager.openScreen(screen, new UISettings(recipeViewerSettings));
+    public static void open(@NotNull ModularScreen screen, @NotNull NEISettingsImpl neiSettings) {
+        GuiManager.openScreen(screen, new UISettings(neiSettings));
     }
 
     /**
-     * Opens a modular screen on the next client tick with custom recipe viewer settings.
+     * Opens a modular screen on the next client tick with custom NEI settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
      * @param screen    new modular screen
@@ -60,21 +61,21 @@ public class ClientGUI {
     }
 
     /**
-     * Opens a modular screen on the next client tick with custom recipe viewer settings.
+     * Opens a modular screen on the next client tick with custom NEI settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
-     * @param screen               new modular screen
-     * @param recipeViewerSettings custom recipe viewer settings
-     * @param container            custom container
+     * @param screen              new modular screen
+     * @param neiSettings         custom NEI settings
+     * @param container   custom container
      */
-    public static void open(@NotNull ModularScreen screen, @NotNull RecipeViewerSettingsImpl recipeViewerSettings, @Nullable Supplier<ModularContainer> container) {
-        UISettings settings = new UISettings(recipeViewerSettings);
+    public static void open(@NotNull ModularScreen screen, @NotNull NEISettingsImpl neiSettings, @Nullable Supplier<ModularContainer> container) {
+        UISettings settings = new UISettings(neiSettings);
         settings.customContainer(container);
         GuiManager.openScreen(screen, settings);
     }
 
     /**
-     * Opens a modular screen on the next client tick with custom recipe viewer settings.
+     * Opens a modular screen on the next client tick with custom jei settings.
      * It needs to be opened in next tick, because we might break the current GUI if we open it now.
      *
      * @param screen   new modular screen

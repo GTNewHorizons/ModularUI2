@@ -1,12 +1,11 @@
 package com.cleanroommc.modularui.integration.nei;
 
+import codechicken.nei.api.INEIGuiAdapter;
+
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
-
-import codechicken.nei.api.INEIGuiAdapter;
 
 import java.awt.*;
 
@@ -18,15 +17,11 @@ public class ModularUINEIGuiHandler extends INEIGuiAdapter {
             return false;
         }
         ModularScreen screen = muiScreen.getScreen();
-        if (!screen.getContext().getRecipeViewerSettings().isRecipeViewerEnabled(screen)) {
+        if (!screen.getContext().getNEISettings().isNEIEnabled(screen)) {
             return false;
         }
-        Area.SHARED.set(x, y, w, h);
-        for (Rectangle exclusionArea : screen.getContext().getRecipeViewerSettings().getAllRecipeViewerExclusionAreas()) {
-            if (exclusionArea.intersects(Area.SHARED)) {
-                return true;
-            }
-        }
-        return false;
+        return screen.getContext().getNEISettings().getAllNEIExclusionAreas().stream().anyMatch(
+                a -> a.intersects(new Rectangle(x, y, w, h))
+        );
     }
 }

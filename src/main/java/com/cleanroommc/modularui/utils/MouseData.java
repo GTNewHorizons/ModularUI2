@@ -1,10 +1,9 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.widget.Interactable;
-
-import net.minecraft.network.PacketBuffer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.network.PacketBuffer;
 
 public class MouseData {
 

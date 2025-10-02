@@ -1,11 +1,10 @@
 package com.cleanroommc.modularui.core;
 
-import com.cleanroommc.modularui.core.mixinplugin.Mixins;
-
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import com.cleanroommc.modularui.mixinplugin.Mixins;
 
 import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

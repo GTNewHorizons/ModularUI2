@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
-
 import net.minecraft.client.Minecraft;
 
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.util.List;
  * Wrapper for {@link UITexture} that you can specify candidate and fallback. If resource path for candidate doesn't
  * exist, fallback is automatically selected.
  */
-// TODO: Does this really need to exist? I rather not have a class keep every instance of it.
 public class FallbackableUITexture {
 
     private final UITexture candidate;

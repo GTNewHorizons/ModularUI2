@@ -1,15 +1,16 @@
 package com.cleanroommc.modularui.screen;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
@@ -21,8 +22,10 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.util.MathHelper;
+
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -106,7 +109,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         TextRenderer renderer = TextRenderer.SHARED;
         RichText copy = this.text.copy();
         // this only turns the text and not any drawables into strings
-        RichTooltipEvent.Pre event = new RichTooltipEvent.Pre(stack, copy.getAsStrings(), mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer(), copy);
+        RichTooltipEvent.Pre event = new RichTooltipEvent.Pre(stack, null, mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer(), copy);
         if (MinecraftForge.EVENT_BUS.post(event)) return; // canceled
         // we are supposed to now use the strings of the event, but we can't properly determine where to put them
         mouseX = event.getX();
@@ -133,7 +136,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         GuiDraw.drawTooltipBackground(stack, copy.getAsStrings(), area.x, area.y, area.width, area.height, this);
 
-        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostBackground(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
+        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostBackground(stack, null, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
 
         GlStateManager.color(1f, 1f, 1f, 1f);
 
@@ -141,7 +144,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         renderer.setSimulate(false);
         renderer.drawCompiled(context, compiledLines);
 
-        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
+        MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, null, area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
     }
 
     public Rectangle determineTooltipArea(RichText text, GuiContext context, TextRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {
@@ -153,7 +156,8 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         Pos pos = this.pos;
         if (pos == null) {
-            pos = ModularUIConfig.tooltipPos;
+            pos = context.isMuiContext() ? context.getMuiContext().getScreen().getCurrentTheme().getTooltipPosOverride() : null;
+            if (pos == null) pos = ModularUIConfig.tooltipPos;
         }
         if (pos == Pos.FIXED) {
             return new Rectangle(this.x, this.y, width, height);
@@ -192,7 +196,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
                 width = (int) renderer.getLastTrimmedWidth();
                 height = (int) renderer.getLastTrimmedHeight();
             }
-            y = MathUtils.clamp(y, padding, screenHeight - padding - height);
+            y = MathHelper.clamp_int(y, padding, screenHeight - padding - height);
             return new Rectangle(x, y, width, height);
         }
 
@@ -381,7 +385,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
     private static void findIngredientArea(Area area, int x, int y) {
         GuiScreen screen = MCHelper.getCurrentScreen();
         if (screen instanceof GuiContainer guiContainer) {
-            Slot slot = ((GuiContainerAccessor) guiContainer).getHoveredSlot();
+            Slot slot = ((GuiContainerAccessor)guiContainer).getHoveredSlot();
             if (slot != null) {
                 int sx = slot.xDisplayPosition + ((GuiContainerAccessor) guiContainer).getGuiLeft();
                 int sy = slot.yDisplayPosition + ((GuiContainerAccessor) guiContainer).getGuiTop();

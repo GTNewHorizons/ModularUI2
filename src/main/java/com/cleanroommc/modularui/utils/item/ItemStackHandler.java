@@ -5,9 +5,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 
 public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializable<NBTTagCompound> {
 

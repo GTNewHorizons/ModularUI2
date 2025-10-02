@@ -12,13 +12,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.IntSupplier;
-
 public class StyledText extends BaseKey {
 
     private final IKey key;
     private Alignment alignment = Alignment.Center;
-    private IntSupplier color = null;
+    private Integer color = null;
     private Boolean shadow = null;
     private float scale = 1f;
 
@@ -40,7 +38,7 @@ public class StyledText extends BaseKey {
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         renderer.setAlignment(this.alignment, width, height);
-        renderer.setColor(this.color != null ? this.color.getAsInt() : widgetTheme.getColor());
+        renderer.setColor(this.color != null ? this.color : widgetTheme.getColor());
         renderer.setScale(this.scale);
         renderer.setPos(x, y);
         renderer.setShadow(this.shadow != null ? this.shadow : widgetTheme.getTextShadow());
@@ -51,7 +49,7 @@ public class StyledText extends BaseKey {
         return this.alignment;
     }
 
-    public @Nullable IntSupplier getColor() {
+    public @Nullable Integer getColor() {
         return this.color;
     }
 
@@ -76,12 +74,7 @@ public class StyledText extends BaseKey {
     }
 
     @Override
-    public StyledText color(int color) {
-        return color(() -> color);
-    }
-
-    @Override
-    public StyledText color(@Nullable IntSupplier color) {
+    public StyledText color(@Nullable Integer color) {
         this.color = color;
         return this;
     }

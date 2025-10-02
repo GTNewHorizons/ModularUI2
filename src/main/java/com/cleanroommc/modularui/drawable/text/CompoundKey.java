@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.drawable.text;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 
+import net.minecraft.util.EnumChatFormatting;
+
 import org.jetbrains.annotations.Nullable;
 
 public class CompoundKey extends BaseKey {

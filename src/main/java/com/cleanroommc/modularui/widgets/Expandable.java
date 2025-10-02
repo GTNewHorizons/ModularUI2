@@ -55,9 +55,14 @@ public class Expandable extends Widget<Expandable> implements Interactable, IVie
     }
 
     @Override
+    public void onResized() {
+        super.onResized();
+        currentChildren = children;
+    }
+
+    @Override
     public void postResize() {
         super.postResize();
-        currentChildren = children;
         if (this.animator != null) {
             this.animator.stop(true);
             this.animator = null;
@@ -120,25 +125,39 @@ public class Expandable extends Widget<Expandable> implements Interactable, IVie
         }
     }
 
+    @Override
+    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
+        if (isInside(stack, x, y)) {
+            widgets.add(this, stack.peek());
+        }
+    }
+
+    @Override
+    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
+        if (hasChildren()) {
+            IViewport.getChildrenAt(this, stack, widgets, x, y);
+        }
+    }
+
     public Expandable expanded(boolean expanded) {
         if (this.expanded == expanded) return this;
         this.expanded = expanded;
+        if (expanded) {
+            this.normalView.setEnabled(false);
+            this.expandedView.setEnabled(true);
+        }
         if (isValid()) {
-            if (expanded) {
-                this.normalView.setEnabled(false);
-                this.expandedView.setEnabled(true);
-            }
             this.areaSnapshot = getArea().copyOrImmutable();
             scheduleResize();
         }
         return this;
     }
 
-    public Expandable collapsedView(IWidget normalView) {
+    public Expandable normalView(IWidget normalView) {
         this.normalView = normalView;
         this.children.set(0, normalView);
         if (isValid()) {
-            this.normalView.initialise(this, true);
+            this.normalView.initialise(this);
         }
         return this;
     }
@@ -147,7 +166,7 @@ public class Expandable extends Widget<Expandable> implements Interactable, IVie
         this.expandedView = expandedView;
         this.children.set(1, expandedView);
         if (isValid()) {
-            this.expandedView.initialise(this, true);
+            this.expandedView.initialise(this);
         }
         return this;
     }

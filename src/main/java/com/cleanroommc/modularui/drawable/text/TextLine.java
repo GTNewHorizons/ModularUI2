@@ -29,7 +29,7 @@ public class TextLine implements ITextLine {
     }
 
     @Override
-    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow, int availableWidth, int availableHeight) {
+    public void draw(GuiContext context, FontRenderer fr, float x, float y, int color, boolean shadow) {
         Platform.setupDrawFont();
         fr.drawString(this.text, (int) x, (int) y, color, shadow);
         this.lastX = x;

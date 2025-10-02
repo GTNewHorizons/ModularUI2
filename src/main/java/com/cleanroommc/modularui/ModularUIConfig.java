@@ -13,7 +13,7 @@ public class ModularUIConfig {
     public static int defaultScrollSpeed = 30;
 
     @Config.Comment("If progress bar should step in texture pixels or screen pixels. (Screen pixels are way smaller and therefore smoother)")
-    public static boolean smoothProgressBar = false;
+    public static boolean smoothProgressBar = true;
 
     // Default direction
     @Config.Comment("Default tooltip position around the widget or its panel.")

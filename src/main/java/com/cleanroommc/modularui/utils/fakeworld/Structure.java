@@ -1,12 +1,16 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+
 import it.unimi.dsi.fastutil.chars.CharArrayList;
 import it.unimi.dsi.fastutil.chars.CharList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 
 import java.util.List;
 import java.util.Map;
@@ -14,15 +18,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Structure {
+    private Structure(){}
 
-    private Structure() {}
-
-    public static StaticBuilder staticBuilder() {
+    public static StaticBuilder staticBuilder(){
         return new StaticBuilder();
     }
 
     public static class StaticBuilder {
-
         private final List<String[]> matrix = new ObjectArrayList<>();
         private final Char2ObjectMap<BlockInfo> map = new Char2ObjectOpenHashMap<>();
 

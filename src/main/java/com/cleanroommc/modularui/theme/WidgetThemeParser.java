@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
  * An interface used to parse json objects to widget themes.
  */
 @FunctionalInterface
-public interface WidgetThemeParser<T extends WidgetTheme> {
+public interface WidgetThemeParser {
 
     /**
      * Parses a json object to a widget theme,
@@ -16,5 +16,5 @@ public interface WidgetThemeParser<T extends WidgetTheme> {
      * @param fallback a fallback widget theme json data object
      * @return the parsed widget theme
      */
-    T parse(T parent, JsonObject json, JsonObject fallback);
+    WidgetTheme parse(WidgetTheme parent, JsonObject json, JsonObject fallback);
 }

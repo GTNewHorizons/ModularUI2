@@ -1,9 +1,8 @@
 package com.cleanroommc.modularui.value.sync;
 
-import com.cleanroommc.modularui.utils.BooleanConsumer;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
+import com.cleanroommc.modularui.utils.BooleanConsumer;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
-
 import net.minecraftforge.fluids.IFluidTank;
 
 import java.util.function.BooleanSupplier;

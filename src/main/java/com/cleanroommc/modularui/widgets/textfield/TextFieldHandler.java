@@ -2,11 +2,10 @@ package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
-
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -226,11 +225,6 @@ public class TextFieldHandler {
         setMainCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length(), true);
     }
 
-    public void markCurrentLine() {
-        setOffsetCursor(getMainCursor().y, 0);
-        setMainCursor(getMainCursor().y, this.text.get(getMainCursor().y).length(), true);
-    }
-
     public String getTextAsString() {
         return JOINER.join(this.text);
     }
@@ -273,15 +267,14 @@ public class TextFieldHandler {
         return this.maxLines > 1 || ((this.pattern == null || this.pattern.matcher(text).matches()) && (this.maxCharacters < 0 || this.maxCharacters >= text.length()));
     }
 
-    public void insert(String text, boolean hasHorizontalScrolling) {
-        insert(Arrays.asList(text.split("\n")), hasHorizontalScrolling);
+    public void insert(String text) {
+        insert(Arrays.asList(text.split("\n")));
     }
 
-    public void insert(List<String> text, boolean hasHorizontalScrolling) {
+    public void insert(List<String> text) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
-        // if we can scroll horizontally, we have virtually an infinite amount of space and don't need to check width
-        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
+        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy)) return;
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);

@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.value;
 
 import com.cleanroommc.modularui.api.value.IStringValue;
-
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;

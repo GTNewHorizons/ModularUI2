@@ -2,40 +2,26 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.widget.Widget;
-
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntConsumer;
 
 public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
 
     private final List<IWidget> pages = new ArrayList<>();
     private IWidget currentPage;
     private int currentPageIndex = 0;
-    @Nullable
-    private IntConsumer onPageChange;
 
     @Override
     public void afterInit() {
-        setPage(this.currentPageIndex);
-    }
-
-    /**
-     * Set a consumer that is accepted <b>right after</b> the page is actually changed and the next page widget is enabled. <br/>
-     * Will also be called with {@code 0} when after this widget is initialized.
-     */
-    public W onPageChange(@Nullable IntConsumer onPageChange) {
-        this.onPageChange = onPageChange;
-        return getThis();
+        setPage(0);
     }
 
     public void setPage(int page) {
         if (page < 0 || page >= this.pages.size()) {
-            throw new IndexOutOfBoundsException("Setting page of " + this + " to " + page + " failed. Only values from 0 to " + (this.pages.size() - 1) + " are allowed.");
+            throw new IndexOutOfBoundsException();
         }
         this.currentPageIndex = page;
         if (this.currentPage != null) {
@@ -43,10 +29,6 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
         }
         this.currentPage = this.pages.get(this.currentPageIndex);
         this.currentPage.setEnabled(true);
-
-        if (this.onPageChange != null) {
-            this.onPageChange.accept(page);
-        }
     }
 
     public void nextPage() {
@@ -78,13 +60,6 @@ public class PagedWidget<W extends PagedWidget<W>> extends Widget<W> {
     @Override
     public @Unmodifiable @NotNull List<IWidget> getChildren() {
         return this.pages;
-    }
-
-    public W initialPage(int page) {
-        if (!isValid()) {
-            this.currentPageIndex = page;
-        }
-        return getThis();
     }
 
     public W addPage(IWidget widget) {

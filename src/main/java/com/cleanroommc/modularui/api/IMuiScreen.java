@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -11,10 +11,10 @@ import com.cleanroommc.neverenoughanimations.api.IAnimatedScreen;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
+
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,17 +41,6 @@ public interface IMuiScreen extends IAnimatedScreen {
     ModularScreen getScreen();
 
     /**
-     * {@link GuiScreen GuiScreens} need to be focused when a text field is focused, to prevent key input from
-     * behaving unexpectedly.
-     *
-     * @param focused if the screen should be focused
-     */
-    default void setFocused(boolean focused) {
-        // doesn't exist in 1.7.10
-        //getGuiScreen().setFocused(focused);
-    }
-
-    /**
      * This method decides how the gui background is drawn.
      * The intended usage is to override {@link GuiScreen#drawWorldBackground(int)} and call this method
      * with the super method reference as the second parameter.
@@ -65,9 +54,9 @@ public interface IMuiScreen extends IAnimatedScreen {
             drawFunction.accept(tint);
         }
         ClientScreenHandler.drawDarkBackground(getGuiScreen(), tint);
-        // after this recipe viewer will draw itself
-        // for some reason recipe viewer is too stupid to set up opengl properly
-        // without this (enableTexture2D() specifically) every item in recipe viewer will be texture less (white)
+        // after this JEI will draw itself
+        // for some reason JEI is too stupid to set up opengl properly
+        // without this (enableTexture2D() specifically) every item in JEI will be texture less (white)
         Platform.setupDrawTex();
     }
 

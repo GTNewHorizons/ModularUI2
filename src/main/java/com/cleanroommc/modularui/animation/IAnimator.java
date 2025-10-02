@@ -18,7 +18,7 @@ public interface IAnimator {
         animate(false);
     }
 
-    boolean stop(boolean force);
+    void stop(boolean force);
 
     void pause();
 

@@ -33,8 +33,6 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
     public SortableListWidget() {
         super(Item::getWidgetValue);
         heightRel(1f);
-        // this is not desired here in favor of animations
-        collapseDisabledChild(false);
     }
 
     @Override
@@ -66,7 +64,6 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
 
     @Override
     public void postResize() {
-        super.postResize();
         if (this.scheduleAnimation && !this.widgetAreaSnapshots.isEmpty()) {
             @UnmodifiableView @NotNull List<Item<T>> typeChildren = getTypeChildren();
             for (int i = 0; i < typeChildren.size(); i++) {
@@ -160,7 +157,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         private Predicate<IGuiElement> dropPredicate;
         private SortableListWidget<T> listWidget;
         private int index = -1;
-        private final int movingFrom = -1;
+        private int movingFrom = -1;
 
         public Item(T value) {
             this.value = value;
@@ -187,6 +184,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
             return this.dropPredicate == null || this.dropPredicate.test(widget);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void onDrag(int mouseButton, long timeSinceLastClick) {
             super.onDrag(mouseButton, timeSinceLastClick);
@@ -217,7 +215,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
 
         public Item<T> child(IWidget widget) {
             this.children = Collections.singletonList(widget);
-            if (isValid()) widget.initialise(this, true);
+            if (isValid()) widget.initialise(this);
             return this;
         }
 

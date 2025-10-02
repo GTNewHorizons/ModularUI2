@@ -4,13 +4,12 @@ import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.network.packets.SyncConfig;
 import com.cleanroommc.modularui.screen.ModularScreen;
-
-import net.minecraft.network.PacketBuffer;
-import cpw.mods.fml.common.Loader;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import cpw.mods.fml.common.Loader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+
+import net.minecraft.network.PacketBuffer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 

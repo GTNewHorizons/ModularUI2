@@ -5,11 +5,9 @@ import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Box;
-
-import net.minecraft.client.gui.GuiScreen;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.GuiScreen;
 
 /**
  * Scrollable area
@@ -21,7 +19,6 @@ public class ScrollArea extends Area {
 
     private HorizontalScrollData scrollX;
     private VerticalScrollData scrollY;
-    private final ScrollPadding scrollPadding = new ScrollPadding();
     private int scrollBarBackgroundColor = Color.withAlpha(Color.BLACK.main, 0.25f);
 
     public ScrollArea(int x, int y, int w, int h) {
@@ -29,15 +26,6 @@ public class ScrollArea extends Area {
     }
 
     public ScrollArea() {}
-
-    @Override
-    public Box getPadding() {
-        return this.scrollPadding;
-    }
-
-    public ScrollPadding getScrollPadding() {
-        return this.scrollPadding;
-    }
 
     public void setScrollData(ScrollData data) {
         if (data instanceof HorizontalScrollData scrollData) {

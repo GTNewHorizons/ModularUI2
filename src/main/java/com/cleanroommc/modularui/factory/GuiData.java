@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 
 import java.util.Objects;
 
@@ -26,10 +25,6 @@ public class GuiData {
 
     public EntityPlayer getPlayer() {
         return this.player;
-    }
-
-    public World getWorld() {
-        return this.player.getEntityWorld();
     }
 
     public boolean isClient() {

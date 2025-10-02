@@ -2,11 +2,14 @@ package com.cleanroommc.modularui.factory;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
 
+import com.gtnewhorizons.modularui.common.internal.network.NetworkUtils;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 
-import com.gtnewhorizons.modularui.common.internal.network.NetworkUtils;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 /**
  * Like {@link SimpleGuiFactory} but with ItemStack data attached. Unlike {@link ItemGuiFactory}, the item itself

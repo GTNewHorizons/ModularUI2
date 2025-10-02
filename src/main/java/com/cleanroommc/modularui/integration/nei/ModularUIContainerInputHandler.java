@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.integration.nei;
 
+import codechicken.nei.guihook.IContainerInputHandler;
+
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
-
-import codechicken.nei.guihook.IContainerInputHandler;
 
 import java.io.IOException;
 

@@ -2,6 +2,9 @@ package com.cleanroommc.modularui.overlay;
 
 import com.cleanroommc.modularui.screen.ModularScreen;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiOpenEvent;
 

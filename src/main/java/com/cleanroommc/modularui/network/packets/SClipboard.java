@@ -3,13 +3,12 @@ package com.cleanroommc.modularui.network.packets;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.NetworkUtils;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import cpw.mods.fml.common.FMLCommonHandler;
 
 public class SClipboard implements IPacket {
 

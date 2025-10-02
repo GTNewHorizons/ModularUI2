@@ -2,21 +2,23 @@ package com.cleanroommc.modularui.utils.fakeworld;
 
 import com.cleanroommc.modularui.ModularUI;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
-
-import com.google.common.collect.AbstractIterator;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+
 import it.unimi.dsi.fastutil.chars.CharArraySet;
 import it.unimi.dsi.fastutil.chars.CharSet;
+
+import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
+import net.minecraft.world.World;
+
+import com.google.common.collect.AbstractIterator;
+
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
@@ -24,6 +26,7 @@ import org.joml.Vector3d;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiPredicate;
 
 public class ArraySchema implements ISchema {
@@ -34,51 +37,16 @@ public class ArraySchema implements ISchema {
         return new Builder();
     }
 
-    public static ArraySchema of(Entity entity, int radius) {
-        return of(entity.worldObj, (int) entity.posX, (int) (entity.posY + 0.5), (int) entity.posZ, radius);
-    }
-
-    public static ArraySchema of(World world, int centerX, int centerY, int centerZ, int radius) {
-        int s = 2 * radius + 1;
-        BlockInfo[][][] blocks = new BlockInfo[s][s][s];
-        BlockPos pos = new BlockPos();
-        BlockPosUtil.add(pos.set(centerX, centerY, centerZ), -radius, -radius, -radius);
-        for (int x = 0; x < s; x++) {
-            for (int y = 0; y < s; y++) {
-                for (int z = 0; z < s; z++) {
-                    blocks[x][y][z] = BlockInfo.of(world, pos);
-                    BlockPosUtil.add(pos, 0, 0, 1);
-                }
-                BlockPosUtil.add(pos, 0, 1, -s);
-            }
-            BlockPosUtil.add(pos, 1, -s, 0);
-        }
-        return new ArraySchema(blocks);
-    }
-
-    public static ArraySchema of(World world, int ax, int ay, int az, int bx, int by, int bz) {
-        int x0 = Math.min(ax, bx), y0 = Math.min(ay, by), z0 = Math.min(az, bz);
-        int x1 = Math.max(ax, bx), y1 = Math.max(ay, by), z1 = Math.max(az, bz);
-        x0--;
-        y0--;
-        z0--;
-        BlockInfo[][][] blocks = new BlockInfo[x1 - x0][y1 - y0][z1 - z0];
-        for (BlockPos pos : BlockPos.getAllInBox(x0, y0, z0, x1, y1, z1)) {
-            blocks[pos.getX() - x0][pos.getY() - y0][pos.getZ() - z0] = BlockInfo.of(world, pos);
-        }
-        return new ArraySchema(blocks);
-    }
-
     private final World world;
     private final BlockInfo[][][] blocks;
-    private BiPredicate<BlockPos, BlockInfo> renderFilter = (__, ___) -> true;
+    private BiPredicate<BlockPos, BlockInfo> renderFilter;
     private final Vector3d center;
 
     public ArraySchema(BlockInfo[][][] blocks) {
         this.blocks = blocks;
         this.world = new DummyWorld();
         BlockPos current = new BlockPos();
-        BlockPos max = new BlockPos(BlockPosUtil.MIN.x, BlockPosUtil.MIN.y, BlockPosUtil.MIN.z);
+        BlockPos max = new BlockPos(BlockPosUtil.MIN.x, BlockPosUtil.MIN.y, BlockPosUtil.MAX.z);
         for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[x].length; y++) {
                 for (int z = 0; z < blocks[x][y].length; z++) {
@@ -120,7 +88,7 @@ public class ArraySchema implements ISchema {
 
     @NotNull
     @Override
-    public Iterator<Pair<BlockPos, BlockInfo>> iterator() {
+    public Iterator<Map.Entry<BlockPos, BlockInfo>> iterator() {
         return new AbstractIterator<>() {
 
             private final BlockPos pos = new BlockPos();
@@ -128,7 +96,7 @@ public class ArraySchema implements ISchema {
             private int x = 0, y = 0, z = -1;
 
             @Override
-            protected Pair<BlockPos, BlockInfo> computeNext() {
+            protected Map.Entry<BlockPos, BlockInfo> computeNext() {
                 BlockInfo info;
                 while (true) {
                     if (++z >= blocks[x][y].length) {

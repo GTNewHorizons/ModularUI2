@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
-
 import org.jetbrains.annotations.Nullable;
 
 public class DraggablePanelWrapper implements IDraggable {

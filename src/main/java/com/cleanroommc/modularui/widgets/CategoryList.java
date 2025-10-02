@@ -6,11 +6,10 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.AbstractParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,12 +24,12 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
     private IDrawable collapsedOverlay;
 
     @Override
-    public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
         super.drawOverlay(context, widgetTheme);
         if (this.expanded) {
-            this.expandedOverlay.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
+            this.expandedOverlay.drawAtZero(context, getArea(), widgetTheme);
         } else {
-            this.collapsedOverlay.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
+            this.collapsedOverlay.drawAtZero(context, getArea(), widgetTheme);
         }
     }
 

@@ -8,9 +8,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.widget.Widget;
-
 import net.minecraft.client.Minecraft;
-
 import org.jetbrains.annotations.NotNull;
 
 public class TransformationTestGui extends CustomModularScreen {

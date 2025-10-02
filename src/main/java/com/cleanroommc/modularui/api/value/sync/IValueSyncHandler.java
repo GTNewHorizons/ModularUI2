@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.api.value.sync;
 
 import com.cleanroommc.modularui.api.value.IValue;
-
 import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;

@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.utils.serialization;
 
 import net.minecraft.network.PacketBuffer;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

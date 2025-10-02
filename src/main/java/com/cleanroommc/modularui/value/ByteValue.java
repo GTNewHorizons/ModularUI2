@@ -28,8 +28,8 @@ public class ByteValue implements IByteValue<Byte> {
 
     public static class Dynamic extends ByteValue {
 
-        private final Supplier getter;
-        private final Consumer setter;
+        private Supplier getter;
+        private Consumer setter;
 
         public Dynamic(Supplier getter, Consumer setter) {
             this.getter = getter;
@@ -48,12 +48,9 @@ public class ByteValue implements IByteValue<Byte> {
     }
 
     public interface Supplier {
-
         byte getByte();
     }
-
     public interface Consumer {
-
         void setByte(byte b);
     }
 }

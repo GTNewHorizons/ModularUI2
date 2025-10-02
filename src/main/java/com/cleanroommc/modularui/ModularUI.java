@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui;
 
 import net.minecraft.launchwrapper.Launch;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.ModContainer;
@@ -8,7 +9,6 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +41,7 @@ public class ModularUI {
     @Mod.Instance
     public static ModularUI INSTANCE;
 
-    public static final boolean isTestEnv = Launch.blackboard == null;
-    public static final boolean isDevEnv = isTestEnv || (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
+    public static final boolean isDevEnv = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
     static {
         // confirm mXparser license

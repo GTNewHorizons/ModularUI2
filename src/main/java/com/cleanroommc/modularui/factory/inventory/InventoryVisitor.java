@@ -10,7 +10,7 @@ public interface InventoryVisitor {
     /**
      * Called on visiting a slot in a player bound inventory.
      *
-     * @param type  type of the current inventory
+     * @param type type of the current inventory
      * @param index index of the slot
      * @param stack content of the slot
      * @return true if no further slots should be visited

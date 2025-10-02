@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.utils.fakeworld;
 
-import net.minecraft.world.World;
-
 import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
+import net.minecraft.world.World;
 import org.joml.Vector3d;
 
 import java.util.function.BiPredicate;
