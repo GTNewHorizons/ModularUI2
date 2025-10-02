@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 public enum TargetedMod implements ITargetMod {
 
-    THAUMCRAFT("Thaumcraft");
+    THAUMCRAFT("Thaumcraft"),
+    NEI("NotEnoughItems");
 
     private final TargetModBuilder builder;
 
