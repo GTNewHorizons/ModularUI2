@@ -3,11 +3,13 @@ package com.cleanroommc.modularui.value.sync;
 import com.cleanroommc.modularui.api.IPacketWriter;
 import com.cleanroommc.modularui.network.NetworkHandler;
 import com.cleanroommc.modularui.network.packets.PacketSyncHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import io.netty.buffer.Unpooled;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -182,7 +184,7 @@ public abstract class SyncHandler {
         if (!syncHandler.isValid()) {
             throw new IllegalStateException();
         }
-        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
+        NetworkHandler.sendToPlayer(new PacketSyncHandler(panel, syncHandler.getKey(), false, buffer), (EntityPlayerMP) syncHandler.syncManager.getPlayer());
     }
 
     public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
@@ -191,6 +193,6 @@ public abstract class SyncHandler {
         if (!syncHandler.isValid()) {
             throw new IllegalStateException();
         }
-        NetworkHandler.sendToServer(new PacketSyncHandler(panel, syncHandler.getKey(), buffer));
+        NetworkHandler.sendToServer(new PacketSyncHandler(panel, syncHandler.getKey(), false, buffer));
     }
 }

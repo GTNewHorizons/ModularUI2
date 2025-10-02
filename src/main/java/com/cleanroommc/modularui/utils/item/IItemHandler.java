@@ -1,17 +1,15 @@
 package com.cleanroommc.modularui.utils.item;
 
-import cpw.mods.fml.common.Optional;
-
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
-
-import javax.annotation.Nullable;
+import cpw.mods.fml.common.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 @Optional.Interface(iface = "com.gtnewhorizons.modularui.api.forge.IItemHandler", modid = "modularui")
 public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IItemHandler {
@@ -25,9 +23,9 @@ public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IIte
 
     /**
      * Returns the ItemStack in a given slot.
-     *
+     * <p>
      * The result's stack size may be greater than the itemstack's max size.
-     *
+     * <p>
      * If the result is empty, then the slot is empty.
      *
      * <p>
@@ -56,8 +54,8 @@ public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IIte
      * @param stack    ItemStack to insert. This must not be modified by the item handler.
      * @param simulate If true, the insertion is only simulated
      * @return The remaining ItemStack that was not inserted (if the entire stack is accepted, then return an empty ItemStack).
-     *         May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
-     *         The returned ItemStack can be safely modified after.
+     * May be the same as the input ItemStack if unchanged, otherwise a new ItemStack.
+     * The returned ItemStack can be safely modified after.
      **/
     @Nullable
     ItemStack insertItem(int slot, @Nullable ItemStack stack, boolean simulate);
@@ -73,7 +71,7 @@ public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IIte
      * @param amount   Amount to extract (may be greater than the current stack's max limit)
      * @param simulate If true, the extraction is only simulated
      * @return ItemStack extracted from the slot, must be empty if nothing can be extracted.
-     *         The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
+     * The returned ItemStack can be safely modified after, so item handlers should return a new or copied stack.
      **/
     @Nullable
     ItemStack extractItem(int slot, int amount, boolean simulate);
@@ -82,7 +80,7 @@ public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IIte
      * Retrieves the maximum stack size allowed to exist in the given slot.
      *
      * @param slot Slot to query.
-     * @return     The maximum stack size allowed in the slot.
+     * @return The maximum stack size allowed in the slot.
      */
     int getSlotLimit(int slot);
 
@@ -99,11 +97,11 @@ public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IIte
      * <li>When isItemValid is true, no assumptions can be made and insertion must be simulated case-by-case.</li>
      * <li>The actual items in the inventory, its fullness, or any other state are <strong>not</strong> considered by isItemValid.</li>
      * </ul>
-     * @param slot    Slot to query for validity
-     * @param stack   Stack to test with for validity
      *
+     * @param slot  Slot to query for validity
+     * @param stack Stack to test with for validity
      * @return true if the slot can insert the ItemStack, not considering the current state of the inventory.
-     *         false if the slot can never insert the ItemStack in any situation.
+     * false if the slot can never insert the ItemStack in any situation.
      */
     default boolean isItemValid(int slot, @Nullable ItemStack stack) {
         return true;
@@ -121,9 +119,10 @@ public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IIte
 
     /**
      * Checks if the given slot index corresponds to the given slot in an IInventory.
-     * @param index The index of the slot in this item handler.
+     *
+     * @param index     The index of the slot in this item handler.
      * @param inventory The Minecraft inventory to check for correspondence.
-     * @param invIndex The index of the slot in the Minecraft inventory to check.
+     * @param invIndex  The index of the slot in the Minecraft inventory to check.
      * @return True if index in this and invIndex in inventory point to the same slot.
      */
     default boolean isSlotFromInventory(int index, IInventory inventory, int invIndex) {

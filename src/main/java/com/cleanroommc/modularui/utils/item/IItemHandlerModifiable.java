@@ -1,8 +1,7 @@
 package com.cleanroommc.modularui.utils.item;
 
-import cpw.mods.fml.common.Optional;
-
 import net.minecraft.item.ItemStack;
+import cpw.mods.fml.common.Optional;
 
 import javax.annotation.Nullable;
 
@@ -18,7 +17,7 @@ public interface IItemHandlerModifiable extends IItemHandler, com.gtnewhorizons.
      * @param slot  Slot to modify
      * @param stack ItemStack to set slot to (may be empty).
      * @throws RuntimeException if the handler is called in a way that the handler
-     * was not expecting.
+     *                          was not expecting.
      **/
     void setStackInSlot(int slot, @Nullable ItemStack stack);
 }

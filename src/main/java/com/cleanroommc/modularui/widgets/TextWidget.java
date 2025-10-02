@@ -2,9 +2,9 @@ package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.drawable.text.StringKey;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.WidgetTree;
@@ -14,11 +14,13 @@ import net.minecraft.util.EnumChatFormatting;
 
 import org.jetbrains.annotations.Nullable;
 
-public class TextWidget extends Widget<TextWidget> {
+import java.util.function.IntSupplier;
+
+public class TextWidget<W extends TextWidget<W>> extends Widget<W> {
 
     private final IKey key;
     private Alignment alignment = Alignment.CenterLeft;
-    private Integer color = null;
+    private IntSupplier color = null;
     private Boolean shadow = null;
     private float scale = 1f;
 
@@ -30,32 +32,41 @@ public class TextWidget extends Widget<TextWidget> {
     }
 
     public TextWidget(String key) {
-         this(new StringKey(key));
+        this(IKey.str(key));
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         TextRenderer renderer = TextRenderer.SHARED;
-        String text = this.key.getFormatted();
-        if (this.lastText != null && !this.lastText.equals(text)) {
-            // scheduling it would resize it on next frame, but we need it now
-            WidgetTree.resizeInternal(this, false);
-        }
-        this.lastText = text;
-        renderer.setColor(this.color != null ? this.color : widgetTheme.getTextColor());
-        renderer.setAlignment(this.alignment, getArea().w() + this.scale, getArea().h());
-        renderer.setShadow(this.shadow != null ? this.shadow : widgetTheme.getTextShadow());
-        renderer.setPos(getArea().getPadding().left, getArea().getPadding().top);
+        this.lastText = checkString();
+        WidgetTheme theme = getActiveWidgetTheme(widgetTheme, isHovering());
+        renderer.setColor(this.color != null ? this.color.getAsInt() : theme.getTextColor());
+        renderer.setAlignment(this.alignment, getArea().paddedWidth() + this.scale, getArea().paddedHeight());
+        renderer.setShadow(this.shadow != null ? this.shadow : theme.getTextShadow());
+        renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         renderer.setScale(this.scale);
         renderer.setSimulate(false);
         renderer.draw(this.key.getFormatted());
+    }
+
+    protected String checkString() {
+        String text = this.key.getFormatted();
+        if (this.lastText != null && !this.lastText.equals(text)) {
+            onTextChanged(text);
+        }
+        return text;
+    }
+
+    protected void onTextChanged(String newText) {
+        // scheduling it would resize it on next frame, but we need it now
+        WidgetTree.resizeInternal(this, false);
     }
 
     private TextRenderer simulate(float maxWidth) {
         Box padding = getArea().getPadding();
         TextRenderer renderer = TextRenderer.SHARED;
         renderer.setAlignment(Alignment.TopLeft, maxWidth);
-        renderer.setPos(padding.left, padding.top);
+        renderer.setPos(padding.getLeft(), padding.getTop());
         renderer.setScale(this.scale);
         renderer.setSimulate(true);
         renderer.draw(getTextForDefaultSize());
@@ -126,7 +137,7 @@ public class TextWidget extends Widget<TextWidget> {
         return this.scale;
     }
 
-    public @Nullable Integer getColor() {
+    public @Nullable IntSupplier getColor() {
         return this.color;
     }
 
@@ -134,28 +145,32 @@ public class TextWidget extends Widget<TextWidget> {
         return this.shadow;
     }
 
-    public TextWidget alignment(Alignment alignment) {
+    public W alignment(Alignment alignment) {
         this.alignment = alignment;
-        return this;
+        return getThis();
     }
 
-    public TextWidget color(@Nullable Integer color) {
+    public W color(int color) {
+        return color(() -> color);
+    }
+
+    public W color(@Nullable IntSupplier color) {
         this.color = color;
-        return this;
+        return getThis();
     }
 
-    public TextWidget scale(float scale) {
+    public W scale(float scale) {
         this.scale = scale;
-        return this;
+        return getThis();
     }
 
-    public TextWidget shadow(@Nullable Boolean shadow) {
+    public W shadow(@Nullable Boolean shadow) {
         this.shadow = shadow;
-        return this;
+        return getThis();
     }
 
-    public TextWidget style(EnumChatFormatting formatting) {
+    public W style(EnumChatFormatting formatting) {
         this.key.style(formatting);
-        return this;
+        return getThis();
     }
 }

@@ -10,13 +10,13 @@ import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
-import com.cleanroommc.modularui.utils.GlStateManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -143,7 +143,7 @@ public class WidgetTree {
             GlStateManager.colorMask(true, true, true, true);
             GlStateManager.color(1f, 1f, 1f, alpha);
             GlStateManager.enableBlend();
-            WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
+            WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
             if (drawBackground) parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
             parent.drawOverlay(context, widgetTheme);
@@ -234,7 +234,7 @@ public class WidgetTree {
         GlStateManager.colorMask(true, true, true, true);
         GlStateManager.color(1f, 1f, 1f, alpha);
         GlStateManager.enableBlend();
-        WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
+        WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
         parent.drawBackground(context, widgetTheme);
 
         GlStateManager.popMatrix();
@@ -391,8 +391,13 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel, boolean includePanel) {
+        collectSyncValues(syncManager, panel.getName(), panel, includePanel);
+    }
+
+    @ApiStatus.Internal
+    public static void collectSyncValues(PanelSyncManager syncManager, String panelName, IWidget panel, boolean includePanel) {
         AtomicInteger id = new AtomicInteger(0);
-        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panel.getName();
+        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panelName;
         foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {

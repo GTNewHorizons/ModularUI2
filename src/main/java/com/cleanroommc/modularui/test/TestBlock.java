@@ -1,6 +1,5 @@
 package com.cleanroommc.modularui.test;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import com.cleanroommc.modularui.factory.GuiFactories;
 
 import net.minecraft.block.Block;
@@ -10,10 +9,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.registry.GameRegistry;
 
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.function.Supplier;
 
 public class TestBlock extends Block implements ITileEntityProvider {
 

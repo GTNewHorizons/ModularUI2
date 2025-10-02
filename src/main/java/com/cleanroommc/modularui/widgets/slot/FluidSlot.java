@@ -2,29 +2,29 @@ package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
-import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.SlotTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
-
-import gregtech.api.util.GTUtility;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -33,13 +33,14 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidTank;
 
+import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
 
-public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDragAndDropHandler, NEIIngredientProvider {
+public class FluidSlot extends Widget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack>, RecipeViewerIngredientProvider {
 
     public static final int DEFAULT_SIZE = 18;
     public static final String UNIT_BUCKET = "B";
@@ -133,8 +134,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
 
     @Override
     public void onInit() {
-        textRenderer.setShadow(true);
-        textRenderer.setScale(0.5f);
+        this.textRenderer.setShadow(true);
+        this.textRenderer.setScale(0.5f);
         this.textRenderer.setColor(Color.WHITE.main);
     }
 
@@ -145,7 +146,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         IFluidTank fluidTank = getFluidTank();
         FluidStack content = getFluidStack();
         if (content != null) {
@@ -159,7 +160,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             GuiDraw.drawFluidTexture(content, this.contentOffsetX, y, getArea().width - this.contentOffsetX * 2, height, 0);
         }
         if (this.overlayTexture != null) {
-            this.overlayTexture.drawAtZero(context, getArea(), widgetTheme);
+            this.overlayTexture.drawAtZero(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
         if (content != null && this.syncHandler.controlsAmount()) {
             String s = NumberFormat.format(getBaseUnitAmount(content.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
@@ -167,6 +168,11 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
             this.textRenderer.setPos((int) (this.contentOffsetX + 0.5f), (int) (getArea().height - 5.5f));
             this.textRenderer.draw(s);
         }
+    }
+
+    @Override
+    public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
+        super.drawOverlay(context, widgetTheme);
         if (isHovering()) {
             GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, getArea().w() - 2, getArea().h() - 2, getSlotHoverColor());
@@ -175,16 +181,13 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     @Override
-    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getFluidSlotTheme();
     }
 
     public int getSlotHoverColor() {
-        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetSlotTheme slotTheme) {
-            return slotTheme.getSlotHoverColor();
-        }
-        return ITheme.getDefault().getFluidSlotTheme().getSlotHoverColor();
+        WidgetThemeEntry<SlotTheme> theme = getWidgetTheme(getContext().getTheme(), SlotTheme.class);
+        return theme.getTheme().getSlotHoverColor();
     }
 
     @Override
@@ -192,7 +195,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         if (!this.syncHandler.canFillSlot() && !this.syncHandler.canDrainSlot()) {
             return Result.ACCEPT;
         }
-        ItemStack cursorStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+        ItemStack cursorStack = Platform.getClientPlayer().inventory.getItemStack();
         if (this.syncHandler.isPhantom() || cursorStack != null) {
             MouseData mouseData = MouseData.create(mouseButton);
             this.syncHandler.syncToServer(FluidSlotSyncHandler.SYNC_CLICK, mouseData::writeToPacket);
@@ -201,7 +204,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         if (this.syncHandler.isPhantom()) {
             if ((scrollDirection.isUp() && !this.syncHandler.canFillSlot()) || (scrollDirection.isDown() && !this.syncHandler.canDrainSlot())) {
                 return false;
@@ -277,6 +280,8 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
         return this;
     }
 
+    /* === Recipe viewer ghost slot === */
+
     @Override
     public boolean handleDragAndDrop(@NotNull ItemStack draggedStack, int button) {
         if (!this.syncHandler.isPhantom()) return false;
@@ -294,7 +299,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, NEIDra
     }
 
     @Override
-    public @Nullable ItemStack getStackForNEI() {
+    public @Nullable ItemStack getStackForRecipeViewer() {
         if (ModularUI.Mods.GT5U.isLoaded()) {
             return GTUtility.getFluidDisplayStack(getFluidStack(), false);
         }

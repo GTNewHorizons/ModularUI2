@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.utils;
 
-import baubles.api.BaubleType;
-import baubles.api.expanded.IBaubleExpanded;
-
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+
+import baubles.api.BaubleType;
+import baubles.api.expanded.IBaubleExpanded;
 
 public interface ISimpleBauble extends IBaubleExpanded {
 

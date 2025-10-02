@@ -1,6 +1,6 @@
 package com.cleanroommc.modularui.screen;
 
-import com.cleanroommc.modularui.api.NEISettings;
+import com.cleanroommc.modularui.api.RecipeViewerSettings;
 import com.cleanroommc.modularui.api.UIFactory;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.PosGuiData;
@@ -18,14 +18,14 @@ public class UISettings {
 
     private Supplier<ModularContainer> containerSupplier;
     private Predicate<EntityPlayer> canInteractWith;
-    private final NEISettings neiSettings;
+    private final RecipeViewerSettings recipeViewerSettings;
 
     public UISettings() {
-        this(new NEISettingsImpl());
+        this(new RecipeViewerSettingsImpl());
     }
 
-    public UISettings(NEISettings neiSettings) {
-        this.neiSettings = neiSettings;
+    public UISettings(RecipeViewerSettings recipeViewerSettings) {
+        this.recipeViewerSettings = recipeViewerSettings;
     }
 
     /**
@@ -76,8 +76,8 @@ public class UISettings {
         canInteractWithinRange(guiData, DEFAULT_INTERACT_RANGE);
     }
 
-    public NEISettings getNEISettings() {
-        return neiSettings;
+    public RecipeViewerSettings getRecipeViewerSettings() {
+        return recipeViewerSettings;
     }
 
     @ApiStatus.Internal

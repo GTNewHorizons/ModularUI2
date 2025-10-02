@@ -7,12 +7,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-
 import cpw.mods.fml.common.FMLCommonHandler;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.jetbrains.annotations.Nullable;
@@ -20,9 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
-
-import static com.google.common.primitives.Ints.saturatedCast;
 
 public class NetworkUtils {
 
@@ -155,6 +149,6 @@ public class NetworkUtils {
 
     @SuppressWarnings("unchecked")
     public static <T extends Enum<T>> T readEnumValue(PacketBuffer buffer, Class<T> enumClass) {
-        return (T)((Enum<T>[])enumClass.getEnumConstants())[buffer.readVarIntFromBuffer()];
+        return (T) ((Enum<T>[]) enumClass.getEnumConstants())[buffer.readVarIntFromBuffer()];
     }
 }
