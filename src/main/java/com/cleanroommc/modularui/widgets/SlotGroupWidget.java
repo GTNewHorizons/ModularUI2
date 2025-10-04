@@ -59,7 +59,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
     public interface SlotConsumer {
 
-        ItemSlot apply(int index, ItemSlot slot);
+        ItemSlot apply(int index, ItemSlot widgetSlot);
     }
 
     private String slotsKeyName;
