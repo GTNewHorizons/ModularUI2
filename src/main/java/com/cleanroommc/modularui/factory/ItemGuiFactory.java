@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * @deprecated use {@link PlayerInventoryGuiFactory}
+ */
 @Deprecated
 public class ItemGuiFactory extends AbstractUIFactory<GuiData> {
 
