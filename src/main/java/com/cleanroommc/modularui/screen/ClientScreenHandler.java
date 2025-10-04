@@ -83,13 +83,10 @@ public class ClientScreenHandler {
 
     private static IMuiScreen lastMui;
 
-    public static boolean guiIsClosing;
-
     // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onGuiOpen(GuiOpenEvent event) {
         GuiScreen newGui = event.gui;
-        guiIsClosing = newGui == null;
 
         defaultContext.reset();
         if (lastMui != null && newGui == null) {
