@@ -37,7 +37,15 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
         IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData, 4);
         guiSyncManager.registerSlotGroup("mixer_items", 2);
 
-        ModularPanel panel = ModularPanel.defaultPanel("knapping_gui");
+        // if the player slot is the slot with this item, then disallow any interaction
+        // if the item is not in the player inventory (bauble for example), then this items slot is not on the screen, and we don't need to
+        // limit accessibility
+        if (guiData.getInventoryType() == InventoryTypes.PLAYER) {
+            guiSyncManager.bindPlayerInventory(guiData.getPlayer(), (inv, index) -> index == guiData.getSlotIndex() ?
+                    new ModularSlot(inv, index).accessibility(false, false) :
+                    new ModularSlot(inv, index));
+        }
+        ModularPanel panel = ModularPanel.defaultPanel("knapping_gui").resizeableOnDrag(true);
         panel.child(new Column().margin(7)
                 .child(new ParentWidget<>().widthRel(1f).expanded()
                         .child(SlotGroupWidget.builder()
@@ -45,7 +53,10 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
                                 .row("II")
                                 .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
                                         .ignoreMaxStackSize(true)
-                                        .slotGroup("mixer_items")))
+                                        .slotGroup("mixer_items")
+                                        // do not allow putting items which can hold other items into the item
+                                        // some mods don't do this on their backpacks, so it won't catch those cases
+                                        .filter(stack -> !stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))))
                                 .build()
                                 .align(Alignment.Center)))
                 .child(SlotGroupWidget.playerInventory(false)));
