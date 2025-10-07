@@ -75,7 +75,7 @@ public interface IGuiElement {
      * @return if this widget is currently right below the mouse
      */
     default boolean isHovering() {
-        return getScreen().getContext().isHovered(this);
+        return false;
     }
 
     /**
@@ -85,10 +85,11 @@ public interface IGuiElement {
      * @return if this element is right blow the mouse for a certain amount of time
      */
     default boolean isHoveringFor(int ticks) {
-        return getScreen().getContext().isHoveredFor(this, ticks);
+        return isHovering();
     }
 
     default boolean isBelowMouse() {
+        // TODO inaccurate
         IGuiElement hovered = getScreen().getContext().getHovered();
         if (hovered == null) return false;
         while (!(hovered instanceof ModularPanel)) {

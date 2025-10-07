@@ -616,11 +616,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
 
         @Override
         public void onMouseStartHover() {
+            super.onMouseStartHover();
             this.animatedKey.startAnimation().forward(true);
         }
 
         @Override
         public void onMouseEndHover() {
+            super.onMouseEndHover();
             this.animatedKey.forward(false);
         }
     }

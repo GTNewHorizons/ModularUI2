@@ -144,6 +144,16 @@ public class PanelManager {
         return null;
     }
 
+    public @NotNull List<LocatedWidget> getAllHoveredWidgetsList(boolean debug) {
+        for (ModularPanel panel : this.panels) {
+            List<LocatedWidget> widgets = panel.getAllHoveringList(debug);
+            if (widgets != null) {
+                return widgets;
+            }
+        }
+        return Collections.emptyList();
+    }
+
     @ApiStatus.Internal
     public void openPanel(@NotNull ModularPanel panel, @NotNull IPanelHandler panelHandler) {
         IPanelHandler existing = this.panelHandlerMap.get(panel.getName());
