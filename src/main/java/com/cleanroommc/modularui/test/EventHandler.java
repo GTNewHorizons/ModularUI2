@@ -17,6 +17,7 @@ import com.cleanroommc.modularui.utils.Color;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -45,15 +46,19 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onItemUse(PlayerInteractEvent event) {
-        ItemStack heldItem = event.entityPlayer.getHeldItem();
-        if (event.entityPlayer.getEntityWorld().isRemote && heldItem != null && heldItem.getItem() == Items.diamond) {
+        if (event.entityPlayer.getEntityWorld().isRemote) {
+            ItemStack itemStack = event.getItemStack();
+            if (itemStack.getItem() == Items.diamond) {
+                ClientGUI.open(new TestGuis());
+            } else if (itemStack.getItem() == Items.emerald) {
+                ClientGUI.open(new GLTestGui());
+            }
             //GuiManager.openClientUI(Platform.getClientPlayer(), new TestGui());
             /*HoloUI.builder()
                     .inFrontOf(Platform.getClientPlayer(), 5, false)
                     .screenScale(0.5f)
                     .open(new TestGui());*/
             //ClientGUI.open(new ResizerTest());
-            ClientGUI.open(new GLTestGui());
         }
     }
 
