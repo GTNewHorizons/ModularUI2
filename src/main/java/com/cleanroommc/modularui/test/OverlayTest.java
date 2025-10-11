@@ -32,6 +32,7 @@ public class OverlayTest {
             AtomicInteger k = new AtomicInteger();
             return new ModularScreen(ModularPanel.defaultPanel("overlay").sizeRel(1f)
                     .background(IDrawable.EMPTY)
+                    .disableHoverBackground()
                     .child(title.scale(5f)
                             .shadow(true)
                             .color(colors[k.get()])
