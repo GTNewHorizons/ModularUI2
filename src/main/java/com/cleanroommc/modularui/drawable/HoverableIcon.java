@@ -4,10 +4,7 @@ import com.cleanroommc.modularui.api.drawable.IHoverable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.widget.ITooltip;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.screen.viewport.GuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.widget.sizer.Area;
-import com.cleanroommc.modularui.widget.sizer.Box;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

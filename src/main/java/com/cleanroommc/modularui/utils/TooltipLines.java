@@ -125,6 +125,7 @@ public class TooltipLines extends AbstractList<String> {
     }
 
     private static class Line {
+
         private final String text;
         private final int length;
         private int index;

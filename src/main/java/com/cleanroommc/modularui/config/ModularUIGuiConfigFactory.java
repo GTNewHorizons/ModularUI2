@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.config;
 
-import com.gtnewhorizon.gtnhlib.config.SimpleGuiFactory;
-
 import net.minecraft.client.gui.GuiScreen;
+
+import com.gtnewhorizon.gtnhlib.config.SimpleGuiFactory;
 
 @SuppressWarnings("unused")
 public class ModularUIGuiConfigFactory implements SimpleGuiFactory {

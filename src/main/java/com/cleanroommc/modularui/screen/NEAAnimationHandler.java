@@ -1,8 +1,8 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
