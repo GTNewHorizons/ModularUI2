@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.factory.PosGuiData;
 import net.minecraft.entity.player.EntityPlayer;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -18,6 +19,7 @@ public class UISettings {
 
     private Supplier<ModularContainer> containerSupplier;
     private Predicate<EntityPlayer> canInteractWith;
+    private String theme;
     private final RecipeViewerSettings recipeViewerSettings;
 
     public UISettings() {
@@ -76,6 +78,10 @@ public class UISettings {
         canInteractWithinRange(guiData, DEFAULT_INTERACT_RANGE);
     }
 
+    public void useTheme(String theme) {
+        this.theme = theme;
+    }
+
     public RecipeViewerSettings getRecipeViewerSettings() {
         return recipeViewerSettings;
     }
@@ -91,5 +97,9 @@ public class UISettings {
 
     public boolean canPlayerInteractWithUI(EntityPlayer player) {
         return canInteractWith == null || canInteractWith.test(player);
+    }
+
+    public @Nullable String getTheme() {
+        return theme;
     }
 }
