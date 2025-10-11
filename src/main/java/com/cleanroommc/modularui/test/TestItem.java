@@ -4,6 +4,8 @@ import com.cleanroommc.modularui.ClientProxy;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
+import com.cleanroommc.modularui.factory.inventory.InventoryType;
+import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -17,6 +19,8 @@ import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
+
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -55,8 +59,9 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
                                         .ignoreMaxStackSize(true)
                                         .slotGroup("mixer_items")
                                         // do not allow putting items which can hold other items into the item
-                                        // some mods don't do this on their backpacks, so it won't catch those cases
-                                        .filter(stack -> !stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))))
+                                        // some mods don't do this on their backpacks, so it won't catch those cases // TODO 1.7.10
+                                        //.filter(stack -> !stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+                                ))
                                 .build()
                                 .align(Alignment.Center)))
                 .child(SlotGroupWidget.playerInventory(false)));

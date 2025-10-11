@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
@@ -11,6 +13,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.DoubleValue;
@@ -22,9 +25,8 @@ import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
@@ -34,7 +36,7 @@ import java.util.Locale;
 
 public class GLTestGui extends CustomModularScreen {
 
-    private static final ItemStack ITEM = new ItemStack(Blocks.CHEST);
+    private static final ItemStack ITEM = new ItemStack(Blocks.chest);
     private static final int COLOR = Color.withAlpha(Color.RED.brighter(0), 0.75f);
 
     private RenderObject ro1;
@@ -133,9 +135,10 @@ public class GLTestGui extends CustomModularScreen {
     private static void drawItem(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         GlStateManager.translate(x, y, 0);
         GlStateManager.scale(width / 16f, height / 16f, 1);
-        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        RenderItem renderItem = GuiScreenAccessor.getItemRender();
         renderItem.zLevel = 0;
-        renderItem.renderItemAndEffectIntoGUI(Platform.getClientPlayer(), ITEM, 0, 0);
+        renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), ITEM, 0, 0);
+        GuiDraw.afterRenderItemAndEffectIntoGUI(ITEM);
         renderItem.zLevel = 0;
     }
 
