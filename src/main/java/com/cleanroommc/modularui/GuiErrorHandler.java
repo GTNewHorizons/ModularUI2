@@ -1,8 +1,10 @@
 package com.cleanroommc.modularui;
 
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.ArrayList;
@@ -17,8 +19,7 @@ public class GuiErrorHandler {
     private final Set<GuiError> errorSet = new ObjectOpenHashSet<>();
     private final List<GuiError> errors = new ArrayList<>();
 
-    private GuiErrorHandler() {
-    }
+    private GuiErrorHandler() {}
 
     public void clear() {
         this.errors.clear();
@@ -27,7 +28,7 @@ public class GuiErrorHandler {
     void pushError(IGuiElement reference, GuiError.Type type, String msg) {
         GuiError error = new GuiError(msg, reference, type);
         if (this.errorSet.add(error)) {
-            ModularUI.LOGGER.error(msg);
+            ModularUI.LOGGER.log(error.getLevel(), error);
             this.errors.add(error);
         }
     }
@@ -36,6 +37,5 @@ public class GuiErrorHandler {
         return this.errors;
     }
 
-    public void drawErrors(int x, int y) {
-    }
+    public void drawErrors(int x, int y) {}
 }

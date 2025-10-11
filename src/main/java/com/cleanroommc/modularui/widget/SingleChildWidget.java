@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -28,12 +29,15 @@ public class SingleChildWidget<W extends SingleChildWidget<W>> extends Widget<W>
         if (child == this || this.child == child) {
             return getThis();
         }
-
-        this.child = child;
-        if (isValid()) {
-            child.initialise(this);
+        if (this.child != null) {
+            this.child.dispose();
         }
+        this.child = child;
         updateList();
+        if (child != null && isValid()) {
+            child.initialise(this, true);
+            scheduleResize();
+        }
         return getThis();
     }
 }

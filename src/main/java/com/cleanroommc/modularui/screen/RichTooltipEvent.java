@@ -2,11 +2,10 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.drawable.IRichTextBuilder;
 
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
+import cpw.mods.fml.common.eventhandler.Cancelable;
+import cpw.mods.fml.common.eventhandler.Event;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +18,7 @@ public class RichTooltipEvent extends Event {
     protected int x, y;
     protected FontRenderer fontRenderer;
 
-    private RichTooltipEvent (IRichTextBuilder<?> tooltip, ItemStack itemStack, int x, int y, FontRenderer fontRenderer) {
+    private RichTooltipEvent(IRichTextBuilder<?> tooltip, ItemStack itemStack, int x, int y, FontRenderer fontRenderer) {
         this.tooltip = tooltip;
         this.itemStack = itemStack;
         this.x = x;

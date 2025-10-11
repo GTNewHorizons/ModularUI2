@@ -23,5 +23,6 @@ public interface IByteValue<T> extends IIntValue<T>, IStringValue<T> {
     }
 
     void setByteValue(byte b);
+
     byte getByteValue();
 }

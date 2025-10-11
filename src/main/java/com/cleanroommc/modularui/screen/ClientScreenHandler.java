@@ -1,21 +1,19 @@
 package com.cleanroommc.modularui.screen;
 
-import codechicken.nei.LayoutManager;
-import codechicken.nei.guihook.GuiContainerManager;
-import codechicken.nei.guihook.IContainerDrawHandler;
-
+import com.cleanroommc.modularui.GuiErrorHandler;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.event.KeyboardInputEvent;
 import com.cleanroommc.modularui.api.event.MouseInputEvent;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.overlay.OverlayManager;
@@ -26,6 +24,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.FpsCounter;
 import com.cleanroommc.modularui.utils.GlStateManager;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
@@ -33,14 +32,6 @@ import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.neverenoughanimations.animations.OpeningAnimation;
-
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
-import cpw.mods.fml.common.gameevent.TickEvent;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -55,10 +46,17 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+import codechicken.nei.LayoutManager;
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerDrawHandler;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -85,19 +83,22 @@ public class ClientScreenHandler {
 
     private static IMuiScreen lastMui;
 
+    // we need to know the actual gui and not some fake bs some other mod overwrites
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onGuiOpen(GuiOpenEvent event) {
+        GuiScreen newGui = event.gui;
+
         defaultContext.reset();
-        if (lastMui != null && event.gui == null) {
+        if (lastMui != null && newGui == null) {
             if (lastMui.getScreen().getPanelManager().isOpen()) {
                 lastMui.getScreen().getPanelManager().closeAll();
             }
             lastMui.getScreen().getPanelManager().dispose();
             lastMui = null;
-        } else if (event.gui instanceof IMuiScreen screenWrapper) {
+        } else if (newGui instanceof IMuiScreen screenWrapper) {
             if (lastMui == null) {
                 lastMui = screenWrapper;
-            } else if (lastMui == event.gui) {
+            } else if (lastMui == newGui) {
                 lastMui.getScreen().getPanelManager().reopen();
             } else {
                 if (lastMui.getScreen().getPanelManager().isOpen()) {
@@ -108,7 +109,7 @@ public class ClientScreenHandler {
             }
         }
 
-        if (event.gui instanceof IMuiScreen muiScreen) {
+        if (newGui instanceof IMuiScreen muiScreen) {
             Objects.requireNonNull(muiScreen.getScreen(), "ModularScreen must not be null!");
             if (currentScreen != muiScreen.getScreen()) {
                 if (hasScreen()) {
@@ -117,14 +118,15 @@ public class ClientScreenHandler {
                     lastChar = null;
                 }
                 currentScreen = muiScreen.getScreen();
+                currentScreen.getContext().setParentScreen(Minecraft.getMinecraft().currentScreen);
                 fpsCounter.reset();
             }
-        } else if (hasScreen() && getMCScreen() != null && event.gui != getMCScreen()) {
+        } else if (hasScreen() && getMCScreen() != null && newGui != getMCScreen()) {
             currentScreen.onCloseParent();
             currentScreen = null;
             lastChar = null;
         }
-
+        GuiErrorHandler.INSTANCE.clear();
         OverlayManager.onGuiOpen(event);
     }
 
@@ -137,14 +139,14 @@ public class ClientScreenHandler {
         OverlayStack.foreach(ms -> ms.onResize(event.gui.width, event.gui.height), false);
     }
 
-    // before NEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputHigh(KeyboardInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         inputEvent(event, InputPhase.EARLY);
     }
 
-    // after NEI
+    // after recipe viewer
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onGuiInputLow(KeyboardInputEvent.Pre event) throws IOException {
         inputEvent(event, InputPhase.LATE);
@@ -168,24 +170,19 @@ public class ClientScreenHandler {
         }
     }
 
-    // before NEI
+    // before recipe viewer
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiInputLow(MouseInputEvent.Pre event) throws IOException {
         defaultContext.updateEventState();
         if (checkGui(event.gui)) currentScreen.getContext().updateEventState();
-        // 1.7.10: In contrast to keyboard, MUI should process click first, otherwise ItemSlot causes infinite recursion
         if (handleMouseInput(Mouse.getEventButton(), currentScreen, event.gui)) {
-            if (ModularUI.Mods.NEI.isLoaded()) {
-                // remove NEI text field focus
-                LayoutManager.searchField.setFocus(false);
-                LayoutManager.quantity.setFocus(false);
-            }
+            Platform.unFocusRecipeViewer();
             event.setCanceled(true);
             return;
         }
         int w = Mouse.getEventDWheel();
         if (w == 0) return;
-        ModularScreen.UpOrDown upOrDown = w > 0 ? ModularScreen.UpOrDown.UP : ModularScreen.UpOrDown.DOWN;
+        UpOrDown upOrDown = w > 0 ? UpOrDown.UP : UpOrDown.DOWN;
         checkGui(event.gui);
         if (doAction(currentScreen, ms -> ms.onMouseScroll(upOrDown, Math.abs(w)))) {
             event.setCanceled(true);
@@ -203,11 +200,13 @@ public class ClientScreenHandler {
             drawScreen(currentScreen, currentScreen.getScreenWrapper().getGuiScreen(), mx, my, pt);
             event.setCanceled(true);
         }
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onGuiDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         OverlayStack.draw(event.mouseX, event.mouseY, event.renderPartialTicks);
+        Platform.setupDrawTex(); // recipe viewer and other mods may expect this state
     }
 
     @SubscribeEvent
@@ -350,6 +349,8 @@ public class ClientScreenHandler {
                 // set clicked slot to make sure the container clicks the desired slot
                 clickableGuiContainer.modularUI$setClickedSlot(slot);
                 acc.invokeMouseClicked(ctx.getAbsMouseX(), ctx.getAbsMouseY(), ctx.getMouseButton());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             } finally {
                 // undo modifications
                 clickableGuiContainer.modularUI$setClickedSlot(null);
@@ -435,16 +436,14 @@ public class ClientScreenHandler {
         GlStateManager.disableDepth();
         // mainly for invtweaks compat
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
-        GlStateManager.pushMatrix();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.enableRescaleNormal();
         acc.setHoveredSlot(null);
+        GlStateManager.pushMatrix();
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderHelper.enableGUIStandardItemLighting();
-        if (muiScreen.getContext().getNEISettings().isNEIEnabled(muiScreen)) {
+        if (muiScreen.getContext().getRecipeViewerSettings().isRecipeViewerEnabled(muiScreen)) {
             // Copied from GuiContainerManager#renderObjects but without translation
             for (IContainerDrawHandler drawHandler : GuiContainerManager.drawHandlers) {
                 drawHandler.renderObjects(mcScreen, mouseX, mouseY);
@@ -463,15 +462,12 @@ public class ClientScreenHandler {
         RenderHelper.disableStandardItemLighting();
         acc.invokeDrawGuiContainerForegroundLayer(mouseX, mouseY);
         muiScreen.drawForeground();
-        RenderHelper.enableGUIStandardItemLighting();
 
         acc.setHoveredSlot(null);
-        IGuiElement hovered = muiScreen.getContext().getHovered();
+        IGuiElement hovered = muiScreen.getContext().getTopHovered();
         if (hovered instanceof IVanillaSlot vanillaSlot && vanillaSlot.handleAsVanillaSlot()) {
             acc.setHoveredSlot(vanillaSlot.getVanillaSlot());
         }
-
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         InventoryPlayer inventoryplayer = Minecraft.getMinecraft().thePlayer.inventory;
         ItemStack itemstack = acc.getDraggedStack() == null ? inventoryplayer.getItemStack() : acc.getDraggedStack();
@@ -482,7 +478,7 @@ public class ClientScreenHandler {
 
             if (acc.getDraggedStack() != null && acc.getIsRightMouseClick()) {
                 itemstack = itemstack.copy();
-                itemstack.stackSize = MathHelper.ceiling_float_int((float) itemstack.stackSize / 2.0F);
+                itemstack.stackSize = MathUtils.ceil((float) itemstack.stackSize / 2.0F);
             } else if (acc.getDragSplitting() && acc.getDragSplittingSlots().size() > 1) {
                 itemstack = itemstack.copy();
                 itemstack.stackSize = acc.getDragSplittingRemnant();
@@ -568,10 +564,12 @@ public class ClientScreenHandler {
         int color = Color.argb(180, 40, 115, 220);
         float scale = 0.80f;
         int shift = (int) (11 * scale + 0.5f);
-        int lineY = screenH - shift - 2 - (!context.getScreen().isOverlay() && context.getNEISettings().isNEIEnabled(muiScreen) ? 20 : 0);
+        int lineY = screenH - shift - 2 - (!context.getScreen().isOverlay() && context.getRecipeViewerSettings().isRecipeViewerEnabled(muiScreen) ? 20 : 0);
         GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, color, true);
         lineY -= shift;
         GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, color, true);
+        lineY -= shift;
+        GuiDraw.drawText("Theme ID: " + context.getTheme().getId(), 5, lineY, scale, color, true);
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
         if (locatedHovered != null) {
             drawSegmentLine(lineY -= 4, scale, color);
@@ -620,7 +618,9 @@ public class ClientScreenHandler {
             } else if (hovered instanceof RichTextWidget richTextWidget) {
                 drawSegmentLine(lineY -= 4, scale, color);
                 lineY -= 10;
+                locatedHovered.applyMatrix(context);
                 Object hoveredElement = richTextWidget.getHoveredElement();
+                locatedHovered.unapplyMatrix(context);
                 GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, scale, color, true);
             }
         }

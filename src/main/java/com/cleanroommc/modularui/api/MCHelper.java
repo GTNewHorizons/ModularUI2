@@ -4,10 +4,10 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Interactable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.FluidStack;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 import gregtech.common.items.ItemFluidDisplay;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,11 +31,11 @@ public class MCHelper {
         return getMc() != null;
     }
 
-    public static Minecraft getMc() {
+    public static @Nullable Minecraft getMc() {
         return Minecraft.getMinecraft();
     }
 
-    public static EntityPlayerSP getPlayer() {
+    public static @Nullable EntityPlayer getPlayer() {
         if (hasMc()) {
             return getMc().thePlayer;
         }
@@ -43,7 +44,7 @@ public class MCHelper {
 
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayer player = getPlayer();
         if (player != null) {
             player.closeScreen();
             return true;

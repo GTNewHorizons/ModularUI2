@@ -33,6 +33,8 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
     public SortableListWidget() {
         super(Item::getWidgetValue);
         heightRel(1f);
+        // this is not desired here in favor of animations
+        collapseDisabledChild(false);
     }
 
     @Override
@@ -64,6 +66,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
 
     @Override
     public void postResize() {
+        super.postResize();
         if (this.scheduleAnimation && !this.widgetAreaSnapshots.isEmpty()) {
             @UnmodifiableView @NotNull List<Item<T>> typeChildren = getTypeChildren();
             for (int i = 0; i < typeChildren.size(); i++) {
@@ -157,7 +160,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         private Predicate<IGuiElement> dropPredicate;
         private SortableListWidget<T> listWidget;
         private int index = -1;
-        private int movingFrom = -1;
+        private final int movingFrom = -1;
 
         public Item(T value) {
             this.value = value;
@@ -184,11 +187,11 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
             return this.dropPredicate == null || this.dropPredicate.test(widget);
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public void onDrag(int mouseButton, long timeSinceLastClick) {
             super.onDrag(mouseButton, timeSinceLastClick);
-            IWidget hovered = getContext().getHovered();
+            // TODO this kind of assumes the hovered is in bounds of the parent Item, which may not be true.
+            IWidget hovered = getContext().getTopHovered();
             SortableListWidget.Item<?> item = WidgetTree.findParent(hovered, Item.class);
             if (item != null && item != this && item.listWidget == this.listWidget) {
                 this.listWidget.moveTo(this.index, item.index);
@@ -196,8 +199,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
         }
 
         @Override
-        public void onDragEnd(boolean successful) {
-        }
+        public void onDragEnd(boolean successful) {}
 
         @Override
         public T getWidgetValue() {
@@ -215,7 +217,7 @@ public class SortableListWidget<T> extends ListValueWidget<T, SortableListWidget
 
         public Item<T> child(IWidget widget) {
             this.children = Collections.singletonList(widget);
-            if (isValid()) widget.initialise(this);
+            if (isValid()) widget.initialise(this, true);
             return this;
         }
 

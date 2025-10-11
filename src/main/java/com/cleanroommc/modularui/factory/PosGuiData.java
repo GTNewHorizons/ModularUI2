@@ -19,10 +19,6 @@ public class PosGuiData extends GuiData {
         this.z = z;
     }
 
-    public World getWorld() {
-        return getPlayer().worldObj;
-    }
-
     public int getX() {
         return this.x;
     }
@@ -55,6 +51,7 @@ public class PosGuiData extends GuiData {
     }
 
     public TileEntity getTileEntity() {
+        // no blockpos needed
         return getWorld().getTileEntity(this.x, this.y, this.z);
     }
 }

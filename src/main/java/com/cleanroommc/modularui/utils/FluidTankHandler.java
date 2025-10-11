@@ -26,7 +26,7 @@ public class FluidTankHandler implements IFluidHandler {
 
     @Override
     public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-        return new FluidTankInfo[] {
+        return new FluidTankInfo[]{
                 new FluidTankInfo(this.fluidTank.getFluid(), this.fluidTank.getCapacity())
         };
     }

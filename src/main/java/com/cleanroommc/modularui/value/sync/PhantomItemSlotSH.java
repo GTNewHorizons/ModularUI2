@@ -5,10 +5,9 @@ import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 
-import cpw.mods.fml.relauncher.Side;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -62,7 +61,7 @@ public class PhantomItemSlotSH extends ItemSlotSH {
         } else if (id == SYNC_ITEM_SIMPLE) {
             if (!isPhantom()) return;
             ItemStack itemStack = NetworkUtils.readItemStack(buf);
-            int button = buf.readVarIntFromBuffer();
+            int button = buf.readVarIntFromBuffer(); // TODO whats this 1.12
             phantomClick(new MouseData(Side.SERVER, button, false, false, false), itemStack);
         }
     }
@@ -70,7 +69,7 @@ public class PhantomItemSlotSH extends ItemSlotSH {
     public void updateFromClient(ItemStack stack, int button) {
         syncToServer(SYNC_ITEM_SIMPLE, buf -> {
             NetworkUtils.writeItemStack(buf, stack);
-            buf.writeVarIntToBuffer(button);
+            buf.writeVarIntToBuffer(button); // TODO whats this 1.12
         });
     }
 

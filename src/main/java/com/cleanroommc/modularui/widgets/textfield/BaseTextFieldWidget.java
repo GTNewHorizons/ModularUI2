@@ -7,13 +7,15 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
+import com.cleanroommc.modularui.theme.TextFieldTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.HorizontalScrollData;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widgets.VoidWidget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     private static final Pattern BASE_PATTERN = Pattern.compile("[^§]");
 
     private static final int CURSOR_BLINK_RATE = 10;
+    private static final int DOUBLE_CLICK_THRESHOLD = 300; // max time between clicks to count as double-click in ms
 
     protected TextFieldHandler handler = new TextFieldHandler(this);
     protected TextFieldRenderer renderer = new TextFieldRenderer(this.handler);
@@ -51,6 +54,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     protected float scale = 1f;
     protected boolean focusOnGuiOpen;
     private int cursorTimer;
+    protected long lastClickTime = 0;
 
     protected Integer textColor;
     protected Integer markedColor;
@@ -101,7 +105,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     @Override
     public void preDraw(ModularGuiContext context, boolean transformed) {
         if (transformed) {
-            WidgetTextFieldTheme widgetTheme = (WidgetTextFieldTheme) getWidgetTheme(context.getTheme());
+            WidgetThemeEntry<TextFieldTheme> entry = getWidgetTheme(context.getTheme(), TextFieldTheme.class);
+            TextFieldTheme widgetTheme = entry.getTheme();
             this.renderer.setColor(this.textColor != null ? this.textColor : widgetTheme.getTextColor());
             this.renderer.setCursorColor(this.textColor != null ? this.textColor : widgetTheme.getTextColor());
             this.renderer.setMarkedColor(this.markedColor != null ? this.markedColor : widgetTheme.getMarkedColor());
@@ -112,13 +117,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         }
     }
 
-    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+    protected void setupDrawText(ModularGuiContext context, TextFieldTheme widgetTheme) {
         this.renderer.setSimulate(false);
+        this.renderer.setPos(getArea().getPadding().getLeft(), getArea().getPadding().getTop());
         this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -2, getArea().height);
+        this.renderer.setAlignment(this.textAlignment, getArea().paddedWidth(), getArea().paddedHeight());
     }
 
-    protected void drawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
+    protected void drawText(ModularGuiContext context, TextFieldTheme widgetTheme) {
         if (this.handler.isTextEmpty() && this.hintText != null) {
             int c = this.renderer.getColor();
             int hintColor = this.hintTextColor != null ? this.hintTextColor : widgetTheme.getHintColor();
@@ -132,7 +138,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     }
 
     @Override
-    public WidgetTextFieldTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getTextFieldTheme();
     }
 
@@ -171,7 +177,27 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             // the current transformation does not include the transformation of the children (the scroll) so we need to manually transform here
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();
+            long now = Minecraft.getSystemTime();
+            if (this.lastClickTime < 0) {
+                // triple click
+                if (now + this.lastClickTime < DOUBLE_CLICK_THRESHOLD) {
+                    this.handler.markAll();
+                    this.lastClickTime = 0;
+                    return Result.SUCCESS;
+                }
+                this.lastClickTime = 0;
+            } else if (this.lastClickTime > 0) {
+                // double click
+                if (now - this.lastClickTime < DOUBLE_CLICK_THRESHOLD) {
+                    this.handler.markCurrentLine();
+                    this.lastClickTime = -Minecraft.getSystemTime();
+                    return Result.SUCCESS;
+                }
+                this.lastClickTime = 0;
+            }
+            // single click
             this.handler.setCursor(this.renderer.getCursorPos(this.handler.getText(), x, y), true);
+            this.lastClickTime = Minecraft.getSystemTime();
         }
         return Result.SUCCESS;
     }
@@ -202,7 +228,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             case Keyboard.KEY_ESCAPE:
                 if (ModularUIConfig.escRestoreLastText) {
                     this.handler.clear();
-                    this.handler.insert(this.lastText);
+                    this.handler.insert(this.lastText, canScrollHorizontally());
                 }
                 getContext().removeFocus();
                 return Result.SUCCESS;
@@ -243,7 +269,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
                 this.handler.delete();
             }
             // paste copied text in marked text
-            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""));
+            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""), canScrollHorizontally());
             return Result.SUCCESS;
         } else if (Interactable.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
@@ -259,10 +285,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
                 this.handler.delete();
             }
             // insert typed char
-            this.handler.insert(String.valueOf(character));
+            this.handler.insert(String.valueOf(character), canScrollHorizontally());
             return Result.SUCCESS;
         }
         return Result.STOP;
+    }
+
+    public boolean canScrollHorizontally() {
+        return getScrollArea().getScrollX() != null;
     }
 
     public int getMaxLines() {

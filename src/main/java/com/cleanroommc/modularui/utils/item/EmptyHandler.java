@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import javax.annotation.Nullable;
 
 public class EmptyHandler implements IItemHandlerModifiable {
+
     public static final IItemHandlerModifiable INSTANCE = new EmptyHandler();
 
     @Override

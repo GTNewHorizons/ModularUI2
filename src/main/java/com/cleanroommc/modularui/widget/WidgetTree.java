@@ -10,18 +10,19 @@ import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
-import com.cleanroommc.modularui.utils.GlStateManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -138,12 +139,11 @@ public class WidgetTree {
         GlStateManager.pushMatrix();
         context.applyToOpenGl();
 
+        GlStateManager.colorMask(true, true, true, true);
         if (canBeSeen) {
             // draw widget
-            GlStateManager.colorMask(true, true, true, true);
             GlStateManager.color(1f, 1f, 1f, alpha);
-            GlStateManager.enableBlend();
-            WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
+            WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
             if (drawBackground) parent.drawBackground(context, widgetTheme);
             parent.draw(context, widgetTheme);
             parent.drawOverlay(context, widgetTheme);
@@ -153,7 +153,6 @@ public class WidgetTree {
             if (canBeSeen) {
                 // draw viewport without children transformation
                 GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.enableBlend();
                 viewport.preDraw(context, false);
                 GlStateManager.popMatrix();
                 // apply children transformation of the viewport
@@ -190,7 +189,6 @@ public class WidgetTree {
             if (canBeSeen) {
                 // apply opengl transformations again and draw
                 GlStateManager.color(1f, 1f, 1f, alpha);
-                GlStateManager.enableBlend();
                 GlStateManager.pushMatrix();
                 context.applyToOpenGl();
                 viewport.postDraw(context, true);
@@ -233,8 +231,7 @@ public class WidgetTree {
         // draw widget
         GlStateManager.colorMask(true, true, true, true);
         GlStateManager.color(1f, 1f, 1f, alpha);
-        GlStateManager.enableBlend();
-        WidgetTheme widgetTheme = parent.getWidgetTheme(context.getTheme());
+        WidgetThemeEntry<?> widgetTheme = parent.getWidgetTheme(context.getTheme());
         parent.drawBackground(context, widgetTheme);
 
         GlStateManager.popMatrix();
@@ -312,7 +309,7 @@ public class WidgetTree {
         if (widget.hasChildren()) {
             anotherResize = new ArrayList<>();
             for (IWidget child : widget.getChildren()) {
-                if (init && expandAxis != null) child.flex().checkExpanded(expandAxis);
+                if (init) child.flex().checkExpanded(expandAxis);
                 if (!resizeWidget(child, init, onOpen)) {
                     anotherResize.add(child);
                 }
@@ -320,6 +317,9 @@ public class WidgetTree {
         }
 
         if (!alreadyCalculated) {
+            // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
+            // fully calculated
+            BitSet state = getCalculatedState(anotherResize);
             if (widget instanceof ILayoutWidget layoutWidget) {
                 layoutWidget.layoutWidgets();
             }
@@ -332,6 +332,7 @@ public class WidgetTree {
             if (widget instanceof ILayoutWidget layoutWidget) {
                 layoutWidget.postLayoutWidgets();
             }
+            checkFullyCalculated(anotherResize, state);
         }
 
         // now fully resize all children which needs it
@@ -342,6 +343,29 @@ public class WidgetTree {
         if (result && !alreadyCalculated) widget.onResized();
 
         return result && anotherResize.isEmpty();
+    }
+
+    private static BitSet getCalculatedState(List<IWidget> children) {
+        if (children.isEmpty()) return null;
+        BitSet state = new BitSet();
+        for (int i = 0; i < children.size(); i++) {
+            IWidget widget = children.get(i);
+            if (widget.resizer().isFullyCalculated()) {
+                state.set(i);
+            }
+        }
+        return state;
+    }
+
+    private static void checkFullyCalculated(List<IWidget> children, BitSet state) {
+        if (children.isEmpty() || state == null) return;
+        for (int i = 0; i < children.size(); i++) {
+            IWidget widget = children.get(i);
+            if (!state.get(i) && widget.resizer().isFullyCalculated()) {
+                widget.onResized();
+                state.set(i);
+            }
+        }
     }
 
     public static void applyPos(IWidget parent) {
@@ -391,8 +415,13 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void collectSyncValues(PanelSyncManager syncManager, ModularPanel panel, boolean includePanel) {
+        collectSyncValues(syncManager, panel.getName(), panel, includePanel);
+    }
+
+    @ApiStatus.Internal
+    public static void collectSyncValues(PanelSyncManager syncManager, String panelName, IWidget panel, boolean includePanel) {
         AtomicInteger id = new AtomicInteger(0);
-        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panel.getName();
+        String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panelName;
         foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {

@@ -1,10 +1,8 @@
 package com.cleanroommc.modularui.holoui;
 
-import com.cleanroommc.modularui.utils.GuiUtils;
-
-import com.cleanroommc.modularui.utils.Matrix4f;
-
 import com.cleanroommc.modularui.utils.GlStateManager;
+import com.cleanroommc.modularui.utils.GuiUtils;
+import com.cleanroommc.modularui.utils.Matrix4f;
 
 import org.jetbrains.annotations.ApiStatus;
 

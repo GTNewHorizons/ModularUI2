@@ -45,9 +45,9 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
         this.valueDeserializer = valueDeserializer;
         this.keySerializer = keySerializer;
         this.valueSerializer = valueSerializer;
-        this.equals = equals != null ? IEquals.wrapNullSafe(equals) : Objects::equals;;
-        this.keyCopy = keyCopy != null ? keyCopy : ICopy.ofSerializer(keySerializer, keyDeserializer);;
-        this.valueCopy = valueCopy != null ? valueCopy : ICopy.ofSerializer(valueSerializer, valueDeserializer);;
+        this.equals = equals != null ? IEquals.wrapNullSafe(equals) : Objects::equals;
+        this.keyCopy = keyCopy != null ? keyCopy : ICopy.ofSerializer(keySerializer, keyDeserializer);
+        this.valueCopy = valueCopy != null ? valueCopy : ICopy.ofSerializer(valueSerializer, valueDeserializer);
     }
 
     @Override
@@ -184,7 +184,8 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
         public GenericMapSyncHandler<K, V> build() {
             if (this.getter == null) throw new NullPointerException("Getter in GenericMapSyncHandler must not be null");
             if (this.keyDeserializer == null) throw new NullPointerException("Key deserializer in GenericMapSyncHandler must not be null");
-            if (this.valueDeserializer == null) throw new NullPointerException("Value deserializer in GenericMapSyncHandler must not be null");
+            if (this.valueDeserializer == null)
+                throw new NullPointerException("Value deserializer in GenericMapSyncHandler must not be null");
             if (this.keySerializer == null) throw new NullPointerException("Key serializer in GenericMapSyncHandler must not be null");
             if (this.valueSerializer == null) throw new NullPointerException("Value serializer in GenericMapSyncHandler must not be null");
             return new GenericMapSyncHandler<>(this.getter, this.setter, this.keyDeserializer, this.valueDeserializer, this.keySerializer,

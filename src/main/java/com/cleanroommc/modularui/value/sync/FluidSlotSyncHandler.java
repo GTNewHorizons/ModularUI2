@@ -165,13 +165,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 return;
             }
             drainFluid(processFullStack);
-            return;
         } else {
             if (!canDrainSlot) {
                 return;
             }
             drainFluid(processFullStack);
-            return;
         }
     }
 
