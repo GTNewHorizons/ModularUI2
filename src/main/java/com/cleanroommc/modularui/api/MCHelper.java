@@ -4,15 +4,23 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Interactable;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketCloseWindow;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
@@ -51,6 +59,30 @@ public class MCHelper {
         }
         Minecraft.getMinecraft().displayGuiScreen(null);
         return false;
+    }
+
+    public static void popScreen(boolean openParentOnClose, GuiScreen parent) {
+        EntityPlayer player = MCHelper.getPlayer();
+        if (player != null) {
+            // TODO: should we really close container here?
+            prepareCloseContainer(player);
+            if (openParentOnClose) {
+                Minecraft.getMinecraft().displayGuiScreen(parent);
+            } else {
+                Minecraft.getMinecraft().displayGuiScreen(null);
+            }
+        } else {
+            // we are currently not in a world and want to display the previous screen
+            Minecraft.getMinecraft().displayGuiScreen(parent);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void prepareCloseContainer(EntityPlayer entityPlayer) {
+        EntityPlayerSP player = (EntityPlayerSP) entityPlayer;
+        player.connection.sendPacket(new CPacketCloseWindow(player.openContainer.windowId));
+        player.openContainer = player.inventoryContainer;
+        player.inventory.setItemStack(ItemStack.EMPTY);
     }
 
     public static boolean displayScreen(GuiScreen screen) {
