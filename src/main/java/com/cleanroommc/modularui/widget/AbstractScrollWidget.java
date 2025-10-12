@@ -65,6 +65,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     @Override
     public void beforeResize(boolean onOpen) {
         super.beforeResize(onOpen);
+        this.scroll.applyWidgetTheme(getContext().getTheme().getScrollbarTheme().getTheme(isHovering()));
         if (onOpen) checkScrollbarActive(true);
         getScrollArea().getScrollPadding().scrollPaddingAll(0);
         applyAdditionalOffset(this.scroll.getScrollX());
@@ -96,14 +97,9 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     public @NotNull Result onMousePressed(int mouseButton) {
         ModularGuiContext context = getContext();
         if (this.scroll.mouseClicked(context)) {
-            return Result.STOP;
+            return Result.SUCCESS;
         }
         return Result.IGNORE;
-    }
-
-    @Override
-    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
-        return this.scroll.mouseScroll(getContext());
     }
 
     @Override
@@ -113,11 +109,19 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     }
 
     @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        return this.scroll.mouseScroll(getContext());
+    }
+
+    @Override
+    public void onMouseDrag(int mouseButton, long timeSinceClick) {
+        this.scroll.drag(getContext().getMouseX(), getContext().getMouseY());
+    }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
         checkScrollbarActive(false);
-        // use abs mouse here since viewport stack is not transformed here // TODO will this cause issues in some cases
-        this.scroll.drag(getContext().getAbsMouseX(), getContext().getAbsMouseY());
     }
 
     @Override
@@ -131,7 +135,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     public void postDraw(ModularGuiContext context, boolean transformed) {
         if (!transformed) {
             Stencil.remove();
-            this.scroll.drawScrollbar();
+            this.scroll.drawScrollbar(context, context.getTheme().getScrollbarTheme().getTheme(isHovering()));
         }
     }
 

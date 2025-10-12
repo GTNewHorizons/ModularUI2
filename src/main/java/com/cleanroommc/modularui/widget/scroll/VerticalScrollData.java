@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 
 public class VerticalScrollData extends ScrollData {
 
@@ -39,28 +41,33 @@ public class VerticalScrollData extends ScrollData {
     }
 
     @Override
+    protected int getFallbackThickness(WidgetTheme widgetTheme) {
+        return widgetTheme.getDefaultWidth();
+    }
+
+    @Override
     public HorizontalScrollData getOtherScrollData(ScrollArea area) {
         return area.getScrollX();
     }
 
     @Override
     public boolean isInsideScrollbarArea(ScrollArea area, int x, int y) {
-        if (!area.isInside(x, y) || !isScrollBarActive(area)) {
+        if (!isScrollBarActive(area)) {
             return false;
         }
         int scrollbar = getThickness();
         ScrollData data = getOtherScrollData(area);
         if (data != null && isOtherScrollBarActive(area, true)) {
             int thickness = data.getThickness();
-            if (data.isOnAxisStart() ? y < area.y + thickness : y >= area.ey() - thickness) {
+            if (data.isOnAxisStart() ? y < thickness : y >= area.h() - thickness) {
                 return false;
             }
         }
-        return isOnAxisStart() ? x >= area.x && x < area.x + scrollbar : x >= area.ex() - scrollbar && x < area.ex();
+        return isOnAxisStart() ? x >= 0 && x < scrollbar : x >= area.w() - scrollbar && x < area.w();
     }
 
     @Override
-    public void drawScrollbar(ScrollArea area) {
+    public void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme) {
         boolean isOtherActive = isOtherScrollBarActive(area, true);
         int l = this.getScrollBarLength(area);
         int x = isOnAxisStart() ? 0 : area.w() - getThickness();
@@ -75,6 +82,6 @@ public class VerticalScrollData extends ScrollData {
             y += data2.getThickness();
         }
         h = l;
-        drawScrollBar(x, y, w, h);
+        drawScrollBar(context, x, y, w, h, widgetTheme);
     }
 }

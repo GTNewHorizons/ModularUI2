@@ -62,7 +62,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
     protected Integer hintTextColor;
 
     public BaseTextFieldWidget() {
-        super(new HorizontalScrollData(), null);
+        super(new HorizontalScrollData(false, 4), null);
         this.handler.setRenderer(this.renderer);
         this.handler.setScrollArea(getScrollArea());
         padding(4, 0);
@@ -204,6 +204,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
+        super.onMouseDrag(mouseButton, timeSinceClick);
         if (isFocused() && !getScrollArea().isDragging()) {
             int x = getContext().getMouseX() + getScrollX();
             int y = getContext().getMouseY() + getScrollY();

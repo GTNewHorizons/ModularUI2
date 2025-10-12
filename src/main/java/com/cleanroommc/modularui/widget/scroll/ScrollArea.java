@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -101,11 +103,6 @@ public class ScrollArea extends Area {
      * This method should be invoked when mouse wheel is scrolling
      */
     public boolean mouseScroll(int x, int y, int scroll, boolean shift) {
-        if (!isInside(x, y)) {
-            // not hovering TODO: this shouldnt be required
-            return false;
-        }
-
         ScrollData data;
         if (this.scrollX != null) {
             data = this.scrollY == null || shift ? this.scrollX : this.scrollY;
@@ -138,7 +135,7 @@ public class ScrollArea extends Area {
 
     @SideOnly(Side.CLIENT)
     public void mouseReleased(GuiContext context) {
-        this.mouseReleased(context.getAbsMouseX(), context.getAbsMouseY());
+        this.mouseReleased(context.getMouseX(), context.getMouseY());
     }
 
     /**
@@ -210,18 +207,23 @@ public class ScrollArea extends Area {
         return (this.scrollX != null && this.scrollX.isDragging()) || (this.scrollY != null && this.scrollY.isDragging());
     }
 
+    public void applyWidgetTheme(WidgetTheme widgetTheme) {
+        if (this.scrollX != null) this.scrollX.applyWidgetTheme(widgetTheme);
+        if (this.scrollY != null) this.scrollY.applyWidgetTheme(widgetTheme);
+    }
+
     /**
      * This method is responsible for drawing a scroll bar
      */
     @SideOnly(Side.CLIENT)
-    public void drawScrollbar() {
+    public void drawScrollbar(ModularGuiContext context, WidgetTheme widgetTheme) {
         boolean isXActive = false; // micro optimisation
         if (this.scrollX != null && this.scrollX.isScrollBarActive(this, false)) {
             isXActive = true;
-            this.scrollX.drawScrollbar(this);
+            this.scrollX.drawScrollbar(this, context, widgetTheme);
         }
         if (this.scrollY != null && this.scrollY.isScrollBarActive(this, isXActive)) {
-            this.scrollY.drawScrollbar(this);
+            this.scrollY.drawScrollbar(this, context, widgetTheme);
         }
     }
 }
