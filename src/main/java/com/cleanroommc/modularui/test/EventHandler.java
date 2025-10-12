@@ -46,7 +46,7 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onItemUse(PlayerInteractEvent event) {
-        if (event.entityPlayer.getEntityWorld().isRemote) {
+        if (event.entityPlayer.getEntityWorld().isRemote && event.entityPlayer.getHeldItem() != null) {
             ItemStack itemStack = event.entityPlayer.getHeldItem();
             if (itemStack.getItem() == Items.diamond) {
                 ClientGUI.open(new TestGuis());
