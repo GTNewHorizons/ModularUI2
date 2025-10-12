@@ -4,23 +4,19 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Interactable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.CPacketCloseWindow;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.network.play.client.C0DPacketCloseWindow;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
@@ -79,10 +75,11 @@ public class MCHelper {
 
     @SideOnly(Side.CLIENT)
     private static void prepareCloseContainer(EntityPlayer entityPlayer) {
-        EntityPlayerSP player = (EntityPlayerSP) entityPlayer;
-        player.connection.sendPacket(new CPacketCloseWindow(player.openContainer.windowId));
-        player.openContainer = player.inventoryContainer;
-        player.inventory.setItemStack(ItemStack.EMPTY);
+        if (entityPlayer instanceof EntityClientPlayerMP clientPlayerMP) {
+            clientPlayerMP.sendQueue.addToSendQueue(new C0DPacketCloseWindow(clientPlayerMP.openContainer.windowId));
+        }
+        entityPlayer.openContainer = entityPlayer.inventoryContainer;
+        entityPlayer.inventory.setItemStack(null);
     }
 
     public static boolean displayScreen(GuiScreen screen) {
