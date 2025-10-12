@@ -58,6 +58,7 @@ public class OverlayTest {
                     return ModularPanel.defaultPanel("watermark_overlay", gui.getXSize(), gui.getYSize())
                             .pos(gui.getGuiLeft(), gui.getGuiTop())
                             .background(IDrawable.EMPTY)
+                            .disableHoverBackground()
                             .child(GuiTextures.MUI_LOGO.asIcon().asWidget()
                                     .top(5).right(5)
                                     .size(18));
