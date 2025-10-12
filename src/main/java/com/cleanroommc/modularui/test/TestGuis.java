@@ -429,7 +429,6 @@ public class TestGuis extends CustomModularScreen {
                                             colorPicker1.openPanel();
                                             return true;
                                         }))
-                                .child(new CycleButtonWidget())
                                 .child(new ButtonWidget<>()
                                         .debugName("color picker button 2")
                                         .background(color2)

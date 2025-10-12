@@ -52,7 +52,7 @@ public class EventHandler {
                 ClientGUI.open(new TestGuis());
             } else if (itemStack.getItem() == Items.emerald) {
                 ClientGUI.open(new GLTestGui());
-            } else if (itemStack.getItem() == Items.GOLD_INGOT) {
+            } else if (itemStack.getItem() == Items.gold_ingot) {
                 ClientGUI.open(new TestGui());
             }
             //GuiManager.openClientUI(Platform.getClientPlayer(), new TestGui());
