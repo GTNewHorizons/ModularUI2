@@ -4,12 +4,12 @@ import com.cleanroommc.modularui.drawable.BufferBuilder;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
-import com.cleanroommc.modularui.utils.Vector3f;
 
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class BlockHighlight {
 
@@ -67,7 +67,7 @@ public class BlockHighlight {
         Color.setGlColor(this.color);
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
-        float dist = camera.squareDistanceTo(x + 0.5f, y + 0.5f, z + 0.5f);
+        float dist = camera.distanceSquared(x + 0.5f, y + 0.5f, z + 0.5f);
         doRender(side, dist);
         GlStateManager.popMatrix();
     }
