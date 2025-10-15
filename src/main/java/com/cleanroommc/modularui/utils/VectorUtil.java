@@ -1,12 +1,23 @@
 package com.cleanroommc.modularui.utils;
 
+import net.minecraft.util.Vec3;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.lwjgl.util.vector.Vector3f;
 
 public class VectorUtil {
+
+    public static final Vector3fc UNIT_X = new Vector3f(1.0f, 0.0f, 0.0f);
+    public static final Vector3fc UNIT_Y = new Vector3f(0.0f, 1.0f, 0.0f);
+    public static final Vector3fc UNIT_Z = new Vector3f(0.0f, 0.0f, 1.0f);
+
+    public static Vec3 toVec3d(Vector3f vec) {
+        return Vec3.createVectorHelper(vec.x, vec.y, vec.z);
+    }
 
     public static Vector3f set(Vector3f target, float x, float y, float z) {
         if (target == null) target = new Vector3f();
@@ -36,7 +47,7 @@ public class VectorUtil {
         if (target == null) target = new Vector3f();
         if (source == null) return set(target, x, y, z);
         if (target != source) target.set(source);
-        return target.translate(x, y, z);
+        return target.add(x, y, z);
     }
 
     @NotNull

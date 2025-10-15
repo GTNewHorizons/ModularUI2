@@ -75,6 +75,7 @@ public class ModularScreen {
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
     private boolean pausesGame = false;
+    private boolean openParentOnClose = false;
 
     private ITheme currentTheme;
     private IMuiScreen screenWrapper;
@@ -183,14 +184,6 @@ public class ModularScreen {
         if (!isOverlay()) {
             this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
         }
-    }
-
-    /**
-     * Called when another screen opens, but this screen is still open or this screen an overlay is and the gui screen parent closes.
-     */
-    @ApiStatus.Internal
-    public final void onCloseParent() {
-        this.panelManager.closeAll();
     }
 
     /**
@@ -550,6 +543,11 @@ public class ModularScreen {
         return this.name;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "#" + getOwner() + ":" + getName();
+    }
+
     /**
      * @return the owner and name as a {@link ResourceLocation}
      * @see #getOwner()
@@ -606,6 +604,10 @@ public class ModularScreen {
 
     public boolean doesPauseGame() {
         return pausesGame;
+    }
+
+    public boolean isOpenParentOnClose() {
+        return openParentOnClose;
     }
 
     @SuppressWarnings("unchecked")
@@ -716,6 +718,11 @@ public class ModularScreen {
      */
     public ModularScreen pausesGame(boolean pausesGame) {
         this.pausesGame = pausesGame;
+        return this;
+    }
+
+    public ModularScreen openParentOnClose(boolean openParentOnClose) {
+        this.openParentOnClose = openParentOnClose;
         return this;
     }
 

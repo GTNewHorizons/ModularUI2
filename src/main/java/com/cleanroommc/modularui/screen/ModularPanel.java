@@ -34,7 +34,6 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
@@ -132,13 +131,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         closeSubPanels();
         if (isMainPanel()) {
             // close screen and let NEA animation
-            EntityPlayer player = MCHelper.getPlayer();
-            if (player != null) {
-                player.closeScreen();
-            } else {
-                // we are currently not in a world and want to display the previous screen
-                Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
-            }
+            MCHelper.popScreen(getScreen().isOpenParentOnClose(), getContext().getParentScreen());
             return;
         }
         if (!shouldAnimate()) {
@@ -237,9 +230,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.state = State.OPEN;
     }
 
-    void reopen() {
-        if (this.state != State.CLOSED) throw new IllegalStateException();
+    boolean reopen(boolean strict) {
+        if (this.state != State.CLOSED) {
+            if (strict) throw new IllegalStateException();
+            return false;
+        }
         this.state = State.OPEN;
+        return true;
     }
 
     @MustBeInvokedByOverriders
@@ -783,7 +780,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     @ApiStatus.Internal
     public boolean shouldAnimate() {
-        return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
+        if (getScreen().isOverlay() || !ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime <= 0) return false;
+        if (!isMainPanel() || !getScreen().isOpenParentOnClose()) return true;
+        return getContext().getParentScreen() == null;
     }
 
     void registerSubPanel(IPanelHandler handler) {

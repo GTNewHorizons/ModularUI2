@@ -2,6 +2,8 @@ package com.cleanroommc.modularui.widget;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IResizeable;
 import com.cleanroommc.modularui.api.layout.IViewport;
@@ -12,14 +14,16 @@ import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.GlStateManager;
+import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
 
-import org.apache.commons.lang3.StringUtils;
+import net.minecraft.util.ChatComponentText;
+
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -33,8 +37,37 @@ import java.util.function.Predicate;
  */
 public class WidgetTree {
 
-    private WidgetTree() {
-    }
+    public static boolean logResizeTime = false;
+
+    public static final WidgetInfo INFO_AREA = (root, widget, builder) -> builder
+            .append("Area xywh:")
+            .append(widget.getArea().x - root.getArea().x)
+            .append(", ")
+            .append(widget.getArea().y - root.getArea().y)
+            .append(", ")
+            .append(widget.getArea().width)
+            .append(", ")
+            .append(widget.getArea().height);
+    public static final WidgetInfo INFO_ENABLED = (root, widget, builder) -> builder.append("Enabled: ").append(widget.isEnabled());
+    public static final WidgetInfo INFO_FULLY_RESIZED = (root, widget, builder) -> builder
+            .append("Fully resized: ")
+            .append(widget.resizer().isFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget));
+    public static final WidgetInfo INFO_RESIZED_DETAILED = (root, widget, builder) -> builder
+            .append("Self resized: ").append(widget.resizer().isSelfFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget))
+            .append(", Is pos final: ").append(!widget.resizer().canRelayout(widget.hasParent() && widget.getParent() instanceof ILayoutWidget))
+            .append(", Children resized: ").append(widget.resizer().areChildrenCalculated())
+            .append(", Layout done: ").append(widget.resizer().isLayoutDone());
+    public static final WidgetInfo INFO_RESIZED_COLLAPSED = (root, widget, builder) -> {
+        if (widget.resizer().isFullyCalculated(widget.hasParent() && widget.getParent() instanceof ILayoutWidget)) {
+            INFO_FULLY_RESIZED.addInfo(root, widget, builder);
+        } else {
+            INFO_RESIZED_DETAILED.addInfo(root, widget, builder);
+        }
+    };
+    public static final WidgetInfo INFO_WIDGET_THEME = (root, widget, builder) -> builder.append("Widget theme: ")
+            .append(widget.getWidgetTheme(widget.getContext().getTheme()).getKey().getFullName());
+
+    private WidgetTree() {}
 
     public static List<IWidget> getAllChildrenByLayer(IWidget parent) {
         return getAllChildrenByLayer(parent, false);
@@ -274,97 +307,126 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void resizeInternal(IWidget parent, boolean onOpen) {
+        long fullTime = System.nanoTime();
         // check if updating this widget's pos and size can potentially update its parents
         while (!(parent instanceof ModularPanel) && (parent.getParent() instanceof ILayoutWidget || parent.getParent().flex().dependsOnChildren())) {
             parent = parent.getParent();
         }
+        long rawTime = System.nanoTime();
         // resize each widget and calculate their relative pos
-        if (!resizeWidget(parent, true, onOpen) && !resizeWidget(parent, false, onOpen)) {
-            throw new IllegalStateException("Failed to resize widgets");
+        if (!resizeWidget(parent, true, onOpen, false) && !resizeWidget(parent, false, onOpen, false)) {
+            if (MCHelper.getPlayer() != null) {
+                MCHelper.getPlayer().addChatMessage(new ChatComponentText(IKey.RED + "ModularUI: Failed to resize sub tree of widget '"
+                        + parent + "' of screen '" + parent.getScreen().toString() + "'. See log for more info."));
+            }
+            ModularUI.LOGGER.error("Failed to resize widget. Affected widget tree:");
+            printTree(parent, INFO_RESIZED_COLLAPSED);
         }
+        rawTime = System.nanoTime() - rawTime;
         // now apply the calculated pos
         applyPos(parent);
         WidgetTree.foreachChildBFS(parent, child -> {
             child.postResize();
             return true;
         }, true);
+
+        if (WidgetTree.logResizeTime) {
+            fullTime = System.nanoTime() - fullTime;
+            ModularUI.LOGGER.info("Resized widget tree in {}s and {}s for full resize.",
+                    NumberFormat.formatNanos(rawTime),
+                    NumberFormat.formatNanos(fullTime));
+        }
     }
 
-    private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen) {
+    private static boolean resizeWidget(IWidget widget, boolean init, boolean onOpen, boolean isParentLayout) {
         boolean alreadyCalculated = false;
         // first try to resize this widget
         IResizeable resizer = widget.resizer();
+        ILayoutWidget layout = widget instanceof ILayoutWidget layoutWidget ? layoutWidget : null;
+        boolean isLayout = layout != null;
         if (init) {
             widget.beforeResize(onOpen);
             resizer.initResizing();
+            if (!isLayout) resizer.setLayoutDone(true);
         } else {
             // if this is not the first time check if this widget is already resized
-            alreadyCalculated = resizer.isFullyCalculated();
+            alreadyCalculated = resizer.isFullyCalculated(isParentLayout);
         }
-        boolean result = alreadyCalculated || resizer.resize(widget);
+        boolean selfFullyCalculated = resizer.isSelfFullyCalculated() || resizer.resize(widget, isParentLayout);
 
         GuiAxis expandAxis = widget instanceof IExpander expander ? expander.getExpandAxis() : null;
         // now resize all children and collect children which could not be fully calculated
         List<IWidget> anotherResize = Collections.emptyList();
-        if (widget.hasChildren()) {
+        if (!resizer.areChildrenCalculated() && widget.hasChildren()) {
             anotherResize = new ArrayList<>();
             for (IWidget child : widget.getChildren()) {
                 if (init) child.flex().checkExpanded(expandAxis);
-                if (!resizeWidget(child, init, onOpen)) {
+                if (!resizeWidget(child, init, onOpen, isLayout)) {
                     anotherResize.add(child);
                 }
             }
         }
 
-        if (!alreadyCalculated) {
+        if (init || !resizer.areChildrenCalculated() || !resizer.isLayoutDone()) {
+            boolean layoutSuccessful = true;
             // we need to keep track of which widgets are not yet fully calculated, so we can call onResized ont those which later are
             // fully calculated
-            BitSet state = getCalculatedState(anotherResize);
-            if (widget instanceof ILayoutWidget layoutWidget) {
-                layoutWidget.layoutWidgets();
+            BitSet state = getCalculatedState(anotherResize, isLayout);
+            if (layout != null) {
+                layoutSuccessful = layout.layoutWidgets();
             }
 
             // post resize this widget if possible
-            if (!result) {
-                result = resizer.postResize(widget);
+            if (!selfFullyCalculated) {
+                resizer.postResize(widget);
             }
 
-            if (widget instanceof ILayoutWidget layoutWidget) {
-                layoutWidget.postLayoutWidgets();
+            if (layout != null) {
+                layoutSuccessful &= layout.postLayoutWidgets();
             }
-            checkFullyCalculated(anotherResize, state);
+            resizer.setLayoutDone(layoutSuccessful);
+            checkFullyCalculated(anotherResize, state, isLayout);
         }
 
         // now fully resize all children which needs it
         if (!anotherResize.isEmpty()) {
-            anotherResize.removeIf(iWidget -> resizeWidget(iWidget, false, onOpen));
+            for (int i = 0; i < anotherResize.size(); i++) {
+                if (resizeWidget(anotherResize.get(i), false, onOpen, isLayout)) {
+                    anotherResize.remove(i--);
+                }
+            }
         }
+        resizer.setChildrenResized(anotherResize.isEmpty());
+        selfFullyCalculated = resizer.isFullyCalculated(isParentLayout);
 
-        if (result && !alreadyCalculated) widget.onResized();
+        if (selfFullyCalculated && !alreadyCalculated) widget.onResized();
 
-        return result && anotherResize.isEmpty();
+        return selfFullyCalculated;
     }
 
-    private static BitSet getCalculatedState(List<IWidget> children) {
+    private static BitSet getCalculatedState(List<IWidget> children, boolean isLayout) {
         if (children.isEmpty()) return null;
         BitSet state = new BitSet();
         for (int i = 0; i < children.size(); i++) {
             IWidget widget = children.get(i);
-            if (widget.resizer().isFullyCalculated()) {
+            if (widget.resizer().isFullyCalculated(isLayout)) {
                 state.set(i);
             }
         }
         return state;
     }
 
-    private static void checkFullyCalculated(List<IWidget> children, BitSet state) {
+    private static void checkFullyCalculated(List<IWidget> children, BitSet state, boolean isLayout) {
         if (children.isEmpty() || state == null) return;
+        int j = 0;
         for (int i = 0; i < children.size(); i++) {
             IWidget widget = children.get(i);
-            if (!state.get(i) && widget.resizer().isFullyCalculated()) {
+            if (!state.get(j) && widget.resizer().isFullyCalculated(isLayout)) {
                 widget.onResized();
-                state.set(i);
+                state.set(j);
+                children.remove(i--);
             }
+            j++;
         }
     }
 
@@ -436,34 +498,82 @@ public class WidgetTree {
         return !foreachChildBFS(panel, widget -> !(widget instanceof ISynced<?> synced) || !synced.isSynced(), true);
     }
 
-    public static void print(IWidget parent, Predicate<IWidget> test) {
+    public static void printTree(IWidget parent) {
+        printTree(parent, w -> true, null);
+    }
+
+    public static void printTree(IWidget parent, WidgetInfo additionalInfo) {
+        printTree(parent, w -> true, additionalInfo);
+    }
+
+    public static void printTree(IWidget parent, Predicate<IWidget> test) {
+        printTree(parent, test, null);
+    }
+
+    public static void printTree(IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
         StringBuilder builder = new StringBuilder("Widget tree of ")
                 .append(parent)
                 .append('\n');
-        getTree(parent.getArea(), parent, test, builder, 0);
-        ModularUI.LOGGER.info(builder.toString());
+        ModularUI.LOGGER.info(widgetTreeToString(builder, parent, test, additionalInfo));
     }
 
-    private static void getTree(Area root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, int indent) {
-        if (indent >= 2) {
-            builder.append(StringUtils.repeat(' ', indent - 2))
-                    .append("- ");
+    public static StringBuilder widgetTreeToString(StringBuilder builder, IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
+        getTree(parent, parent, test, builder, additionalInfo, "", false);
+        return builder;
+    }
+
+    private static void getTree(IWidget root, IWidget parent, Predicate<IWidget> test, StringBuilder builder, WidgetInfo additionalInfo, String indent, boolean hasNextSibling) {
+        if (!indent.isEmpty()) {
+            builder.append(indent).append(hasNextSibling ? "├ " : "└ ");
         }
-        builder.append(parent).append(" {")
-                .append(parent.getArea().x - root.x)
-                .append(", ")
-                .append(parent.getArea().y - root.y)
-                .append(" | ")
-                .append(parent.getArea().width)
-                .append(", ")
-                .append(parent.getArea().height)
-                .append("}\n");
+        builder.append(parent);
+        if (additionalInfo != null) {
+            builder.append(" {");
+            additionalInfo.addInfo(root, parent, builder);
+            builder.append("}");
+        }
+        builder.append('\n');
         if (parent.hasChildren()) {
-            for (IWidget child : parent.getChildren()) {
+            @NotNull List<IWidget> children = parent.getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                IWidget child = children.get(i);
                 if (test.test(child)) {
-                    getTree(root, child, test, builder, indent + 2);
+                    getTree(root, child, test, builder, additionalInfo, indent + (hasNextSibling ? "│ " : "  "), i < children.size() - 1);
                 }
             }
+        }
+    }
+
+    public interface WidgetInfo {
+
+        void addInfo(IWidget root, IWidget widget, StringBuilder builder);
+
+        default WidgetInfo combine(WidgetInfo other, String joiner) {
+            return (root, widget, builder) -> {
+                addInfo(root, widget, builder);
+                builder.append(joiner);
+                other.addInfo(root, widget, builder);
+            };
+        }
+
+        default WidgetInfo combine(WidgetInfo other) {
+            return combine(other, " ");
+        }
+
+        static WidgetInfo of(String joiner, WidgetInfo... infos) {
+            return (root, widget, builder) -> {
+                for (int i = 0; i < infos.length; i++) {
+                    WidgetInfo info = infos[i];
+                    info.addInfo(root, widget, builder);
+                    if (i < infos.length - 1) {
+                        builder.append(joiner);
+                    }
+                }
+            };
+        }
+
+        static WidgetInfo of(WidgetInfo... infos) {
+            return of(" ", infos);
         }
     }
 }
