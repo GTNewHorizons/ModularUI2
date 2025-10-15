@@ -472,6 +472,7 @@ public class WidgetTree {
         return filter.test(parent) ? parent : null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends IWidget> T findParent(IWidget parent, Class<T> type) {
         if (parent == null) return null;
         while (!(parent instanceof ModularPanel)) {
