@@ -37,7 +37,7 @@ import java.util.function.Predicate;
  */
 public class WidgetTree {
 
-    public static boolean logResizeTime = true;
+    public static boolean logResizeTime = false;
 
     public static final WidgetInfo INFO_AREA = (root, widget, builder) -> builder
             .append("Area xywh:")
