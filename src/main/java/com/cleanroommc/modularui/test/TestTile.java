@@ -330,7 +330,6 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                 .child(new Column()
                                                                         .debugName("button and slots test 3")
                                                                         .coverChildren()
-                                                                        //.alignY(Alignment.START) // TODO this fails to resize the widget tree
                                                                         .child(new TextFieldWidget()
                                                                                 .size(60, 20)
                                                                                 .value(SyncHandlers.intNumber(() -> this.intValue, val -> this.intValue = val))
