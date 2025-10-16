@@ -7,9 +7,8 @@ import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.widgets.layout.IExpander;
-
-import net.minecraft.client.renderer.GlStateManager;
 
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.ApiStatus;

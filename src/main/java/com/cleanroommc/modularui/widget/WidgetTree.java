@@ -8,7 +8,6 @@ import com.cleanroommc.modularui.api.widget.ISynced;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ObjectList;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
@@ -17,11 +16,11 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import net.minecraft.util.ChatComponentText;
 
 import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Streams;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.spongepowered.libraries.com.google.common.collect.Streams;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -203,7 +202,6 @@ public class WidgetTree {
      * @param parent starting point.
      * @return stream of the sub widget tree
      */
-    @SuppressWarnings("UnstableApiUsage")
     public static Stream<IWidget> stream(IWidget parent) {
         if (!parent.hasChildren()) return Stream.of(parent);
         return Streams.stream(iteratorBFS(parent));
