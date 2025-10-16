@@ -17,6 +17,7 @@ import net.minecraft.network.PacketBuffer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -76,8 +77,8 @@ public class ModularSyncManager {
         throw new NullPointerException("No PanelSyncManager found for name '" + panelName + "'!");
     }
 
-    public SyncHandler getSyncHandler(String panelName, String syncKey) {
-        return getPanelSyncManager(panelName).getSyncHandler(syncKey);
+    public @Nullable SyncHandler getSyncHandler(String panelName, String syncKey) {
+        return getPanelSyncManager(panelName).getSyncHandlerFromMapKey(syncKey);
     }
 
     public SlotGroup getSlotGroup(String panelName, String slotGroupName) {
