@@ -424,6 +424,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                 .childPadding(2)
                                                                 .child(new TextFieldWidget()
                                                                         .value(new IntValue.Dynamic(() -> this.num, val -> this.num = val))
+                                                                        .disableHoverBackground()
                                                                         .setNumbers(1, Short.MAX_VALUE)
                                                                         .setTextAlignment(Alignment.Center)
                                                                         .background(new Rectangle().setColor(0xFFb1b1b1))
