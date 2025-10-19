@@ -73,7 +73,6 @@ public interface IThemeApi {
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER = ITEM_SLOT.createSubKey("player");
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_HOTBAR = ITEM_SLOT_PLAYER.createSubKey("playerHotbar");
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_MAIN_INV = ITEM_SLOT_PLAYER.createSubKey("playerMainInventory");
-    WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_OFFHAND = ITEM_SLOT_PLAYER.createSubKey("playerOffhand");
     WidgetThemeKey<SlotTheme> ITEM_SLOT_PLAYER_ARMOR = ITEM_SLOT_PLAYER.createSubKey("playerArmor");
 
     String HOVER_SUFFIX = ":hover";
