@@ -503,7 +503,9 @@ public class ClientScreenHandler {
                 }
             }
 
+            GlStateManager.translate(0, 0, 500);
             drawItemStack(mcScreen, NEAAnimationHandler.injectVirtualCursorStack(mcScreen, itemstack), mouseX - x - 8, mouseY - y - k2, s);
+            GlStateManager.translate(0, 0, -500);
         }
 
         if (acc.getReturningStack() != null) {
