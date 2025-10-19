@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import net.minecraft.util.ChatComponentText;
 
 import com.google.common.collect.AbstractIterator;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -498,16 +498,28 @@ public class WidgetTree {
 
     @ApiStatus.Internal
     public static void collectSyncValues(PanelSyncManager syncManager, String panelName, IWidget panel, boolean includePanel) {
-        AtomicInteger id = new AtomicInteger(0);
+        MutableInt id = new MutableInt(0);
         String syncKey = ModularSyncManager.AUTO_SYNC_PREFIX + panelName;
         foreachChildBFS(panel, widget -> {
             if (widget instanceof ISynced<?> synced) {
                 if (synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
-                    syncManager.syncValue(syncKey, id.getAndIncrement(), synced.getSyncHandler());
+                    syncManager.syncValue(syncKey, id.intValue(), synced.getSyncHandler());
+                    id.increment();
                 }
             }
             return true;
         }, includePanel);
+    }
+
+    public static int countUnregisteredSyncHandlers(PanelSyncManager syncManager, IWidget parent) {
+        MutableInt count = new MutableInt();
+        foreachChildBFS(parent, widget -> {
+            if (widget instanceof ISynced<?> synced && synced.isSynced() && !syncManager.hasSyncHandler(synced.getSyncHandler())) {
+                count.increment();
+            }
+            return true;
+        });
+        return count.intValue();
     }
 
     public static void drawTree(IWidget parent, ModularGuiContext context) {
