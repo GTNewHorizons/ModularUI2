@@ -140,7 +140,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
                         this.widgetIt.remove();
                         continue;
                     }
-                    if (!widget.isEnabled()) continue;
+                    if (!widget.isEnabled() || !widget.getPanel().isOpen()) continue;
                     return widget.getArea();
                 }
                 this.widgetIt = null;
