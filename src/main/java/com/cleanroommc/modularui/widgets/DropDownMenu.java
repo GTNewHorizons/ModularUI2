@@ -34,6 +34,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         menu.background(GuiTextures.BUTTON_CLEAN);
         child(menu);
         setArrows(GuiTextures.ARROW_UP, GuiTextures.ARROW_DOWN);
+        background();
     }
 
     public int getSelectedIndex() {
@@ -205,7 +206,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
                 if (!(child instanceof Widget<?> childAsWidget)) continue;
                 childAsWidget.background(background);
             }
-            return super.background();
+            return super.background(background);
         }
 
         public void setMaxItemsToDisplay(int maxItems) {
@@ -217,8 +218,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             super.onResized();
             if (!isValid()) return;
             Area parentArea = getParent().getArea();
-            size(parentArea.width, parentArea.height * maxItemsOnDisplay);
-            pos(0, direction == DropDownDirection.UP ? -parentArea.height * (maxItemsOnDisplay + 1) : parentArea.height);
+            int maxItems = Math.min(maxItemsOnDisplay, children.size());
+            size(parentArea.width, parentArea.height * maxItems);
+            pos(0, direction == DropDownDirection.UP ? -parentArea.height * (maxItems + 1) : parentArea.height);
 
             List<IWidget> children = getChildren();
             for (int i = 0; i < children.size(); i++) {
