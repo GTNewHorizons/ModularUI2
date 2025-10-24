@@ -205,7 +205,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
                 if (!(child instanceof Widget<?> childAsWidget)) continue;
                 childAsWidget.background(background);
             }
-            return super.background();
+            return super.background(background);
         }
 
         public void setMaxItemsToDisplay(int maxItems) {
