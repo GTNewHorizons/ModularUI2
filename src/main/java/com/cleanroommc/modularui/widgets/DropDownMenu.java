@@ -238,6 +238,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     public static class DropDownItem extends ButtonWidget<DropDownItem> {
 
         @Override
+        public boolean canClickThrough() {
+            return false;
+        }
+
+        @Override
         public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
             return theme.getFallback();
         }
