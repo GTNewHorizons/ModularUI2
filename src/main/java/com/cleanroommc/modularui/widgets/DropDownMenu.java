@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.ScrollWidget;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -28,6 +29,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
     private IDrawable arrowOpened;
+    private static int offsetLeft = 5;
 
     public DropDownMenu() {
         menu.setEnabled(false);
@@ -62,19 +64,19 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     public DropDownMenu addChoice(ItemSelected onSelect, IDrawable... drawable) {
-        DropDownItem item = new DropDownItem();
+        DropDownItem item = new DropDownItem(drawable);
         return addChoice(index ->
                 item.onMouseReleased(m -> {
-                            menu.setOpened(false);
-                            menu.setCurrentIndex(index);
-                            onSelect.selected(this);
-                            return true;
-                        })
-                        .overlay(drawable));
+                    menu.setOpened(false);
+                    menu.setCurrentIndex(index);
+                    onSelect.selected(this);
+                    return true;
+                }));
     }
 
     public DropDownMenu addChoice(ItemSelected onSelect, String text) {
-        return addChoice(onSelect, IKey.str(text));
+        IKey key = IKey.str(text).alignment(Alignment.CenterLeft);
+        return addChoice(onSelect, key);
     }
 
     public DropDownMenu setDropDownDirection(DropDownDirection direction) {
@@ -100,14 +102,12 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
         Area area = getArea();
         int smallerSide = Math.min(area.width, area.height);
         WidgetTheme wt = getActiveWidgetTheme(widgetTheme, isHovering());
-        if (menu.getSelectedItem() != null) {
-            menu.getSelectedItem().setEnabled(true);
-            menu.getSelectedItem().drawBackground(context, widgetTheme);
-            menu.getSelectedItem().draw(context, widgetTheme);
-            menu.getSelectedItem().drawForeground(context);
-            menu.getSelectedItem().drawOverlay(context, widgetTheme);
+        DropDownItem selectedItem = menu.getSelectedItem();
+        if (selectedItem != null) {
+            selectedItem.setEnabled(true);
+            selectedItem.getDrawable().draw(context, offsetLeft, 0, area.width, area.height, wt);
         } else {
-            NONE.draw(context, 0, 0, area.width, area.height, wt);
+            NONE.draw(context, offsetLeft, 0, area.width, area.height, wt);
         }
 
         int arrowSize = smallerSide / 2;
@@ -149,7 +149,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
 
         private DropDownDirection direction = DropDownDirection.DOWN;
         private int maxItemsOnDisplay = 10;
-        private final List<IWidget> children = new ArrayList<>();
+        private final List<DropDownItem> children = new ArrayList<>();
         private boolean open;
         private int count = 0;
         private int currentIndex = -1;
@@ -192,11 +192,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             return Collections.unmodifiableList(children);
         }
 
-        public IWidget getSelectedItem() {
+        public DropDownItem getSelectedItem() {
             if (currentIndex < 0 || currentIndex >= count) {
                 return null;
             }
-            return getChildren().get(currentIndex);
+            return children.get(currentIndex);
         }
 
         @Override
@@ -223,9 +223,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             List<IWidget> children = getChildren();
             for (int i = 0; i < children.size(); i++) {
                 IWidget child = children.get(i);
-                child.getArea().setSize(parentArea.width, parentArea.height);
-                child.getArea().setPos(0, parentArea.height * i);
-                child.getFlex().left(0).top(parentArea.height * i);
+                child.getFlex().left(offsetLeft).top(parentArea.height * i).width(parentArea.width);
                 child.setEnabled(open);
             }
         }
@@ -236,6 +234,17 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     public static class DropDownItem extends ButtonWidget<DropDownItem> {
+
+        private final IDrawable drawable;
+
+        public DropDownItem(IDrawable[] drawable) {
+            this.drawable = IDrawable.of(drawable);
+            overlay(drawable);
+        }
+
+        public IDrawable getDrawable() {
+            return drawable;
+        }
 
         @Override
         public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
