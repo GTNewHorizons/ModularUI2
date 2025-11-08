@@ -16,7 +16,6 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
-import java.util.Locale;
 import java.util.function.Consumer;
 
 public class ColorPickerDialog extends Dialog<Integer> {
@@ -59,11 +58,9 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .left(5).right(5).height(14)
                         .child(new PageButton(0, controller)
                                 .sizeRel(0.5f, 1f)
-                                .invertSelected(true)
                                 .overlay(IKey.str("RGB")))
                         .child(new PageButton(1, controller)
                                 .sizeRel(0.5f, 1f)
-                                .invertSelected(true)
                                 .overlay(IKey.str("HSV"))))
                 .child(new Row().widthRel(1f).height(12).marginTop(4)
                         .child(IKey.str("Hex: ").asWidget().heightRel(1f))
@@ -116,21 +113,21 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .widthRel(1f).height(12)
                         .child(IKey.str("R: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundR)
-                                .debugName("red")
+                                .name("red")
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> this.red, this::updateRed))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("G: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundG)
-                                .debugName("green")
+                                .name("green")
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> this.green, this::updateGreen))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("B: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundB)
-                                .debugName("blue")
+                                .name("blue")
                                 .bounds(0, 255)
                                 .value(new DoubleValue.Dynamic(() -> this.blue, this::updateBlue))))
                 .childIf(alphaSlider != null, alphaSlider);
@@ -143,21 +140,21 @@ public class ColorPickerDialog extends Dialog<Integer> {
                         .widthRel(1f).height(12)
                         .child(IKey.str("H: ").asWidget().heightRel(1f))
                         .child(createSlider(new HueBar(GuiAxis.X))
-                                .debugName("hue")
+                                .name("hue")
                                 .bounds(0, 360)
                                 .value(new DoubleValue.Dynamic(() -> this.hue, this::updateHue))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("S: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundS)
-                                .debugName("saturation")
+                                .name("saturation")
                                 .bounds(0, 1)
                                 .value(new DoubleValue.Dynamic(() -> this.saturation, this::updateSaturation))))
                 .child(new Row()
                         .widthRel(1f).height(12)
                         .child(IKey.str("V: ").asWidget().heightRel(1f))
                         .child(createSlider(this.sliderBackgroundV)
-                                .debugName("value")
+                                .name("value")
                                 .bounds(0, 1)
                                 .value(new DoubleValue.Dynamic(() -> this.value, this::updateValue))))
                 .childIf(alphaSlider != null, alphaSlider);
@@ -177,7 +174,7 @@ public class ColorPickerDialog extends Dialog<Integer> {
                 .widthRel(1f).height(12)
                 .child(IKey.str("A: ").asWidget().heightRel(1f))
                 .child(createSlider(this.sliderBackgroundA)
-                        .debugName("alpha " + s)
+                        .name("alpha " + s)
                         .bounds(0, 255)
                         .value(new DoubleValue.Dynamic(() -> this.alpha, this::updateAlpha))) : null;
     }

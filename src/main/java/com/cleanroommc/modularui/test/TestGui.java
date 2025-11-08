@@ -63,7 +63,7 @@ public class TestGui extends CustomModularScreen {
         }
         SortableListWidget<String> sortableListWidget = new SortableListWidget<String>()
                 .children(configuredOptions, items::get)
-                .debugName("sortable list");
+                .name("sortable list");
         List<List<AvailableElement>> availableMatrix = Grid.mapToMatrix(2, this.lines, (index, value) -> {
             AvailableElement availableElement = new AvailableElement().overlay(IKey.str(value))
                     .widthRel(0.5f).height(14)
@@ -95,7 +95,7 @@ public class TestGui extends CustomModularScreen {
                     .child(new Grid()
                             .matrix(availableMatrix)
                             .scrollable()
-                            .pos(7, 7).right(16).bottom(7).debugName("available list"));
+                            .pos(7, 7).right(16).bottom(7).name("available list"));
         }, true);
         panel.child(new ButtonWidget<>()
                 .bottom(7).size(12, 12).leftRel(0.5f)

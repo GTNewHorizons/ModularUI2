@@ -34,7 +34,6 @@ import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
@@ -44,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
@@ -132,13 +132,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         closeSubPanels();
         if (isMainPanel()) {
             // close screen and let NEA animation
-            EntityPlayer player = MCHelper.getPlayer();
-            if (player != null) {
-                player.closeScreen();
-            } else {
-                // we are currently not in a world and want to display the previous screen
-                Minecraft.getMinecraft().displayGuiScreen(getContext().getParentScreen());
-            }
+            MCHelper.popScreen(getScreen().isOpenParentOnClose(), getContext().getParentScreen());
             return;
         }
         if (!shouldAnimate()) {
@@ -237,9 +231,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.state = State.OPEN;
     }
 
-    void reopen() {
-        if (this.state != State.CLOSED) throw new IllegalStateException();
+    boolean reopen(boolean strict) {
+        if (this.state != State.CLOSED) {
+            if (strict) throw new IllegalStateException();
+            return false;
+        }
         this.state = State.OPEN;
+        return true;
     }
 
     @MustBeInvokedByOverriders
@@ -665,6 +663,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return !isDraggable();
     }
 
+    @Override
     public @NotNull String getName() {
         return this.name;
     }
@@ -705,7 +704,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return null;
     }
 
-    public List<LocatedWidget> getAllHoveringList(boolean debug) {
+    public @NotNull List<LocatedWidget> getAllHoveringList(boolean debug) {
+        if (this.hovering.isEmpty()) return Collections.emptyList();
         List<LocatedWidget> hovering = new ArrayList<>();
         for (ObjectListIterator<LocatedWidget> iterator = this.hovering.iterator(); iterator.hasNext(); ) {
             LocatedWidget lw = iterator.next();
@@ -722,7 +722,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 if (!lw.getElement().canHoverThrough()) break;
             }
         }
-        return hovering;
+        return hovering.isEmpty() ? Collections.emptyList() : hovering;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
@@ -783,7 +783,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     @ApiStatus.Internal
     public boolean shouldAnimate() {
-        return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
+        if (getScreen().isOverlay() || !ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime <= 0) return false;
+        if (!isMainPanel() || !getScreen().isOpenParentOnClose()) return true;
+        return getContext().getParentScreen() == null;
     }
 
     void registerSubPanel(IPanelHandler handler) {
