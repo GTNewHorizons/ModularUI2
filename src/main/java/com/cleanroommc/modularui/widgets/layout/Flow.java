@@ -259,7 +259,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      * @param doReverse true if the children list should be read in reverse
      * @return this
      */
-    public Flow shouldReverseChildren(boolean doReverse) {
+    public Flow reverseLayout(boolean doReverse) {
         this.reverseChildren = doReverse;
         return this;
     }
