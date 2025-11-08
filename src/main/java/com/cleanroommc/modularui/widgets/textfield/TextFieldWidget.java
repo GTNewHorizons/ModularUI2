@@ -56,6 +56,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         setText(this.stringValue.getStringValue());
         if (!hasTooltip() && !tooltipOverride) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
+            tooltipOverride = false;
         }
     }
 
