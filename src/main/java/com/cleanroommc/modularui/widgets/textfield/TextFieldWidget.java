@@ -244,10 +244,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
         Number number = format.parse(getText(), new ParsePosition(0));
         double primitive = (number == null ? defaultNumber : number.doubleValue()) + value;
+        String representation = format.format(primitive);
 
-        this.stringValue.setStringValue(Double.toString(primitive));
-        this.setText(Double.toString(primitive));
+        this.stringValue.setStringValue(representation);
+        this.setText(representation);
         markTooltipDirty();
+
         return true;
     }
 
@@ -261,7 +263,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
      * @param shiftStep - By how much to change the value when the shfit key is held
      * @return this
      */
-    public TextFieldWidget setScrollValues(int baseStep, int ctrlStep, int shiftStep) {
+    public TextFieldWidget setScrollValues(double baseStep, double ctrlStep, double shiftStep) {
             this.scrollStep = baseStep;
             this.scrollStepCtrl = ctrlStep;
             this.scrollStepShift = shiftStep;

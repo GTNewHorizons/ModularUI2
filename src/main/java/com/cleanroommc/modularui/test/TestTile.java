@@ -286,7 +286,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 .size(60, 18)
                                                                                 .paddingTop(1)
                                                                                 .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
-                                                                                .setScrollValues(10, 1, 100)
+                                                                                .setScrollValues(10, 0.5, 100)
                                                                                 .setNumbersDouble(Function.identity())
                                                                                 .hintText("number"))
                                                                         //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
