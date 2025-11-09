@@ -230,12 +230,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     /**
      * Allows for setting the numeric values with mouse scrolling.
-     * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is not focused
+     * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is focused
      */
     @Override
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is focused
-        if (!this.usingScrollStep || !this.numbers || isFocused()) return super.onMouseScroll(scrollDirection, amount);
+        if (!this.usingScrollStep || !this.numbers || !isFocused()) return super.onMouseScroll(scrollDirection, amount);
 
         double value;
         if (Interactable.hasControlDown()) value = scrollDirection.modifier * scrollStepCtrl;
@@ -244,7 +244,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
         Number number = format.parse(getText(), new ParsePosition(0));
         double primitive = (number == null ? defaultNumber : number.doubleValue()) + value;
-        String representation = format.format(primitive);
+        String representation = validator.apply(format.format(primitive));
 
         this.stringValue.setStringValue(representation);
         this.setText(representation);
@@ -260,7 +260,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
      *  Default values: 1, 0.1, 100 in order.
      * @param baseStep - By how much to change the value when no modifier key is held
      * @param ctrlStep - By how much to change the value when the ctrl key is held
-     * @param shiftStep - By how much to change the value when the shfit key is held
+     * @param shiftStep - By how much to change the value when the shift key is held
      * @return this
      */
     public TextFieldWidget setScrollValues(double baseStep, double ctrlStep, double shiftStep) {

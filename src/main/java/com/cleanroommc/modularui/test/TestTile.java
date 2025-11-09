@@ -336,6 +336,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                         .child(new TextFieldWidget()
                                                                                 .size(60, 20)
                                                                                 .value(SyncHandlers.intNumber(() -> this.intValue, val -> this.intValue = val))
+                                                                                .setScrollValues(1, 0.5, 2.5)
                                                                                 .setNumbers(0, 9999999)
                                                                                 .setFormatAsInteger(true)
                                                                                 .hintText("integer")))
