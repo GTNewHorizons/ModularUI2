@@ -242,9 +242,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         else if (Interactable.hasShiftDown()) value = scrollDirection.modifier * scrollStepShift;
         else value = scrollDirection.modifier * scrollStep;
 
-        Number number = format.parse(getText(), new ParsePosition(0));
-        double primitive = (number == null ? defaultNumber : number.doubleValue()) + value;
-        String representation = validator.apply(format.format(primitive));
+        double number = this.parse(getText()) + value;
+        String representation = validator.apply(Double.toString(number));
 
         this.stringValue.setStringValue(representation);
         this.setText(representation);
