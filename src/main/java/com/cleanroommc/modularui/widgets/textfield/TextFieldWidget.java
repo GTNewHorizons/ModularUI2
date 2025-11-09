@@ -230,11 +230,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     /**
      * Allows for setting the numeric values with mouse scrolling.
-     * Will only allow for this behavior when number formatting is on, the scroll is toggled on, and the field is not focused
+     * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is not focused
      */
     @Override
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
-        // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is not focused
+        // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is focused
         if (!this.usingScrollStep || !this.numbers || isFocused()) return super.onMouseScroll(scrollDirection, amount);
 
         double value;
