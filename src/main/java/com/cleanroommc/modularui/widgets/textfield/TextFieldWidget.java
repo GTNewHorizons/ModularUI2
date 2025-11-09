@@ -243,7 +243,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         else value = scrollDirection.modifier * scrollStep;
 
         Number number = format.parse(getText(), new ParsePosition(0));
-        double primitive = (number == null ? 0.0 : number.doubleValue()) + value;
+        double primitive = (number == null ? defaultNumber : number.doubleValue()) + value;
 
         this.stringValue.setStringValue(Double.toString(primitive));
         this.setText(Double.toString(primitive));
