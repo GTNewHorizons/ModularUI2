@@ -1,10 +1,12 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IStringValue;
+import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
@@ -33,6 +35,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private String mathFailMessage = null;
     private double defaultNumber = 0;
     private boolean tooltipOverride = false;
+    private double scrollStep = 1;
+    private double scrollStepCtrl = 0.1;
+    private double scrollStepShift = 100;
+    private boolean usingScrollStep = false;
+
     public double parse(String num) {
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
         double value = result.getResult();
@@ -86,7 +93,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     @Override
     public void drawForeground(ModularGuiContext context) {
-        if (hasTooltip() && (tooltipOverride || getScrollData().isScrollBarActive(getScrollArea())) && isHoveringFor(getTooltip().getShowUpTimer())) {
+        if (hasTooltip() && (tooltipOverride || getScrollData().isScrollBarActive(getScrollArea())) && ( isHoveringFor(getTooltip().getShowUpTimer()))) {
             getTooltip().draw(getContext());
         }
     }
@@ -220,6 +227,56 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         setValue(stringValue);
         return this;
     }
+
+    /**
+     * Allows for setting the numeric values with mouse scrolling.
+     * Will only allow for this behavior when number formatting is on, the scroll is toggled on, and the field is not focused
+     */
+    @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is not focused
+        if (!this.usingScrollStep || !this.numbers || isFocused()) return super.onMouseScroll(scrollDirection, amount);
+
+        double value;
+        if (Interactable.hasControlDown()) value = scrollDirection.modifier * scrollStepCtrl;
+        else if (Interactable.hasShiftDown()) value = scrollDirection.modifier * scrollStepShift;
+        else value = scrollDirection.modifier * scrollStep;
+
+        Number number = format.parse(getText(), new ParsePosition(0));
+        double primitive = (number == null ? 0.0 : number.doubleValue()) + value;
+
+        this.stringValue.setStringValue(Double.toString(primitive));
+        this.setText(Double.toString(primitive));
+        markTooltipDirty();
+        return true;
+    }
+
+    /**
+     *  Sets the values by which to increment the field when the player uses the scroll wheel.
+     *  Scrolling up increases value, and scrolling down decreases value.
+     *  Also enables the usingScrollStep flag.
+     *  Default values: 1, 0.1, 100 in order.
+     * @param baseStep - By how much to change the value when no modifier key is held
+     * @param ctrlStep - By how much to change the value when the ctrl key is held
+     * @param shiftStep - By how much to change the value when the shfit key is held
+     * @return this
+     */
+    public TextFieldWidget setScrollValues(int baseStep, int ctrlStep, int shiftStep) {
+            this.scrollStep = baseStep;
+            this.scrollStepCtrl = ctrlStep;
+            this.scrollStepShift = shiftStep;
+            this.usingScrollStep = true;
+            return this;
+    }
+    /**
+     *  Sets the usingScrollStep flag
+     * @return this
+     */
+    public TextFieldWidget usingScrollStep(boolean usingScrollStep) {
+            this.usingScrollStep = true;
+            return this;
+    }
+
 
     /**
      *  Normally, Tooltips on text field widgets are used to display the contents of the widget when the scrollbar is active
