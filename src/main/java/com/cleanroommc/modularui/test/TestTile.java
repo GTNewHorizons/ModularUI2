@@ -275,7 +275,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 })
                                                                                 //.flex(flex -> flex.left(3)) // ?
                                                                                 .overlay(IKey.str("Button 2")))
-                                                                        .child(new TextFieldWidget()
+                                                                        .child(new TextFieldWidget().tooltip(t->t.addLine("asdasdasdas")).setTooltipOverride(true)
+
                                                                                 .size(60, 18)
                                                                                 .setTextAlignment(Alignment.Center)
                                                                                 .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
@@ -304,6 +305,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                         .texture(GuiTextures.PROGRESS_CYCLE, 20)
                                                                         .direction(ProgressWidget.Direction.CIRCULAR_CW))
                                                                 .child(new Row().coverChildrenWidth().height(18)
+                                                                        .reverseLayout(false)
                                                                         .child(new ToggleButton()
                                                                                 .value(new BoolValue.Dynamic(() -> cycleStateValue.getIntValue() == 0, val -> cycleStateValue.setIntValue(0)))
                                                                                 .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
