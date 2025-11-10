@@ -275,8 +275,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 })
                                                                                 //.flex(flex -> flex.left(3)) // ?
                                                                                 .overlay(IKey.str("Button 2")))
-                                                                        .child(new TextFieldWidget().tooltip(t->t.addLine("asdasdasdas")).setTooltipOverride(true)
-
+                                                                        .child(new TextFieldWidget()
+                                                                                .tooltip(t->t.addLine("hello, i am overridden!"))
                                                                                 .size(60, 18)
                                                                                 .setTextAlignment(Alignment.Center)
                                                                                 .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
@@ -286,6 +286,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 .size(60, 18)
                                                                                 .paddingTop(1)
                                                                                 .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                                                .setScrollValues(10, 0.1, 100)
                                                                                 .setNumbersDouble(Function.identity())
                                                                                 .hintText("number"))
                                                                         //.child(IKey.str("Test string").asWidget().padding(2).debugName("test string"))
@@ -335,6 +336,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                         .child(new TextFieldWidget()
                                                                                 .size(60, 20)
                                                                                 .value(SyncHandlers.intNumber(() -> this.intValue, val -> this.intValue = val))
+                                                                                .setScrollValues(1, 0.5, 2.5)
                                                                                 .setNumbers(0, 9999999)
                                                                                 .setFormatAsInteger(true)
                                                                                 .hintText("integer")))
