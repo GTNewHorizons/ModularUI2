@@ -47,8 +47,8 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
         if (fluid == null) return;
         GuiDraw.drawFluidTexture(fluid, 0, 0, getArea().width, getArea().height, context.getCurrentDrawingZ());
         if (this.displayAmount) {
-            drawAmountText(fluid.amount, null, 1, 1, this.getArea().width-1,
-                    this.getArea().height-1, Alignment.BottomRight);
+            GuiDraw.drawScaledAmountText(fluid.amount, null, 1, 1, this.getArea().width-1,
+                    this.getArea().height-1, Alignment.BottomRight, 1);
         }
     }
 
@@ -58,31 +58,10 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
         return this;
     }
 
-    public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
-        if (amount > 1 || format != null) {
-            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
-            if (format != null) {
-                amountText = format + amountText;
-            }
-            FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-
-            float maxWidth = width * 0.9f;
-            float textWidth = fontRenderer.getStringWidth(amountText);
-            float scale = Math.min(1f, maxWidth / textWidth);
-            if (amountText.length() > 4) scale = Math.min(scale, 0.5f);
 
 
-            textRenderer.setShadow(true);
-            textRenderer.setScale(scale);
-            textRenderer.setColor(Color.WHITE.main);
-            textRenderer.setAlignment(alignment, width, height);
-            textRenderer.setPos(x, y);
-            textRenderer.setHardWrapOnBorder(false);
-            textRenderer.draw(amountText);
 
-            textRenderer.setHardWrapOnBorder(true);
-        }
-    }
+
 
     public FluidDisplayWidget fluid(FluidStack fluidStack) {
         return fluid(new ObjectValue<>(fluidStack));
