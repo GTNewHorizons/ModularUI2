@@ -34,7 +34,7 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         FluidStack fluid = value.getValue();
-        if (fluid == null)return;
+        if (fluid == null) return;
         GuiDraw.drawFluidTexture(fluid, 0, 0, getArea().width, getArea().height, context.getCurrentDrawingZ());
         if (this.displayAmount) {
             GuiDraw.drawStandardSlotAmountText(fluid.amount, null, getArea());
