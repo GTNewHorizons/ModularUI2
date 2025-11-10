@@ -28,6 +28,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
     private IDrawable arrowOpened;
+    private static int offsetArrow = 5;
 
     public DropDownMenu() {
         menu.setEnabled(false);
@@ -112,9 +113,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
 
         int arrowSize = smallerSide / 2;
         if (menu.isOpen()) {
-            arrowOpened.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, wt);
+            arrowOpened.draw(context, area.width - arrowSize - offsetArrow, arrowSize / 2, arrowSize, arrowSize, wt);
         } else {
-            arrowClosed.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, wt);
+            arrowClosed.draw(context, area.width - arrowSize - offsetArrow, arrowSize / 2, arrowSize, arrowSize, wt);
         }
     }
 
