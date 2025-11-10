@@ -35,7 +35,7 @@ public class PacketSyncHandler implements IPacket {
     @Override
     public void write(PacketBuffer buf) {
         NetworkUtils.writeStringSafe(buf, this.panel);
-        NetworkUtils.writeStringSafe(buf, this.key, 64, true);
+        NetworkUtils.writeStringSafe(buf, this.key, 256, true);
         buf.writeBoolean(this.action);
         NetworkUtils.writeByteBuf(buf, this.packet);
     }
