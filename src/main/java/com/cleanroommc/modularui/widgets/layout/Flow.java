@@ -4,9 +4,11 @@ import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import java.util.List;
 import java.util.function.IntFunction;
 
 public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander {
@@ -41,6 +43,11 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      */
     private boolean collapseDisabledChild = false;
 
+    /**
+     *  Whether the children list should be read in reverse or not
+     */
+    private boolean reverseChildren = false;
+
     public Flow(GuiAxis axis) {
         this.axis = axis;
         sizeRel(1f, 1f);
@@ -57,6 +64,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             // for anything else than start we need the size to be known
             return false;
         }
+        List<IWidget> childrenList = reverseChildren ? new ReversedList<>(getChildren()) : getChildren();
         int space = this.spaceBetween;
 
         int childrenSize = 0;
@@ -64,7 +72,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         int amount = 0;
 
         // calculate total size
-        for (IWidget widget : getChildren()) {
+        for (IWidget widget : childrenList) {
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) continue;
             // exclude children whose position of main axis is fixed
@@ -96,7 +104,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
 
         if (expandedAmount > 0 && hasSize) {
             int newSize = (size - childrenSize) / expandedAmount;
-            for (IWidget widget : getChildren()) {
+            for (IWidget widget : childrenList) {
                 // ignore disabled child if configured as such
                 if (shouldIgnoreChildSize(widget)) continue;
                 // exclude children whose position of main axis is fixed
@@ -118,7 +126,7 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
             }
         }
 
-        for (IWidget widget : getChildren()) {
+        for (IWidget widget : childrenList) {
             // ignore disabled child if configured as such
             if (shouldIgnoreChildSize(widget)) {
                 widget.resizer().updateResized();
@@ -153,7 +161,10 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
         Box padding = getArea().getPadding();
         boolean hasWidth = resizer().isSizeCalculated(other);
         if (!hasWidth && this.caa != Alignment.CrossAxis.START) return false;
-        for (IWidget widget : getChildren()) {
+
+        List<IWidget> childrenList = reverseChildren ? new ReversedList<>(getChildren()) : getChildren();
+
+        for (IWidget widget : childrenList) {
             // exclude children whose position of main axis is fixed
             if (widget.flex().hasPos(this.axis)) continue;
             Box margin = widget.getArea().getMargin();
@@ -239,6 +250,17 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget, IExpander
      */
     public Flow collapseDisabledChild(boolean doCollapse) {
         this.collapseDisabledChild = doCollapse;
+        return this;
+    }
+
+    /**
+     * Sets if the children list should be reversed or not.
+     * This is useful when using a MainAxisAlignment of END and want the children to be added in the same order they are read in.
+     * @param doReverse true if the children list should be read in reverse
+     * @return this
+     */
+    public Flow reverseLayout(boolean doReverse) {
+        this.reverseChildren = doReverse;
         return this;
     }
 
