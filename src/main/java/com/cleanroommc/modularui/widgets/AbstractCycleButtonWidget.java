@@ -34,6 +34,8 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     protected IDrawable[] overlay = null;
     protected IDrawable[] hoverOverlay = null;
     private final List<RichTooltip> stateTooltip = new ArrayList<>();
+    private boolean playClickSound = true;
+    private Runnable clickSound;
 
     @Override
     public void onInit() {
@@ -81,16 +83,26 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         markTooltipDirty();
     }
 
+    public void playClickSound() {
+        if (this.playClickSound) {
+            if (this.clickSound != null) {
+                this.clickSound.run();
+            } else {
+                Interactable.playButtonClickSound();
+            }
+        }
+    }
+
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         switch (mouseButton) {
             case 0:
                 next();
-                Interactable.playButtonClickSound();
+                playClickSound();
                 return Result.SUCCESS;
             case 1:
                 prev();
-                Interactable.playButtonClickSound();
+                playClickSound();
                 return Result.SUCCESS;
         }
         return Result.IGNORE;
@@ -506,6 +518,16 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
 
     protected W tooltipBuilder(int index, Consumer<RichTooltip> builder) {
         this.stateTooltip.get(index).tooltipBuilder(builder);
+        return getThis();
+    }
+
+    public W playClickSound(boolean play) {
+        this.playClickSound = play;
+        return getThis();
+    }
+
+    public W clickSound(Runnable clickSound) {
+        this.clickSound = clickSound;
         return getThis();
     }
 }
