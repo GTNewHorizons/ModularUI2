@@ -1,5 +1,13 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.NumberFormat;
+import com.cleanroommc.modularui.widget.sizer.Area;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.cleanroommc.modularui.api.ITheme;
@@ -16,6 +24,8 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
 
     private IValue<FluidStack> value;
     private boolean displayAmount = false;
+    public static TextRenderer textRenderer = new TextRenderer();
+
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
@@ -37,7 +47,8 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
         if (fluid == null) return;
         GuiDraw.drawFluidTexture(fluid, 0, 0, getArea().width, getArea().height, context.getCurrentDrawingZ());
         if (this.displayAmount) {
-            GuiDraw.drawStandardSlotAmountText(fluid.amount, null, getArea());
+            drawAmountText(fluid.amount, null, 1, 1, this.getArea().width-1,
+                    this.getArea().height-1, Alignment.BottomRight);
         }
     }
 
@@ -45,6 +56,32 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
         this.value = fluidSupplier;
         setValue(fluidSupplier);
         return this;
+    }
+
+    public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
+        if (amount > 1 || format != null) {
+            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
+            if (format != null) {
+                amountText = format + amountText;
+            }
+            FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+
+            float maxWidth = width * 0.9f;
+            float textWidth = fontRenderer.getStringWidth(amountText);
+            float scale = Math.min(1f, maxWidth / textWidth);
+            if (amountText.length() > 4) scale = Math.min(scale, 0.5f);
+
+
+            textRenderer.setShadow(true);
+            textRenderer.setScale(scale);
+            textRenderer.setColor(Color.WHITE.main);
+            textRenderer.setAlignment(alignment, width, height);
+            textRenderer.setPos(x, y);
+            textRenderer.setHardWrapOnBorder(false);
+            textRenderer.draw(amountText);
+
+            textRenderer.setHardWrapOnBorder(true);
+        }
     }
 
     public FluidDisplayWidget fluid(FluidStack fluidStack) {
