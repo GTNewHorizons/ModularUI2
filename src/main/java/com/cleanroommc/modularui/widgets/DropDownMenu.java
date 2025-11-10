@@ -28,12 +28,14 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
     private IDrawable arrowOpened;
+    private static int offsetArrow = 5;
 
     public DropDownMenu() {
         menu.setEnabled(false);
         menu.background(GuiTextures.BUTTON_CLEAN);
         child(menu);
         setArrows(GuiTextures.ARROW_UP, GuiTextures.ARROW_DOWN);
+        background();
     }
 
     public int getSelectedIndex() {
@@ -112,9 +114,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
 
         int arrowSize = smallerSide / 2;
         if (menu.isOpen()) {
-            arrowOpened.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, wt);
+            arrowOpened.draw(context, area.width - arrowSize - offsetArrow, arrowSize / 2, arrowSize, arrowSize, wt);
         } else {
-            arrowClosed.draw(context, area.width - arrowSize, arrowSize / 2, arrowSize, arrowSize, wt);
+            arrowClosed.draw(context, area.width - arrowSize - offsetArrow, arrowSize / 2, arrowSize, arrowSize, wt);
         }
     }
 
@@ -205,7 +207,7 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
                 if (!(child instanceof Widget<?> childAsWidget)) continue;
                 childAsWidget.background(background);
             }
-            return super.background();
+            return super.background(background);
         }
 
         public void setMaxItemsToDisplay(int maxItems) {
@@ -217,8 +219,9 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
             super.onResized();
             if (!isValid()) return;
             Area parentArea = getParent().getArea();
-            size(parentArea.width, parentArea.height * maxItemsOnDisplay);
-            pos(0, direction == DropDownDirection.UP ? -parentArea.height * (maxItemsOnDisplay + 1) : parentArea.height);
+            int maxItems = Math.min(maxItemsOnDisplay, children.size());
+            size(parentArea.width, parentArea.height * maxItems);
+            pos(0, direction == DropDownDirection.UP ? -parentArea.height * (maxItems + 1) : parentArea.height);
 
             List<IWidget> children = getChildren();
             for (int i = 0; i < children.size(); i++) {
@@ -236,6 +239,11 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     }
 
     public static class DropDownItem extends ButtonWidget<DropDownItem> {
+
+        @Override
+        public boolean canClickThrough() {
+            return false;
+        }
 
         @Override
         public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
