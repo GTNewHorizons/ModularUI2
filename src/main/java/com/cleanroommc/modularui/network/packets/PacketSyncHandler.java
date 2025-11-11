@@ -30,6 +30,7 @@ public class PacketSyncHandler implements IPacket {
         this.key = key;
         this.action = action;
         this.packet = packet;
+        
     }
 
     @Override
