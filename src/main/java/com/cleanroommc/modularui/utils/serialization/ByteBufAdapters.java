@@ -27,11 +27,14 @@ public class ByteBufAdapters {
     public static final IByteBufAdapter<byte[]> BYTE_ARR = new IByteBufAdapter<>() {
         @Override
         public byte[] deserialize(PacketBuffer buffer) throws IOException {
-            return buffer.readByteArray();
+            byte[] arr = new byte[buffer.readVarIntFromBuffer()];
+            buffer.readBytes(arr);
+            return arr;
         }
 
         @Override
         public void serialize(PacketBuffer buffer, byte[] u) throws IOException {
+            buffer.writeVarIntToBuffer(u.length);
             buffer.writeBytes(u);
         }
 
@@ -48,7 +51,7 @@ public class ByteBufAdapters {
     public static final IByteBufAdapter<long[]> LONG_ARR = new IByteBufAdapter<>() {
         @Override
         public long[] deserialize(PacketBuffer buffer) throws IOException {
-            long[] u = new long[buffer.readVarInt()];
+            long[] u = new long[buffer.readVarIntFromBuffer()];
             for (int i = 0; i < u.length; i++) {
                 u[i] = buffer.readLong();
             }
@@ -57,7 +60,7 @@ public class ByteBufAdapters {
 
         @Override
         public void serialize(PacketBuffer buffer, long[] u) throws IOException {
-            buffer.writeVarInt(u.length);
+            buffer.writeVarIntToBuffer(u.length);
             for (long i : u) {
                 buffer.writeLong(i);
             }
@@ -76,12 +79,12 @@ public class ByteBufAdapters {
     public static final IByteBufAdapter<BigInteger> BIG_INT = new IByteBufAdapter<>() {
         @Override
         public BigInteger deserialize(PacketBuffer buffer) throws IOException {
-            return new BigInteger(buffer.readByteArray());
+            return new BigInteger(BYTE_ARR.deserialize(buffer));
         }
 
         @Override
         public void serialize(PacketBuffer buffer, BigInteger u) throws IOException {
-            buffer.writeBytes(u.toByteArray());
+            BYTE_ARR.serialize(buffer, u.toByteArray());
         }
 
         @Override
@@ -93,13 +96,13 @@ public class ByteBufAdapters {
     public static final IByteBufAdapter<BigDecimal> BIG_DECIMAL = new IByteBufAdapter<>() {
         @Override
         public BigDecimal deserialize(PacketBuffer buffer) throws IOException {
-            return new BigDecimal(new BigInteger(buffer.readByteArray()), buffer.readVarInt());
+            return new BigDecimal(BIG_INT.deserialize(buffer), buffer.readVarIntFromBuffer());
         }
 
         @Override
         public void serialize(PacketBuffer buffer, BigDecimal u) throws IOException {
-            buffer.writeBytes(u.unscaledValue().toByteArray());
-            buffer.writeVarInt(u.scale());
+            BIG_INT.serialize(buffer, u.unscaledValue());
+            buffer.writeVarIntToBuffer(u.scale());
         }
 
         @Override
