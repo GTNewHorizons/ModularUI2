@@ -24,8 +24,6 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
 
     private IValue<FluidStack> value;
     private boolean displayAmount = false;
-    public static TextRenderer textRenderer = new TextRenderer();
-
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
@@ -57,11 +55,6 @@ public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
         setValue(fluidSupplier);
         return this;
     }
-
-
-
-
-
 
     public FluidDisplayWidget fluid(FluidStack fluidStack) {
         return fluid(new ObjectValue<>(fluidStack));
