@@ -341,6 +341,32 @@ public class GuiDraw {
         drawAmountText(amount, format, 1, 1, area.width - 1, area.height - 1, Alignment.BottomRight);
     }
 
+    public static void drawScaledAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment, int border) {
+        if (amount > 1 || format != null) {
+            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
+            if (format != null) {
+                amountText = format + amountText;
+            }
+            FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+
+            float maxWidth = width - border * 2 ;
+            float textWidth = fontRenderer.getStringWidth(amountText);
+            float scale = Math.min(1f, maxWidth / textWidth);
+            if (amountText.length() > 4) scale = Math.max(scale, 0.5f);
+
+
+            textRenderer.setShadow(true);
+            textRenderer.setScale(scale);
+            textRenderer.setColor(Color.WHITE.main);
+            textRenderer.setAlignment(alignment, width, height);
+            textRenderer.setPos(x, y);
+            textRenderer.setHardWrapOnBorder(false);
+            textRenderer.draw(amountText);
+
+            textRenderer.setHardWrapOnBorder(true);
+        }
+    }
+
     public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
         if (amount > 1 || format != null) {
             String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
