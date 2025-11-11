@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.ObjectValue;
 import com.cleanroommc.modularui.value.sync.GenericSyncValue;
@@ -45,9 +46,18 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         ItemStack item = value.getValue();
         if (!Platform.isStackEmpty(item)) {
-            GuiDraw.drawItem(item, 1, 1, 16, 16, context.getCurrentDrawingZ());
+            int contentOffsetY = 1;
+            int contentOffsetX = 1;
+            GuiDraw.drawItem(
+                    item,
+                    contentOffsetX,
+                    contentOffsetY,
+                    getArea().width - 2 * contentOffsetX,
+                    getArea().height - 2 * contentOffsetY,
+                    context.getCurrentDrawingZ());
             if (this.displayAmount) {
-                GuiDraw.drawStandardSlotAmountText(item.stackSize, null, getArea());
+                GuiDraw.drawScaledAmountText(item.stackSize, null, 1, 1, this.getArea().width-1,
+                        this.getArea().height-1, Alignment.BottomRight, 0);
             }
         }
     }
