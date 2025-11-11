@@ -349,7 +349,7 @@ public class GuiDraw {
             }
             FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
 
-            float maxWidth = width -  border * 2 ;
+            float maxWidth = width - border * 2 ;
             float textWidth = fontRenderer.getStringWidth(amountText);
             float scale = Math.min(1f, maxWidth / textWidth);
             if (amountText.length() > 4) scale = Math.max(scale, 0.5f);
