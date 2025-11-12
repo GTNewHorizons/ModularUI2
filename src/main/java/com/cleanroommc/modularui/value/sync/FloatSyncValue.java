@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
-import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
+import com.cleanroommc.modularui.api.value.sync.IFloatSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.utils.FloatConsumer;
+import com.cleanroommc.modularui.utils.FloatSupplier;
 
 import net.minecraft.network.PacketBuffer;
 
@@ -12,34 +15,32 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
 
-public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncValue<Integer>, IDoubleSyncValue<Integer>, IStringSyncValue<Integer> {
+public class FloatSyncValue extends ValueSyncHandler<Float> implements IFloatSyncValue<Float>, IDoubleSyncValue<Float>, IStringSyncValue<Float> {
 
-    private int cache;
-    private final IntSupplier getter;
-    private final IntConsumer setter;
+    private final FloatSupplier getter;
+    private final FloatConsumer setter;
+    private float cache;
 
-    public IntSyncValue(@NotNull IntSupplier getter, @Nullable IntConsumer setter) {
+    public FloatSyncValue(@NotNull FloatSupplier getter, @Nullable FloatConsumer setter) {
         this.getter = Objects.requireNonNull(getter);
         this.setter = setter;
-        this.cache = getter.getAsInt();
+        this.cache = getter.getAsFloat();
     }
 
-    public IntSyncValue(@NotNull IntSupplier getter) {
-        this(getter, (IntConsumer) null);
+    public FloatSyncValue(@NotNull FloatSupplier getter) {
+        this(getter, (FloatConsumer) null);
     }
 
     @Contract("null, null -> fail")
-    public IntSyncValue(@Nullable IntSupplier clientGetter,
-                        @Nullable IntSupplier serverGetter) {
+    public FloatSyncValue(@Nullable FloatSupplier clientGetter,
+                          @Nullable FloatSupplier serverGetter) {
         this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")
-    public IntSyncValue(@Nullable IntSupplier clientGetter, @Nullable IntConsumer clientSetter,
-                        @Nullable IntSupplier serverGetter, @Nullable IntConsumer serverSetter) {
+    public FloatSyncValue(@Nullable FloatSupplier clientGetter, @Nullable FloatConsumer clientSetter,
+                          @Nullable FloatSupplier serverGetter, @Nullable FloatConsumer serverSetter) {
         if (clientGetter == null && serverGetter == null) {
             throw new NullPointerException("Client or server getter must not be null!");
         }
@@ -50,26 +51,26 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
             this.getter = serverGetter != null ? serverGetter : clientGetter;
             this.setter = serverSetter != null ? serverSetter : clientSetter;
         }
-        this.cache = this.getter.getAsInt();
+        this.cache = this.getter.getAsFloat();
     }
 
     @Override
-    public Integer getValue() {
+    public Float getValue() {
         return this.cache;
     }
 
     @Override
-    public int getIntValue() {
+    public void setValue(@NotNull Float value, boolean setSource, boolean sync) {
+        setFloatValue(value, setSource, sync);
+    }
+
+    @Override
+    public float getFloatValue() {
         return this.cache;
     }
 
     @Override
-    public void setValue(Integer value, boolean setSource, boolean sync) {
-        setIntValue(value, setSource, sync);
-    }
-
-    @Override
-    public void setIntValue(int value, boolean setSource, boolean sync) {
+    public void setFloatValue(float value, boolean setSource, boolean sync) {
         this.cache = value;
         if (setSource && this.setter != null) {
             this.setter.accept(value);
@@ -80,19 +81,9 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
     }
 
     @Override
-    public void setDoubleValue(double value, boolean setSource, boolean sync) {
-        setIntValue((int) value, setSource, sync);
-    }
-
-    @Override
-    public double getDoubleValue() {
-        return this.cache;
-    }
-
-    @Override
     public boolean updateCacheFromSource(boolean isFirstSync) {
-        if (isFirstSync || this.getter.getAsInt() != this.cache) {
-            setIntValue(this.getter.getAsInt(), false, false);
+        if (isFirstSync || this.getter.getAsFloat() != this.cache) {
+            setFloatValue(this.getter.getAsFloat(), false, false);
             return true;
         }
         return false;
@@ -100,26 +91,36 @@ public class IntSyncValue extends ValueSyncHandler<Integer> implements IIntSyncV
 
     @Override
     public void notifyUpdate() {
-        setIntValue(this.getter.getAsInt(), false, true);
+        setFloatValue(this.getter.getAsFloat(), false, true);
     }
 
     @Override
     public void write(PacketBuffer buffer) {
-        buffer.writeVarIntToBuffer(this.cache);
+        buffer.writeFloat(getFloatValue());
     }
 
     @Override
     public void read(PacketBuffer buffer) {
-        setIntValue(buffer.readVarIntFromBuffer(), true, false);
+        setFloatValue(buffer.readFloat(), true, false);
     }
 
     @Override
     public void setStringValue(String value, boolean setSource, boolean sync) {
-        setIntValue(Integer.parseInt(value), setSource, sync);
+        setFloatValue(Float.parseFloat(value), setSource, sync);
     }
 
     @Override
     public String getStringValue() {
         return String.valueOf(this.cache);
+    }
+
+    @Override
+    public double getDoubleValue() {
+        return getFloatValue();
+    }
+
+    @Override
+    public void setDoubleValue(double value, boolean setSource, boolean sync) {
+        setFloatValue((float) value, setSource, sync);
     }
 }
