@@ -56,7 +56,6 @@ public class TextFieldRenderer extends TextRenderer {
     }
 
     // 1.7.10 only until proper number groupings support
-    @ApiStatus.Experimental
     public void setFormatAsInteger(boolean formatAsInteger) {
         this.formatAsInteger = formatAsInteger;
     }
