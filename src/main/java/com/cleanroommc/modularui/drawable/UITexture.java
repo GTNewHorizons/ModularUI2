@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -17,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public class UITexture implements IDrawable, IJsonSerializable {
@@ -30,7 +30,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
         return UITexture.builder()
                 .location(ICONS_LOCATION)
                 .imageSize(256, 256)
-                .xy(x, y, w, h)
+                .subAreaXYWH(x, y, w, h)
                 .iconColorType()
                 .name(name)
                 .build();
@@ -156,7 +156,6 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
     public void draw(float x, float y, float width, float height) {
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, this.u0, this.v0, this.u1, this.v1, this.nonOpaque);
-        GlStateManager.disableBlend();
     }
 
     @Deprecated
@@ -171,7 +170,6 @@ public class UITexture implements IDrawable, IJsonSerializable {
             Color.setGlColorOpaque(Color.WHITE.main);
         }
         GuiDraw.drawTexture(this.location, x, y, x + width, y + height, lerpU(uStart), lerpV(vStart), lerpU(uEnd), lerpV(vEnd), this.nonOpaque);
-        GlStateManager.disableBlend();
     }
 
     @Override
@@ -194,12 +192,12 @@ public class UITexture implements IDrawable, IJsonSerializable {
             if (mode2) {
                 throw new JsonParseException("Tried to specify x, y, w, h and u0, v0, u1, v1!");
             }
-            builder.xy(JsonHelper.getInt(json, 0, "x"),
+            builder.subAreaXYWH(JsonHelper.getInt(json, 0, "x"),
                     JsonHelper.getInt(json, 0, "y"),
                     JsonHelper.getInt(json, builder.iw, "w", "width"),
                     JsonHelper.getInt(json, builder.ih, "h", "height"));
         } else if (mode2) {
-            builder.uv(JsonHelper.getFloat(json, 0, "u0"),
+            builder.subAreaUV(JsonHelper.getFloat(json, 0, "u0"),
                     JsonHelper.getFloat(json, 0, "v0"),
                     JsonHelper.getFloat(json, 1, "u1"),
                     JsonHelper.getFloat(json, 1, "v1"));
@@ -326,14 +324,28 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * Specify a sub area of the image in pixels.
+         * Specify a sub area of the image in pixels, with a position and a size.
+         *
+         * @param x x in pixels
+         * @param y y in pixels
+         * @param w width in pixels
+         * @param h height in pixels
+         * @see #subAreaXYWH(int, int, int, int)
+         */
+        @ApiStatus.Obsolete
+        public Builder xy(int x, int y, int w, int h) {
+            return subAreaXYWH(x, y, w, h);
+        }
+
+        /**
+         * Specify a sub area of the image in pixels, with a position and a size.
          *
          * @param x x in pixels
          * @param y y in pixels
          * @param w width in pixels
          * @param h height in pixels
          */
-        public Builder xy(int x, int y, int w, int h) {
+        public Builder subAreaXYWH(int x, int y, int w, int h) {
             this.mode = Mode.PIXEL;
             this.x = x;
             this.y = y;
@@ -343,14 +355,42 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * Specify a sub area of the image in relative uv values (0 - 1).
+         * Specify a sub area of the image in pixels, with a start position and an end position.
+         *
+         * @param left   start position on the x-axis (equivalent to x in above methods)
+         * @param top    start position on the y-axis (equivalent to y in above methods)
+         * @param right  end position on the x-axis (equivalent to x + w in above methods)
+         * @param bottom end position on the y-axis (equivalent to y + h in above methods)
+         */
+        public Builder subAreaLTRB(int left, int top, int right, int bottom) {
+            return subAreaXYWH(left, top, right - left, bottom - top);
+        }
+
+        /**
+         * Specify a sub area of the image in relative uv values (0 - 1). u0 and v0 are start positions, while u1 and v1 are end positions.
+         * This means that the relative size is u1 - u0 and v1 - v0.
+         *
+         * @param u0 x start
+         * @param v0 y start
+         * @param u1 x end
+         * @param v1 y end
+         * @see #subAreaUV(float, float, float, float)
+         */
+        @ApiStatus.Obsolete
+        public Builder uv(float u0, float v0, float u1, float v1) {
+            return subAreaUV(u0, v0, u1, v1);
+        }
+
+        /**
+         * Specify a sub area of the image in relative uv values (0 - 1). u0 and v0 are start positions, while u1 and v1 are end positions.
+         * This means that the relative size is u1 - u0 and v1 - v0.
          *
          * @param u0 x start
          * @param v0 y start
          * @param u1 x end
          * @param v1 y end
          */
-        public Builder uv(float u0, float v0, float u1, float v1) {
+        public Builder subAreaUV(float u0, float v0, float u1, float v1) {
             this.mode = Mode.RELATIVE;
             this.u0 = u0;
             this.v0 = v0;
@@ -360,7 +400,8 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
+         * This will draw the corners, edges and body of the image separately. This allows to only stretch/tile the body so the border
+         * looks right on all sizes. This is also known as a <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice texture</a>.
          *
          * @param bl left border width. Can be 0.
          * @param bt top border width. Can be 0.
@@ -376,7 +417,8 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
+         * This will draw the corners, edges and body of the image separately. This allows to only stretch/tile the body so the border
+         * looks right on all sizes. This is also known as a <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice texture</a>.
          *
          * @param borderX left and right border width. Can be 0.
          * @param borderY top and bottom border width. Can be 0
@@ -386,7 +428,8 @@ public class UITexture implements IDrawable, IJsonSerializable {
         }
 
         /**
-         * This will draw the border of the image separately, so it won't get stretched/tiled with the image body.
+         * This will draw the corners, edges and body of the image separately. This allows to only stretch/tile the body so the border
+         * * looks right on all sizes. This is also known as a <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice texture</a>.
          *
          * @param border border width
          */
@@ -514,10 +557,12 @@ public class UITexture implements IDrawable, IJsonSerializable {
                 if (this.u0 < 0 || this.v0 < 0 || this.u1 > 1 || this.v1 > 1)
                     throw new IllegalArgumentException("UV values must be 0 - 1");
                 if (this.bl > 0 || this.bt > 0 || this.br > 0 || this.bb > 0) {
-                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
+                    return new AdaptableUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.nonOpaque,
+                            this.iw, this.ih, this.bl, this.bt, this.br, this.bb, this.tiled);
                 }
                 if (this.tiled) {
-                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.colorType);
+                    return new TiledUITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.iw, this.ih, this.colorType,
+                            this.nonOpaque);
                 }
                 return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.nonOpaque);
             }

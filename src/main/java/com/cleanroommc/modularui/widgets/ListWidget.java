@@ -7,13 +7,20 @@ import com.cleanroommc.modularui.api.widget.IParentWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.utils.ReversedList;
 import com.cleanroommc.modularui.widget.AbstractScrollWidget;
 import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
+import com.cleanroommc.modularui.widget.sizer.Unit;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 
 /**
@@ -28,6 +35,13 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     private IIcon childSeparator;
     private final IntList separatorPositions = new IntArrayList();
     private boolean collapseDisabledChild = true;
+    private boolean wrapTight = false;
+    private Alignment.CrossAxis caa = Alignment.CrossAxis.CENTER;
+    private Unit mainAxisMaxSize;
+    /**
+     * Whether the children list should be layout in reverse.
+     */
+    private boolean reverseLayout = false;
 
     public ListWidget() {
         super(null, null);
@@ -37,6 +51,14 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     public void onInit() {
         if (this.scrollData == null) {
             scrollDirection(new VerticalScrollData());
+        }
+    }
+
+    @Override
+    public void beforeResize(boolean onOpen) {
+        super.beforeResize(onOpen);
+        if (this.mainAxisMaxSize != null) {
+            flex().setUnit(this.mainAxisMaxSize, getAxis(), Unit.State.SIZE);
         }
     }
 
@@ -64,11 +86,15 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
 
     @Override
     public boolean layoutWidgets() {
+        if (!hasChildren()) return true;
+        if (this.wrapTight && !resizer().isSizeCalculated(getAxis())) {
+            return false;
+        }
         this.separatorPositions.clear();
-        GuiAxis axis = this.scrollData.getAxis();
+        GuiAxis axis = getAxis();
         int separatorSize = getSeparatorSize();
         int p = getArea().getPadding().getStart(axis);
-        for (IWidget widget : getChildren()) {
+        for (IWidget widget : getOrderedChildren()) {
             if (shouldIgnoreChildSize(widget)) {
                 widget.resizer().updateResized();
                 continue;
@@ -90,8 +116,29 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
                 widget.flex().applyPos(widget);
             }
         }
-        getScrollData().setScrollSize(p + getArea().getPadding().getEnd(axis));
+        int size = p + getArea().getPadding().getEnd(axis);
+        getScrollData().setScrollSize(size);
+        int widgetSize = getArea().getSize(axis);
+        if (this.wrapTight && size < widgetSize) {
+            getArea().setSize(getAxis(), size);
+            resizer().setSizeResized(axis, true);
+            if (resizer().isPosCalculated(axis)) {
+                // if the position is defined with right(), bottom() or is relative, then the position is very likely invalid now
+                // let mui recalculate position
+                resizer().setPosResized(axis, false);
+            }
+        }
         return true;
+    }
+
+    @Override
+    public boolean postLayoutWidgets() {
+        return Flow.layoutCrossAxisListLike(this, getAxis(), this.caa, this.reverseLayout);
+    }
+
+    @Override
+    public boolean canCoverByDefaultSize(GuiAxis axis) {
+        return axis.getOther() == getAxis();
     }
 
     @Override
@@ -122,7 +169,12 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
-    public void onChildAdd(I child) {
+    public boolean removeAll() {
+        return super.removeAll();
+    }
+
+    @Override
+    protected void onChildAdd(I child) {
         super.onChildAdd(child);
         if (isValid()) {
             scheduleResize();
@@ -131,7 +183,7 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
-    public void onChildRemove(I child) {
+    protected void onChildRemove(I child) {
         super.onChildRemove(child);
         if (isValid()) {
             scheduleResize();
@@ -141,11 +193,64 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
 
     public int getSeparatorSize() {
         if (this.childSeparator == null) return 0;
-        return this.scrollData.getAxis().isHorizontal() ? this.childSeparator.getWidth() : this.childSeparator.getHeight();
+        return getAxis().isHorizontal() ? this.childSeparator.getWidth() : this.childSeparator.getHeight();
     }
 
     public ScrollData getScrollData() {
         return this.scrollData;
+    }
+
+    public GuiAxis getAxis() {
+        return this.scrollData.getAxis();
+    }
+
+    public List<IWidget> getOrderedChildren() {
+        return this.reverseLayout ? new ReversedList<>(getChildren()) : getChildren();
+    }
+
+    private W maxSize(float v, int offset, Unit.Measure measure) {
+        if (this.mainAxisMaxSize == null) this.mainAxisMaxSize = new Unit();
+        this.mainAxisMaxSize.setValue(v);
+        this.mainAxisMaxSize.setOffset(offset);
+        this.mainAxisMaxSize.setMeasure(measure);
+        return wrapTight();
+    }
+
+    private W maxSize(DoubleSupplier v, int offset, Unit.Measure measure) {
+        if (this.mainAxisMaxSize == null) this.mainAxisMaxSize = new Unit();
+        this.mainAxisMaxSize.setValue(v);
+        this.mainAxisMaxSize.setOffset(offset);
+        this.mainAxisMaxSize.setMeasure(measure);
+        return wrapTight();
+    }
+
+    public W maxSize(int v) {
+        return maxSize(v, 0, Unit.Measure.PIXEL);
+    }
+
+    public W maxSizeRel(float v) {
+        return maxSize(v, 0, Unit.Measure.RELATIVE);
+    }
+
+    public W maxSizeRelOffset(float v, int offset) {
+        return maxSize(v, offset, Unit.Measure.RELATIVE);
+    }
+
+    public W maxSize(DoubleSupplier v) {
+        return maxSize(v, 0, Unit.Measure.PIXEL);
+    }
+
+    public W maxSizeRel(DoubleSupplier v) {
+        return maxSize(v, 0, Unit.Measure.RELATIVE);
+    }
+
+    public W maxSizeRelOffset(DoubleSupplier v, int offset) {
+        return maxSize(v, offset, Unit.Measure.RELATIVE);
+    }
+
+    public W wrapTight() {
+        this.wrapTight = true;
+        return getThis();
     }
 
     public W scrollDirection(GuiAxis axis) {
@@ -178,6 +283,13 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
         return getThis();
     }
 
+    public <T> W children(Iterable<T> it, Function<T, I> widgetCreator) {
+        for (T t : it) {
+            child(widgetCreator.apply(t));
+        }
+        return getThis();
+    }
+
     /**
      * Sets if disabled children should be collapsed.
      */
@@ -195,6 +307,22 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
      */
     public W collapseDisabledChild(boolean doCollapse) {
         this.collapseDisabledChild = doCollapse;
+        return getThis();
+    }
+
+    public W crossAxisAlignment(Alignment.CrossAxis caa) {
+        this.caa = caa;
+        return getThis();
+    }
+
+    /**
+     * Sets if the children list should be layout in reversed or not (Default is false).
+     *
+     * @param reverseLayout true if the children list should be layout in reverse
+     * @return this
+     */
+    public W reverseLayout(boolean reverseLayout) {
+        this.reverseLayout = reverseLayout;
         return getThis();
     }
 }

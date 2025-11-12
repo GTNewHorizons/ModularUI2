@@ -6,7 +6,6 @@ import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.UpOrDown;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
 import com.cleanroommc.modularui.api.widget.IDragResizeable;
@@ -131,7 +130,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (!isOpen()) return;
         closeSubPanels();
         if (isMainPanel()) {
-            // close screen and let NEA animation
+            // close screen and let NEA handle animation
             MCHelper.popScreen(getScreen().isOpenParentOnClose(), getContext().getParentScreen());
             return;
         }
@@ -160,6 +159,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public void animateClose() {
         closeIfOpen();
     }
@@ -242,9 +243,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        if (!getScreen().isOverlay()) {
-            getContext().getRecipeViewerSettings().removeRecipeViewerExclusionArea(this);
-        }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
             this.panelHandler.closePanelInternal();
@@ -307,7 +305,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             if (this.hovering.isEmpty()) {
                 // no element is hovered -> try close panel
                 if (closeOnOutOfBoundsClick()) {
-                    animateClose();
+                    closeIfOpen();
                     result = true;
                 }
             } else if (checkRecipeViewerGhostIngredient(mouseButton)) {
@@ -706,30 +704,27 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public @NotNull List<LocatedWidget> getAllHoveringList(boolean debug) {
         if (this.hovering.isEmpty()) return Collections.emptyList();
-        List<LocatedWidget> hovering = new ArrayList<>();
-        for (ObjectListIterator<LocatedWidget> iterator = this.hovering.iterator(); iterator.hasNext(); ) {
-            LocatedWidget lw = iterator.next();
-            if (!lw.getElement().isValid()) {
-                iterator.remove();
-                continue;
-            }
-            if (debug) {
-                hovering.add(lw);
-                continue;
-            }
-            if (lw.getElement().canHover()) {
-                hovering.add(lw);
-                if (!lw.getElement().canHoverThrough()) break;
-            }
+        return new ArrayList<>(this.hovering);
+    }
+
+    public boolean isBelowMouse(IWidget widget) {
+        if (!widget.isValid() || widget.getPanel() != this) return false;
+        for (LocatedWidget lw : this.hovering) {
+            if (lw.getElement() == widget) return true;
         }
-        return hovering.isEmpty() ? Collections.emptyList() : hovering;
+        return false;
+    }
+
+    public boolean isAnyHovered() {
+        if (this.hovering.isEmpty()) return false;
+        if (this.hovering.size() == 1 && this.hovering.get(0).getElement() instanceof ModularPanel panel) {
+            return panel.canHover();
+        }
+        return true;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
-        if (!context.getScreen().isOverlay()) {
-            context.getRecipeViewerSettings().addRecipeViewerExclusionArea(this);
-        }
     }
 
     public boolean isOpening() {
@@ -783,7 +778,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     @ApiStatus.Internal
     public boolean shouldAnimate() {
-        if (getScreen().isOverlay() || !ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime <= 0) return false;
+        if (this.invisible || !ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime <= 0) {
+            return false;
+        }
         if (!isMainPanel() || !getScreen().isOpenParentOnClose()) return true;
         return getContext().getParentScreen() == null;
     }
@@ -802,6 +799,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    @Override
+    public boolean isExcludeAreaInRecipeViewer() {
+        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !flex().isFullSize());
+    }
+
     public ModularPanel bindPlayerInventory() {
         return child(SlotGroupWidget.playerInventory(true));
     }
@@ -810,9 +812,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return child(SlotGroupWidget.playerInventory(bottom, true));
     }
 
+    @Override
     public ModularPanel invisible() {
         this.invisible = true;
-        return background(IDrawable.EMPTY);
+        return super.invisible();
+    }
+
+    public ModularPanel fullScreenInvisible() {
+        return invisible().full();
     }
 
     public ModularPanel resizeableOnDrag(boolean resizeable) {
@@ -831,20 +838,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public enum State {
         /**
-         * Initial state of any panel
+         * Initial state of any panel.
          */
         IDLE,
         /**
-         * State after the panel opened
+         * State after the panel opened.
          */
         OPEN,
         /**
-         * State after panel closed
+         * State after panel closed. Panel can still be reopened in this state.
          */
         CLOSED,
         /**
-         * State after panel disposed.
-         * Panel can still be reopened in this state.
+         * State after panel disposed. The panel is now lost and has to be rebuilt, when reopening it.
          */
         DISPOSED,
         /**

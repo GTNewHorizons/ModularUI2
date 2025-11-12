@@ -4,6 +4,10 @@ import com.cleanroommc.modularui.api.value.IByteValue;
 
 public class ByteValue implements IByteValue<Byte> {
 
+    public static Dynamic wrap(IByteValue<?> val) {
+        return new Dynamic(val::getByteValue, val::setByteValue);
+    }
+
     protected byte value;
 
     @Override

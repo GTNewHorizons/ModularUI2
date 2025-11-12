@@ -19,17 +19,29 @@ public interface RecipeViewerSettings {
     /**
      * Force recipe viewer to be enabled
      */
-    void enableRecipeViewer();
+    void enable();
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void enableRecipeViewer() {enable();}
 
     /**
      * Force recipe viewer to be disabled
      */
-    void disableRecipeViewer();
+    void disable();
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void disableRecipeViewer() {disable();}
 
     /**
      * Only enable recipe viewer in synced GUIs
      */
-    void defaultRecipeViewerState();
+    void defaultState();
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void defaultRecipeViewerState() {defaultState();}
 
     /**
      * Checks if recipe viewer is enabled for a given screen
@@ -37,22 +49,34 @@ public interface RecipeViewerSettings {
      * @param screen modular screen
      * @return true if jei is enabled
      */
-    boolean isRecipeViewerEnabled(ModularScreen screen);
+    boolean isEnabled(ModularScreen screen);
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default boolean isRecipeViewerEnabled(ModularScreen screen) {return isEnabled(screen);}
 
     /**
      * Adds an exclusion zone. Recipe viewer will always try to avoid exclusion zones. <br>
-     * <b>If a widgets wishes to have an exclusion zone it should use {@link #addRecipeViewerExclusionArea(IWidget)}!</b>
+     * <b>If a widgets wishes to have an exclusion zone it should use {@link #addExclusionArea(IWidget)}!</b>
      *
      * @param area exclusion area
      */
-    void addRecipeViewerExclusionArea(Rectangle area);
+    void addExclusionArea(Rectangle area);
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void addRecipeViewerExclusionArea(Rectangle area) {addExclusionArea(area);}
 
     /**
      * Removes an exclusion zone.
      *
      * @param area exclusion area to remove (must be the same instance)
      */
-    void removeRecipeViewerExclusionArea(Rectangle area);
+    void removeExclusionArea(Rectangle area);
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void removeRecipeViewerExclusionArea(Rectangle area) {removeExclusionArea(area);}
 
     /**
      * Adds an exclusion zone of a widget. Recipe viewer will always try to avoid exclusion zones. <br>
@@ -60,40 +84,48 @@ public interface RecipeViewerSettings {
      *
      * @param area widget
      */
-    void addRecipeViewerExclusionArea(IWidget area);
+    void addExclusionArea(IWidget area);
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void addRecipeViewerExclusionArea(IWidget area) {addExclusionArea(area);}
 
     /**
      * Removes a widget exclusion area.
      *
      * @param area widget
      */
-    void removeRecipeViewerExclusionArea(IWidget area);
+    void removeExclusionArea(IWidget area);
+
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    default void removeRecipeViewerExclusionArea(IWidget area) {removeExclusionArea(area);}
 
     RecipeViewerSettings DUMMY = new RecipeViewerSettings() {
         @Override
-        public void enableRecipeViewer() {}
+        public void enable() {}
 
         @Override
-        public void disableRecipeViewer() {}
+        public void disable() {}
 
         @Override
-        public void defaultRecipeViewerState() {}
+        public void defaultState() {}
 
         @Override
-        public boolean isRecipeViewerEnabled(ModularScreen screen) {
+        public boolean isEnabled(ModularScreen screen) {
             return false;
         }
 
         @Override
-        public void addRecipeViewerExclusionArea(Rectangle area) {}
+        public void addExclusionArea(Rectangle area) {}
 
         @Override
-        public void removeRecipeViewerExclusionArea(Rectangle area) {}
+        public void removeExclusionArea(Rectangle area) {}
 
         @Override
-        public void addRecipeViewerExclusionArea(IWidget area) {}
+        public void addExclusionArea(IWidget area) {}
 
         @Override
-        public void removeRecipeViewerExclusionArea(IWidget area) {}
+        public void removeExclusionArea(IWidget area) {}
     };
 }

@@ -145,7 +145,7 @@ public class WidgetTree {
         if (!parent.hasChildren()) return true;
         for (IWidget widget : parent.getChildren()) {
             if (!consumer.test(widget)) return false;
-            if (widget.hasChildren() && foreachChild(widget, consumer, false)) {
+            if (widget.hasChildren() && !foreachChild(widget, consumer, false)) {
                 return false;
             }
         }
@@ -625,6 +625,22 @@ public class WidgetTree {
                 .append(parent)
                 .append('\n');
         ModularUI.LOGGER.info(widgetTreeToString(builder, parent, test, additionalInfo));
+    }
+
+    public static String widgetTreeToString(IWidget parent) {
+        return widgetTreeToString(parent, w -> true, null);
+    }
+
+    public static String widgetTreeToString(IWidget parent, WidgetInfo additionalInfo) {
+        return widgetTreeToString(parent, w -> true, additionalInfo);
+    }
+
+    public static String widgetTreeToString(IWidget parent, Predicate<IWidget> test) {
+        return widgetTreeToString(parent, test, null);
+    }
+
+    public static String widgetTreeToString(IWidget parent, Predicate<IWidget> test, WidgetInfo additionalInfo) {
+        return widgetTreeToString(null, parent, test, additionalInfo).toString();
     }
 
     /**

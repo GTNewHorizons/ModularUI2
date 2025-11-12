@@ -701,11 +701,12 @@ public class Color {
      * @return average ARGB color
      */
     public static int average(int... colors) {
-        float r = 0, g = 0, b = 0, a = 0;
+        float r = 0, g = 0, b = 0;
+        int a = 0;
         for (int color : colors) {
-            r += getRed(color);
-            g += getGreen(color);
-            b += getBlue(color);
+            r += getRedSq(color);
+            g += getGreenSq(color);
+            b += getBlueSq(color);
             a += getAlpha(color);
         }
         return argb((int) MathUtils.sqrt(r / colors.length),
@@ -1181,7 +1182,7 @@ public class Color {
             .addDarker(0xFFFF3D00, 0xFFDD2C00)
             .build();
 
-    public static final ColorShade BROWN = ColorShade.builder("bown", 0xFF795548)
+    public static final ColorShade BROWN = ColorShade.builder("brown", 0xFF795548)
             .addBrighter(0xFF8D6E63, 0xFFA1887F, 0xFFBCAAA4, 0xFFD7CCC8, 0xFFEFEBE9)
             .addDarker(0xFF6D4C41, 0xFF5D4037, 0xFF4E342E, 0xFF3E2723)
             .build();

@@ -34,7 +34,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * Force recipe viewer to be enabled
      */
     @Override
-    public void enableRecipeViewer() {
+    public void enable() {
         this.recipeViewerState = RecipeViewerState.ENABLED;
     }
 
@@ -42,7 +42,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * Force recipe viewer to be disabled
      */
     @Override
-    public void disableRecipeViewer() {
+    public void disable() {
         this.recipeViewerState = RecipeViewerState.DISABLED;
     }
 
@@ -50,7 +50,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * Only enabled recipe viewer in synced GUIs
      */
     @Override
-    public void defaultRecipeViewerState() {
+    public void defaultState() {
         this.recipeViewerState = RecipeViewerState.DEFAULT;
     }
 
@@ -61,18 +61,18 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * @return true if recipe viewer is enabled
      */
     @Override
-    public boolean isRecipeViewerEnabled(ModularScreen screen) {
+    public boolean isEnabled(ModularScreen screen) {
         return this.recipeViewerState.test(screen);
     }
 
     /**
      * Adds an exclusion zone. Recipe viewer will always try to avoid exclusion zones. <br>
-     * <b>If a widgets wishes to have an exclusion zone it should use {@link #addRecipeViewerExclusionArea(IWidget)}!</b>
+     * <b>If a widgets wishes to have an exclusion zone it should use {@link #addExclusionArea(IWidget)}!</b>
      *
      * @param area exclusion area
      */
     @Override
-    public void addRecipeViewerExclusionArea(Rectangle area) {
+    public void addExclusionArea(Rectangle area) {
         if (!this.recipeViewerExclusionAreas.contains(area)) {
             this.recipeViewerExclusionAreas.add(area);
         }
@@ -84,7 +84,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * @param area exclusion area to remove (must be the same instance)
      */
     @Override
-    public void removeRecipeViewerExclusionArea(Rectangle area) {
+    public void removeExclusionArea(Rectangle area) {
         this.recipeViewerExclusionAreas.remove(area);
     }
 
@@ -95,7 +95,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * @param area widget
      */
     @Override
-    public void addRecipeViewerExclusionArea(IWidget area) {
+    public void addExclusionArea(IWidget area) {
         if (!this.recipeViewerExclusionWidgets.contains(area)) {
             this.recipeViewerExclusionWidgets.add(area);
         }
@@ -107,7 +107,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
      * @param area widget
      */
     @Override
-    public void removeRecipeViewerExclusionArea(IWidget area) {
+    public void removeExclusionArea(IWidget area) {
         this.recipeViewerExclusionWidgets.remove(area);
     }
 
@@ -140,7 +140,7 @@ public class RecipeViewerSettingsImpl implements RecipeViewerSettings {
                         this.widgetIt.remove();
                         continue;
                     }
-                    if (!widget.isEnabled()) continue;
+                    if (!widget.isEnabled() || !widget.getPanel().isOpen()) continue;
                     return widget.getArea();
                 }
                 this.widgetIt = null;

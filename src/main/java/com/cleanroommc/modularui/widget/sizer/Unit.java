@@ -54,6 +54,15 @@ public class Unit {
         this.offset = 0;
     }
 
+    public void setFrom(Unit other) {
+        this.autoAnchor = other.autoAnchor;
+        this.value = other.value;
+        this.valueSupplier = other.valueSupplier;
+        this.measure = other.measure;
+        this.anchor = other.anchor;
+        this.offset = other.offset;
+    }
+
     public void setValue(float value) {
         this.value = value;
         this.valueSupplier = null;
@@ -80,6 +89,10 @@ public class Unit {
         return this.offset;
     }
 
+    public int getAbsOffset() {
+        return Math.abs(this.offset);
+    }
+
     public Measure getMeasure() {
         return this.measure;
     }
@@ -98,6 +111,13 @@ public class Unit {
 
     public void setMeasure(Measure measure) {
         this.measure = measure;
+    }
+
+    public boolean isCloseToZero() {
+        if (isRelative()) {
+            return Math.abs(getValue()) <= 0.01f && Math.abs(getOffset()) < 5;
+        }
+        return Math.abs(getValue() + getOffset()) < 5;
     }
 
     public boolean isRelative() {

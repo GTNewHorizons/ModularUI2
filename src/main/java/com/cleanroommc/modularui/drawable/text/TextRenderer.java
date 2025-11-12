@@ -179,18 +179,21 @@ public class TextRenderer {
             drawMeasuredLines(Collections.singletonList(line));
             return;
         }
-        float scroll = (this.maxWidth - line.getWidth()) * progress;
-        //scroll = scroll % (int) (line.width + 1);
-        String drawString = line.getText();//getFontRenderer().trimStringToWidth(line.getText(), (int) (this.maxWidth + scroll));
+        float scroll = (line.getWidth() - this.maxWidth) * progress;
         Stencil.apply(this.x, -500, (int) this.maxWidth, 1000, context);
-        GlStateManager.translate(scroll, 0, 0);
-        drawMeasuredLines(Collections.singletonList(line(drawString)));
         GlStateManager.translate(-scroll, 0, 0);
+        drawMeasuredLines(Collections.singletonList(line));
+        GlStateManager.translate(scroll, 0, 0);
         Stencil.remove();
     }
 
     public List<String> wrapLine(String line) {
-        return this.maxWidth > 0 ? getFontRenderer().listFormattedStringToWidth(line, (int) (this.maxWidth / this.scale)) : Collections.singletonList(line);
+        if (this.maxWidth > 0) {
+            // min size of 10 to prevent stackoverflow on render
+            int wrapWidth = Math.max(10, (int) (this.maxWidth / this.scale));
+            return getFontRenderer().listFormattedStringToWidth(line, wrapWidth);
+        }
+        return Collections.singletonList(line);
     }
 
     public boolean wouldFit(List<String> text, boolean shouldCheckWidth) {
