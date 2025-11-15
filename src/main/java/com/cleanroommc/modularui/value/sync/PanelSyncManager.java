@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -337,6 +338,10 @@ public class PanelSyncManager {
 
     public PanelSyncManager registerSyncedAction(String mapKey, ISyncedAction action) {
         return registerSyncedAction(mapKey, true, true, action);
+    }
+
+    public PanelSyncManager registerSyncedAction(String mapKey, Side side, ISyncedAction action) {
+        return registerSyncedAction(mapKey, side.isClient(), side.isServer(), action);
     }
 
     public PanelSyncManager registerClientSyncedAction(String mapKey, ISyncedAction action) {
