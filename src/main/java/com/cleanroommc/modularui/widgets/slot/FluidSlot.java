@@ -22,6 +22,7 @@ import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.modularui.utils.SIPrefix;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -92,6 +93,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
+                tooltip.addLine(IKey.lang("modularui.fluid.capacity", formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
             }
             if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
                 tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
@@ -117,19 +119,23 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     public String formatFluidTooltipAmount(double amount) {
         // the tooltip show the full number
         // 1.7.10 hardcoded to use UNIT_LITER for now, so no milli-buckets.
-        return TOOLTIP_FORMAT.format(amount);// + " " + getBaseUnitBaseSuffix();
+        return TOOLTIP_FORMAT.format(amount);
     }
 
     protected double getBaseUnitAmount(double amount) {
-        return amount;
+        return amount * getBaseUnitSiPrefix().factor;
+    }
+
+    protected final String getUnit() {
+        return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
     }
 
     protected String getBaseUnit() {
         return UNIT_LITER;
     }
 
-    protected String getBaseUnitBaseSuffix() {
-        return "m";
+    protected SIPrefix getBaseUnitSiPrefix() {
+        return SIPrefix.One;
     }
 
     @Override
