@@ -381,7 +381,7 @@ public class PanelSyncManager {
     }
 
     public <T extends SyncHandler> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
-        SyncHandler syncHandler = getSyncHandler(name);
+        SyncHandler syncHandler = findSyncHandlerNullable(name, id);
         if (syncHandler == null) {
             if (isLocked() && !this.allowSyncHandlerRegistration) {
                 // registration is locked, and we don't have permission to temporarily bypass lock
@@ -395,7 +395,7 @@ public class PanelSyncManager {
             return t;
         }
         if (clazz.isAssignableFrom(syncHandler.getClass())) {
-            return (T) syncHandler;
+            return clazz.cast(syncHandler);
         }
         throw new IllegalStateException("SyncHandler for key " + makeSyncKey(name, id) + " is of type " + syncHandler.getClass() + ", but type " + clazz + " was expected!");
     }
@@ -442,11 +442,10 @@ public class PanelSyncManager {
         return findSyncHandler(name, 0);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends SyncHandler> @Nullable T findSyncHandlerNullable(String name, int id, Class<T> type) {
         SyncHandler syncHandler = this.syncHandlers.get(makeSyncKey(name, id));
         if (syncHandler != null && type.isAssignableFrom(syncHandler.getClass())) {
-            return (T) syncHandler;
+            return type.cast(syncHandler);
         }
         return null;
     }
@@ -455,7 +454,6 @@ public class PanelSyncManager {
         return findSyncHandlerNullable(name, 0, type);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends SyncHandler> @NotNull T findSyncHandler(String name, int id, Class<T> type) {
         SyncHandler syncHandler = this.syncHandlers.get(makeSyncKey(name, id));
         if (syncHandler == null) {
@@ -465,7 +463,7 @@ public class PanelSyncManager {
             throw new ClassCastException("Expected to find sync handler with key '" + makeSyncKey(name, id) + "' of type '" + type.getName()
                     + "', but found type '" + syncHandler.getClass().getName() + "'.");
         }
-        return (T) syncHandler;
+        return type.cast(syncHandler);
     }
 
     public <T extends SyncHandler> @NotNull T findSyncHandler(String name, Class<T> type) {
