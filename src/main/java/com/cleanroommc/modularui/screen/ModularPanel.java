@@ -327,7 +327,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                         break;
                     }
                     // click widget and see how it reacts
-                    if (widget.getElement() instanceof Interactable interactable) {
+                    if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid()) {
                         Interactable.Result interactResult = interactable.onMousePressed(mouseButton);
                         if (interactResult.accepts) {
                             this.mouse.addAcceptedInteractable(interactable);
@@ -429,7 +429,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             // first see if the clicked widget is still hovered and try to interact with it
             for (LocatedWidget widget : this.hovering) {
                 if (this.mouse.isWidget(widget)) {
-                    if (widget.getElement() instanceof Interactable interactable &&
+                    if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid() &&
                             onMouseRelease(mouseButton, tryTap, widget, interactable)) {
                         return true;
                     }
@@ -439,8 +439,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             // now try all other hovered
             for (LocatedWidget widget : this.hovering) {
-                if (!this.mouse.isWidget(widget) && widget.getElement() instanceof Interactable interactable &&
-                        onMouseRelease(mouseButton, tryTap, widget, interactable)) {
+                if (!this.mouse.isWidget(widget)  && widget.getElement() instanceof Interactable interactable
+                        && widget.getElement().isValid() && onMouseRelease(mouseButton, tryTap, widget, interactable)) {
                     return true;
                 }
             }
@@ -489,7 +489,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             LocatedWidget pressed = null;
             boolean result = false;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
+                if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid()) {
                     widget.applyMatrix(getContext());
                     Interactable.Result interactResult = interactable.onKeyPressed(typedChar, keyCode);
                     if (interactResult.accepts) {
@@ -607,7 +607,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             if (this.mouse.held &&
                     mouseButton == this.mouse.lastButton &&
-                    this.mouse.lastPressed != null &&
+                    this.mouse.lastPressed != null && this.mouse.lastPressed.getElement().isValid() &&
                     this.mouse.lastPressed.getElement() instanceof Interactable interactable) {
                 this.mouse.lastPressed.applyMatrix(getContext());
                 interactable.onMouseDrag(mouseButton, timeSinceClick);
@@ -622,7 +622,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
-        if (focused.getElement() instanceof Interactable interactable) {
+        if (focused.getElement() instanceof Interactable interactable && focused.getElement().isValid()) {
             focused.applyMatrix(getContext());
             result = function.apply((W) interactable);
             focused.unapplyMatrix(getContext());
