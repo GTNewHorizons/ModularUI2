@@ -97,9 +97,6 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        if (!isValid()) {
-            return Result.IGNORE;
-        }
         ModularGuiContext context = getContext();
         if (this.scroll.mouseClicked(context)) {
             return Result.SUCCESS;
@@ -109,26 +106,17 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
 
     @Override
     public boolean onMouseRelease(int mouseButton) {
-        if (!isValid()) {
-            return false;
-        }
         this.scroll.mouseReleased(getContext());
         return false;
     }
 
     @Override
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
-        if (!isValid()) {
-            return false;
-        }
         return this.scroll.mouseScroll(getContext());
     }
 
     @Override
     public void onMouseDrag(int mouseButton, long timeSinceClick) {
-        if (!isValid()) {
-            return;
-        }
         this.scroll.drag(getContext().getMouseX(), getContext().getMouseY());
     }
 

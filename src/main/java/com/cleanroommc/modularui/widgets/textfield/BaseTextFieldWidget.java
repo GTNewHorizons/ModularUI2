@@ -144,7 +144,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     @Override
     public boolean isFocused() {
-        return isValid() && getContext().isFocused(this);
+        return getContext().isFocused(this);
     }
 
     @Override
