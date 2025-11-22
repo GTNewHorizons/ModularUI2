@@ -41,6 +41,7 @@ import com.cleanroommc.modularui.widgets.ColorPickerDialog;
 import com.cleanroommc.modularui.widgets.CycleButtonWidget;
 import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
+import com.cleanroommc.modularui.widgets.EntityDisplayWidget;
 import com.cleanroommc.modularui.widgets.Expandable;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
@@ -62,6 +63,12 @@ import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
+import ganymedes01.etfuturum.entities.EntityFox;
+
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.entity.monster.EntityWitch;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -130,6 +137,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
 
     @Override
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
+        final EntityLivingBase fool = new EntityVillager(getWorldObj());
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
         syncManager.addOpenListener(player -> {
             LOGGER.info("Test Tile panel open by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
@@ -456,6 +464,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                 .name("page 4 storage")
                                                 .sizeRel(1f)
                                                 .child(new Column()
+                                                        .child(new EntityDisplayWidget(()->fool).doesLookAtMouse(true).mouseFollowStrength(10f).tooltip(t-> t.addLine("Please dont bully me")))
                                                         .padding(7)
                                                         .child(new ItemSlot()
                                                                 .slot(new ModularSlot(this.storageInventory0, 0)
