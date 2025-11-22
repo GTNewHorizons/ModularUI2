@@ -55,7 +55,7 @@ public class EntityDisplayWidget implements IDrawable {
         if (this.lookAtMouse) {
             GuiDraw.drawEntityLookingAtMouse(entitySupplier.get(), x, y, width, height, context.getCurrentDrawingZ(), context.getMouseX(), context.getMouseY() );
         } else {
-            GuiDraw.drawEntity(entitySupplier.get(),x,y,width,height,context.getCurrentDrawingZ(), preDraw, postDraw);
+            GuiDraw.drawEntity(entitySupplier.get(), x, y, width, height, context.getCurrentDrawingZ(), preDraw, postDraw);
         }
     }
 }
