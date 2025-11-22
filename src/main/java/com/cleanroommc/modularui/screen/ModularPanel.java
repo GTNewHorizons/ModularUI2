@@ -90,6 +90,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     private boolean resizable = false;
 
+    private Runnable onCloseAction;
+
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
         center();
@@ -243,6 +245,9 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     @MustBeInvokedByOverriders
     public void onClose() {
+        if (this.onCloseAction != null) {
+            this.onCloseAction.run();
+        }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
             this.panelHandler.closePanelInternal();
@@ -828,6 +833,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public ModularPanel resizeableOnDrag(boolean resizeable) {
         this.resizable = resizeable;
+        return this;
+    }
+
+    public ModularPanel onCloseAction(Runnable onCloseAction) {
+        this.onCloseAction = onCloseAction;
         return this;
     }
 
