@@ -682,21 +682,27 @@ public class GuiDraw {
 
         // pre draw
         if (preDraw != null) preDraw.accept(entity);
+
         float f = entity.renderYawOffset;
         float f1 = entity.rotationYaw;
         float f2 = entity.rotationPitch;
         float f3 = entity.prevRotationYawHead;
         float f4 = entity.rotationYawHead;
-        GlStateManager.rotate(-((float) Math.atan(mouseY / 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
-        entity.renderYawOffset = (float) Math.atan(mouseX / 40.0F) * 20.0F;
-        entity.rotationYaw = (float) Math.atan(mouseX / 40.0F) * 40.0F;
-        entity.rotationPitch = -((float) Math.atan(mouseY / 40.0F)) * 20.0F;
+
+        //the 180 comes from the fact that this has him turned backwords :D i hate math :/
+        float mouseYaw = (float)(Math.atan2(mouseX- (x+w / 2),  40.0f) * 180F / Math.PI - 180);
+
+        //yaw
+        GlStateManager.rotate(((float) Math.atan2(mouseY , 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
+        entity.renderYawOffset = -mouseYaw;
+        entity.rotationYaw = -mouseYaw;
+
+        GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+        entity.rotationPitch = ((float) Math.atan2(mouseY , 40.0F)) * 20.0F;
         entity.rotationYawHead = entity.rotationYaw;
         entity.prevRotationYawHead = entity.rotationYaw;
 
 
-        // TODO: is this needed? in 1.12 its just 0,0,0
-        GL11.glTranslatef(0.0F, entity.yOffset, 0.0F);
 
         drawEntityRaw(entity);
 
