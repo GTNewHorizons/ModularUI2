@@ -337,7 +337,7 @@ public class ClientScreenHandler {
         }
         if (keyCode == 1 || keyCode == Minecraft.getMinecraft().gameSettings.keyBindInventory.getKeyCode()) {
             if (currentScreen.getContext().hasDraggable()) {
-                currentScreen.getContext().dropDraggable();
+                currentScreen.getContext().dropDraggable(true);
             } else {
                 currentScreen.getPanelManager().closeTopPanel();
             }

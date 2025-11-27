@@ -48,10 +48,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     private ItemSlotSH syncHandler;
+    private RichTooltip tooltip;
 
     public ItemSlot() {
-        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
+        itemTooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
+        itemTooltip().tooltipBuilder(tooltip -> {
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             buildTooltip(stack, tooltip);
@@ -68,8 +69,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        return syncHandler instanceof ItemSlotSH;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
         this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
-        return this.syncHandler != null;
     }
 
     @Override
@@ -166,6 +172,36 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return this.syncHandler;
     }
 
+    public RichTooltip getItemTooltip() {
+        return super.getTooltip();
+    }
+
+    public RichTooltip itemTooltip() {
+        return super.tooltip();
+    }
+
+    @Override
+    public @Nullable RichTooltip getTooltip() {
+        if (isSynced() && getSlot().getStack() != null) {
+            return getItemTooltip();
+        }
+        return tooltip;
+    }
+
+    @Override
+    public ItemSlot tooltip(RichTooltip tooltip) {
+        this.tooltip = tooltip;
+        return this;
+    }
+
+    @Override
+    public @NotNull RichTooltip tooltip() {
+        if (this.tooltip == null) {
+            this.tooltip = new RichTooltip().parent(this);
+        }
+        return this.tooltip;
+    }
+
     public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
@@ -177,8 +213,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot syncHandler(ItemSlotSH syncHandler) {
-        this.syncHandler = syncHandler;
-        setSyncHandler(this.syncHandler);
+        setSyncHandler(syncHandler);
         return this;
     }
 

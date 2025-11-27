@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -38,7 +39,7 @@ public class PanelSyncManager {
     private final Map<String, SyncHandler> syncHandlers = new Object2ObjectLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ObjectOpenHashMap<>();
     private final Map<SyncHandler, String> reverseSyncHandlers = new Object2ObjectOpenHashMap<>();
-    private final Map<String, ISyncedAction> syncedActions = new Object2ObjectOpenHashMap<>();
+    private final Map<String, SyncedAction> syncedActions = new Object2ObjectOpenHashMap<>();
     private final Map<String, SyncHandler> subPanels = new Object2ObjectArrayMap<>();
     private ModularSyncManager modularSyncManager;
     private String panelName;
@@ -136,15 +137,21 @@ public class PanelSyncManager {
     }
 
     private boolean invokeSyncedAction(String mapKey, PacketBuffer buf) {
-        ISyncedAction syncedAction = this.syncedActions.get(mapKey);
+        SyncedAction syncedAction = this.syncedActions.get(mapKey);
         if (syncedAction == null) {
             ModularUI.LOGGER.warn("SyncAction '{}' does not exist for panel '{}'!.", mapKey, panelName);
             return false;
         }
-        allowTemporarySyncHandlerRegistration(true);
-        syncedAction.invoke(buf);
-        allowTemporarySyncHandlerRegistration(false);
-        return true;
+        if (this.allowSyncHandlerRegistration || !syncedAction.isExecuteClient() || !syncedAction.isExecuteServer()) {
+            syncedAction.invoke(this.client, buf);
+        } else {
+            // only allow sync handler registration if it is executed on client and server
+            allowTemporarySyncHandlerRegistration(true);
+            syncedAction.invoke(this.client, buf);
+            allowTemporarySyncHandlerRegistration(false);
+        }
+        // true if the action should be executed on the other side
+        return syncedAction.isExecute(!this.client);
     }
 
     public ItemStack getCursorItem() {
@@ -330,7 +337,25 @@ public class PanelSyncManager {
     }
 
     public PanelSyncManager registerSyncedAction(String mapKey, ISyncedAction action) {
-        this.syncedActions.put(mapKey, action);
+        return registerSyncedAction(mapKey, true, true, action);
+    }
+
+    public PanelSyncManager registerSyncedAction(String mapKey, Side side, ISyncedAction action) {
+        return registerSyncedAction(mapKey, side.isClient(), side.isServer(), action);
+    }
+
+    public PanelSyncManager registerClientSyncedAction(String mapKey, ISyncedAction action) {
+        return registerSyncedAction(mapKey, true, false, action);
+    }
+
+    public PanelSyncManager registerServerSyncedAction(String mapKey, ISyncedAction action) {
+        return registerSyncedAction(mapKey, false, true, action);
+    }
+
+    public PanelSyncManager registerSyncedAction(String mapKey, boolean executeClient, boolean executeServer, ISyncedAction action) {
+        if (executeClient || executeServer) {
+            this.syncedActions.put(mapKey, new SyncedAction(action, executeClient, executeServer));
+        }
         return this;
     }
 
@@ -356,7 +381,7 @@ public class PanelSyncManager {
     }
 
     public <T extends SyncHandler> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
-        SyncHandler syncHandler = getSyncHandler(name);
+        SyncHandler syncHandler = findSyncHandlerNullable(name, id);
         if (syncHandler == null) {
             if (isLocked() && !this.allowSyncHandlerRegistration) {
                 // registration is locked, and we don't have permission to temporarily bypass lock
@@ -370,7 +395,7 @@ public class PanelSyncManager {
             return t;
         }
         if (clazz.isAssignableFrom(syncHandler.getClass())) {
-            return (T) syncHandler;
+            return clazz.cast(syncHandler);
         }
         throw new IllegalStateException("SyncHandler for key " + makeSyncKey(name, id) + " is of type " + syncHandler.getClass() + ", but type " + clazz + " was expected!");
     }
@@ -417,11 +442,10 @@ public class PanelSyncManager {
         return findSyncHandler(name, 0);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends SyncHandler> @Nullable T findSyncHandlerNullable(String name, int id, Class<T> type) {
         SyncHandler syncHandler = this.syncHandlers.get(makeSyncKey(name, id));
         if (syncHandler != null && type.isAssignableFrom(syncHandler.getClass())) {
-            return (T) syncHandler;
+            return type.cast(syncHandler);
         }
         return null;
     }
@@ -430,7 +454,6 @@ public class PanelSyncManager {
         return findSyncHandlerNullable(name, 0, type);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends SyncHandler> @NotNull T findSyncHandler(String name, int id, Class<T> type) {
         SyncHandler syncHandler = this.syncHandlers.get(makeSyncKey(name, id));
         if (syncHandler == null) {
@@ -440,7 +463,7 @@ public class PanelSyncManager {
             throw new ClassCastException("Expected to find sync handler with key '" + makeSyncKey(name, id) + "' of type '" + type.getName()
                     + "', but found type '" + syncHandler.getClass().getName() + "'.");
         }
-        return (T) syncHandler;
+        return type.cast(syncHandler);
     }
 
     public <T extends SyncHandler> @NotNull T findSyncHandler(String name, Class<T> type) {
