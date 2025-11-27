@@ -3,8 +3,8 @@ package com.cleanroommc.modularui.factory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

@@ -182,7 +182,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public @Nullable RichTooltip getTooltip() {
-        if (isSynced() && !getSlot().getStack().isEmpty()) {
+        if (isSynced() && getSlot().getStack() != null) {
             return getItemTooltip();
         }
         return tooltip;
