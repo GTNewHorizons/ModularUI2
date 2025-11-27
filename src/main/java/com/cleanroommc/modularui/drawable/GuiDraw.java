@@ -676,11 +676,12 @@ public class GuiDraw {
      * @param mouseX current x pos of the mouse
      * @param mouseY current y pos of the mouse
      */
-    public static void drawEntityLookingAtMouse(EntityLivingBase entity, float x, float y, float w, float h, float z, int mouseX, int mouseY) {
+    public static void drawEntityLookingAtMouse(EntityLivingBase entity, float x, float y, float w, float h, float z, int mouseX, int mouseY, Consumer<EntityLivingBase> preDraw, Consumer<EntityLivingBase> postDraw) {
         GlStateManager.pushMatrix();
         Platform.setupDrawEntity(entity, x, y, w, h, z);
 
         // pre draw
+        if (preDraw != null) preDraw.accept(entity);
         float f = entity.renderYawOffset;
         float f1 = entity.rotationYaw;
         float f2 = entity.rotationPitch;
@@ -693,12 +694,14 @@ public class GuiDraw {
         entity.rotationYawHead = entity.rotationYaw;
         entity.prevRotationYawHead = entity.rotationYaw;
 
+
         // TODO: is this needed? in 1.12 its just 0,0,0
         GL11.glTranslatef(0.0F, entity.yOffset, 0.0F);
 
         drawEntityRaw(entity);
 
         // post draw
+        if (postDraw != null) postDraw.accept(entity);
         entity.renderYawOffset = f;
         entity.rotationYaw = f1;
         entity.rotationPitch = f2;
