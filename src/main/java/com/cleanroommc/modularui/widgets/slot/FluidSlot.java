@@ -147,8 +147,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
-        return this.syncHandler != null;
+        return syncHandler instanceof FluidSlotSyncHandler;
     }
 
     @Override
@@ -282,8 +281,13 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
 
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
-        this.syncHandler = syncHandler;
         return this;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
+        super.setSyncHandler(syncHandler);
     }
 
     /* === Recipe viewer ghost slot === */
