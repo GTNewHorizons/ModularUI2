@@ -63,13 +63,25 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         setText(this.stringValue.getStringValue());
         if (!hasTooltip() && !tooltipOverride) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
+            // set back to false so this won't get triggered
             tooltipOverride = false;
         }
     }
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof IStringValue<?> && syncHandler instanceof ValueSyncHandler<?>;
+        return syncHandler instanceof IStringValue<?>;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        if (syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
+            valueSyncHandler.setChangeListener(() -> {
+                markTooltipDirty();
+                setText(this.stringValue.getValue().toString());
+            });
+        }
     }
 
     @Override
@@ -219,17 +231,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return this;
     }
 
-    @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        if (syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
-            valueSyncHandler.setChangeListener(() -> {
-                markTooltipDirty();
-                setText(this.stringValue.getValue().toString());
-            });
-        }
-        super.setSyncHandler(syncHandler);
-    }
-
     /**
      * Allows for setting the numeric values with mouse scrolling.
      * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is focused
@@ -280,17 +281,18 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             return this;
     }
 
-
     /**
-     *  Normally, Tooltips on text field widgets are used to display the contents of the widget when the scrollbar is active
-     *  This value is an override, that allows the methods provided by {@link com.cleanroommc.modularui.api.widget.ITooltip} to be used
-     *  Every method that adds a tooltip from ITooltip is overridden to enable the tooltipOverride
+     * Normally, Tooltips on text field widgets are used to display the contents of the widget when the scrollbar is active
+     * This value is an override, that allows the methods provided by {@link com.cleanroommc.modularui.api.widget.ITooltip} to be used
+     * Every method that adds a tooltip from ITooltip is overridden to enable the tooltipOverride
+     *
      * @param value - sets the tooltip override on or off
      */
     public TextFieldWidget setTooltipOverride(boolean value) {
         this.tooltipOverride = value;
         return this;
     }
+
     @Override
     public TextFieldWidget tooltipBuilder(Consumer<RichTooltip> tooltipBuilder) {
         tooltipOverride = true;
@@ -363,5 +365,4 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         tooltipOverride = true;
         return super.addTooltipStringLines(lines);
     }
-
 }

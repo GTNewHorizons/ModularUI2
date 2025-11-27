@@ -27,6 +27,12 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     }
 
     @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
+    }
+
+    @Override
     protected void drawOverlay() {
         // in 1.12 this draws a green overlay if there is a JEI ghost dragging ingredient
         super.drawOverlay();
@@ -82,12 +88,6 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     public PhantomItemSlot syncHandler(ItemSlotSH syncHandler) {
         setSyncHandler(syncHandler);
         return this;
-    }
-
-    @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
-        super.setSyncHandler(syncHandler);
     }
 
     @Override
