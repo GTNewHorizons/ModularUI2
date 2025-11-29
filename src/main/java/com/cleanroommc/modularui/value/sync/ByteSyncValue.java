@@ -90,9 +90,7 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
         if (setSource && this.setter != null) {
             this.setter.setByte(value);
         }
-        if (sync) {
-            sync(0, this::write);
-        }
+        if (sync) sync();
     }
 
     @Override
