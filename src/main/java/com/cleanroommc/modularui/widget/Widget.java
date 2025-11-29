@@ -101,7 +101,6 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
             this.parent = parent;
             this.panel = parent.getPanel();
             this.context = parent.getContext();
-            getArea().setPanelLayer(this.panel.getArea().getPanelLayer());
             getArea().z(parent.getArea().z() + 1);
             if (this.guiActionListeners != null) {
                 for (IGuiAction action : this.guiActionListeners) {
@@ -142,19 +141,17 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     public void afterInit() {}
 
     /**
-     * Retrieves, initialises and verifies a linked sync handler.
+     * Retrieves, verifies, and initialises a linked sync handler.
      * Custom logic should be handled in {@link #isValidSyncHandler(SyncHandler)}.
      */
     @Override
     public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
-        if (this.syncKey != null) {
-            this.syncHandler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
+        SyncHandler handler = this.syncHandler;
+        if (handler == null && this.syncKey != null) {
+            handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
         }
-        if ((this.syncKey != null || this.syncHandler != null) && !isValidSyncHandler(this.syncHandler)) {
-            String type = this.syncHandler == null ? null : this.syncHandler.getClass().getName();
-            this.syncHandler = null;
-            throw new IllegalStateException("SyncHandler of type " + type + " is not valid for " + getClass().getName() + ", with key " + this.syncKey);
-        }
+        if (handler != null) checkValidSyncHandler(handler);
+        setSyncHandler(handler);
         if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }
@@ -851,12 +848,13 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
     }
 
     /**
-     * Used for widgets to set a value handler. Can also be a sync handler
+     * Used for widgets to set a value handler. <br />
+     * Will also call {@link #setSyncHandler(SyncHandler)} if it is a SyncHandler
      */
     protected void setValue(IValue<?> value) {
         this.value = value;
-        if (value instanceof SyncHandler syncHandler1) {
-            setSyncHandler(syncHandler1);
+        if (value instanceof SyncHandler handler) {
+            setSyncHandler(handler);
         }
     }
 
@@ -864,6 +862,7 @@ public class Widget<W extends Widget<W>> implements IWidget, IPositioned<W>, ITo
      * Used for widgets to set a sync handler.
      */
     protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        if (syncHandler != null) checkValidSyncHandler(syncHandler);
         this.syncHandler = syncHandler;
     }
 

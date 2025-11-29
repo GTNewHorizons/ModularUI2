@@ -52,12 +52,13 @@ public class EventHandler {
             ItemStack itemStack = event.entityPlayer.getHeldItem();
             if (itemStack.getItem() == Items.diamond) {
                 ClientGUI.open(new TestGuis());
-            } else if (itemStack.getItem() == Items.emerald) {
-                HoloUI.builder()
-                        .inFrontOf(Platform.getClientPlayer(), 5, false)
-                        .screenScale(0.5f)
-                        .open(new TestGui());
-            }
+            } // todo: fix ScreenEntityRender / TestGui().
+           //else if (itemStack.getItem() == Items.emerald) {
+           //    HoloUI.builder()
+           //            .inFrontOf(Platform.getClientPlayer(), 5, false)
+           //            .screenScale(0.5f)
+           //            .open(new TestGui());
+           //}
         }
     }
 

@@ -14,6 +14,9 @@ import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.item.ItemStack;
 
+import org.jetbrains.annotations.Nullable;
+import scala.tools.nsc.doc.model.Class;
+
 /**
  * An item slot which only purpose is to display an item stack.
  * The displayed item stack can be supplied directly, by an {@link ObjectValue} dynamically or by a {@link GenericSyncValue} synced.
@@ -30,8 +33,21 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.value = castIfTypeGenericElseNull(syncHandler, ItemStack.class);
-        return this.value != null;
+        return syncHandler instanceof GenericSyncValue<?> gsv && gsv.isOfType(ItemStack.class);
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        if (syncHandler != null) {
+            this.value = castIfTypeGenericElseNull(syncHandler, ItemStack.class);
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        this.value = (IValue<ItemStack>) value;
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.network.NetworkUtils;
-import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.SlotTheme;
@@ -22,11 +21,11 @@ import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.modularui.utils.SIPrefix;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -92,6 +91,7 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
+                tooltip.addLine(IKey.lang("modularui2.fluid.capacity", formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
             }
             if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
                 tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
@@ -117,19 +117,23 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
     public String formatFluidTooltipAmount(double amount) {
         // the tooltip show the full number
         // 1.7.10 hardcoded to use UNIT_LITER for now, so no milli-buckets.
-        return TOOLTIP_FORMAT.format(amount);// + " " + getBaseUnitBaseSuffix();
+        return TOOLTIP_FORMAT.format(amount);
     }
 
     protected double getBaseUnitAmount(double amount) {
-        return amount;
+        return amount * getBaseUnitSiPrefix().factor;
+    }
+
+    protected final String getUnit() {
+        return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
     }
 
     protected String getBaseUnit() {
         return UNIT_LITER;
     }
 
-    protected String getBaseUnitBaseSuffix() {
-        return "m";
+    protected SIPrefix getBaseUnitSiPrefix() {
+        return SIPrefix.One;
     }
 
     @Override
@@ -141,8 +145,13 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        return syncHandler instanceof FluidSlotSyncHandler;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
         this.syncHandler = castIfTypeElseNull(syncHandler, FluidSlotSyncHandler.class);
-        return this.syncHandler != null;
     }
 
     @Override
@@ -276,7 +285,6 @@ public class FluidSlot extends Widget<FluidSlot> implements Interactable, Recipe
 
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncHandler(syncHandler);
-        this.syncHandler = syncHandler;
         return this;
     }
 
