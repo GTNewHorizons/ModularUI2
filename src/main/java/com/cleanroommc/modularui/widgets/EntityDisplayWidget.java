@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 
 /**
  *  See {@link com.cleanroommc.modularui.drawable.GuiDraw#drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)}
- *  The consumers are only called if the lookAtMouse is not enabled.
  */
 public class EntityDisplayWidget implements IDrawable {
 
@@ -53,7 +52,7 @@ public class EntityDisplayWidget implements IDrawable {
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         if (entitySupplier == null || entitySupplier.get() == null) return;
         if (this.lookAtMouse) {
-            GuiDraw.drawEntityLookingAtMouse(entitySupplier.get(), x, y, width, height, context.getCurrentDrawingZ(), context.getMouseX(), context.getMouseY() );
+            GuiDraw.drawEntityLookingAtMouse(entitySupplier.get(), x, y, width, height, context.getCurrentDrawingZ(), context.getMouseX(), context.getMouseY(), preDraw, postDraw );
         } else {
             GuiDraw.drawEntity(entitySupplier.get(), x, y, width, height, context.getCurrentDrawingZ(), preDraw, postDraw);
         }
