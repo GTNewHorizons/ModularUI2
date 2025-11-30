@@ -28,6 +28,7 @@ import com.cleanroommc.modularui.utils.item.ItemStackHandler;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.StringValue;
+import com.cleanroommc.modularui.value.sync.DoubleSyncValue;
 import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
 import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
@@ -150,6 +151,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         syncManager.syncValue("cycle_state", cycleStateValue);
         syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
         syncManager.bindPlayerInventory(guiData.getPlayer());
+        syncManager.syncValue("textFieldSyncer", SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val));
 
         DynamicSyncHandler dynamicSyncHandler = new DynamicSyncHandler()
                 .widgetProvider((syncManager1, packet) -> {
@@ -290,7 +292,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                         .child(new TextFieldWidget()
                                                                                 .size(60, 18)
                                                                                 .paddingTop(1)
-                                                                                .value(SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val))
+                                                                                .syncHandler("textFieldSyncer")
                                                                                 .setScrollValues(10, 0.1, 100)
                                                                                 .setNumbersDouble(Function.identity())
                                                                                 .hintText("number"))
