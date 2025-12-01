@@ -595,7 +595,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             if (this.hovering.isEmpty()) return false;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
+                if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid()) {
                     widget.applyMatrix(getContext());
                     boolean result = interactable.onMouseScroll(scrollDirection, amount);
                     widget.unapplyMatrix(getContext());
@@ -624,7 +624,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                     mouseButton == this.mouse.lastButton &&
                     this.mouse.lastPressed != null &&
                     this.mouse.lastPressed.getElement() instanceof Interactable interactable &&
-            this.mouse.lastPressed.getElement().isValid()) {
+                    this.mouse.lastPressed.getElement().isValid()) {
                 this.mouse.lastPressed.applyMatrix(getContext());
                 interactable.onMouseDrag(mouseButton, timeSinceClick);
                 this.mouse.lastPressed.unapplyMatrix(getContext());
