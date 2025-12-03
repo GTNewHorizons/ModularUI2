@@ -60,6 +60,7 @@ public class FluidInteractions {
         }
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
+            if(filledContainer == null) return itemStack; // give up and return original clicked stack
             FluidStack newFluid = getFluidForRealItem(filledContainer);
             fluidStack.amount -= newFluid.amount;
         }
