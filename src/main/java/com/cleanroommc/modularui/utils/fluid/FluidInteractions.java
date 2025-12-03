@@ -18,7 +18,7 @@ public class FluidInteractions {
      */
     public static FluidStack getFluidForRealItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
-        if (itemStack.getItem() instanceof IFluidContainerItem container) {
+        if (itemStack.getItem() != null && itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
         }
         if (fluidStack == null) {
@@ -60,6 +60,7 @@ public class FluidInteractions {
         }
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
+            if(filledContainer == null) return itemStack; // give up and return original clicked stack
             FluidStack newFluid = getFluidForRealItem(filledContainer);
             fluidStack.amount -= newFluid.amount;
         }
