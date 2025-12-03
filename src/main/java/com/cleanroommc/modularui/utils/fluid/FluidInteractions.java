@@ -18,7 +18,7 @@ public class FluidInteractions {
      */
     public static FluidStack getFluidForRealItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
-        if (itemStack.getItem() != null && itemStack.getItem() instanceof IFluidContainerItem container) {
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
         }
         if (fluidStack == null) {
