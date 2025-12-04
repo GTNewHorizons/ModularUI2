@@ -234,4 +234,12 @@ public class ModularSlot extends SlotItemHandler {
     public ModularSlot singletonSlotGroup() {
         return singletonSlotGroup(SlotGroup.STORAGE_SLOT_PRIO);
     }
+
+    public static boolean isPlayerSlot(Slot slot) {
+        return slot.inventory instanceof InventoryPlayer;
+    }
+
+    public static boolean isPlayerSlot(SlotItemHandler slot) {
+        return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper;
+    }
 }
