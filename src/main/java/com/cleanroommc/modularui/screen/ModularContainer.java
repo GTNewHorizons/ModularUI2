@@ -360,8 +360,10 @@ public class ModularContainer extends Container {
     public static int stackLimit(Slot slot, ItemStack stack) {
         if (stack == null) return 0;
         if (slot instanceof SlotItemHandler slotItemHandler) {
+            // this is triggered for modular slots
             return slotItemHandler.getItemStackLimit(stack);
         }
+        // anything else is just extra safety, but will likely never be triggered
         if (slot instanceof com.gtnewhorizons.modularui.api.forge.SlotItemHandler slotItemHandler) {
             return slotItemHandler.getItemStackLimit(stack);
         }
