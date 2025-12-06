@@ -13,6 +13,7 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -98,11 +99,21 @@ public class ModularContainer extends Container {
     }
 
     @MustBeInvokedByOverriders
-    @Override
-    public void onContainerClosed(@NotNull EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
+    public void onModularContainerOpened() {
         if (this.syncManager != null) {
-            this.syncManager.onClose();
+            this.syncManager.onOpen();
+        }
+    }
+
+    /**
+     * Called when this container closes. This is different to {@link Container#onContainerClosed(EntityPlayer)}, since that one is also
+     * called from {@link GuiContainer#onGuiClosed()}, which means it is called even when the container may still exist.
+     * This happens when a temporary client screen takes over (like JEI,NEI,etc.). This is only called when the container actually closes.
+     */
+    @MustBeInvokedByOverriders
+    public void onModularContainerClosed() {
+        if (this.syncManager != null) {
+            this.syncManager.dispose();
         }
     }
 
@@ -116,7 +127,7 @@ public class ModularContainer extends Container {
         this.init = false;
     }
 
-    @ApiStatus.Internal
+    @MustBeInvokedByOverriders
     public void onUpdate() {
         // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
         if (this.syncManager != null) {
