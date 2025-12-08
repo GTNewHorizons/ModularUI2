@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -15,13 +16,14 @@ import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.item.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An item slot which only purpose is to display an item stack.
  * The displayed item stack can be supplied directly, by an {@link ObjectValue} dynamically or by a {@link GenericSyncValue} synced.
  * Players can not interact with this widget in any form.
  */
-public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
+public class ItemDisplayWidget extends Widget<ItemDisplayWidget> implements RecipeViewerIngredientProvider {
 
     private IValue<ItemStack> value;
     private boolean displayAmount = false;
@@ -78,5 +80,10 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
     public ItemDisplayWidget displayAmount(boolean displayAmount) {
         this.displayAmount = displayAmount;
         return this;
+    }
+
+    @Override
+    public @Nullable Object getIngredient() {
+        return value.getValue();
     }
 }
