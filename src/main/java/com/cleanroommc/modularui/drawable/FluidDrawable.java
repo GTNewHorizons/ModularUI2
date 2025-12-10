@@ -10,7 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
 
-public class FluidDrawable  implements IDrawable{
+public class FluidDrawable implements IDrawable {
 
     private FluidStack fluid = null;
 
@@ -18,11 +18,13 @@ public class FluidDrawable  implements IDrawable{
 
     /**
      * Takes a fluid stack, it can be null but will not draw anything
+     *
      * @param fluid - fluid stack to draw
      */
     public FluidDrawable(@Nullable FluidStack fluid) {
         setFluid(fluid);
     }
+
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         GuiDraw.drawFluidTexture(fluid, x, y, width, height, context.getCurrentDrawingZ());
