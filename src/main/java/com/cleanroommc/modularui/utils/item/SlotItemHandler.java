@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 
 public class SlotItemHandler extends Slot {
 
-    private static IInventory emptyInventory = new InventoryBasic("[Null]", true, 0);
+    private static final IInventory emptyInventory = new InventoryBasic("[Null]", true, 0);
     private final IItemHandler itemHandler;
     private final int index;
 
@@ -29,8 +29,7 @@ public class SlotItemHandler extends Slot {
         if (stack != null && this.itemHandler.isItemValid(this.index, stack)) {
             IItemHandler handler = this.getItemHandler();
             ItemStack remainder;
-            if (handler instanceof IItemHandlerModifiable) {
-                IItemHandlerModifiable handlerModifiable = (IItemHandlerModifiable) handler;
+            if (handler instanceof IItemHandlerModifiable handlerModifiable) {
                 ItemStack currentStack = handlerModifiable.getStackInSlot(this.index);
                 handlerModifiable.setStackInSlot(this.index, null);
                 remainder = handlerModifiable.insertItem(this.index, stack, true);
@@ -70,8 +69,7 @@ public class SlotItemHandler extends Slot {
         maxAdd.stackSize = maxInput;
         IItemHandler handler = this.getItemHandler();
         ItemStack currentStack = handler.getStackInSlot(this.index);
-        if (handler instanceof IItemHandlerModifiable) {
-            IItemHandlerModifiable handlerModifiable = (IItemHandlerModifiable) handler;
+        if (handler instanceof IItemHandlerModifiable handlerModifiable) {
             handlerModifiable.setStackInSlot(this.index, null);
             ItemStack remainder = handlerModifiable.insertItem(this.index, maxAdd, true);
             handlerModifiable.setStackInSlot(this.index, currentStack);

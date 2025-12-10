@@ -6,9 +6,10 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Flex;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +18,7 @@ public class EmptyWidget implements IWidget {
     private final Area area = new Area();
     private final Flex flex = new Flex(this);
     private boolean requiresResize = false;
+    private boolean enabled = true;
     private IWidget parent;
 
     @Override
@@ -25,8 +27,9 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void initialise(@NotNull IWidget parent) {
+    public void initialise(@NotNull IWidget parent, boolean late) {
         this.parent = parent;
+        getArea().z(parent.getArea().z() + 1);
     }
 
     @Override
@@ -40,13 +43,13 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {}
+    public void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {}
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {}
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {}
 
     @Override
-    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {}
+    public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {}
 
     @Override
     public void drawForeground(ModularGuiContext context) {}
@@ -66,7 +69,7 @@ public class EmptyWidget implements IWidget {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
     @Override
@@ -85,11 +88,23 @@ public class EmptyWidget implements IWidget {
     }
 
     @Override
-    public void setEnabled(boolean enabled) {}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     public boolean canBeSeen(IViewportStack stack) {
         return false;
+    }
+
+    @Override
+    public boolean canHover() {
+        return false;
+    }
+
+    @Override
+    public boolean canHoverThrough() {
+        return true;
     }
 
     @Override
@@ -121,5 +136,10 @@ public class EmptyWidget implements IWidget {
     @Override
     public Flex getFlex() {
         return this.flex;
+    }
+
+    @Override
+    public @Nullable String getName() {
+        return null;
     }
 }

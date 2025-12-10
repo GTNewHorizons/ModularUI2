@@ -7,7 +7,9 @@ import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.MathUtils;
 
-import java.awt.Rectangle;
+import org.jetbrains.annotations.ApiStatus;
+
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
 
@@ -31,10 +33,6 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
      */
     public int rx, ry;
     /**
-     * each panel has its own layer
-     */
-    private byte panelLayer = 0;
-    /**
      * the widget layer within this panel
      */
     private int z;
@@ -55,10 +53,9 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         super(area);
         this.rx = area.rx;
         this.ry = area.ry;
-        this.panelLayer = area.panelLayer;
         this.z = area.z;
-        this.margin.set(area.margin);
-        this.padding.set(area.padding);
+        getMargin().set(area.getMargin());
+        getPadding().set(area.getPadding());
     }
 
     public int x() {
@@ -106,7 +103,7 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     }
 
     public void ey(int ey) {
-        this.y = ey - this.width;
+        this.y = ey - this.height;
     }
 
     public int mx() {
@@ -125,13 +122,15 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         this.z = z;
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public byte getPanelLayer() {
-        return this.panelLayer;
+        return 0;
     }
 
-    public void setPanelLayer(byte panelLayer) {
-        this.panelLayer = panelLayer;
-    }
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
+    public void setPanelLayer(byte panelLayer) {}
 
     /**
      * Calculate X based on anchor value
@@ -187,25 +186,49 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         }
     }
 
+    public void addPoint(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.x += v;
+        } else {
+            this.y += v;
+        }
+    }
+
+    public void addSize(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.width += v;
+        } else {
+            this.height += v;
+        }
+    }
+
+    public void addRelativePoint(GuiAxis axis, int v) {
+        if (axis.isHorizontal()) {
+            this.rx += v;
+        } else {
+            this.ry += v;
+        }
+    }
+
     void applyPos(int parentX, int parentY) {
         this.x = parentX + this.rx;
         this.y = parentY + this.ry;
     }
 
     public int requestedWidth() {
-        return this.width + this.margin.horizontal();
+        return this.width + getMargin().horizontal();
     }
 
     public int paddedWidth() {
-        return this.width - this.padding.horizontal();
+        return this.width - getPadding().horizontal();
     }
 
     public int requestedHeight() {
-        return this.height + this.margin.vertical();
+        return this.height + getMargin().vertical();
     }
 
     public int paddedHeight() {
-        return this.height - this.padding.vertical();
+        return this.height - getPadding().vertical();
     }
 
     public int requestedSize(GuiAxis axis) {
@@ -473,7 +496,7 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     }
 
     @Override
-    public boolean resize(IGuiElement guiElement) {
+    public boolean resize(IGuiElement guiElement, boolean isParentLayout) {
         guiElement.getArea().set(this);
         return true;
     }
@@ -510,8 +533,8 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         this.height = Interpolations.lerp(start.height, end.height, t);
         this.rx = Interpolations.lerp(start.rx, end.rx, t);
         this.ry = Interpolations.lerp(start.ry, end.ry, t);
-        this.margin.interpolate(start.margin, end.margin, t);
-        this.padding.interpolate(start.padding, end.padding, t);
+        getMargin().interpolate(start.getMargin(), end.getMargin(), t);
+        getPadding().interpolate(start.getPadding(), end.getPadding(), t);
         return this;
     }
 
@@ -523,7 +546,8 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
     @Override
     public boolean shouldAnimate(Area target) {
         return x != target.x || y != target.y || width != target.width || height != target.height ||
-                rx != target.rx || ry != target.ry || !margin.isEqual(target.margin) || !padding.isEqual(target.padding);
+                rx != target.rx || ry != target.ry || !getMargin().isEqual(target.getMargin()) ||
+                !getPadding().isEqual(target.getPadding());
     }
 
     @Override
@@ -532,13 +556,13 @@ public class Area extends Rectangle implements IUnResizeable, IAnimatable<Area> 
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Area area = (Area) o;
-        return rx == area.rx && ry == area.ry && panelLayer == area.panelLayer && z == area.z && Objects.equals(margin,
-                area.margin) && Objects.equals(
-                padding, area.padding);
+        return rx == area.rx && ry == area.ry && z == area.z && Objects.equals(getMargin(),
+                area.getMargin()) && Objects.equals(
+                getPadding(), area.getPadding());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), rx, ry, panelLayer, z, margin, padding);
+        return Objects.hash(super.hashCode(), rx, ry, z, getMargin(), getPadding());
     }
 }

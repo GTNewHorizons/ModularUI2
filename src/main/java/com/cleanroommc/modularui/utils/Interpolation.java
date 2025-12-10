@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.utils;
 
 import com.cleanroommc.modularui.api.drawable.IInterpolation;
-import net.minecraft.util.MathHelper;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -271,7 +271,7 @@ public enum Interpolation implements IInterpolation {
     CIRCLE_IN("circle_in") {
         @Override
         public float interpolate(float a, float b, float x) {
-            x = MathHelper.clamp_float(x, 0, 1);
+            x = MathUtils.clamp(x, 0, 1);
 
             float factor = 1 - (float) Math.sqrt(1 - Math.pow(x, 2));
 
@@ -281,7 +281,7 @@ public enum Interpolation implements IInterpolation {
     CIRCLE_OUT("circle_out") {
         @Override
         public float interpolate(float a, float b, float x) {
-            x = MathHelper.clamp_float(x, 0, 1);
+            x = MathUtils.clamp(x, 0, 1);
 
             float factor = (float) Math.sqrt(1 - Math.pow(x - 1, 2));
 
@@ -291,7 +291,7 @@ public enum Interpolation implements IInterpolation {
     CIRCLE_INOUT("circle_inout") {
         @Override
         public float interpolate(float a, float b, float x) {
-            x = MathHelper.clamp_float(x, 0, 1);
+            x = MathUtils.clamp(x, 0, 1);
 
             float factor = x < 0.5
                     ? (float) (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2

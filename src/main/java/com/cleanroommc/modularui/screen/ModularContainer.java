@@ -2,33 +2,38 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.inventory.ClickType;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
-import com.cleanroommc.modularui.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
+import com.cleanroommc.modularui.utils.item.SlotItemHandler;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
+// TODO: any changes from 1.12?
 public class ModularContainer extends Container {
 
     public static ModularContainer getCurrent(EntityPlayer player) {
@@ -92,14 +97,7 @@ public class ModularContainer extends Container {
         return (ContainerAccessor) this;
     }
 
-    @Override
-    public void addCraftingToCrafters(ICrafting player) {
-        super.addCraftingToCrafters(player);
-        if (this.syncManager != null) {
-            this.syncManager.onOpen();
-        }
-    }
-
+    @MustBeInvokedByOverriders
     @Override
     public void onContainerClosed(@NotNull EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
@@ -108,6 +106,7 @@ public class ModularContainer extends Container {
         }
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
@@ -115,6 +114,14 @@ public class ModularContainer extends Container {
             this.syncManager.detectAndSendChanges(this.init);
         }
         this.init = false;
+    }
+
+    @ApiStatus.Internal
+    public void onUpdate() {
+        // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
+        if (this.syncManager != null) {
+            this.syncManager.onUpdate();
+        }
     }
 
     private void sortShiftClickSlots() {
@@ -271,8 +278,9 @@ public class ModularContainer extends Container {
                         if (heldStack != null && clickedSlot.isItemValid(heldStack)) {
                             int stackCount = mouseButton == LEFT_MOUSE ? heldStack.stackSize : 1;
 
-                            if (stackCount > clickedSlot.getSlotStackLimit()) {
-                                stackCount = clickedSlot.getSlotStackLimit();
+                            int lim = stackLimit(clickedSlot, heldStack);
+                            if (stackCount > lim) {
+                                stackCount = lim;
                             }
 
                             clickedSlot.putStack(heldStack.splitStack(stackCount));
@@ -302,13 +310,10 @@ public class ModularContainer extends Container {
                                     ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
                                 int stackCount = mouseButton == 0 ? heldStack.stackSize : 1;
 
-                                if (stackCount > clickedSlot.getSlotStackLimit() - slotStack.stackSize) {
-                                    stackCount = clickedSlot.getSlotStackLimit() - slotStack.stackSize;
+                                int lim = stackLimit(clickedSlot, heldStack);
+                                if (stackCount > lim - slotStack.stackSize) {
+                                    stackCount = lim - slotStack.stackSize;
                                 }
-
-                                // if (stackCount > heldStack.getMaxStackSize() - slotStack.stackSize) {
-                                //     stackCount = heldStack.getMaxStackSize() - slotStack.stackSize;
-                                // } // Removed
 
                                 heldStack.splitStack(stackCount);
 
@@ -318,7 +323,7 @@ public class ModularContainer extends Container {
 
                                 slotStack.stackSize += stackCount;
                                 clickedSlot.putStack(slotStack); // Added
-                            } else if (heldStack.stackSize <= clickedSlot.getSlotStackLimit()) {
+                            } else if (heldStack.stackSize <= stackLimit(clickedSlot, heldStack)) {
                                 clickedSlot.putStack(heldStack);
                                 inventoryplayer.setItemStack(slotStack);
                             }
@@ -349,6 +354,20 @@ public class ModularContainer extends Container {
         }
 
         return superSlotClick(slotId, mouseButton, mode, player);
+    }
+
+    // this method properly takes into account max item stack size and max slot limit
+    public static int stackLimit(Slot slot, ItemStack stack) {
+        if (stack == null) return 0;
+        if (slot instanceof SlotItemHandler slotItemHandler) {
+            // this is triggered for modular slots
+            return slotItemHandler.getItemStackLimit(stack);
+        }
+        // anything else is just extra safety, but will likely never be triggered
+        if (slot instanceof com.gtnewhorizons.modularui.api.forge.SlotItemHandler slotItemHandler) {
+            return slotItemHandler.getItemStackLimit(stack);
+        }
+        return Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
     }
 
     protected final @NotNull ItemStack superSlotClick(int slotId, int mouseButton, int mode, @NotNull EntityPlayer player) {

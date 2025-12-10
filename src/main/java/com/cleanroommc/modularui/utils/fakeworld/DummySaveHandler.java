@@ -91,9 +91,7 @@ public class DummySaveHandler implements ISaveHandler, IPlayerFileData, IChunkLo
     }
 
     @Override
-    public void saveExtraData() {
-
-    }
+    public void saveExtraData() {}
 
     @Override
     public String getWorldDirectoryName() {

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.api.value.sync;
 
 import com.cleanroommc.modularui.api.value.IValue;
+
 import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
@@ -48,6 +49,17 @@ public interface IValueSyncHandler<T> extends IValue<T> {
      * @return true if the current value was different from source
      */
     boolean updateCacheFromSource(boolean isFirstSync);
+
+    /**
+     * Updates the cache from source and syncs it to the other sides.
+     * <p>Usually this is
+     * <code>
+     * setValue(getter.get(), false, true);
+     * </code>
+     * </p>
+     * Where  {@code getter} is the source.
+     */
+    void notifyUpdate();
 
     /**
      * Writes the current value to the buffer

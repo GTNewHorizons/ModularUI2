@@ -1,22 +1,26 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
-import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.value.sync.InteractionSyncHandler;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.SingleChildWidget;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W> implements Interactable {
 
     public static ButtonWidget<?> panelCloseButton() {
         ButtonWidget<?> buttonWidget = new ButtonWidget<>();
-        return buttonWidget.overlay(GuiTextures.CROSS_TINY)
-                .size(10).top(4).right(4)
+        return buttonWidget.widgetTheme(IThemeApi.CLOSE_BUTTON)
+                .top(4).right(4)
+                .overlay(GuiTextures.CROSS_TINY)
                 .onMousePressed(mouseButton -> {
                     if (mouseButton == 0 || mouseButton == 1) {
                         buttonWidget.getPanel().closeIfOpen();
@@ -40,12 +44,11 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
-        return this.syncHandler != null;
+        return syncHandler instanceof InteractionSyncHandler;
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getButtonTheme();
     }
 
@@ -122,7 +125,7 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     @Override
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return (this.mouseScroll != null && this.mouseScroll.scroll(scrollDirection, amount)) ||
                 (this.syncHandler != null && this.syncHandler.onMouseScroll((int) Math.copySign(amount, scrollDirection.modifier)));
     }
@@ -163,9 +166,14 @@ public class ButtonWidget<W extends ButtonWidget<W>> extends SingleChildWidget<W
     }
 
     public W syncHandler(InteractionSyncHandler interactionSyncHandler) {
-        this.syncHandler = interactionSyncHandler;
         setSyncHandler(interactionSyncHandler);
         return getThis();
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        this.syncHandler = castIfTypeElseNull(syncHandler, InteractionSyncHandler.class);
     }
 
     public W playClickSound(boolean play) {

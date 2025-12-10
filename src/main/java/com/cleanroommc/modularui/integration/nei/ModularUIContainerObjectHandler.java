@@ -1,11 +1,14 @@
 package com.cleanroommc.modularui.integration.nei;
 
-import codechicken.nei.guihook.IContainerObjectHandler;
-
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
+
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
+
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+
+import codechicken.nei.guihook.IContainerObjectHandler;
 
 public class ModularUIContainerObjectHandler implements IContainerObjectHandler {
 
@@ -22,8 +25,8 @@ public class ModularUIContainerObjectHandler implements IContainerObjectHandler 
     public ItemStack getStackUnderMouse(GuiContainer gui, int mousex, int mousey) {
         if (gui instanceof IMuiScreen muiScreen) {
             IGuiElement hovered = muiScreen.getScreen().getContext().getHovered();
-            if (hovered instanceof NEIIngredientProvider) {
-                return ((NEIIngredientProvider) hovered).getStackForNEI();
+            if (hovered instanceof RecipeViewerIngredientProvider ingredientProvider) {
+                return ingredientProvider.getStackForRecipeViewer();
             }
         }
         return null;
@@ -31,11 +34,11 @@ public class ModularUIContainerObjectHandler implements IContainerObjectHandler 
 
     @Override
     public boolean objectUnderMouse(GuiContainer gui, int mousex, int mousey) {
-        return false;
+        return gui instanceof IMuiScreen muiScreen && muiScreen.getScreen().getContext().isHovered();
     }
 
     @Override
     public boolean shouldShowTooltip(GuiContainer gui) {
-        return true;
+        return !(gui instanceof IMuiScreen muiScreen) || !muiScreen.getScreen().getContext().hasDraggable();
     }
 }

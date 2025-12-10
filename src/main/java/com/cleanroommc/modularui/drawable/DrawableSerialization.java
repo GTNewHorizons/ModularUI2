@@ -66,6 +66,7 @@ public class DrawableSerialization implements JsonSerializer<IDrawable>, JsonDes
         registerDrawableType("ellipse", Circle.class, json -> new Circle());
         registerDrawableType("item", ItemDrawable.class, ItemDrawable::ofJson);
         registerDrawableType("icon", Icon.class, Icon::ofJson);
+        registerDrawableType("scrollbar", Scrollbar.class, Scrollbar::ofJson);
     }
 
     public static IDrawable deserialize(JsonElement json) {

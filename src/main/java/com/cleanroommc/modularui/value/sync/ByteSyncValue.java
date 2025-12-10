@@ -1,9 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.value.sync.IByteSyncValue;
-
 import com.cleanroommc.modularui.network.NetworkUtils;
-
 import com.cleanroommc.modularui.value.ByteValue;
 
 import net.minecraft.network.PacketBuffer;
@@ -12,7 +10,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncValue<Byte> {
@@ -64,6 +61,11 @@ public class ByteSyncValue extends ValueSyncHandler<Byte> implements IByteSyncVa
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void notifyUpdate() {
+        setByteValue(this.getter.getByte(), false, true);
     }
 
     @Override

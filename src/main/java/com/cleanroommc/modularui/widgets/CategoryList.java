@@ -6,10 +6,11 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.widget.AbstractParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,12 +25,12 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
     private IDrawable collapsedOverlay;
 
     @Override
-    public void drawOverlay(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void drawOverlay(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         super.drawOverlay(context, widgetTheme);
         if (this.expanded) {
-            this.expandedOverlay.drawAtZero(context, getArea(), widgetTheme);
+            this.expandedOverlay.drawAtZeroPadded(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         } else {
-            this.collapsedOverlay.drawAtZero(context, getArea(), widgetTheme);
+            this.collapsedOverlay.drawAtZeroPadded(context, getArea(), getActiveWidgetTheme(widgetTheme, isHovering()));
         }
     }
 
@@ -82,12 +83,13 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
         calculateHeightAndLayout(true);
     }
 
-    public void calculateHeightAndLayout(boolean calculateParents) {
+    public boolean calculateHeightAndLayout(boolean calculateParents) {
         if (this.expanded) {
             int y = getArea().height;
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
                 widget.resizer().setYResized(true);
+                if (!widget.resizer().isHeightCalculated()) return false;
                 y += widget instanceof CategoryList categoryList && categoryList.expanded ?
                         categoryList.totalHeight : widget.getArea().height;
             }
@@ -96,17 +98,19 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
             this.totalHeight = getArea().height;
         }
 
-        if (!calculateParents) return;
-        if (getParent() instanceof CategoryList categoryList) {
-            categoryList.calculateHeightAndLayout(true);
-        } else if (getParent() instanceof Root root) {
-            root.updateHeight();
+        if (calculateParents) {
+            if (getParent() instanceof CategoryList categoryList) {
+                categoryList.calculateHeightAndLayout(true);
+            } else if (getParent() instanceof Root root) {
+                root.updateHeight();
+            }
         }
+        return true;
     }
 
     @Override
-    public void layoutWidgets() {
-        calculateHeightAndLayout(false);
+    public boolean layoutWidgets() {
+        return calculateHeightAndLayout(false);
     }
 
     public CategoryList setCollapsedOverlay(IDrawable collapsedOverlay) {
@@ -139,15 +143,17 @@ public class CategoryList extends AbstractParentWidget<IWidget, CategoryList> im
         }
 
         @Override
-        public void layoutWidgets() {
+        public boolean layoutWidgets() {
             int y = 0;
             for (IWidget widget : getChildren()) {
                 widget.getArea().ry = y;
                 widget.resizer().setYResized(true);
+                if (!widget.resizer().isHeightCalculated()) return false;
                 y += widget instanceof CategoryList categoryList && categoryList.expanded ?
                         categoryList.totalHeight : widget.getArea().height;
             }
             getScrollArea().getScrollY().setScrollSize(y);
+            return true;
         }
 
         public Root setCollapsedOverlay(IDrawable collapsedOverlay) {

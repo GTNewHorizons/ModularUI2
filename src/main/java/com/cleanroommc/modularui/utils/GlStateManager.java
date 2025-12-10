@@ -98,6 +98,10 @@ public class GlStateManager {
         GL11.glColorMask(red, green, blue, alpha);
     }
 
+    public static void clearDepth(double depth) {
+        GL11.glClearDepth(depth);
+    }
+
     public static void clear(int mask) {
         GL11.glClear(mask);
     }

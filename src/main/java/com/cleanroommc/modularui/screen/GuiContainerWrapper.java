@@ -2,10 +2,9 @@ package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import net.minecraft.client.gui.inventory.GuiContainer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,5 +35,10 @@ public class GuiContainerWrapper extends GuiContainer implements IMuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return this.screen != null && this.screen.doesPauseGame();
+    }
+
+    @Override
+    public String toString() {
+        return "Wrapper(" + getScreen() + ")";
     }
 }

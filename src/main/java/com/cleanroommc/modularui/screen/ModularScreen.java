@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.GuiDraw;
@@ -16,6 +17,11 @@ import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -23,16 +29,11 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.util.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,6 +76,7 @@ public class ModularScreen {
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
     private boolean pausesGame = false;
+    private boolean openParentOnClose = false;
 
     private ITheme currentTheme;
     private IMuiScreen screenWrapper;
@@ -115,7 +117,6 @@ public class ModularScreen {
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
         this.name = mainPanel.getName();
-        this.currentTheme = IThemeApi.get().getThemeForScreen(this, null);
         this.panelManager = new PanelManager(this, mainPanel);
     }
 
@@ -184,14 +185,6 @@ public class ModularScreen {
         if (!isOverlay()) {
             this.screenWrapper.updateGuiArea(this.panelManager.getMainPanel().getArea());
         }
-    }
-
-    /**
-     * Called when another screen opens, but this screen is still open or this screen an overlay is and the gui screen parent closes.
-     */
-    @ApiStatus.Internal
-    public final void onCloseParent() {
-        this.panelManager.closeAll();
     }
 
     /**
@@ -298,11 +291,13 @@ public class ModularScreen {
         this.context.reset();
         this.context.pushViewport(null, this.context.getScreenArea());
         for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
-            this.context.updateZ(panel.getArea().getPanelLayer() * 20);
+            this.context.updateZ(0);
             if (panel.disablePanelsBelow()) {
                 GuiDraw.drawRect(0, 0, this.context.getScreenArea().w(), this.context.getScreenArea().h(), Color.argb(16, 16, 16, (int) (125 * panel.getAlpha())));
             }
             WidgetTree.drawTree(panel, this.context);
+            GlStateManager.clearDepth(1);
+            GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
         }
         this.context.updateZ(0);
         this.context.popViewport(null);
@@ -329,7 +324,7 @@ public class ModularScreen {
         this.context.reset();
         this.context.pushViewport(null, this.context.getScreenArea());
         for (ModularPanel panel : this.panelManager.getReverseOpenPanels()) {
-            this.context.updateZ(100 + panel.getArea().getPanelLayer() * 20);
+            this.context.updateZ(100);
             if (panel.isEnabled()) {
                 WidgetTree.drawTreeForeground(panel, this.context);
             }
@@ -512,12 +507,13 @@ public class ModularScreen {
     /**
      * Called with {@code true} after a widget which implements {@link com.cleanroommc.modularui.api.widget.IFocusedWidget IFocusedWidget}
      * has consumed a mouse press and called with {@code false} if a widget is currently focused and anything else has consumed a mouse
-     * press. This is required for other mods like JEI/NEI to not interfere with inputs.
+     * press. This is required for other mods like recipe viewer to not interfere with inputs.
      *
      * @param focus true if the gui screen will be focused
      */
     @ApiStatus.Internal
     public void setFocused(boolean focus) {
+        // TODO: 1.12
         //this.screenWrapper.setFocused(focus);
     }
 
@@ -548,6 +544,11 @@ public class ModularScreen {
     @NotNull
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "#" + getOwner() + ":" + getName();
     }
 
     /**
@@ -608,6 +609,10 @@ public class ModularScreen {
         return pausesGame;
     }
 
+    public boolean isOpenParentOnClose() {
+        return openParentOnClose;
+    }
+
     @SuppressWarnings("unchecked")
     private <T extends IGuiAction> List<T> getGuiActionListeners(Class<T> clazz) {
         return (List<T>) this.guiActionListeners.getOrDefault(clazz, Collections.emptyList());
@@ -622,6 +627,7 @@ public class ModularScreen {
      * @param action action listener
      */
     public void registerGuiActionListener(IGuiAction action) {
+        // TODO these should be linked to a IWidget, which can be checked for isValid() and is panel open on use -> proper event system
         List<IGuiAction> list = this.guiActionListeners.computeIfAbsent(getGuiActionClass(action), key -> new ArrayList<>());
         if (!list.contains(action)) list.add(action);
     }
@@ -689,6 +695,9 @@ public class ModularScreen {
     }
 
     public ITheme getCurrentTheme() {
+        if (this.currentTheme == null) {
+            useTheme(null);
+        }
         return this.currentTheme;
     }
 
@@ -716,22 +725,9 @@ public class ModularScreen {
         return this;
     }
 
-    // TODO move this to a more appropriate place
-    public enum UpOrDown {
-        UP(1), DOWN(-1);
-
-        public final int modifier;
-
-        UpOrDown(int modifier) {
-            this.modifier = modifier;
-        }
-
-        public boolean isUp() {
-            return this == UP;
-        }
-
-        public boolean isDown() {
-            return this == DOWN;
-        }
+    public ModularScreen openParentOnClose(boolean openParentOnClose) {
+        this.openParentOnClose = openParentOnClose;
+        return this;
     }
+
 }

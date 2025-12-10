@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.api.widget;
 
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.layout.IResizeable;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.widget.sizer.Area;
@@ -50,6 +49,7 @@ public interface IGuiElement {
      *
      * @param theme themes to apply
      */
+    // TODO: what is this doing here, not in 1.12
     default void applyTheme(ITheme theme) {}
 
 
@@ -61,22 +61,31 @@ public interface IGuiElement {
     void draw(ModularGuiContext context);
 
     /**
-     * Called when the mouse enters the area of this element
+     * Called when the mouse hovers this element. This means this element is directly below the mouse or there are widgets in between which
+     * all allow to pass hover through. This is not called when the element is at any point below the mouse.
      */
-    default void onMouseStartHover() {
-    }
+    default void onMouseStartHover() {}
 
     /**
-     * Called when the mouse leaves the area of this element
+     * Called when the mouse no longer hovers this element. This widget can still be below the mouse on some level.
      */
-    default void onMouseEndHover() {
-    }
+    default void onMouseEndHover() {}
+
+    /**
+     * Called when the mouse enters this elements area with any amount of widgets above it from the current panel.
+     */
+    default void onMouseEnterArea() {}
+
+    /**
+     * Called when the mouse leaves the area, or it started hovering a different panel.
+     */
+    default void onMouseLeaveArea() {}
 
     /**
      * @return if this widget is currently right below the mouse
      */
     default boolean isHovering() {
-        return getScreen().getContext().isHovered(this);
+        return isHoveringFor(0);
     }
 
     /**
@@ -86,17 +95,15 @@ public interface IGuiElement {
      * @return if this element is right blow the mouse for a certain amount of time
      */
     default boolean isHoveringFor(int ticks) {
-        return getScreen().getContext().isHoveredFor(this, ticks);
+        return false;
     }
 
     default boolean isBelowMouse() {
-        IGuiElement hovered = getScreen().getContext().getHovered();
-        if (hovered == null) return false;
-        while (!(hovered instanceof ModularPanel)) {
-            if (hovered == this) return true;
-            hovered = hovered.getParent();
-        }
-        return hovered == this;
+        return isBelowMouseFor(0);
+    }
+
+    default boolean isBelowMouseFor(int ticks) {
+        return false;
     }
 
     /**

@@ -9,15 +9,17 @@ import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated
 public class IconRenderer {
 
     public static final IconRenderer SHARED = new IconRenderer();
@@ -104,7 +106,7 @@ public class IconRenderer {
         for (IIcon icon : lines) {
             int x = icon.getWidth() > 0 ? getStartX(icon.getWidth()) : this.x;
             if (!this.simulate) {
-                icon.draw(context, x, y, maxWidth, icon.getHeight(), WidgetTheme.getDefault());
+                icon.draw(context, x, y, maxWidth, icon.getHeight(), WidgetTheme.getDefault().getTheme());
             }
             y += (int) ((icon.getHeight() + this.linePadding) * this.scale);
         }

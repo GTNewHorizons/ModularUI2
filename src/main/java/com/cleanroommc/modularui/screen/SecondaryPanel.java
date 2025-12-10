@@ -1,7 +1,7 @@
 package com.cleanroommc.modularui.screen;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
-import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.WidgetTree;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,10 +29,14 @@ public class SecondaryPanel implements IPanelHandler {
         parent.registerSubPanel(this);
     }
 
+    public ModularPanel getParent() {
+        return parent;
+    }
+
     @Override
     public void closePanel() {
         if (!this.open) return;
-        this.panel.animateClose();
+        this.panel.closeIfOpen();
     }
 
     @Override
@@ -93,7 +97,7 @@ public class SecondaryPanel implements IPanelHandler {
 
     @SideOnly(Side.CLIENT)
     private ModularPanel buildPanel() {
-        return Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), MCHelper.getPlayer()));
+        return Objects.requireNonNull(this.provider.build(this.screen.getMainPanel(), Platform.getClientPlayer()));
     }
 
     public interface IPanelBuilder {

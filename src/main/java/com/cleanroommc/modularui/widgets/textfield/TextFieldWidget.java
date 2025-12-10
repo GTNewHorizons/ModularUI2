@@ -1,23 +1,26 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.ModularUI;
-import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.UpOrDown;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IStringValue;
+import com.cleanroommc.modularui.api.value.IValue;
+import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTextFieldTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.awt.Point;
 import java.text.ParsePosition;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -32,6 +35,11 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private boolean numbers = false;
     private String mathFailMessage = null;
     private double defaultNumber = 0;
+    private boolean tooltipOverride = false;
+    private double scrollStep = 1;
+    private double scrollStepCtrl = 0.1;
+    private double scrollStepShift = 100;
+    private boolean usingScrollStep = false;
 
     public double parse(String num) {
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
@@ -54,30 +62,35 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.stringValue = new StringValue("");
         }
         setText(this.stringValue.getStringValue());
-        if (!hasTooltip()) {
+        if (!hasTooltip() && !tooltipOverride) {
             tooltipBuilder(tooltip -> tooltip.addLine(IKey.str(getText())));
+            // set back to false so this won't get triggered
+            tooltipOverride = false;
         }
-    }
-
-    public int getMarkedColor() {
-        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetTextFieldTheme textFieldTheme) {
-            return textFieldTheme.getMarkedColor();
-        }
-        return ITheme.getDefault().getTextFieldTheme().getMarkedColor();
     }
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof IStringValue<?> iStringValue && syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
-            this.stringValue = iStringValue;
+        return syncHandler instanceof IStringValue<?>;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        if (syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
             valueSyncHandler.setChangeListener(() -> {
                 markTooltipDirty();
                 setText(this.stringValue.getValue().toString());
             });
-            return true;
         }
-        return false;
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        if (value instanceof IStringValue<?> stringValue1) {
+            this.stringValue = stringValue1;
+        }
     }
 
     @Override
@@ -92,16 +105,8 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    protected void setupDrawText(ModularGuiContext context, WidgetTextFieldTheme widgetTheme) {
-        this.renderer.setSimulate(false);
-        this.renderer.setPos(getArea().getPadding().left, 0);
-        this.renderer.setScale(this.scale);
-        this.renderer.setAlignment(this.textAlignment, -1, getArea().height);
-    }
-
-    @Override
     public void drawForeground(ModularGuiContext context) {
-        if (hasTooltip() && getScrollData().isScrollBarActive(getScrollArea()) && isHoveringFor(getTooltip().getShowUpTimer())) {
+        if (hasTooltip() && (tooltipOverride || getScrollData().isScrollBarActive(getScrollArea())) && isHoveringFor(getTooltip().getShowUpTimer())) {
             getTooltip().draw(getContext());
         }
     }
@@ -122,15 +127,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.handler.getText().add(text);
         } else {
             this.handler.getText().set(0, text);
-        }
-    }
-
-    @Override
-    public void onFocus(ModularGuiContext context) {
-        super.onFocus(context);
-        Point main = this.handler.getMainCursor();
-        if (main.x == 0) {
-            this.handler.setCursor(main.y, getText().length(), true, true);
         }
     }
 
@@ -233,7 +229,6 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return this;
     }
 
-    @ApiStatus.Experimental
     public TextFieldWidget setFormatAsInteger(boolean formatAsInteger) {
         this.renderer.setFormatAsInteger(formatAsInteger);
         return getThis();
@@ -243,5 +238,140 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         this.stringValue = stringValue;
         setValue(stringValue);
         return this;
+    }
+
+    /**
+     * Allows for setting the numeric values with mouse scrolling.
+     * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is focused
+     */
+    @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is focused
+        if (!this.usingScrollStep || !this.numbers || !isFocused()) return super.onMouseScroll(scrollDirection, amount);
+
+        double value;
+        if (Interactable.hasControlDown()) value = scrollDirection.modifier * scrollStepCtrl;
+        else if (Interactable.hasShiftDown()) value = scrollDirection.modifier * scrollStepShift;
+        else value = scrollDirection.modifier * scrollStep;
+
+        double number = this.parse(getText()) + value;
+        String representation = validator.apply(Double.toString(number));
+
+        this.stringValue.setStringValue(representation);
+        this.setText(representation);
+        markTooltipDirty();
+
+        return true;
+    }
+
+    /**
+     *  Sets the values by which to increment the field when the player uses the scroll wheel.
+     *  Scrolling up increases value, and scrolling down decreases value.
+     *  Also enables the usingScrollStep flag.
+     *  Default values: 1, 0.1, 100 in order.
+     * @param baseStep - By how much to change the value when no modifier key is held
+     * @param ctrlStep - By how much to change the value when the ctrl key is held
+     * @param shiftStep - By how much to change the value when the shift key is held
+     * @return this
+     */
+    public TextFieldWidget setScrollValues(double baseStep, double ctrlStep, double shiftStep) {
+            this.scrollStep = baseStep;
+            this.scrollStepCtrl = ctrlStep;
+            this.scrollStepShift = shiftStep;
+            this.usingScrollStep = true;
+            return this;
+    }
+    /**
+     *  Sets the usingScrollStep flag
+     * @return this
+     */
+    public TextFieldWidget usingScrollStep(boolean usingScrollStep) {
+            this.usingScrollStep = true;
+            return this;
+    }
+
+    /**
+     * Normally, Tooltips on text field widgets are used to display the contents of the widget when the scrollbar is active
+     * This value is an override, that allows the methods provided by {@link com.cleanroommc.modularui.api.widget.ITooltip} to be used
+     * Every method that adds a tooltip from ITooltip is overridden to enable the tooltipOverride
+     *
+     * @param value - sets the tooltip override on or off
+     */
+    public TextFieldWidget setTooltipOverride(boolean value) {
+        this.tooltipOverride = value;
+        return this;
+    }
+
+    @Override
+    public TextFieldWidget tooltipBuilder(Consumer<RichTooltip> tooltipBuilder) {
+        tooltipOverride = true;
+        return super.tooltipBuilder(tooltipBuilder);
+    }
+
+    @Override
+    public TextFieldWidget tooltip(RichTooltip tooltip) {
+        tooltipOverride = true;
+        return super.tooltip(tooltip);
+    }
+
+    @Override
+    public TextFieldWidget tooltip(Consumer<RichTooltip> tooltipConsumer) {
+        tooltipOverride = true;
+        return super.tooltip(tooltipConsumer);
+    }
+
+    @Override
+    public @NotNull RichTooltip tooltip() {
+        tooltipOverride = true;
+        return super.tooltip();
+    }
+
+    @Override
+    public TextFieldWidget tooltipDynamic(Consumer<RichTooltip> tooltipBuilder) {
+        tooltipOverride = true;
+        return super.tooltipDynamic(tooltipBuilder);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipDrawableLines(Iterable<IDrawable> lines) {
+        tooltipOverride = true;
+        return super.addTooltipDrawableLines(lines);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipElement(String s) {
+        tooltipOverride = true;
+        return super.addTooltipElement(s);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipElement(IDrawable drawable) {
+        tooltipOverride = true;
+        return super.addTooltipElement(drawable);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipLine(String line) {
+        tooltipOverride = true;
+        return super.addTooltipLine(line);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipLine(ITextLine line) {
+        tooltipOverride = true;
+
+        return super.addTooltipLine(line);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipLine(IDrawable drawable) {
+        tooltipOverride = true;
+        return super.addTooltipLine(drawable);
+    }
+
+    @Override
+    public TextFieldWidget addTooltipStringLines(Iterable<String> lines) {
+        tooltipOverride = true;
+        return super.addTooltipStringLines(lines);
     }
 }

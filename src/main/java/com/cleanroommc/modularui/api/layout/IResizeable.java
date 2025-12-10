@@ -18,13 +18,14 @@ public interface IResizeable {
     /**
      * Resizes the given element
      *
-     * @param guiElement element to resize
+     * @param guiElement     element to resize
+     * @param isParentLayout if the parent is a layout widget
      * @return true if element is fully resized
      */
-    boolean resize(IGuiElement guiElement);
+    boolean resize(IGuiElement guiElement, boolean isParentLayout);
 
     /**
-     * Called if {@link #resize(IGuiElement)} returned false after children have been resized.
+     * Called if {@link #resize(IGuiElement, boolean)} returned false after children have been resized.
      *
      * @param guiElement element to resize
      * @return if element is fully resized
@@ -37,8 +38,7 @@ public interface IResizeable {
      *
      * @param guiElement element that was resized
      */
-    default void applyPos(IGuiElement guiElement) {
-    }
+    default void applyPos(IGuiElement guiElement) {}
 
     /**
      * @return area of the element
@@ -66,6 +66,10 @@ public interface IResizeable {
      */
     boolean isHeightCalculated();
 
+    boolean areChildrenCalculated();
+
+    boolean isLayoutDone();
+
     default boolean isSizeCalculated(GuiAxis axis) {
         return axis.isHorizontal() ? isWidthCalculated() : isHeightCalculated();
     }
@@ -77,9 +81,27 @@ public interface IResizeable {
     /**
      * @return true if the relative position and size are fully calculated
      */
-    default boolean isFullyCalculated() {
+    default boolean isSelfFullyCalculated(boolean isParentLayout) {
+        return isSelfFullyCalculated() && !canRelayout(isParentLayout);
+    }
+
+    default boolean isSelfFullyCalculated() {
         return isXCalculated() && isYCalculated() && isWidthCalculated() && isHeightCalculated();
     }
+
+    default boolean isFullyCalculated() {
+        return isSelfFullyCalculated() && areChildrenCalculated() && isLayoutDone();
+    }
+
+    default boolean isFullyCalculated(boolean isParentLayout) {
+        return isSelfFullyCalculated(isParentLayout) && areChildrenCalculated() && isLayoutDone();
+    }
+
+    boolean canRelayout(boolean isParentLayout);
+
+    void setChildrenResized(boolean resized);
+
+    void setLayoutDone(boolean done);
 
     /**
      * Marks position and size as calculated.
@@ -128,6 +150,10 @@ public interface IResizeable {
 
     default void setResized(boolean b) {
         setResized(b, b, b, b);
+    }
+
+    default void updateResized() {
+        setResized(isXCalculated(), isYCalculated(), isWidthCalculated(), isHeightCalculated());
     }
 
     /**

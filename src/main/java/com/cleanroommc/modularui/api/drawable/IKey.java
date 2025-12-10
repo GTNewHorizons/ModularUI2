@@ -2,7 +2,15 @@ package com.cleanroommc.modularui.api.drawable;
 
 import com.cleanroommc.modularui.api.IJsonSerializable;
 import com.cleanroommc.modularui.drawable.Icon;
-import com.cleanroommc.modularui.drawable.text.*;
+import com.cleanroommc.modularui.drawable.text.AnimatedText;
+import com.cleanroommc.modularui.drawable.text.CompoundKey;
+import com.cleanroommc.modularui.drawable.text.DynamicKey;
+import com.cleanroommc.modularui.drawable.text.FormattingState;
+import com.cleanroommc.modularui.drawable.text.KeyIcon;
+import com.cleanroommc.modularui.drawable.text.LangKey;
+import com.cleanroommc.modularui.drawable.text.StringKey;
+import com.cleanroommc.modularui.drawable.text.StyledText;
+import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -17,6 +25,7 @@ import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
@@ -156,6 +165,16 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * @return dynamic text key
      */
     static IKey dynamic(@NotNull Supplier<@NotNull String> getter) {
+        return dynamicKey(() -> IKey.str(getter.get()));
+    }
+
+    /**
+     * Creates a dynamic text key.
+     *
+     * @param getter key supplier
+     * @return dynamic text key
+     */
+    static IKey dynamicKey(@NotNull Supplier<@NotNull IKey> getter) {
         return new DynamicKey(getter);
     }
 
@@ -182,17 +201,52 @@ public interface IKey extends IDrawable, IJsonSerializable {
     @SideOnly(Side.CLIENT)
     @Override
     default void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+        drawAligned(context, x, y, width, height, widgetTheme, Alignment.CENTER);
+    }
+
+    @SideOnly(Side.CLIENT)
+    default void drawAligned(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme, Alignment alignment) {
         renderer.setColor(widgetTheme.getTextColor());
         renderer.setShadow(widgetTheme.getTextShadow());
-        renderer.setAlignment(Alignment.Center, width, height);
-        renderer.setScale(1f);
+        renderer.setAlignment(alignment, width, height);
+        renderer.setScale(getScale());
         renderer.setPos(x, y);
         renderer.draw(getFormatted());
     }
 
     @Override
-    default TextWidget asWidget() {
-        return new TextWidget(this);
+    default boolean canApplyTheme() {
+        return true;
+    }
+
+    @Override
+    default int getDefaultWidth() {
+        renderer.setAlignment(Alignment.TopLeft, -1, -1);
+        renderer.setScale(getScale());
+        renderer.setPos(0, 0);
+        renderer.setSimulate(true);
+        renderer.draw(getFormatted());
+        renderer.setSimulate(false);
+        return (int) renderer.getLastActualWidth();
+    }
+
+    @Override
+    default int getDefaultHeight() {
+        renderer.setAlignment(Alignment.TopLeft, -1, -1);
+        renderer.setScale(getScale());
+        renderer.setPos(0, 0);
+        renderer.setSimulate(true);
+        renderer.draw(getFormatted());
+        renderer.setSimulate(false);
+        return (int) renderer.getLastActualHeight();
+    }
+
+    default float getScale() {
+        return 1f;
+    }
+
+    default TextWidget<?> asWidget() {
+        return new TextWidget<>(this);
     }
 
     default StyledText withStyle() {
@@ -234,7 +288,11 @@ public interface IKey extends IDrawable, IJsonSerializable {
         return withStyle().alignment(alignment);
     }
 
-    default StyledText color(@Nullable Integer color) {
+    default StyledText color(int color) {
+        return withStyle().color(() -> color);
+    }
+
+    default StyledText color(@Nullable IntSupplier color) {
         return withStyle().color(color);
     }
 

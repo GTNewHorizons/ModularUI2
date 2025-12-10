@@ -5,15 +5,15 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class IngredientDrawable implements IDrawable, IJsonSerializable {
 
     private ItemStack[] items;
+    private int cycleTime = 1000;
 
     public IngredientDrawable(ItemStack... items) {
         setItems(items);
@@ -23,7 +23,8 @@ public class IngredientDrawable implements IDrawable, IJsonSerializable {
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
         if (this.items.length == 0) return;
-        ItemStack item = this.items[(int) (Minecraft.getSystemTime() % (1000 * this.items.length)) / 1000];
+        applyColor(widgetTheme.getColor());
+        ItemStack item = this.items[(int) (Minecraft.getSystemTime() % (this.cycleTime * this.items.length)) / this.cycleTime];
         if (item != null) {
             GuiDraw.drawItem(item, x, y, width, height, context.getCurrentDrawingZ());
         }
@@ -35,5 +36,20 @@ public class IngredientDrawable implements IDrawable, IJsonSerializable {
 
     public void setItems(ItemStack... items) {
         this.items = items;
+    }
+
+    public int getCycleTime() {
+        return cycleTime;
+    }
+
+    /**
+     * Sets how many milliseconds each item shows up
+     *
+     * @param cycleTime time per item in milliseconds
+     * @return this
+     */
+    public IngredientDrawable cycleTime(int cycleTime) {
+        this.cycleTime = cycleTime;
+        return this;
     }
 }

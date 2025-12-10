@@ -4,7 +4,9 @@ import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
 import com.cleanroommc.modularui.api.value.sync.ILongSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
+
 import net.minecraft.network.PacketBuffer;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,6 +86,11 @@ public class LongSyncValue extends ValueSyncHandler<Long> implements ILongSyncVa
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void notifyUpdate() {
+        setLongValue(this.getter.getAsLong(), false, true);
     }
 
     @Override

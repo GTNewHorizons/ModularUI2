@@ -3,13 +3,16 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IBoolValue;
 import com.cleanroommc.modularui.api.value.IEnumValue;
 import com.cleanroommc.modularui.api.value.IIntValue;
+import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.RichTooltip;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.value.IntValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
@@ -32,6 +35,8 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     protected IDrawable[] overlay = null;
     protected IDrawable[] hoverOverlay = null;
     private final List<RichTooltip> stateTooltip = new ArrayList<>();
+    private boolean playClickSound = true;
+    private Runnable clickSound;
 
     @Override
     public void onInit() {
@@ -42,8 +47,23 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
-        return this.intValue != null;
+        return syncHandler instanceof IIntValue<?>;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        if (syncHandler != null) {
+            this.intValue = castIfTypeElseNull(syncHandler, IIntValue.class);
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        if (value instanceof IIntValue<?> intValue1) {
+            this.intValue = intValue1;
+        }
     }
 
     protected int getState() {
@@ -79,40 +99,50 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         markTooltipDirty();
     }
 
+    public void playClickSound() {
+        if (this.playClickSound) {
+            if (this.clickSound != null) {
+                this.clickSound.run();
+            } else {
+                Interactable.playButtonClickSound();
+            }
+        }
+    }
+
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
         switch (mouseButton) {
             case 0:
                 next();
-                Interactable.playButtonClickSound();
+                playClickSound();
                 return Result.SUCCESS;
             case 1:
                 prev();
-                Interactable.playButtonClickSound();
+                playClickSound();
                 return Result.SUCCESS;
         }
         return Result.IGNORE;
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getButtonTheme();
     }
 
     @Override
-    public IDrawable getCurrentBackground(ITheme theme, WidgetTheme widgetTheme) {
+    public IDrawable getCurrentBackground(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
         // make sure texture is up-to-date
         int state = getState();
-        if (isHovering() && this.hoverBackground != null && this.hoverBackground[state] != null) {
+        if (isHovering() && this.hoverBackground != null && this.hoverBackground[state] != null && this.hoverBackground[state] != IDrawable.NONE) {
             return this.hoverBackground[state];
         }
         return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(theme, widgetTheme);
     }
 
     @Override
-    public IDrawable getCurrentOverlay(ITheme theme, WidgetTheme widgetTheme) {
+    public IDrawable getCurrentOverlay(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
         int state = getState();
-        if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null) {
+        if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null && this.hoverOverlay[state] != IDrawable.NONE) {
             return this.hoverOverlay[state];
         }
         return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(theme, widgetTheme);
@@ -140,6 +170,28 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
             return this.stateTooltip.get(getState());
         }
         return tooltip;
+    }
+
+    @Override
+    public W disableHoverBackground() {
+        if (this.hoverBackground != null) {
+            Arrays.fill(this.hoverBackground, IDrawable.NONE);
+        }
+        if (getHoverBackground() == null) {
+            super.hoverBackground(IDrawable.NONE);
+        }
+        return getThis();
+    }
+
+    @Override
+    public W disableHoverOverlay() {
+        if (this.hoverOverlay != null) {
+            Arrays.fill(this.hoverOverlay, IDrawable.NONE);
+        }
+        if (getHoverOverlay() == null) {
+            super.hoverOverlay(IDrawable.NONE);
+        }
+        return getThis();
     }
 
     protected W value(IIntValue<?> value) {
@@ -219,6 +271,217 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         return addTooltip(state, IKey.str(tooltip));
     }
 
+    /**
+     * Adds a tooltip element to all states.
+     *
+     * @param s element
+     * @return this
+     */
+    @Override
+    public W addTooltipElement(String s) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.add(s);
+        }
+        return getThis();
+    }
+
+    /**
+     * Adds tooltip drawables as lines to all states.
+     *
+     * @param lines drawables
+     * @return this
+     */
+    @Override
+    public W addTooltipDrawableLines(Iterable<IDrawable> lines) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.addDrawableLines(lines);
+        }
+        return getThis();
+    }
+
+    /**
+     * Adds a tooltip element to all states.
+     *
+     * @param drawable element
+     * @return this
+     */
+    @Override
+    public W addTooltipElement(IDrawable drawable) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.add(drawable);
+        }
+        return getThis();
+    }
+
+    /**
+     * Adds a tooltip line to all states.
+     *
+     * @param line tooltip line
+     * @return this
+     */
+    @Override
+    public W addTooltipLine(ITextLine line) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.addLine(line);
+        }
+        return getThis();
+    }
+
+    /**
+     * Adds a tooltip line to all states.
+     *
+     * @param drawable tooltip line
+     * @return this
+     */
+    @Override
+    public W addTooltipLine(IDrawable drawable) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.addLine(drawable);
+        }
+        return getThis();
+    }
+
+    /**
+     * Adds tooltip lines to all states.
+     *
+     * @param lines tooltip lines
+     * @return this
+     */
+    @Override
+    public W addTooltipStringLines(Iterable<String> lines) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.addStringLines(lines);
+        }
+        return getThis();
+    }
+
+    /**
+     * Applies a function to the tooltip of all states once.
+     *
+     * @param tooltipConsumer tooltip function
+     * @return this
+     */
+    @Override
+    public W tooltipStatic(Consumer<RichTooltip> tooltipConsumer) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltipConsumer.accept(tooltip);
+        }
+        return getThis();
+    }
+
+    /**
+     * Applies a function to the tooltip of all states every time the tooltip needs to update.
+     *
+     * @param tooltipBuilder tooltip function
+     * @return this
+     */
+    @Override
+    public W tooltipDynamic(Consumer<RichTooltip> tooltipBuilder) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.tooltipBuilder(tooltipBuilder);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip alignment of all states.
+     *
+     * @param alignment alignment
+     * @return this
+     */
+    @Override
+    public W tooltipAlignment(Alignment alignment) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.alignment(alignment);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip position of all states.
+     *
+     * @param pos tooltip pos
+     * @return this
+     */
+    @Override
+    public W tooltipPos(RichTooltip.Pos pos) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.pos(pos);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip position of all states.
+     *
+     * @param x x
+     * @param y y
+     * @return this
+     */
+    @Override
+    public W tooltipPos(int x, int y) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.pos(x, y);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip scale of all states.
+     *
+     * @param scale tooltip scale
+     * @return this
+     */
+    @Override
+    public W tooltipScale(float scale) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.scale(scale);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip text color of all states.
+     *
+     * @param textColor tooltip text color
+     * @return this
+     */
+    @Override
+    public W tooltipTextColor(int textColor) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.textColor(textColor);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip text shadow of all states.
+     *
+     * @param textShadow tooltip pos
+     * @return this
+     */
+    @Override
+    public W tooltipTextShadow(boolean textShadow) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.textShadow(textShadow);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip show up timer of all states.
+     *
+     * @param showUpTimer tooltip show up timer
+     * @return this
+     */
+    @Override
+    public W tooltipShowUpTimer(int showUpTimer) {
+        for (RichTooltip tooltip : this.stateTooltip) {
+            tooltip.showUpTimer(showUpTimer);
+        }
+        return getThis();
+    }
+
     protected W stateCount(int stateCount) {
         this.stateCount = stateCount;
         // adjust tooltip buffer size
@@ -271,6 +534,16 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
 
     protected W tooltipBuilder(int index, Consumer<RichTooltip> builder) {
         this.stateTooltip.get(index).tooltipBuilder(builder);
+        return getThis();
+    }
+
+    public W playClickSound(boolean play) {
+        this.playClickSound = play;
+        return getThis();
+    }
+
+    public W clickSound(Runnable clickSound) {
+        this.clickSound = clickSound;
         return getThis();
     }
 }

@@ -1,17 +1,18 @@
 package com.cleanroommc.modularui.utils.fluid;
 
-import codechicken.nei.recipe.StackInfo;
-
 import com.cleanroommc.modularui.ModularUI;
 
-import gregtech.api.util.GTUtility;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 
+import codechicken.nei.recipe.StackInfo;
+import gregtech.api.util.GTUtility;
+
 public class FluidInteractions {
+
     /**
      * Gets fluid actually stored in item. Used for transferring fluid.
      */
@@ -59,6 +60,7 @@ public class FluidInteractions {
         }
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
+            if(filledContainer == null) return itemStack; // give up and return original clicked stack
             FluidStack newFluid = getFluidForRealItem(filledContainer);
             fluidStack.amount -= newFluid.amount;
         }

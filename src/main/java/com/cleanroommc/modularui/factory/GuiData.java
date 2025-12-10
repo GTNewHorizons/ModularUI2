@@ -4,6 +4,9 @@ import com.cleanroommc.modularui.network.NetworkUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -19,12 +22,17 @@ public class GuiData {
 
     private final EntityPlayer player;
 
-    public GuiData(EntityPlayer player) {
+    public GuiData(@NotNull EntityPlayer player) {
         this.player = Objects.requireNonNull(player);
     }
 
+    @NotNull
     public EntityPlayer getPlayer() {
         return this.player;
+    }
+
+    public World getWorld() {
+        return this.player.getEntityWorld();
     }
 
     public boolean isClient() {

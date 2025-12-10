@@ -4,7 +4,8 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.ObjectValue;
 import com.cleanroommc.modularui.value.sync.GenericSyncValue;
@@ -12,6 +13,9 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 
 import net.minecraft.item.ItemStack;
+
+import org.jetbrains.annotations.Nullable;
+import scala.tools.nsc.doc.model.Class;
 
 /**
  * An item slot which only purpose is to display an item stack.
@@ -29,25 +33,44 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof GenericSyncValue<?> genericSyncValue && genericSyncValue.isOfType(ItemStack.class)) {
-            this.value = genericSyncValue.cast();
-            return true;
-        }
-        return false;
+        return syncHandler instanceof GenericSyncValue<?> gsv && gsv.isOfType(ItemStack.class);
     }
 
     @Override
-    protected WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        if (syncHandler != null) {
+            this.value = castIfTypeGenericElseNull(syncHandler, ItemStack.class);
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        this.value = (IValue<ItemStack>) value;
+    }
+
+    @Override
+    protected WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getItemSlotTheme();
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         ItemStack item = value.getValue();
         if (!Platform.isStackEmpty(item)) {
-            GuiDraw.drawItem(item, 1, 1, 16, 16, context.getCurrentDrawingZ());
+            int contentOffsetY = 1;
+            int contentOffsetX = 1;
+            GuiDraw.drawItem(
+                    item,
+                    contentOffsetX,
+                    contentOffsetY,
+                    getArea().width - 2 * contentOffsetX,
+                    getArea().height - 2 * contentOffsetY,
+                    context.getCurrentDrawingZ());
             if (this.displayAmount) {
-                GuiDraw.drawStandardSlotAmountText(item.stackSize, null, getArea());
+                GuiDraw.drawScaledAmountText(item.stackSize, null, 1, 1, this.getArea().width-1,
+                        this.getArea().height-1, Alignment.BottomRight, 0);
             }
         }
     }
@@ -58,7 +81,7 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> {
         return this;
     }
 
-    public ItemDisplayWidget item(ItemStack itemStack) {;
+    public ItemDisplayWidget item(ItemStack itemStack) {
         return item(new ObjectValue<>(itemStack));
     }
 

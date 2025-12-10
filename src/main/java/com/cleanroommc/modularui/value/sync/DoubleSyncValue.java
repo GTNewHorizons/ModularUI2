@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.value.sync.IDoubleSyncValue;
+import com.cleanroommc.modularui.api.value.sync.IFloatSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
+
 import net.minecraft.network.PacketBuffer;
+
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +15,7 @@ import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDoubleSyncValue<Double>, IStringSyncValue<Double> {
+public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDoubleSyncValue<Double>, IFloatSyncValue<Double>, IStringSyncValue<Double> {
 
     private final DoubleSupplier getter;
     private final DoubleConsumer setter;
@@ -86,6 +89,11 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     }
 
     @Override
+    public void notifyUpdate() {
+        setDoubleValue(this.getter.getAsDouble(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         buffer.writeDouble(getDoubleValue());
     }
@@ -103,5 +111,15 @@ public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDouble
     @Override
     public String getStringValue() {
         return String.valueOf(this.cache);
+    }
+
+    @Override
+    public float getFloatValue() {
+        return (float) getDoubleValue();
+    }
+
+    @Override
+    public void setFloatValue(float value, boolean setSource, boolean sync) {
+        setDoubleValue(value, setSource, sync);
     }
 }

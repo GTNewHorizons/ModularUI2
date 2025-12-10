@@ -2,19 +2,20 @@ package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
+import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.integration.nei.NEIIngredientProvider;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiContainerAccessor;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.screen.NEAAnimationHandler;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetSlotTheme;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.SlotTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
@@ -22,8 +23,6 @@ import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
-
-import com.cleanroommc.neverenoughanimations.animations.ItemMoveAnimation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -34,13 +33,13 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, NEIIngredientProvider {
+public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interactable, RecipeViewerIngredientProvider {
 
     public static final int SIZE = 18;
 
@@ -49,10 +48,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     private ItemSlotSH syncHandler;
+    private RichTooltip tooltip;
 
     public ItemSlot() {
-        tooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
-        tooltipBuilder(tooltip -> {
+        itemTooltip().setAutoUpdate(true);//.setHasTitleMargin(true);
+        itemTooltip().tooltipBuilder(tooltip -> {
             if (!isSynced()) return;
             ItemStack stack = getSlot().getStack();
             buildTooltip(stack, tooltip);
@@ -69,8 +69,13 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
+        return syncHandler instanceof ItemSlotSH;
+    }
+
+    @Override
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
         this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
-        return this.syncHandler != null;
     }
 
     @Override
@@ -83,7 +88,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         if (this.syncHandler == null) return;
         RenderHelper.enableGUIStandardItemLighting();
         drawSlot(getSlot());
@@ -113,16 +118,19 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public WidgetSlotTheme getWidgetThemeInternal(ITheme theme) {
-        return theme.getItemSlotTheme();
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
+        PlayerSlotType playerSlotType = this.syncHandler != null ? this.syncHandler.getPlayerSlotType() : null;
+        if (playerSlotType == null) return theme.getWidgetTheme(IThemeApi.ITEM_SLOT);
+        return switch (playerSlotType) {
+            case HOTBAR -> theme.getWidgetTheme(IThemeApi.ITEM_SLOT_PLAYER_HOTBAR);
+            case MAIN_INVENTORY -> theme.getWidgetTheme(IThemeApi.ITEM_SLOT_PLAYER_MAIN_INV);
+            case ARMOR -> theme.getWidgetTheme(IThemeApi.ITEM_SLOT_PLAYER_ARMOR);
+        };
     }
 
     public int getSlotHoverColor() {
-        WidgetTheme theme = getWidgetTheme(getContext().getTheme());
-        if (theme instanceof WidgetSlotTheme slotTheme) {
-            return slotTheme.getSlotHoverColor();
-        }
-        return ITheme.getDefault().getItemSlotTheme().getSlotHoverColor();
+        WidgetThemeEntry<SlotTheme> theme = getWidgetTheme(getContext().getTheme(), SlotTheme.class);
+        return theme.getTheme().getSlotHoverColor();
     }
 
     @Override
@@ -164,6 +172,36 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         return this.syncHandler;
     }
 
+    public RichTooltip getItemTooltip() {
+        return super.getTooltip();
+    }
+
+    public RichTooltip itemTooltip() {
+        return super.tooltip();
+    }
+
+    @Override
+    public @Nullable RichTooltip getTooltip() {
+        if (isSynced() && getSlot().getStack() != null) {
+            return getItemTooltip();
+        }
+        return tooltip;
+    }
+
+    @Override
+    public ItemSlot tooltip(RichTooltip tooltip) {
+        this.tooltip = tooltip;
+        return this;
+    }
+
+    @Override
+    public @NotNull RichTooltip tooltip() {
+        if (this.tooltip == null) {
+            this.tooltip = new RichTooltip().parent(this);
+        }
+        return this.tooltip;
+    }
+
     public ItemSlot slot(ModularSlot slot) {
         this.syncHandler = new ItemSlotSH(slot);
         setSyncHandler(this.syncHandler);
@@ -172,6 +210,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
         return slot(new ModularSlot(itemHandler, index));
+    }
+
+    public ItemSlot syncHandler(ItemSlotSH syncHandler) {
+        setSyncHandler(syncHandler);
+        return this;
     }
 
     @SideOnly(Side.CLIENT)
@@ -236,6 +279,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 renderItem.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer, Minecraft.getMinecraft().getTextureManager(), itemstack, 1, 1);
                 GuiDraw.afterRenderItemAndEffectIntoGUI(itemstack);
                 GlStateManager.disableRescaleNormal();
+                Platform.endDrawItem();
 
                 if (amount < 0) {
                     amount = itemstack.stackSize;
@@ -249,6 +293,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 NEAAnimationHandler.endHoverScale();
                 itemstack.stackSize = cachedCount;
                 GlStateManager.disableDepth();
+                GlStateManager.disableLighting();
             }
         }
 
@@ -257,7 +302,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public @Nullable ItemStack getStackForNEI() {
+    public @Nullable ItemStack getStackForRecipeViewer() {
         return this.syncHandler.getSlot().getStack();
     }
 }

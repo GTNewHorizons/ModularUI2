@@ -1,27 +1,28 @@
 package com.cleanroommc.modularui.screen;
 
-import codechicken.nei.ItemPanels;
-
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.animation.Animator;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.MCHelper;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.layout.IViewport;
 import com.cleanroommc.modularui.api.layout.IViewportStack;
+import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
-import com.cleanroommc.modularui.integration.nei.NEIDragAndDropHandler;
-import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.api.widget.ResizeDragArea;
+import com.cleanroommc.modularui.integration.nei.NEIUtil;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.screen.viewport.GuiViewportStack;
 import com.cleanroommc.modularui.screen.viewport.LocatedWidget;
-import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.ObjectList;
-import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.PanelSyncHandler;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
@@ -29,18 +30,19 @@ import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
-
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
@@ -53,7 +55,7 @@ import java.util.function.Supplier;
  * To open another panel on top of the main panel you must use {@link IPanelHandler#simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
  * or {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)} if the panel should be synced.
  */
-public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport {
+public class ModularPanel extends ParentWidget<ModularPanel> implements IViewport, IDragResizeable {
 
     public static ModularPanel defaultPanel(@NotNull String name) {
         return defaultPanel(name, 176, 166);
@@ -75,9 +77,20 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private final Input keyboard = new Input();
     private final Input mouse = new Input();
 
+    // drag resizing
+    private IDragResizeable currentResizing = null;
+    private LocatedWidget currentResizingWidget = null;
+    private ResizeDragArea draggingDragArea = null;
+    private final Area startArea = new Area();
+    private int dragX, dragY;
+
     private final List<IPanelHandler> clientSubPanels = new ArrayList<>();
     private boolean invisible = false;
     private Animator animator;
+
+    private boolean resizable = false;
+
+    private Runnable onCloseAction;
 
     public ModularPanel(@NotNull String name) {
         this.name = Objects.requireNonNull(name, "A panels name must not be null and should be unique!");
@@ -104,6 +117,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return syncHandler instanceof IPanelHandler;
     }
 
+    @ApiStatus.Internal
+    @Override
+    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        setPanelHandler((IPanelHandler) syncHandler);
+    }
+
     /**
      * @return true if this panel is currently open on a screen
      */
@@ -119,8 +139,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         if (!isOpen()) return;
         closeSubPanels();
         if (isMainPanel()) {
-            // close screen and let NEA animation
-            Platform.getClientPlayer().closeScreen();
+            // close screen and let NEA handle animation
+            MCHelper.popScreen(getScreen().isOpenParentOnClose(), getContext().getParentScreen());
             return;
         }
         if (!shouldAnimate()) {
@@ -148,6 +168,8 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+    @Deprecated
     public void animateClose() {
         closeIfOpen();
     }
@@ -162,7 +184,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     }
 
     @Override
-    public WidgetTheme getWidgetThemeInternal(ITheme theme) {
+    public WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
         return theme.getPanelTheme();
     }
 
@@ -170,32 +192,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void transform(IViewportStack stack) {
         super.transform(stack);
         // apply scaling for animation
-        if (getScale() != 1f) {
+        float scale = getScale();
+        if (scale != 1f) {
             float x = getArea().w() / 2f;
             float y = getArea().h() / 2f;
             stack.translate(x, y);
-            stack.scale(getScale(), getScale());
+            stack.scale(scale, scale);
             stack.translate(-x, -y);
-        }
-    }
-
-    @Override
-    public void getWidgetsAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (hasChildren()) {
-            IViewport.getChildrenAt(this, stack, widgets, x, y);
-        }
-    }
-
-    @Override
-    public void getSelfAt(IViewportStack stack, HoveredWidgetList widgets, int x, int y) {
-        if (isInside(stack, x, y)) {
-            widgets.add(this, stack.peek());
         }
     }
 
     private void findHoveredWidgets() {
         this.hovering.clear();
-        this.hovering.trim();
         if (!isEnabled()) {
             return;
         }
@@ -210,6 +218,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         getWidgetsAt(stack, widgetList, getContext().getAbsMouseX(), getContext().getAbsMouseY());
         stack.popViewport(this);
         stack.popViewport(null);
+        stack.reset();
     }
 
     @Override
@@ -221,7 +230,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     public void onOpen(ModularScreen screen) {
         this.screen = screen;
         getArea().z(1);
-        initialise(this);
+        initialise(this, false);
         // call first tick after everything is initialised
         WidgetTree.onUpdate(this);
         if (!isMainPanel() && shouldAnimate()) {
@@ -232,15 +241,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         this.state = State.OPEN;
     }
 
-    void reopen() {
-        if (this.state != State.CLOSED) throw new IllegalStateException();
+    boolean reopen(boolean strict) {
+        if (this.state != State.CLOSED) {
+            if (strict) throw new IllegalStateException();
+            return false;
+        }
         this.state = State.OPEN;
+        return true;
     }
 
     @MustBeInvokedByOverriders
     public void onClose() {
-        if (!getScreen().isOverlay()) {
-            getContext().getNEISettings().removeNEIExclusionArea(this);
+        if (this.onCloseAction != null) {
+            this.onCloseAction.run();
         }
         this.state = State.CLOSED;
         if (this.panelHandler != null) {
@@ -304,14 +317,28 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             if (this.hovering.isEmpty()) {
                 // no element is hovered -> try close panel
                 if (closeOnOutOfBoundsClick()) {
-                    animateClose();
+                    closeIfOpen();
                     result = true;
                 }
-            } else if (checkNEIGhostIngredient(mouseButton)) {
+            } else if (checkRecipeViewerGhostIngredient(mouseButton)) {
                 return true;
             } else {
                 for (LocatedWidget widget : this.hovering) {
+                    if (widget.getElement() == null || !widget.getElement().isValid()) continue;
                     widget.applyMatrix(getContext());
+                    IWidget w = widget.getElement();
+                    if (w instanceof IDragResizeable resizeable && widget.getAdditionalHoverInfo() instanceof ResizeDragArea dragArea) {
+                        this.currentResizing = resizeable;
+                        this.currentResizingWidget = widget;
+                        this.dragX = getContext().getMouseX();
+                        this.dragY = getContext().getMouseY();
+                        this.startArea.set(w.getArea());
+                        this.startArea.rx = w.getArea().rx;
+                        this.startArea.ry = w.getArea().ry;
+                        this.draggingDragArea = dragArea;
+                        widget.unapplyMatrix(getContext());
+                        break;
+                    }
                     // click widget and see how it reacts
                     if (widget.getElement() instanceof Interactable interactable) {
                         Interactable.Result interactResult = interactable.onMousePressed(mouseButton);
@@ -358,18 +385,18 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     /**
      * Called on mouse pressed. Similar logic on 1.7.10 and 1.12.2
      */
-    private boolean checkNEIGhostIngredient(int mouseButton) {
+    private boolean checkRecipeViewerGhostIngredient(int mouseButton) {
         // NEI injects GuiContainerManager#mouseClicked at the start of GuiContainer#mouseClicked,
         // so at this point NEI has not handled drag-and-drop yet.
         // Also, we cannot rely on INEIGuiHandler, as root panel will always return true for interaction,
         // and click never gets propagated to NEI.
         if (ModularUI.Mods.NEI.isLoaded()) {
-            ItemStack dndTarget = getNEIDragAndDropTarget();
+            ItemStack dndTarget = NEIUtil.getNEIDragAndDropTarget(getContext());
             if (dndTarget != null) {
                 for (LocatedWidget widget : this.hovering) {
-                    if (widget.getElement() instanceof NEIDragAndDropHandler dndHandler) {
+                    if (widget.getElement() instanceof RecipeViewerGhostIngredientSlot<?> dndHandler) {
                         if (dndHandler.handleDragAndDrop(dndTarget, mouseButton)) {
-                            stopNEIGhostDrag();
+                            NEIUtil.stopNEIGhostDrag();
                             // SUCCESS, except that onMouseTapped should not be fired
                             this.mouse.pressed(widget, mouseButton);
                             this.mouse.doRelease = false;
@@ -385,7 +412,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
                 // no target found -> tell nei to drop the ghost ingredient
                 // stop all further interaction since dropping the ingredient counts as an interaction
-                stopNEIGhostDrag();
+                NEIUtil.stopNEIGhostDrag();
                 this.mouse.pressed(LocatedWidget.EMPTY, mouseButton);
                 this.mouse.doRelease = false;
                 getContext().removeFocus();
@@ -401,6 +428,12 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 this.mouse.reset();
                 return false;
             }
+            if (this.currentResizing != null) {
+                this.mouse.reset();
+                this.currentResizing = null;
+                this.currentResizingWidget = null;
+                return true;
+            }
             if (interactFocused(widget -> widget.onMouseRelease(mouseButton), false)) {
                 return true;
             }
@@ -408,6 +441,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             boolean tryTap = this.mouse.tryTap(mouseButton);
             // first see if the clicked widget is still hovered and try to interact with it
             for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
                 if (this.mouse.isWidget(widget)) {
                     if (widget.getElement() instanceof Interactable interactable &&
                             onMouseRelease(mouseButton, tryTap, widget, interactable)) {
@@ -419,13 +453,13 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             }
             // now try all other hovered
             for (LocatedWidget widget : this.hovering) {
-                if (!this.mouse.isWidget(widget) && widget.getElement() instanceof Interactable interactable &&
-                        onMouseRelease(mouseButton, tryTap, widget, interactable)) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
+                if (!this.mouse.isWidget(widget) && widget.getElement() instanceof Interactable interactable && onMouseRelease(mouseButton, tryTap, widget, interactable)) {
                     return true;
                 }
             }
             // nothing worked, but since the pressed widget is still hovered we assume success
-            // otherwise JEI tries to pull some weird shit
+            // otherwise recipe viewer tries to pull some weird shit
             if (lastPressedIsHovered) {
                 this.mouse.reset();
                 return true;
@@ -456,30 +490,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
-    private ItemStack getNEIDragAndDropTarget() {
-        if (getContext().getScreen().isOverlay() || !getContext().getNEISettings().isNEIEnabled(this.screen)) {
-            return null;
-        }
-        if (ItemPanels.itemPanel.draggedStack != null) {
-            return ItemPanels.itemPanel.draggedStack;
-        }
-        if (ItemPanels.bookmarkPanel.draggedStack != null) {
-            return ItemPanels.bookmarkPanel.draggedStack;
-        }
-        return null;
-    }
-
-    private void stopNEIGhostDrag() {
-        // Replicate behavior of PanelWidget#handleDraggedClick
-        if (ItemPanels.itemPanel.draggedStack != null && ItemPanels.itemPanel.draggedStack.stackSize == 0) {
-            ItemPanels.itemPanel.draggedStack = null;
-        }
-        if (ItemPanels.bookmarkPanel.draggedStack != null && ItemPanels.bookmarkPanel.draggedStack.stackSize == 0) {
-            ItemPanels.bookmarkPanel.draggedStack = null;
-        }
-    }
-
-    @ApiStatus.OverrideOnly
     public boolean onKeyPressed(char typedChar, int keyCode) {
         return doSafeBool(() -> {
             switch (interactFocused(widget -> widget.onKeyPressed(typedChar, keyCode), Interactable.Result.IGNORE)) {
@@ -493,6 +503,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
             LocatedWidget pressed = null;
             boolean result = false;
             for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
                 if (widget.getElement() instanceof Interactable interactable) {
                     widget.applyMatrix(getContext());
                     Interactable.Result interactResult = interactable.onKeyPressed(typedChar, keyCode);
@@ -546,7 +557,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
                 }
             }
             // nothing worked, but since the pressed widget is still hovered we assume success
-            // otherwise JEI tries to pull some weird shit
+            // otherwise recipe viewer tries to pull some weird shit
             if (lastPressedIsHovered) {
                 this.keyboard.reset();
                 return true;
@@ -577,14 +588,14 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
-    public boolean onMouseScroll(ModularScreen.UpOrDown scrollDirection, int amount) {
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         return doSafeBool(() -> {
             if (interactFocused(widget -> widget.onMouseScroll(scrollDirection, amount), false)) {
                 return true;
             }
             if (this.hovering.isEmpty()) return false;
             for (LocatedWidget widget : this.hovering) {
-                if (widget.getElement() instanceof Interactable interactable) {
+                if (widget.getElement() instanceof Interactable interactable && widget.getElement().isValid()) {
                     widget.applyMatrix(getContext());
                     boolean result = interactable.onMouseScroll(scrollDirection, amount);
                     widget.unapplyMatrix(getContext());
@@ -597,10 +608,23 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public boolean onMouseDrag(int mouseButton, long timeSinceClick) {
         return doSafeBool(() -> {
+            if (this.currentResizing != null) {
+                this.currentResizingWidget.applyMatrix(getContext());
+                int mx = getContext().getMouseX();
+                int my = getContext().getMouseY();
+                this.currentResizingWidget.unapplyMatrix(getContext());
+                int dx = mx - this.dragX;
+                int dy = my - this.dragY;
+                if (dx != 0 || dy != 0) {
+                    IDragResizeable.applyDrag(this.currentResizing, (IWidget) this.currentResizing, this.draggingDragArea, this.startArea, dx, dy);
+                }
+                return true;
+            }
             if (this.mouse.held &&
                     mouseButton == this.mouse.lastButton &&
                     this.mouse.lastPressed != null &&
-                    this.mouse.lastPressed.getElement() instanceof Interactable interactable) {
+                    this.mouse.lastPressed.getElement() instanceof Interactable interactable &&
+                    this.mouse.lastPressed.getElement().isValid()) {
                 this.mouse.lastPressed.applyMatrix(getContext());
                 interactable.onMouseDrag(mouseButton, timeSinceClick);
                 this.mouse.lastPressed.unapplyMatrix(getContext());
@@ -614,7 +638,7 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
     private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
-        if (focused.getElement() instanceof Interactable interactable) {
+        if (focused.getElement() instanceof Interactable interactable && focused.getElement().isValid()) {
             focused.applyMatrix(getContext());
             result = function.apply((W) interactable);
             focused.unapplyMatrix(getContext());
@@ -643,6 +667,17 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return false;
     }
 
+    @Override
+    public boolean isCurrentlyResizable() {
+        return this.resizable;
+    }
+
+    @Override
+    public boolean keepPosOnDragResize() {
+        return !isDraggable();
+    }
+
+    @Override
     public @NotNull String getName() {
         return this.name;
     }
@@ -683,21 +718,29 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return null;
     }
 
-    @Override
-    public int getDefaultHeight() {
-        return 166;
+    public @NotNull List<LocatedWidget> getAllHoveringList(boolean debug) {
+        if (this.hovering.isEmpty()) return Collections.emptyList();
+        return new ArrayList<>(this.hovering);
     }
 
-    @Override
-    public int getDefaultWidth() {
-        return 176;
+    public boolean isBelowMouse(IWidget widget) {
+        if (!widget.isValid() || widget.getPanel() != this) return false;
+        for (LocatedWidget lw : this.hovering) {
+            if (lw.getElement() == widget) return true;
+        }
+        return false;
+    }
+
+    public boolean isAnyHovered() {
+        if (this.hovering.isEmpty()) return false;
+        if (this.hovering.size() == 1 && this.hovering.get(0).getElement() instanceof ModularPanel panel) {
+            return panel.canHover();
+        }
+        return true;
     }
 
     final void setPanelGuiContext(@NotNull ModularGuiContext context) {
         setContext(context);
-        if (!context.getScreen().isOverlay()) {
-            context.getNEISettings().addNEIExclusionArea(this);
-        }
     }
 
     public boolean isOpening() {
@@ -722,16 +765,6 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return getScreen().getMainPanel() == this;
     }
 
-    @ApiStatus.Internal
-    @Override
-    public void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        if (!isValidSyncHandler(syncHandler))
-            throw new IllegalStateException("Panel SyncHandler's must implement IPanelHandler!");
-
-        super.setSyncHandler(syncHandler);
-        setPanelHandler((IPanelHandler) syncHandler);
-    }
-
     @NotNull
     protected Animator getAnimator() {
         if (this.animator == null) {
@@ -751,7 +784,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
      */
     @ApiStatus.Internal
     public boolean shouldAnimate() {
-        return !getScreen().isOverlay() && ModularUI.Mods.NEA.isLoaded() && NEAConfig.openingAnimationTime > 0;
+        if (this.invisible || !ModularUI.Mods.NEA.isLoaded() || NEAConfig.openingAnimationTime <= 0) {
+            return false;
+        }
+        if (!isMainPanel() || !getScreen().isOpenParentOnClose()) return true;
+        return getContext().getParentScreen() == null;
     }
 
     void registerSubPanel(IPanelHandler handler) {
@@ -768,6 +805,11 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         }
     }
 
+    @Override
+    public boolean isExcludeAreaInRecipeViewer() {
+        return super.isExcludeAreaInRecipeViewer() || (!getScreen().isOverlay() && !this.invisible && !flex().isFullSize());
+    }
+
     public ModularPanel bindPlayerInventory() {
         return child(SlotGroupWidget.playerInventory(true));
     }
@@ -776,14 +818,30 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         return child(SlotGroupWidget.playerInventory(bottom, true));
     }
 
+    @Override
     public ModularPanel invisible() {
         this.invisible = true;
-        return background(IDrawable.EMPTY);
+        return super.invisible();
     }
 
+    public ModularPanel fullScreenInvisible() {
+        return invisible().full();
+    }
+
+    public ModularPanel resizeableOnDrag(boolean resizeable) {
+        this.resizable = resizeable;
+        return this;
+    }
+
+    public ModularPanel onCloseAction(Runnable onCloseAction) {
+        this.onCloseAction = onCloseAction;
+        return this;
+    }
+
+    @Deprecated
     @Override
-    public String toString() {
-        return super.toString() + "#" + getName();
+    public ModularPanel name(String name) {
+        throw new IllegalStateException("Name for ModularPanels are final!");
     }
 
     public State getState() {
@@ -792,20 +850,19 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
 
     public enum State {
         /**
-         * Initial state of any panel
+         * Initial state of any panel.
          */
         IDLE,
         /**
-         * State after the panel opened
+         * State after the panel opened.
          */
         OPEN,
         /**
-         * State after panel closed
+         * State after panel closed. Panel can still be reopened in this state.
          */
         CLOSED,
         /**
-         * State after panel disposed.
-         * Panel can still be reopened in this state.
+         * State after panel disposed. The panel is now lost and has to be rebuilt, when reopening it.
          */
         DISPOSED,
         /**

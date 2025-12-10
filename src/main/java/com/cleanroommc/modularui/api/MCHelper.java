@@ -4,19 +4,24 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Interactable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.C0DPacketCloseWindow;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerTooltipHandler;
 import gregtech.common.items.ItemFluidDisplay;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,11 +35,11 @@ public class MCHelper {
         return getMc() != null;
     }
 
-    public static Minecraft getMc() {
+    public static @Nullable Minecraft getMc() {
         return Minecraft.getMinecraft();
     }
 
-    public static EntityPlayerSP getPlayer() {
+    public static @Nullable EntityPlayer getPlayer() {
         if (hasMc()) {
             return getMc().thePlayer;
         }
@@ -43,13 +48,38 @@ public class MCHelper {
 
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayer player = getPlayer();
         if (player != null) {
             player.closeScreen();
             return true;
         }
         Minecraft.getMinecraft().displayGuiScreen(null);
         return false;
+    }
+
+    public static void popScreen(boolean openParentOnClose, GuiScreen parent) {
+        EntityPlayer player = MCHelper.getPlayer();
+        if (player != null) {
+            // TODO: should we really close container here?
+            prepareCloseContainer(player);
+            if (openParentOnClose) {
+                Minecraft.getMinecraft().displayGuiScreen(parent);
+            } else {
+                Minecraft.getMinecraft().displayGuiScreen(null);
+            }
+        } else {
+            // we are currently not in a world and want to display the previous screen
+            Minecraft.getMinecraft().displayGuiScreen(parent);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void prepareCloseContainer(EntityPlayer entityPlayer) {
+        if (entityPlayer instanceof EntityClientPlayerMP clientPlayerMP) {
+            clientPlayerMP.sendQueue.addToSendQueue(new C0DPacketCloseWindow(clientPlayerMP.openContainer.windowId));
+        }
+        entityPlayer.openContainer = entityPlayer.inventoryContainer;
+        entityPlayer.inventory.setItemStack(null);
     }
 
     public static boolean displayScreen(GuiScreen screen) {

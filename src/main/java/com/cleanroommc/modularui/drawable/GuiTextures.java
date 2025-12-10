@@ -72,6 +72,7 @@ public interface GuiTextures {
     UITexture BOOKMARK = icon("bookmark", 128, 48);
     UITexture SOUND = icon("sound", 144, 48);
     UITexture SEARCH = icon("search", 160, 48);
+    UITexture CHECKMARK = icon("checkmark", 176, 48);
 
     UITexture CHECKBOARD = icon("checkboard", 0, 240);
     UITexture DISABLED = icon("disabled", 16, 240);
@@ -87,29 +88,40 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/background/vanilla_background")
             .imageSize(195, 136)
             .adaptable(4)
-            .name("vanilla_background").canApplyTheme()
+            .name("vanilla_background")
+            .defaultColorType()
+            .build();
+
+    UITexture MENU_BACKGROUND = UITexture.builder()
+            .location(ModularUI.ID, "gui/background/menu")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("menu")
+            .defaultColorType()
             .build();
 
     UITexture MC_BUTTON = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button")
             .imageSize(16, 32) // texture is 32x64, but this looks nicer
-            .uv(0f, 0f, 1f, 0.5f)
+            .subAreaUV(0f, 0f, 1f, 0.5f)
             .adaptable(2).tiled()
             .name("mc_button")
+            .defaultColorType()
             .build();
 
     UITexture MC_BUTTON_PRESSED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button")
             .imageSize(16, 32)
-            .uv(0f, 0.5f, 1f, 1f)
+            .subAreaUV(0f, 0.5f, 1f, 1f)
             .adaptable(2).tiled()
             .name("mc_button_pressed")
+            .defaultColorType()
             .build();
 
     UITexture MC_BUTTON_HOVERED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button_hovered")
             .imageSize(16, 32)
-            .uv(0f, 0f, 1f, 0.5f)
+            .subAreaUV(0f, 0f, 1f, 0.5f)
             .adaptable(2).tiled()
             .name("mc_button_hovered")
             .build();
@@ -117,7 +129,7 @@ public interface GuiTextures {
     UITexture MC_BUTTON_HOVERED_PRESSED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button_hovered")
             .imageSize(16, 32)
-            .uv(0f, 0.5f, 1f, 1f)
+            .subAreaUV(0f, 0.5f, 1f, 1f)
             .adaptable(2).tiled()
             .name("mc_button_hovered_pressed")
             .build();
@@ -125,9 +137,10 @@ public interface GuiTextures {
     UITexture MC_BUTTON_DISABLED = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/mc_button_disabled")
             .imageSize(16, 16)
-            .uv(0f, 0f, 1f, 0.5f)
+            .fullImage()
             .adaptable(1).tiled()
             .name("mc_button_disabled")
+            .defaultColorType()
             .build();
 
     UITexture BUTTON_CLEAN = UITexture.builder()
@@ -155,24 +168,42 @@ public interface GuiTextures {
             .location(ModularUI.ID, "gui/slot/item")
             .imageSize(18, 18)
             .adaptable(1)
+            .canApplyTheme()
             .name("slot_item")
+            .build();
+
+    UITexture SLOT_ITEM_PLAYER = UITexture.builder()
+            .location(ModularUI.ID, "gui/slot/item_player")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("slot_item_player")
+            .build();
+
+    UITexture SLOT_ITEM_HOTBAR = UITexture.builder()
+            .location(ModularUI.ID, "gui/slot/item_hotbar")
+            .imageSize(18, 18)
+            .adaptable(1)
+            .name("slot_item_hotbar")
             .build();
 
     UITexture SLOT_FLUID = UITexture.builder()
             .location(ModularUI.ID, "gui/slot/fluid")
             .imageSize(18, 18)
             .adaptable(1)
+            .canApplyTheme()
             .name("slot_fluid")
             .build();
 
     UITexture PROGRESS_ARROW = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/progress_bar_arrow")
             .imageSize(20, 40)
+            .canApplyTheme()
             .build();
 
     UITexture PROGRESS_CYCLE = UITexture.builder()
             .location(ModularUI.ID, "gui/widgets/progress_bar_mixer")
             .imageSize(20, 40)
+            .canApplyTheme()
             .build();
 
     UITexture CYCLE_BUTTON_DEMO = UITexture.builder()
@@ -185,9 +216,11 @@ public interface GuiTextures {
     UITexture CROSS_TINY = UITexture.fullImage(ModularUI.ID, "gui/icons/cross_tiny");
     UITexture ARROW_UP = UITexture.fullImage(ModularUI.ID, "gui/icons/arrow_up");
     UITexture ARROW_DOWN = UITexture.fullImage(ModularUI.ID, "gui/icons/arrow_down");
+    UITexture CHECK_BOX_EMPTY = CHECK_BOX.getSubArea(0, 0, 1f, 0.5f);
+    UITexture CHECK_BOX_FULL = CHECK_BOX.getSubArea(0, 0.5f, 1f, 1f);
 
-    TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", true), GuiAxis.Y, false, 28, 32, 4);
-    TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", true), GuiAxis.Y, true, 28, 32, 4);
-    TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", true), GuiAxis.X, false, 32, 28, 4);
-    TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", true), GuiAxis.X, true, 32, 28, 4);
+    TabTexture TAB_TOP = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_top", ColorType.DEFAULT), GuiAxis.Y, false, 28, 32, 4);
+    TabTexture TAB_BOTTOM = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_bottom", ColorType.DEFAULT), GuiAxis.Y, true, 28, 32, 4);
+    TabTexture TAB_LEFT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_left", ColorType.DEFAULT), GuiAxis.X, false, 32, 28, 4);
+    TabTexture TAB_RIGHT = TabTexture.of(UITexture.fullImage(ModularUI.ID, "gui/tab/tabs_right", ColorType.DEFAULT), GuiAxis.X, true, 32, 28, 4);
 }

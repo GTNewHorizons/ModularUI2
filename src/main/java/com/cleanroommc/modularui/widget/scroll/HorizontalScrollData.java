@@ -1,7 +1,10 @@
 package com.cleanroommc.modularui.widget.scroll;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.theme.WidgetTheme;
 
 public class HorizontalScrollData extends ScrollData {
 
@@ -39,28 +42,33 @@ public class HorizontalScrollData extends ScrollData {
     }
 
     @Override
+    protected int getFallbackThickness(WidgetTheme widgetTheme) {
+        return widgetTheme.getDefaultHeight();
+    }
+
+    @Override
     public VerticalScrollData getOtherScrollData(ScrollArea area) {
         return area.getScrollY();
     }
 
     @Override
     public boolean isInsideScrollbarArea(ScrollArea area, int x, int y) {
-        if (!area.isInside(x, y) || !isScrollBarActive(area, false)) {
+        if (!isScrollBarActive(area, false)) {
             return false;
         }
         int scrollbar = getThickness();
         ScrollData data = getOtherScrollData(area);
         if (data != null && isOtherScrollBarActive(area, true)) {
             int thickness = data.getThickness();
-            if (data.isOnAxisStart() ? x < area.x + thickness : x >= area.ex() - thickness) {
+            if (data.isOnAxisStart() ? x < thickness : x >= area.w() - thickness) {
                 return false;
             }
         }
-        return isOnAxisStart() ? y >= area.y && y < area.y + scrollbar : y >= area.ey() - scrollbar && y < area.ey();
+        return isOnAxisStart() ? y >= 0 && y < scrollbar : y >= area.h() - scrollbar && y < area.h();
     }
 
     @Override
-    public void drawScrollbar(ScrollArea area) {
+    public void drawScrollbar(ScrollArea area, ModularGuiContext context, WidgetTheme widgetTheme, IDrawable texture) {
         boolean isOtherActive = isOtherScrollBarActive(area, true);
         int l = getScrollBarLength(area);
         int x = 0;
@@ -76,6 +84,6 @@ public class HorizontalScrollData extends ScrollData {
         }
 
         w = l;
-        drawScrollBar(x, y, w, h);
+        drawScrollBar(context, x, y, w, h, widgetTheme, texture);
     }
 }

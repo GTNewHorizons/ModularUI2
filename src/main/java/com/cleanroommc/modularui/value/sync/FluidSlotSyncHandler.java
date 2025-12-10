@@ -85,6 +85,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     @Override
+    public void notifyUpdate() {
+        setValue(this.fluidTank.getFluid(), false, true);
+    }
+
+    @Override
     public void write(PacketBuffer buffer) {
         NetworkUtils.writeFluidStack(buffer, this.cache);
     }
@@ -165,13 +170,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 return;
             }
             drainFluid(processFullStack);
-            return;
         } else {
             if (!canDrainSlot) {
                 return;
             }
             drainFluid(processFullStack);
-            return;
         }
     }
 
@@ -353,6 +356,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         } else {
             ItemStack heldItem = getSyncManager().getCursorItem();
             heldItem.stackSize -= resultStack.stackSize;
+            getSyncManager().setCursorItem(heldItem);
             addItemToPlayerInventory(player, resultStack);
         }
     }

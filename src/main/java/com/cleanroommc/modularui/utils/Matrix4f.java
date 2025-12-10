@@ -1,9 +1,12 @@
 package com.cleanroommc.modularui.utils;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.util.vector.Vector4f;
 
 import java.nio.FloatBuffer;
 
+@ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
+@Deprecated
 public class Matrix4f {
 
     public float m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33;
@@ -19,16 +22,36 @@ public class Matrix4f {
         load(src);
     }
 
+    public org.joml.Matrix4f toJoml() {
+        org.joml.Matrix4f m = new org.joml.Matrix4f();
+        m.m00(m00);
+        m.m01(m01);
+        m.m02(m02);
+        m.m03(m03);
+        m.m10(m10);
+        m.m11(m11);
+        m.m12(m12);
+        m.m13(m13);
+        m.m20(m20);
+        m.m21(m21);
+        m.m22(m22);
+        m.m23(m23);
+        m.m30(m30);
+        m.m31(m31);
+        m.m32(m32);
+        m.m33(m33);
+        return m;
+    }
+
     /**
      * Returns a string representation of this matrix
      */
     public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append(m00).append(' ').append(m10).append(' ').append(m20).append(' ').append(m30).append('\n');
-        buf.append(m01).append(' ').append(m11).append(' ').append(m21).append(' ').append(m31).append('\n');
-        buf.append(m02).append(' ').append(m12).append(' ').append(m22).append(' ').append(m32).append('\n');
-        buf.append(m03).append(' ').append(m13).append(' ').append(m23).append(' ').append(m33).append('\n');
-        return buf.toString();
+        String buf = String.valueOf(m00) + ' ' + m10 + ' ' + m20 + ' ' + m30 + '\n' +
+                m01 + ' ' + m11 + ' ' + m21 + ' ' + m31 + '\n' +
+                m02 + ' ' + m12 + ' ' + m22 + ' ' + m32 + '\n' +
+                m03 + ' ' + m13 + ' ' + m23 + ' ' + m33 + '\n';
+        return buf;
     }
 
     /**

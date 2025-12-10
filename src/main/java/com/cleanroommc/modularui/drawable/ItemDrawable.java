@@ -12,19 +12,17 @@ import com.cleanroommc.modularui.widget.Widget;
 import net.minecraft.block.Block;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.jetbrains.annotations.NotNull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 
@@ -39,15 +37,15 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
     }
 
     public ItemDrawable(@NotNull Item item) {
-         setItem(item);
+        setItem(item);
     }
 
     public ItemDrawable(@NotNull Item item, int meta) {
-         setItem(item, meta);
+        setItem(item, meta);
     }
 
     public ItemDrawable(@NotNull Item item, int meta, int amount) {
-         setItem(item, meta, amount);
+        setItem(item, meta, amount);
     }
 
     public ItemDrawable(@NotNull Item item, int meta, int amount, @Nullable NBTTagCompound nbt) {
@@ -55,31 +53,41 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
     }
 
     public ItemDrawable(@NotNull Block item) {
-         setItem(item);
+        setItem(item);
     }
 
     public ItemDrawable(@NotNull Block item, int meta) {
-         setItem(item, meta);
+        setItem(item, meta);
     }
 
     public ItemDrawable(@NotNull Block item, int meta, int amount) {
         setItem(new ItemStack(item, amount, meta));
     }
 
+    public ItemStack getItem() {
+        return item;
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
+        applyColor(widgetTheme.getColor());
         GuiDraw.drawItem(this.item, x, y, width, height, context.getCurrentDrawingZ());
+    }
+
+    @Override
+    public int getDefaultWidth() {
+        return 16;
+    }
+
+    @Override
+    public int getDefaultHeight() {
+        return 16;
     }
 
     @Override
     public Widget<?> asWidget() {
         return IDrawable.super.asWidget().size(16);
-    }
-
-    @Override
-    public Icon asIcon() {
-        return IDrawable.super.asIcon().size(16);
     }
 
     public ItemDrawable setItem(@Nullable ItemStack item) {

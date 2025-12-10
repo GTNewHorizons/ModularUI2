@@ -4,9 +4,9 @@ import com.cleanroommc.modularui.utils.serialization.IByteBufAdapter;
 import com.cleanroommc.modularui.utils.serialization.IByteBufDeserializer;
 import com.cleanroommc.modularui.utils.serialization.IByteBufSerializer;
 
-import io.netty.buffer.Unpooled;
-
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 

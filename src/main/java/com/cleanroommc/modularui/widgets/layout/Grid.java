@@ -10,12 +10,16 @@ import com.cleanroommc.modularui.widget.scroll.ScrollData;
 import com.cleanroommc.modularui.widget.scroll.VerticalScrollData;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Box;
+
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
@@ -47,15 +51,15 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     }
 
     private int getElementWidth(Area area) {
-        return area.width + Math.max(area.getMargin().left, this.minElementMargin.left) + Math.max(area.getMargin().right, this.minElementMargin.right);
+        return area.width + Math.max(area.getMargin().getLeft(), this.minElementMargin.getLeft()) + Math.max(area.getMargin().getRight(), this.minElementMargin.getRight());
     }
 
     private int getElementHeight(Area area) {
-        return area.height + Math.max(area.getMargin().top, this.minElementMargin.top) + Math.max(area.getMargin().bottom, this.minElementMargin.bottom);
+        return area.height + Math.max(area.getMargin().getTop(), this.minElementMargin.getTop()) + Math.max(area.getMargin().getBottom(), this.minElementMargin.getBottom());
     }
 
     @Override
-    public void layoutWidgets() {
+    public boolean layoutWidgets() {
         IntList rowSizes = new IntArrayList();
         IntList colSizes = new IntArrayList();
 
@@ -68,6 +72,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     colSizes.add(this.minColWidth);
                 }
                 if (!shouldIgnoreChildSize(child)) {
+                    if (!child.resizer().isWidthCalculated() || !child.resizer().isHeightCalculated()) return false;
                     rowSizes.set(i, Math.max(rowSizes.getInt(i), getElementHeight(child.getArea())));
                     colSizes.set(j, Math.max(colSizes.getInt(j), getElementWidth(child.getArea())));
                 }
@@ -98,6 +103,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         if (getScrollArea().getScrollY() != null) {
             getScrollArea().getScrollY().setScrollSize(y);
         }
+        return true;
     }
 
     @Override
@@ -129,7 +135,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     rowHeight = Math.max(rowHeight, getElementHeight(child.getArea()));
                 }
             }
-            h += Math.min(rowHeight, this.minRowHeight);
+            h += Math.max(rowHeight, this.minRowHeight);
         }
         return h;
     }
@@ -175,7 +181,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
 
     public Grid row(@NotNull IWidget... row) {
         Objects.requireNonNull(row);
-        return row(Arrays.asList(row));
+        return row(new ArrayList<>(Arrays.asList(row)));
     }
 
     @Override
@@ -188,7 +194,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         }
         super.getChildren().add(index, child);
         if (isValid()) {
-            child.initialise(this);
+            child.initialise(this, true);
         }
         onChildAdd(child);
         this.dirty = true;
@@ -313,6 +319,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     }
 
     public interface IndexedElementMapper<T, I> {
+
         I apply(int index, T value);
     }
 }

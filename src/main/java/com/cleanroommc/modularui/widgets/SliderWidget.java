@@ -3,24 +3,26 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
+import com.cleanroommc.modularui.api.value.IValue;
 import com.cleanroommc.modularui.api.widget.IGuiAction;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.Rectangle;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
+import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Color;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.Unit;
+
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-
-import net.minecraft.util.MathHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
@@ -63,12 +65,27 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     @Override
     public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
-        return this.doubleValue != null;
+        return syncHandler instanceof IDoubleValue<?>;
     }
 
     @Override
-    public void drawBackground(ModularGuiContext context, WidgetTheme widgetTheme) {
+    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+        super.setSyncHandler(syncHandler);
+        if (syncHandler != null) {
+            this.doubleValue = castIfTypeElseNull(syncHandler, IDoubleValue.class);
+        }
+    }
+
+    @Override
+    protected void setValue(IValue<?> value) {
+        super.setValue(value);
+        if (value instanceof IDoubleValue<?> doubleValue1) {
+            this.doubleValue = doubleValue1;
+        }
+    }
+
+    @Override
+    public void drawBackground(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         super.drawBackground(context, widgetTheme);
         if (this.stopper != null && this.stopperDrawable != null && this.stopperWidth > 0 && this.stopperHeight > 0) {
             for (double stop : this.stopper) {
@@ -76,20 +93,20 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 if (this.axis.isHorizontal()) {
                     pos -= this.stopperWidth / 2;
                     int crossAxisPos = (int) (getArea().height / 2D - this.stopperHeight / 2D);
-                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault());
+                    this.stopperDrawable.draw(context, pos, crossAxisPos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault().getTheme());
                 } else {
                     pos -= this.stopperHeight / 2;
                     int crossAxisPos = (int) (getArea().width / 2D - this.stopperWidth / 2D);
-                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault());
+                    this.stopperDrawable.draw(context, crossAxisPos, pos, this.stopperWidth, this.stopperHeight, WidgetTheme.getDefault().getTheme());
                 }
             }
         }
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetTheme widgetTheme) {
+    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         if (this.handleDrawable != null) {
-            this.handleDrawable.draw(context, this.sliderArea, context.getTheme().getButtonTheme());
+            this.handleDrawable.draw(context, this.sliderArea, context.getTheme().getButtonTheme().getTheme());
         }
     }
 
@@ -122,9 +139,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
 
     @Override
     public @NotNull Result onMousePressed(int mouseButton) {
-        int p = this.axis.isHorizontal() ?
-                getContext().unTransformX(getContext().getAbsMouseX(), getContext().getAbsMouseY()) :
-                getContext().unTransformY(getContext().getAbsMouseX(), getContext().getAbsMouseY());
+        int p = getContext().getMouse(this.axis);
         setValue(posToValue(p), true);
         this.dragging = true;
         return Result.SUCCESS;
@@ -170,7 +185,7 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
                 value = this.stopper.get(this.stopper.size() - 1);
             }
         }
-        value = MathHelper.clamp_double(value, this.min, this.max);
+        value = MathUtils.clamp(value, this.min, this.max);
         this.cache = value;
         this.sliderArea.setPoint(this.axis, valueToPos(value));
         if (setSource) {
@@ -204,6 +219,9 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     public SliderWidget bounds(double min, double max) {
         this.max = Math.max(min, max);
         this.min = Math.min(min, max);
+        if (isValid()) {
+            setValue(getSliderValue(), true);
+        }
         return this;
     }
 

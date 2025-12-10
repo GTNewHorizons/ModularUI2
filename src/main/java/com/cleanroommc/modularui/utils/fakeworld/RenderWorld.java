@@ -3,14 +3,13 @@ package com.cleanroommc.modularui.utils.fakeworld;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-
 import net.minecraftforge.common.util.ForgeDirection;
+
+import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 
 public class RenderWorld implements IBlockAccess {
 

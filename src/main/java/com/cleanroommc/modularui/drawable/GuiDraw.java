@@ -1,14 +1,15 @@
 package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
+import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.GlStateManager;
+import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -17,21 +18,25 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-
-import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
+import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GuiDraw {
 
@@ -41,7 +46,18 @@ public class GuiDraw {
     public static final double PI_2 = Math.PI / 2;
 
     public static void drawRect(float x0, float y0, float w, float h, int color) {
-        drawRect(x0, y0, w, h, color, color, color, color);
+        Platform.setupDrawColor();
+        float x1 = x0 + w, y1 = y0 + h;
+        float r = Color.getRedF(color);
+        float g = Color.getGreenF(color);
+        float b = Color.getBlueF(color);
+        float a = Color.getAlphaF(color);
+        Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_COLOR, bufferBuilder -> {
+            bufferBuilder.pos(x0, y0, 0.0f).color(r, g, b, a).endVertex();
+            bufferBuilder.pos(x0, y1, 0.0f).color(r, g, b, a).endVertex();
+            bufferBuilder.pos(x1, y1, 0.0f).color(r, g, b, a).endVertex();
+            bufferBuilder.pos(x1, y0, 0.0f).color(r, g, b, a).endVertex();
+        });
     }
 
     public static void drawHorizontalGradientRect(float x0, float y0, float w, float h, int colorLeft, int colorRight) {
@@ -206,7 +222,11 @@ public class GuiDraw {
     }
 
     public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
-        Platform.setupDrawTex(location);
+        drawTexture(location, x0, y0, x1, y1, u0, v0, u1, v1, false);
+    }
+
+    public static void drawTexture(ResourceLocation location, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, boolean withBlend) {
+        Platform.setupDrawTex(location, withBlend);
         drawTexture(x0, y0, x1, y1, u0, v0, u1, v1, 0);
     }
 
@@ -296,7 +316,7 @@ public class GuiDraw {
         GuiDraw.afterRenderItemAndEffectIntoGUI(item);
         GlStateManager.disableRescaleNormal();
         renderItem.zLevel = 0;
-        GlStateManager.disableDepth();
+        Platform.endDrawItem();
         GlStateManager.popMatrix();
     }
 
@@ -321,6 +341,32 @@ public class GuiDraw {
         drawAmountText(amount, format, 1, 1, area.width - 1, area.height - 1, Alignment.BottomRight);
     }
 
+    public static void drawScaledAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment, int border) {
+        if (amount > 1 || format != null) {
+            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
+            if (format != null) {
+                amountText = format + amountText;
+            }
+            FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+
+            float maxWidth = width - border * 2 ;
+            float textWidth = fontRenderer.getStringWidth(amountText);
+            float scale = Math.min(1f, maxWidth / textWidth);
+            if (amountText.length() > 4) scale = Math.max(scale, 0.5f);
+
+
+            textRenderer.setShadow(true);
+            textRenderer.setScale(scale);
+            textRenderer.setColor(Color.WHITE.main);
+            textRenderer.setAlignment(alignment, width, height);
+            textRenderer.setPos(x, y);
+            textRenderer.setHardWrapOnBorder(false);
+            textRenderer.draw(amountText);
+
+            textRenderer.setHardWrapOnBorder(true);
+        }
+    }
+
     public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
         if (amount > 1 || format != null) {
             String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
@@ -341,8 +387,6 @@ public class GuiDraw {
             textRenderer.setAlignment(alignment, width, height);
             textRenderer.setPos(x, y);
             textRenderer.setHardWrapOnBorder(false);
-            GlStateManager.disableLighting();
-            GlStateManager.disableDepth();
             textRenderer.draw(amountText);
             textRenderer.setHardWrapOnBorder(true);
         }
@@ -575,5 +619,102 @@ public class GuiDraw {
             OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         }
+    }
+
+    /**
+     * Draws an entity. Note that this does NOT do any necessary setup for rendering the entity. Please see
+     * {@link #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)} for a full draw method.
+     *
+     * @param entity entity to draw.
+     * @see #drawEntity(Entity, float, float, float, float, float, Consumer, Consumer)
+     */
+    public static void drawEntityRaw(Entity entity) {
+        RenderManager rendermanager = RenderManager.instance;
+        rendermanager.playerViewY = 180.0F;
+        //rendermanager.setRenderShadow(false);
+        rendermanager.renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+        //rendermanager.setRenderShadow(true);
+    }
+
+    /**
+     * A simple method to a draw an entity in a GUI. Using the consumers is not always ideal to modify and restore entity state. In those
+     * cases just copy and paste this method and put your code where the consumers would be called. The entity will be scaled so that it
+     * fits right in the given size when untransformed (default). When transforming during pre draw, you may need to manually correct the
+     * scale and offset.
+     *
+     * @param entity   entity to draw
+     * @param x        x pos
+     * @param y        y pos
+     * @param w        the width of the area where the entity should be drawn
+     * @param h        the height of the area where the entity should be drawn
+     * @param z        the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param preDraw  a function to call before rendering. Transform or modify the entity here.
+     * @param postDraw a function to call after rendering. Restore old entity state here if needed.
+     * @param <T>      type of the entity to render
+     */
+    public static <T extends Entity> void drawEntity(T entity, float x, float y, float w, float h, float z, @Nullable Consumer<T> preDraw, @Nullable Consumer<T> postDraw) {
+        GlStateManager.pushMatrix();
+        Platform.setupDrawEntity(entity, x, y, w, h, z);
+        if (preDraw != null) preDraw.accept(entity);
+        drawEntityRaw(entity);
+        if (postDraw != null) postDraw.accept(entity);
+        Platform.endDrawEntity();
+        GlStateManager.popMatrix();
+    }
+
+    /**
+     * Draws an entity which looks in the direction of the mouse like the player render in the player inventory does.
+     * The code was copied from
+     * {@link net.minecraft.client.gui.inventory.GuiInventory#func_147046_a(int, int, int, float, float, EntityLivingBase)  GuiInventory.drawEntityOnScreen}.
+     *
+     * @param entity entity to draw
+     * @param x      x pos
+     * @param y      y pos
+     * @param w      the width of the area where the entity should be drawn
+     * @param h      the height of the area where the entity should be drawn
+     * @param z      the z layer ({@link GuiContext#getCurrentDrawingZ()} if drawn in a MUI)
+     * @param mouseX current x pos of the mouse
+     * @param mouseY current y pos of the mouse
+     */
+    public static void drawEntityLookingAtMouse(EntityLivingBase entity, float x, float y, float w, float h, float z, int mouseX, int mouseY, Consumer<EntityLivingBase> preDraw, Consumer<EntityLivingBase> postDraw) {
+        GlStateManager.pushMatrix();
+        Platform.setupDrawEntity(entity, x, y, w, h, z);
+
+        // pre draw
+        if (preDraw != null) preDraw.accept(entity);
+
+        float f = entity.renderYawOffset;
+        float f1 = entity.rotationYaw;
+        float f2 = entity.rotationPitch;
+        float f3 = entity.prevRotationYawHead;
+        float f4 = entity.rotationYawHead;
+
+        //the 180 comes from the fact that this has him turned backwords :D i hate math :/
+        float mouseYaw = (float)(Math.atan2(mouseX- (x+w / 2),  40.0f) * 180F / Math.PI - 180);
+
+        //yaw
+        GlStateManager.rotate(((float) Math.atan2(mouseY , 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
+        entity.renderYawOffset = -mouseYaw;
+        entity.rotationYaw = -mouseYaw;
+
+        GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+        entity.rotationPitch = ((float) Math.atan2(mouseY , 40.0F)) * 20.0F;
+        entity.rotationYawHead = entity.rotationYaw;
+        entity.prevRotationYawHead = entity.rotationYaw;
+
+
+
+        drawEntityRaw(entity);
+
+        // post draw
+        if (postDraw != null) postDraw.accept(entity);
+        entity.renderYawOffset = f;
+        entity.rotationYaw = f1;
+        entity.rotationPitch = f2;
+        entity.prevRotationYawHead = f3;
+        entity.rotationYawHead = f4;
+
+        Platform.endDrawEntity();
+        GlStateManager.popMatrix();
     }
 }
