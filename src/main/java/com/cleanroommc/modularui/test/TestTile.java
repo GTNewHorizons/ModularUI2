@@ -5,6 +5,7 @@ import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.drawable.Circle;
+import com.cleanroommc.modularui.drawable.FluidDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
@@ -44,6 +45,7 @@ import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
 import com.cleanroommc.modularui.widgets.EntityDisplayWidget;
 import com.cleanroommc.modularui.widgets.Expandable;
+import com.cleanroommc.modularui.widgets.FluidDisplayWidget;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.PageButton;
@@ -72,6 +74,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import cpw.mods.fml.common.registry.GameData;
 
@@ -260,6 +264,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
                                                                         .child(new ButtonWidget<>()
                                                                                 .size(60, 18)
+
                                                                                 .tooltip(tooltip -> {
                                                                                     tooltip.showUpTimer(10);
                                                                                     tooltip.addLine(IKey.str("Test Line g"));
@@ -526,7 +531,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
-                        .overlay(IKey.str("3"))
+                        .overlay((new FluidDrawable().setFluid(new FluidStack(FluidRegistry.WATER,100))),IKey.str("3"))
                         .onMousePressed(mouseButton -> {
                             panelSyncHandler.openPanel();
                             return true;
