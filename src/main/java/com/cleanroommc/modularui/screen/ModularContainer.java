@@ -7,6 +7,7 @@ import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
+import com.cleanroommc.modularui.utils.item.SlotItemHandler;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
@@ -15,7 +16,6 @@ import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
@@ -278,8 +278,9 @@ public class ModularContainer extends Container {
                         if (heldStack != null && clickedSlot.isItemValid(heldStack)) {
                             int stackCount = mouseButton == LEFT_MOUSE ? heldStack.stackSize : 1;
 
-                            if (stackCount > clickedSlot.getSlotStackLimit()) {
-                                stackCount = clickedSlot.getSlotStackLimit();
+                            int lim = stackLimit(clickedSlot, heldStack);
+                            if (stackCount > lim) {
+                                stackCount = lim;
                             }
 
                             clickedSlot.putStack(heldStack.splitStack(stackCount));
@@ -309,13 +310,10 @@ public class ModularContainer extends Container {
                                     ItemStack.areItemStackTagsEqual(slotStack, heldStack)) {
                                 int stackCount = mouseButton == 0 ? heldStack.stackSize : 1;
 
-                                if (stackCount > clickedSlot.getSlotStackLimit() - slotStack.stackSize) {
-                                    stackCount = clickedSlot.getSlotStackLimit() - slotStack.stackSize;
+                                int lim = stackLimit(clickedSlot, heldStack);
+                                if (stackCount > lim - slotStack.stackSize) {
+                                    stackCount = lim - slotStack.stackSize;
                                 }
-
-                                // if (stackCount > heldStack.getMaxStackSize() - slotStack.stackSize) {
-                                //     stackCount = heldStack.getMaxStackSize() - slotStack.stackSize;
-                                // } // Removed
 
                                 heldStack.splitStack(stackCount);
 
@@ -325,7 +323,7 @@ public class ModularContainer extends Container {
 
                                 slotStack.stackSize += stackCount;
                                 clickedSlot.putStack(slotStack); // Added
-                            } else if (heldStack.stackSize <= clickedSlot.getSlotStackLimit()) {
+                            } else if (heldStack.stackSize <= stackLimit(clickedSlot, heldStack)) {
                                 clickedSlot.putStack(heldStack);
                                 inventoryplayer.setItemStack(slotStack);
                             }
@@ -356,6 +354,20 @@ public class ModularContainer extends Container {
         }
 
         return superSlotClick(slotId, mouseButton, mode, player);
+    }
+
+    // this method properly takes into account max item stack size and max slot limit
+    public static int stackLimit(Slot slot, ItemStack stack) {
+        if (stack == null) return 0;
+        if (slot instanceof SlotItemHandler slotItemHandler) {
+            // this is triggered for modular slots
+            return slotItemHandler.getItemStackLimit(stack);
+        }
+        // anything else is just extra safety, but will likely never be triggered
+        if (slot instanceof com.gtnewhorizons.modularui.api.forge.SlotItemHandler slotItemHandler) {
+            return slotItemHandler.getItemStackLimit(stack);
+        }
+        return Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
     }
 
     protected final @NotNull ItemStack superSlotClick(int slotId, int mouseButton, int mode, @NotNull EntityPlayer player) {

@@ -356,6 +356,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         } else {
             ItemStack heldItem = getSyncManager().getCursorItem();
             heldItem.stackSize -= resultStack.stackSize;
+            getSyncManager().setCursorItem(heldItem);
             addItemToPlayerInventory(player, resultStack);
         }
     }
