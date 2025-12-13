@@ -27,12 +27,10 @@ public class RecipeInfoMixin {
 
     @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false, cancellable = true, at=@At("HEAD"))
     private static void modularui$hasOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<Boolean> ci) {
-        if (gui instanceof GuiContainerWrapper muw) {
-            if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-                if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                    ci.setReturnValue(true);
-                    ci.cancel();
-                }
+        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
+            if (Arrays.asList(tr.getIdents()).contains(ident)) {
+                ci.setReturnValue(true);
+                ci.cancel();
             }
         }
     }
@@ -57,13 +55,11 @@ public class RecipeInfoMixin {
 
     @Inject(method = "getOverlayHandler", remap = false, cancellable = true, at=@At("HEAD"))
     private static void modularui$getOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<IOverlayHandler> ci) {
-        if (gui instanceof GuiContainerWrapper muw) {
-            if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-                if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                    ci.setReturnValue(NEIModularUIConfig.overlayHandler);
-                    ci.cancel();
-                    return;
-                }
+        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
+            if (Arrays.asList(tr.getIdents()).contains(ident)) {
+                ci.setReturnValue(NEIModularUIConfig.overlayHandler);
+                ci.cancel();
+                return;
             }
         }
     }
