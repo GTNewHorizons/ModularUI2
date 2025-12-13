@@ -7,6 +7,9 @@ import codechicken.nei.guihook.GuiContainerManager;
 @SuppressWarnings("unused")
 public class NEIModularUIConfig implements IConfigureNEI {
 
+    public static final ModularUIGuiContainerStackPositioner stackPositioner = new ModularUIGuiContainerStackPositioner();
+    public static final ModularUIGuiContainerStackOverlay overlayHandler = new ModularUIGuiContainerStackOverlay();
+
     @Override
     public void loadConfig() {
         GuiContainerManager.addInputHandler(new ModularUIContainerInputHandler());
