@@ -140,6 +140,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         final EntityLivingBase fool = new EntityVillager(getWorldObj());
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
+        settings.customGui(() -> TestGuiContainer::new);
+
         syncManager.addOpenListener(player -> {
             LOGGER.info("Test Tile panel open by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
         });
@@ -264,7 +266,6 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
                                                                         .child(new ButtonWidget<>()
                                                                                 .size(60, 18)
-
                                                                                 .tooltip(tooltip -> {
                                                                                     tooltip.showUpTimer(10);
                                                                                     tooltip.addLine(IKey.str("Test Line g"));
@@ -288,7 +289,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 //.flex(flex -> flex.left(3)) // ?
                                                                                 .overlay(IKey.str("Button 2")))
                                                                         .child(new TextFieldWidget()
-                                                                                .tooltip(t->t.addLine("hello, i am overridden!"))
+                                                                                .addTooltipLine("this tooltip is overridden")
                                                                                 .size(60, 18)
                                                                                 .setTextAlignment(Alignment.Center)
                                                                                 .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
@@ -363,15 +364,15 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                         .childPadding(2)
                                                         //.child(SlotGroupWidget.playerInventory().left(0))
                                                         .child(SlotGroupWidget.builder()
-                                                                        .matrix("III", "III", "III")
-                                                                        .key('I', index -> {
-                                                                            // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
-                                                                            if (index == 4) {
-                                                                                return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
-                                                                            }
-                                                                            return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
-                                                                        })
-                                                                        .build().name("9 slot inv")
+                                                                .matrix("III", "III", "III")
+                                                                .key('I', index -> {
+                                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
+                                                                    if (index == 4) {
+                                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
+                                                                    }
+                                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
+                                                                })
+                                                                .build().name("9 slot inv")
                                                                 //.marginBottom(2)
                                                         )
                                                         .child(SlotGroupWidget.builder()
