@@ -1,8 +1,6 @@
 package com.cleanroommc.modularui.integration.nei;
 
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
-import com.cleanroommc.modularui.screen.ModularContainer;
-
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 
 import codechicken.nei.PositionedStack;
@@ -14,28 +12,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public interface INEIRecipeTransfer<Self extends ModularContainer> {
+public interface INEIRecipeTransfer<G extends GuiContainer> {
+
     String[] getIdents();
 
-    default void overlayRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer) {
-        transferRecipe(gui, self, recipe, recipeIndex, maxTransfer ? Integer.MAX_VALUE : 1);
+    default void overlayRecipe(G gui, IRecipeHandler recipe, int recipeIndex, boolean maxTransfer) {
+        transferRecipe(gui, recipe, recipeIndex, maxTransfer ? Integer.MAX_VALUE : 1);
     }
 
-    int transferRecipe(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier);
+    int transferRecipe(G gui, IRecipeHandler recipe, int recipeIndex, int multiplier);
 
-    default boolean canFillCraftingGrid(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex) {
+    default boolean canFillCraftingGrid(G gui, IRecipeHandler recipe, int recipeIndex) {
         return true;
     }
 
-    default boolean craft(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex, int multiplier) {
+    default boolean craft(G gui, IRecipeHandler recipe, int recipeIndex, int multiplier) {
         return false;
     }
 
-    default boolean canCraft(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex) {
+    default boolean canCraft(G gui, IRecipeHandler recipe, int recipeIndex) {
         return false;
     }
 
-    default List<GuiOverlayButton.ItemOverlayState> presenceOverlay(GuiContainerWrapper gui, ModularContainer self, IRecipeHandler recipe, int recipeIndex) {
+    default List<GuiOverlayButton.ItemOverlayState> presenceOverlay(G gui, IRecipeHandler recipe, int recipeIndex) {
         final List<GuiOverlayButton.ItemOverlayState> itemPresenceSlots = new ArrayList<>();
         final List<PositionedStack> ingredients = recipe.getIngredientStacks(recipeIndex);
         final List<ItemStack> invStacks = gui.inventorySlots.inventorySlots.stream()
@@ -61,7 +60,7 @@ public interface INEIRecipeTransfer<Self extends ModularContainer> {
         return itemPresenceSlots;
     }
 
-    default ArrayList<PositionedStack> positionStacks(GuiContainerWrapper gui, ModularContainer self, ArrayList<PositionedStack> stacks) {
+    default ArrayList<PositionedStack> positionStacks(G gui, ArrayList<PositionedStack> stacks) {
         return stacks;
     }
 }

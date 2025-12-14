@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.core.mixins.late.nei;
 
 
+import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.integration.nei.INEIRecipeTransfer;
 import com.cleanroommc.modularui.integration.nei.ModularUIGuiContainerStackPositioner;
 import com.cleanroommc.modularui.integration.nei.NEIModularUIConfig;
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -25,38 +25,27 @@ import java.util.Arrays;
 @Mixin(RecipeInfo.class)
 public class RecipeInfoMixin {
 
-    @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false, cancellable = true, at=@At("HEAD"))
+    @Inject(method = "hasOverlayHandler(Lnet/minecraft/client/gui/inventory/GuiContainer;Ljava/lang/String;)Z", remap = false, cancellable = true, at = @At("HEAD"))
     private static void modularui$hasOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<Boolean> ci) {
-        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-            if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                ci.setReturnValue(true);
-                ci.cancel();
-            }
+        if (gui instanceof IMuiScreen && gui.inventorySlots instanceof ModularContainer muc &&
+                muc instanceof INEIRecipeTransfer<?> tr && Arrays.asList(tr.getIdents()).contains(ident)) {
+            ci.setReturnValue(true);
         }
     }
 
-    @Inject(method = "getStackPositioner", remap = false, cancellable = true, at=@At("HEAD"))
+    @Inject(method = "getStackPositioner", remap = false, cancellable = true, at = @At("HEAD"))
     private static void modularui$getStackPositioner(GuiContainer gui, String ident, CallbackInfoReturnable<IStackPositioner> ci) {
-        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-            if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                //Hacky way around it, but should work
-                ModularUIGuiContainerStackPositioner positioner = NEIModularUIConfig.stackPositioner;
-                positioner.wrapper = (GuiContainerWrapper) gui;
-                positioner.container = muc;
-                positioner.recipeTransfer = tr;
-                ci.setReturnValue(positioner);
-                ci.cancel();
-            }
+        ModularUIGuiContainerStackPositioner<?> positioner = ModularUIGuiContainerStackPositioner.of(gui, ident);
+        if (positioner != null) {
+            ci.setReturnValue(positioner);
         }
     }
 
-    @Inject(method = "getOverlayHandler", remap = false, cancellable = true, at=@At("HEAD"))
+    @Inject(method = "getOverlayHandler", remap = false, cancellable = true, at = @At("HEAD"))
     private static void modularui$getOverlayHandler(GuiContainer gui, String ident, CallbackInfoReturnable<IOverlayHandler> ci) {
-        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-            if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                ci.setReturnValue(NEIModularUIConfig.overlayHandler);
-                ci.cancel();
-            }
+        if (gui instanceof IMuiScreen && gui.inventorySlots instanceof ModularContainer muc &&
+                muc instanceof INEIRecipeTransfer<?> tr && Arrays.asList(tr.getIdents()).contains(ident)) {
+            ci.setReturnValue(NEIModularUIConfig.overlayHandler);
         }
     }
 }
