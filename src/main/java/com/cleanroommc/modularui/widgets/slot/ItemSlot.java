@@ -99,9 +99,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     protected void drawOverlay() {
         if (isHovering() && (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.itemHoverOverlay)) {
-            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
         }
     }
 
@@ -204,9 +202,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot slot(ModularSlot slot) {
-        this.syncHandler = new ItemSlotSH(slot);
-        setSyncHandler(this.syncHandler);
-        return this;
+        return syncHandler(new ItemSlotSH(slot));
     }
 
     public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
@@ -266,9 +262,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         ((GuiAccessor) guiScreen).setZLevel(z);
         renderItem.zLevel = z;
 
-        if (!flag1) {
+        if (!doDrawItem) {
             if (isDragPreview) {
-                GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
+                GuiDraw.drawRect(1, 1, 16, 16, 0x80FFFFFF);
             }
 
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
