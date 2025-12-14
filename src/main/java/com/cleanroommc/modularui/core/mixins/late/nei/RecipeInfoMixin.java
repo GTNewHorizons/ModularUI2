@@ -37,16 +37,14 @@ public class RecipeInfoMixin {
 
     @Inject(method = "getStackPositioner", remap = false, cancellable = true, at=@At("HEAD"))
     private static void modularui$getStackPositioner(GuiContainer gui, String ident, CallbackInfoReturnable<IStackPositioner> ci) {
-        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
+        if (gui instanceof GuiContainerWrapper gcw &&
+                gui.inventorySlots instanceof ModularContainer muc &&
+                muc instanceof INEIRecipeTransfer<?> tr) {
             if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                //Hacky way around it, but should work
-                ModularUIGuiContainerStackPositioner positioner = NEIModularUIConfig.stackPositioner;
-                positioner.wrapper = (GuiContainerWrapper) gui;
-                positioner.container = muc;
-                positioner.recipeTransfer = tr;
+                ModularUIGuiContainerStackPositioner<GuiContainerWrapper> positioner =
+                        new ModularUIGuiContainerStackPositioner<>(gcw, muc, tr);
                 ci.setReturnValue(positioner);
                 ci.cancel();
-                return;
             }
         }
     }
@@ -57,7 +55,6 @@ public class RecipeInfoMixin {
             if (Arrays.asList(tr.getIdents()).contains(ident)) {
                 ci.setReturnValue(NEIModularUIConfig.overlayHandler);
                 ci.cancel();
-                return;
             }
         }
     }
