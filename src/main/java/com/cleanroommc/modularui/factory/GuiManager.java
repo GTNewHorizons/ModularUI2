@@ -90,6 +90,7 @@ public class GuiManager {
         player.openContainer = container;
         player.openContainer.windowId = windowId;
         player.openContainer.addCraftingToCrafters(player);
+        container.onModularContainerOpened();
     }
 
     @ApiStatus.Internal

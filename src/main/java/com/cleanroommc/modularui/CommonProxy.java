@@ -63,20 +63,6 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onOpenContainer(PlayerContainerEvent.Open event) {
-        if (event.getContainer() instanceof ModularContainer container) {
-            container.onModularContainerOpened();
-        }
-    }
-
-    @SubscribeEvent
-    public void onCloseContainer(PlayerContainerEvent.Close event) {
-        if (event.getContainer() instanceof ModularContainer container) {
-            container.onModularContainerClosed();
-        }
-    }
-
-    @SubscribeEvent
     public void onTick(TickEvent.PlayerTickEvent event) {
         if (event.player.openContainer instanceof ModularContainer container) {
             container.onUpdate();

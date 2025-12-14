@@ -1,11 +1,15 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.utils.item.IItemHandler;
+import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
+import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
 import com.cleanroommc.modularui.utils.item.SlotItemHandler;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -240,6 +244,7 @@ public class ModularSlot extends SlotItemHandler {
     }
 
     public static boolean isPlayerSlot(SlotItemHandler slot) {
-        return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper;
+        return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper ||
+                slot.getItemHandler() instanceof com.gtnewhorizons.modularui.api.forge.PlayerMainInvWrapper;
     }
 }

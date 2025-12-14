@@ -2,12 +2,12 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.ISyncedAction;
+import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import cpw.mods.fml.relauncher.Side;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,12 +1,11 @@
 package com.cleanroommc.modularui.drawable.graph;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.drawable.BufferBuilder;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.DAM;
-
-import net.minecraft.client.renderer.BufferBuilder;
 
 import org.jetbrains.annotations.ApiStatus;
 

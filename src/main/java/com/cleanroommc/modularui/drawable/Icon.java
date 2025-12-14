@@ -10,7 +10,6 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.JsonHelper;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -81,7 +80,7 @@ public class Icon implements IIcon, IJsonSerializable {
             } else if (this.height <= 0) {
                 // width is set, so adjust height to width
                 height = (int) (width / this.aspectRatio);
-            } else if (FMLLaunchHandler.isDeobfuscatedEnvironment()) {
+            } else if (ModularUI.isDevEnv) {
                 ModularUI.LOGGER.error("Aspect ration in Icon can't be applied when width and height are specified");
                 // remove aspect ratio to avoid log spamming, it does nothing in the current state anyway
                 this.aspectRatio = 0;

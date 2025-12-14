@@ -83,7 +83,7 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> implements Reci
     }
 
     @Override
-    public @Nullable Object getIngredient() {
+    public @Nullable ItemStack getStackForRecipeViewer() {
         return value.getValue();
     }
 }

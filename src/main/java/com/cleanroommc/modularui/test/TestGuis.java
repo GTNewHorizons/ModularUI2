@@ -26,9 +26,9 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.ColorShade;
 import com.cleanroommc.modularui.utils.DAM;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.Platform;
@@ -224,7 +224,7 @@ public class TestGuis extends CustomModularScreen {
                                         .transform((widget, stack) -> stack.translate(post.getValue(), 0)))
                                 .child(IKey.str("the ").asWidget()
                                         .transform((widget, stack) -> stack.translate(0, the.getValue())))
-                                .child(IKey.str("fucking ").style(TextFormatting.OBFUSCATED).asWidget()
+                                .child(IKey.str("fucking ").style(IKey.OBFUSCATED).asWidget()
                                         .transform((widget, stack) -> stack.translate(extraordinary.getValue(), 0))))
                         .child(IKey.str("LOOOOGG!!!!").asWidget()
                                 .paddingTop(4)

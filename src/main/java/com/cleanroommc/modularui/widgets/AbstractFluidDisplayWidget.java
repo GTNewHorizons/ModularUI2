@@ -21,8 +21,8 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     public static final String UNIT_LITER = "L";
 
     private final Box contentPadding = new Box().all(1);
-    private String unit = UNIT_BUCKET;
-    private SIPrefix baseUnitPrefix = SIPrefix.Milli;
+    private String unit = UNIT_LITER;
+    private SIPrefix baseUnitPrefix = SIPrefix.One;
     private boolean flipLighterThanAir = true;
 
     protected AbstractFluidDisplayWidget() {
@@ -45,7 +45,8 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         float c = getCapacity();
         if (c > 0 && fluid.amount > 0) {
             int newH = (int) MathUtils.rescaleLinear(fluid.amount, 0, c, 1, h);
-            if (!this.flipLighterThanAir || !fluid.getFluid().isLighterThanAir()) y += h - newH;
+            // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
+            if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
             h = newH;
         }
         GuiDraw.drawFluidTexture(fluid, x, y, w, h, context.getCurrentDrawingZ());
