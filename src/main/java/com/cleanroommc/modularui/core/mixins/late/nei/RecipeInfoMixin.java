@@ -37,18 +37,16 @@ public class RecipeInfoMixin {
 
     @Inject(method = "getStackPositioner", remap = false, cancellable = true, at=@At("HEAD"))
     private static void modularui$getStackPositioner(GuiContainer gui, String ident, CallbackInfoReturnable<IStackPositioner> ci) {
-        if (gui instanceof GuiContainerWrapper muw) {
-            if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
-                if (Arrays.asList(tr.getIdents()).contains(ident)) {
-                    //Hacky way around it, but should work
-                    ModularUIGuiContainerStackPositioner positioner = NEIModularUIConfig.stackPositioner;
-                    positioner.wrapper = muw;
-                    positioner.container = muc;
-                    positioner.recipeTransfer = tr;
-                    ci.setReturnValue(positioner);
-                    ci.cancel();
-                    return;
-                }
+        if (gui.inventorySlots instanceof ModularContainer muc && muc instanceof INEIRecipeTransfer<?> tr) {
+            if (Arrays.asList(tr.getIdents()).contains(ident)) {
+                //Hacky way around it, but should work
+                ModularUIGuiContainerStackPositioner positioner = NEIModularUIConfig.stackPositioner;
+                positioner.wrapper = (GuiContainerWrapper) gui;
+                positioner.container = muc;
+                positioner.recipeTransfer = tr;
+                ci.setReturnValue(positioner);
+                ci.cancel();
+                return;
             }
         }
     }
