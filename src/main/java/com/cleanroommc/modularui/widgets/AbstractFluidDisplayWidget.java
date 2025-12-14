@@ -1,7 +1,9 @@
 package com.cleanroommc.modularui.widgets;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.drawable.GuiDraw;
+import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
@@ -11,11 +13,13 @@ import com.cleanroommc.modularui.utils.SIPrefix;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
+import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayWidget<W>> extends Widget<W> {
+public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayWidget<W>> extends Widget<W> implements RecipeViewerIngredientProvider {
 
     public static final String UNIT_BUCKET = "B";
     public static final String UNIT_LITER = "L";
@@ -68,6 +72,14 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
 
     @Nullable
     protected abstract FluidStack getFluidStack();
+
+    @Override
+    public @Nullable ItemStack getStackForRecipeViewer() {
+        if (ModularUI.Mods.GT5U.isLoaded()) {
+            return GTUtility.getFluidDisplayStack(getFluidStack(), false);
+        }
+        return null;
+    }
 
     /**
      * Return a positive value if the fluid should be drawn partly depending on the amount filled.

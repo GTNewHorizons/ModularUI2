@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
-import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
@@ -35,7 +34,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
 
-public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack>, RecipeViewerIngredientProvider {
+public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack> {
 
     private static final DecimalFormat TOOLTIP_FORMAT = new DecimalFormat("#.##");
     private static final IFluidTank EMPTY = new FluidTank(0);
@@ -255,13 +254,5 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
 
     protected void setPhantomValue(@NotNull ItemStack draggedStack) {
         this.syncHandler.setValue(FluidContainerRegistry.getFluidForFilledItem(draggedStack));
-    }
-
-    @Override
-    public @Nullable ItemStack getStackForRecipeViewer() {
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.getFluidDisplayStack(getFluidStack(), false);
-        }
-        return null;
     }
 }
