@@ -45,7 +45,6 @@ import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
 import com.cleanroommc.modularui.widgets.EntityDisplayWidget;
 import com.cleanroommc.modularui.widgets.Expandable;
-import com.cleanroommc.modularui.widgets.FluidDisplayWidget;
 import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.PageButton;
@@ -106,7 +105,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
 
     private static final Logger LOGGER = LogManager.getLogger("MUI2-Test");
     private final FluidTank fluidTank = new FluidTank(10000);
-    private final FluidTank fluidTankPhantom = new FluidTank(Integer.MAX_VALUE);
+    private final FluidTank fluidTankPhantom = new FluidTank(500000);
     private long time = 0;
     private int val, val2 = 0;
     private String value = "";
@@ -140,6 +139,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         final EntityLivingBase fool = new EntityVillager(getWorldObj());
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
+        settings.customGui(() -> TestGuiContainer::new);
+
         syncManager.addOpenListener(player -> {
             LOGGER.info("Test Tile panel open by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
         });
@@ -152,7 +153,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         syncManager.syncValue("mixer_fluids", 0, SyncHandlers.fluidSlot(this.mixerFluids1));
         syncManager.syncValue("mixer_fluids", 1, SyncHandlers.fluidSlot(this.mixerFluids2));
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
-        syncManager.syncValue("cycle_state", cycleStateValue);
+        syncManager.getHyperVisor().syncValue("cycle_state", cycleStateValue);
         syncManager.syncValue("display_item", GenericSyncValue.forItem(() -> this.displayItem, null));
         syncManager.bindPlayerInventory(guiData.getPlayer());
         syncManager.syncValue("textFieldSyncer", SyncHandlers.doubleNumber(() -> this.doubleValue, val -> this.doubleValue = val));
@@ -173,10 +174,10 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                     return flow;
                 });
 
-        Rectangle colorPickerBackground = new Rectangle().setColor(Color.RED.main);
+        Rectangle colorPickerBackground = new Rectangle().color(Color.RED.main);
         ModularPanel panel = new ModularPanel("test_tile");
-        IPanelHandler panelSyncHandler = syncManager.panel("other_panel", this::openSecondWindow, true);
-        IPanelHandler colorPicker = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog(colorPickerBackground::setColor, colorPickerBackground.getColor(), true)
+        IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel", true, this::openSecondWindow);
+        IPanelHandler colorPicker = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog(colorPickerBackground::color, colorPickerBackground.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
                 .top(0)
@@ -264,7 +265,6 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 .syncHandler(SyncHandlers.fluidSlot(this.fluidTank)))
                                                                         .child(new ButtonWidget<>()
                                                                                 .size(60, 18)
-
                                                                                 .tooltip(tooltip -> {
                                                                                     tooltip.showUpTimer(10);
                                                                                     tooltip.addLine(IKey.str("Test Line g"));
@@ -288,7 +288,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                                 //.flex(flex -> flex.left(3)) // ?
                                                                                 .overlay(IKey.str("Button 2")))
                                                                         .child(new TextFieldWidget()
-                                                                                .tooltip(t->t.addLine("hello, i am overridden!"))
+                                                                                .addTooltipLine("this tooltip is overridden")
                                                                                 .size(60, 18)
                                                                                 .setTextAlignment(Alignment.Center)
                                                                                 .value(SyncHandlers.string(() -> this.value, val -> this.value = val))
@@ -341,6 +341,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                 .child(new FluidSlot()
                                                                         .margin(2)
                                                                         .width(30)
+                                                                        .alwaysShowFull(false)
                                                                         .syncHandler(SyncHandlers.fluidSlot(this.fluidTankPhantom).phantom(true)))
                                                                 .child(new Column()
                                                                         .name("button and slots test 3")
@@ -363,15 +364,15 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                         .childPadding(2)
                                                         //.child(SlotGroupWidget.playerInventory().left(0))
                                                         .child(SlotGroupWidget.builder()
-                                                                        .matrix("III", "III", "III")
-                                                                        .key('I', index -> {
-                                                                            // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
-                                                                            if (index == 4) {
-                                                                                return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
-                                                                            }
-                                                                            return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
-                                                                        })
-                                                                        .build().name("9 slot inv")
+                                                                .matrix("III", "III", "III")
+                                                                .key('I', index -> {
+                                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
+                                                                    if (index == 4) {
+                                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
+                                                                    }
+                                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
+                                                                })
+                                                                .build().name("9 slot inv")
                                                                 //.marginBottom(2)
                                                         )
                                                         .child(SlotGroupWidget.builder()
@@ -443,7 +444,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                         .disableHoverBackground()
                                                                         .setNumbers(1, Short.MAX_VALUE)
                                                                         .setTextAlignment(Alignment.Center)
-                                                                        .background(new Rectangle().setColor(0xFFb1b1b1))
+                                                                        .background(new Rectangle().color(0xFFb1b1b1))
                                                                         .setTextColor(IKey.TEXT_COLOR)
                                                                         .size(20, 14))
                                                                 .child(IKey.str("Number config").asWidget()
@@ -526,12 +527,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         syncManager.registerSlotGroup(slotGroup);
         AtomicInteger number = new AtomicInteger(0);
         syncManager.syncValue("int_value", new IntSyncValue(number::get, number::set));
-        IPanelHandler panelSyncHandler = syncManager.panel("other_panel_2", (syncManager1, syncHandler1) ->
-                openThirdWindow(syncManager1, syncHandler1, number), true);
+        IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel_2", true, (syncManager1, syncHandler1) ->
+                openThirdWindow(syncManager1, syncHandler1, number));
+        IntSyncValue num = syncManager.getHyperVisor().findSyncHandler("cycle_state", IntSyncValue.class);
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
-                        .overlay((new FluidDrawable().setFluid(new FluidStack(FluidRegistry.WATER,100))),IKey.str("3"))
+                        .overlay((new FluidDrawable().setFluid(new FluidStack(FluidRegistry.WATER, 100))), IKey.str("3"))
                         .onMousePressed(mouseButton -> {
                             panelSyncHandler.openPanel();
                             return true;
@@ -545,6 +547,13 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                         .key('I', i -> new ItemSlot().slot(new ModularSlot(smallInv, i).slotGroup(slotGroup)))
                         .build()
                         .center())
+                .child(new CycleButtonWidget()
+                        .size(16).pos(5, 5 + 11)
+                        .value(num)
+                        .stateOverlay(0, IKey.str("1"))
+                        .stateOverlay(1, IKey.str("2"))
+                        .stateOverlay(2, IKey.str("3"))
+                        .addTooltipLine(IKey.str("Hyper Visor test")))
                 .child(new ButtonWidget<>()
                         .bottom(5)
                         .right(5)

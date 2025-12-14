@@ -14,6 +14,8 @@ import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.Rectangle;
+import com.cleanroommc.modularui.drawable.UITexture;
+import com.cleanroommc.modularui.drawable.graph.GraphDrawable;
 import com.cleanroommc.modularui.factory.ClientGUI;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
@@ -24,8 +26,9 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.ColorShade;
+import com.cleanroommc.modularui.utils.DAM;
+import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Interpolation;
 import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.Platform;
@@ -59,6 +62,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,6 +76,8 @@ import java.util.List;
 import java.util.Random;
 
 public class TestGuis extends CustomModularScreen {
+
+    public static boolean withCode = false;
 
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
@@ -97,11 +103,21 @@ public class TestGuis extends CustomModularScreen {
                                     String name = m.getName();
                                     if (name.startsWith("build")) name = name.substring(5);
                                     if (name.endsWith("UI")) name = name.substring(0, name.length() - 2);
+                                    String codeTextureName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
                                     name = name.replaceAll("([a-z])([A-Z])", "$1 $2");
                                     return button(name)
                                             .onMousePressed(button -> {
                                                 try {
-                                                    ClientGUI.open(new ModularScreen((ModularPanel) m.invoke(null)).openParentOnClose(true));
+                                                    ModularPanel panel = (ModularPanel) m.invoke(null);
+                                                    if (TestGuis.withCode) {
+                                                        panel.child(UITexture.builder()
+                                                                .location("gui/code/" + codeTextureName)
+                                                                .build()
+                                                                .asWidget()
+                                                                .leftRel(1f)
+                                                                .heightRel(1f));
+                                                    }
+                                                    ClientGUI.open(new ModularScreen(panel).openParentOnClose(true));
                                                 } catch (IllegalAccessException | InvocationTargetException e) {
                                                     ModularUI.LOGGER.throwing(e);
                                                 }
@@ -186,28 +202,21 @@ public class TestGuis extends CustomModularScreen {
     public static @NotNull ModularPanel buildPostTheLogAnimationUI() {
         Animator post = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-35, 0);
         Animator the = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(-20, 0);
-        Animator fucking = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(53, 0);
+        Animator extraordinary = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(53, 0);
         Animator log = new Animator().curve(Interpolation.SINE_IN).duration(300).bounds(20, 0);
         Animator logGrow = new Animator().curve(Interpolation.LINEAR).duration(2500).bounds(0f, 1f);
         IAnimator animator = new Wait(300)
                 .followedBy(post)
                 .followedBy(the)
-                .followedBy(fucking)
+                .followedBy(extraordinary)
                 .followedBy(log)
                 .followedBy(logGrow);
         animator.animate();
         Random rnd = new Random();
-        /*TextureAtlasSprite[] sprites = IntStream.range(0, 10).mapToObj(SpriteHelper::getDestroyBlockSprite).toArray(TextureAtlasSprite[]::new);
-        IDrawable broken = ((context1, x, y, width, height, widgetTheme) -> {
-            if (logGrow.getValue() < 0.1f) return;
-            GlStateManager.color(1f, 1f, 1f, 0.75f);
-            GuiDraw.drawTiledSprite(sprites[(int) Math.min(9, logGrow.getValue() * 10)], x, y, width + 24, height + 24);
-        });*/
         return new ModularPanel("main")
                 .coverChildren()
-                .padding(12)
-                //.overlay(broken)
                 .child(new Column()
+                        .margin(12)
                         .coverChildren()
                         .child(new Row()
                                 .coverChildren()
@@ -215,9 +224,9 @@ public class TestGuis extends CustomModularScreen {
                                         .transform((widget, stack) -> stack.translate(post.getValue(), 0)))
                                 .child(IKey.str("the ").asWidget()
                                         .transform((widget, stack) -> stack.translate(0, the.getValue())))
-                                .child(IKey.str("fucking ").asWidget()
-                                        .transform((widget, stack) -> stack.translate(fucking.getValue(), 0))))
-                        .child(IKey.str("LOOOOGG!!!! ").asWidget()
+                                .child(IKey.str("fucking ").style(IKey.OBFUSCATED).asWidget()
+                                        .transform((widget, stack) -> stack.translate(extraordinary.getValue(), 0))))
+                        .child(IKey.str("LOOOOGG!!!!").asWidget()
                                 .paddingTop(4)
                                 .transform((widget, stack) -> {
                                     float logVal = log.getValue();
@@ -228,7 +237,7 @@ public class TestGuis extends CustomModularScreen {
                                     stack.translate(x0, y0);
                                     stack.scale(scale, scale);
                                     stack.translate(-x0, -y0);
-                                    widget.color(Color.interpolate(0xFF040404, Color.RED.main, Math.min(1f, 1.2f * logGrowVal)));
+                                    widget.color(Color.lerp(0xFF040404, Color.RED.main, Math.min(1f, 1.2f * logGrowVal)));
                                 })));
     }
 
@@ -239,6 +248,10 @@ public class TestGuis extends CustomModularScreen {
         float period = 3000f;
         return ModularPanel.defaultPanel("main")
                 .size(150)
+                .overlay(new Rectangle()
+                        .color(Color.GREEN.main)
+                        .hollow(2)
+                        .asIcon().margin(5))
                 .child(new TextWidget<>(IKey.str("Test String")).scale(0.6f).horizontalCenter().top(7))
                 .child(new DraggableWidget<>()
                         //.background(new SpriteDrawable(sprite))
@@ -439,8 +452,8 @@ public class TestGuis extends CustomModularScreen {
             }
         };
 
-        Rectangle color1 = new Rectangle().setColor(Color.BLACK.main);
-        Rectangle color2 = new Rectangle().setColor(Color.WHITE.main);
+        Rectangle color1 = new Rectangle().color(Color.BLACK.main);
+        Rectangle color2 = new Rectangle().color(Color.WHITE.main);
 
         IDrawable gradient = (context1, x, y, width, height, widgetTheme) -> GuiDraw.drawHorizontalGradientRect(x, y, width, height, color1.getColor(), color2.getColor());
         IDrawable correctedGradient = (context1, x, y, width, height, widgetTheme) -> {
@@ -463,12 +476,12 @@ public class TestGuis extends CustomModularScreen {
 
         ModularPanel panel = new ModularPanel("colors").width(300).coverChildrenHeight().padding(7);
 
-        IPanelHandler colorPicker1 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker1", color1::setColor, color1.getColor(), true)
+        IPanelHandler colorPicker1 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker1", color1::color, color1.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
                 .top(0)
                 .rightRel(1f), true);
-        IPanelHandler colorPicker2 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker2", color2::setColor, color2.getColor(), true)
+        IPanelHandler colorPicker2 = IPanelHandler.simple(panel, (mainPanel, player) -> new ColorPickerDialog("color_picker2", color2::color, color2.getColor(), true)
                 .setDraggable(true)
                 .relative(panel)
                 .top(0)
@@ -513,6 +526,40 @@ public class TestGuis extends CustomModularScreen {
                         .size(50, 50)
                         .background(GuiTextures.MC_BUTTON)
                         .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
+    }
+
+    public static @NotNull ModularPanel buildGraphUI() {
+        double[] x = DAM.linspace(-25, 25, 200);
+        // sin(x) / x
+        double[] y1 = DAM.div(DAM.sin(x, null), x, null);
+        return new ModularPanel("graph")
+                .size(200, 160)
+                .padding(5)
+                .overlay(new GraphDrawable()
+                        .graphAspectRatio(16 / 9f)
+                        .plot(x, y1));
+    }
+
+    public static @NotNull ModularPanel buildAspectRatioUI() {
+        return new ModularPanel("aspect_ratio")
+                .coverChildren()
+                .padding(10)
+                .child(new Row()
+                        .childPadding(10)
+                        .coverChildren()
+                        .child(new Rectangle().color(Color.BLUE_ACCENT.main)
+                                .asIcon().aspectRatio(4f / 3)
+                                .asWidget().size(80)
+                                .overlay(IKey.str("4:3 Free")))
+                        .child(new Rectangle().color(Color.RED_ACCENT.main)
+                                .asIcon().aspectRatio(4f / 3).width(70)
+                                .asWidget().size(80)
+                                .overlay(IKey.str("4:3 | width = 70")))
+                        .child(new Rectangle().color(Color.LIGHT_GREEN.main)
+                                .asIcon().aspectRatio(4f / 3).height(45).alignment(Alignment.BottomRight)
+                                .asWidget().size(80)
+                                .overlay(IKey.str("4:3 | height = 45\nBottom Right"))))
+                .overlay();
     }
 
     private static class TestPanel extends ModularPanel {
