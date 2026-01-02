@@ -32,13 +32,15 @@ import static com.cleanroommc.modularui.screen.ClientScreenHandler.getDefaultCon
 public class MCHelper {
 
     public static boolean hasMc() {
-        return getMc() != null;
+        return NetworkUtils.isDedicatedClient() && getMc() != null;
     }
 
+    @SideOnly(Side.CLIENT)
     public static @Nullable Minecraft getMc() {
         return Minecraft.getMinecraft();
     }
 
+    @SideOnly(Side.CLIENT)
     public static @Nullable EntityPlayer getPlayer() {
         if (hasMc()) {
             return getMc().thePlayer;
@@ -46,22 +48,19 @@ public class MCHelper {
         return null;
     }
 
+    @SideOnly(Side.CLIENT)
     public static boolean closeScreen() {
         if (!hasMc()) return false;
-        EntityPlayer player = getPlayer();
-        if (player != null) {
-            player.closeScreen();
-            return true;
-        }
         Minecraft.getMinecraft().displayGuiScreen(null);
         return false;
     }
 
+    @SideOnly(Side.CLIENT)
     public static void popScreen(boolean openParentOnClose, GuiScreen parent) {
         EntityPlayer player = MCHelper.getPlayer();
         if (player != null) {
-            // container should not just be closed here, however this means the gui stack only works with client only screens (except the root)
-            // TODO: figure out the necessity of a Container stack
+            // container should not just be closed here
+            // instead they are kept in a stack until all screens are closed
             if (openParentOnClose) {
                 Minecraft.getMinecraft().displayGuiScreen(parent);
             } else {
@@ -74,14 +73,6 @@ public class MCHelper {
     }
 
     @SideOnly(Side.CLIENT)
-    private static void prepareCloseContainer(EntityPlayer entityPlayer) {
-        if (entityPlayer instanceof EntityClientPlayerMP clientPlayerMP) {
-            clientPlayerMP.sendQueue.addToSendQueue(new C0DPacketCloseWindow(clientPlayerMP.openContainer.windowId));
-        }
-        entityPlayer.openContainer = entityPlayer.inventoryContainer;
-        entityPlayer.inventory.setItemStack(null);
-    }
-
     public static boolean displayScreen(GuiScreen screen) {
         Minecraft mc = getMc();
         if (mc != null) {
@@ -91,11 +82,13 @@ public class MCHelper {
         return false;
     }
 
+    @SideOnly(Side.CLIENT)
     public static GuiScreen getCurrentScreen() {
         Minecraft mc = getMc();
         return mc != null ? mc.currentScreen : null;
     }
 
+    @SideOnly(Side.CLIENT)
     public static FontRenderer getFontRenderer() {
         if (hasMc()) return getMc().fontRenderer;
         return null;

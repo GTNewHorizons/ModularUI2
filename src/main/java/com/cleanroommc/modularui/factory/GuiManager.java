@@ -86,18 +86,20 @@ public class GuiManager {
         int windowId = player.currentWindowId;
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        ModularNetwork.SERVER.activate(windowId, msm);
-        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, factory, buffer), player);
+        int nid = ModularNetwork.SERVER.activate(msm);
+        NetworkHandler.sendToPlayer(new OpenGuiPacket<>(windowId, nid, factory, buffer), player);
         // open container // this mimics forge behaviour
         player.openContainer = container;
         player.openContainer.windowId = windowId;
         player.openContainer.addCraftingToCrafters(player);
-        container.onModularContainerOpened();
+        // init mui syncer
+        msm.onOpen();
+        // 1.12.2 invokes event here which doesnt exist in 1.7.10
     }
 
     @ApiStatus.Internal
     @SideOnly(Side.CLIENT)
-    public static <T extends GuiData> void openFromClient(int windowId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
+    public static <T extends GuiData> void openFromClient(int windowId, int networkId, @NotNull UIFactory<T> factory, @NotNull PacketBuffer data, @NotNull EntityPlayerSP player) {
         T guiData = factory.readGuiData(player, data);
         UISettings settings = new UISettings();
         settings.defaultCanInteractWith(factory, guiData);
@@ -115,17 +117,19 @@ public class GuiManager {
         }
         if (guiContainer.inventorySlots != container) throw new IllegalStateException("Custom Containers are not yet allowed!");
         guiContainer.inventorySlots.windowId = windowId;
-        ModularNetwork.CLIENT.activate(windowId, msm);
+        ModularNetwork.CLIENT.activate(networkId, msm);
         MCHelper.displayScreen(wrapper.getGuiScreen());
         player.openContainer = guiContainer.inventorySlots;
-        syncManager.onOpen(); // TODO: not here in 1.12
+        msm.onOpen();
     }
 
     @SideOnly(Side.CLIENT)
     public static <T extends GuiData> void openFromClient(@NotNull UIFactory<T> factory, @NotNull T guiData) {
+        // notify server to open the gui
+        // server will send packet back to actually open the gui
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         factory.writeGuiData(guiData, buffer);
-        NetworkHandler.sendToServer(new OpenGuiPacket<>(0, factory, buffer));
+        NetworkHandler.sendToServer(new OpenGuiPacket<>(0, 0, factory, buffer));
     }
 
     @SideOnly(Side.CLIENT)

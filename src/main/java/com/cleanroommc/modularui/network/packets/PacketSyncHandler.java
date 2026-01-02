@@ -10,6 +10,8 @@ import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +53,7 @@ public class PacketSyncHandler implements IPacket {
         this.packet = NetworkUtils.readPacketBuffer(buf);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
         ModularNetwork.CLIENT.receivePacket(this);
