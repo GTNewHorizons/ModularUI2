@@ -364,15 +364,16 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                         .childPadding(2)
                                                         //.child(SlotGroupWidget.playerInventory().left(0))
                                                         .child(SlotGroupWidget.builder()
-                                                                .matrix("III", "III", "III")
-                                                                .key('I', index -> {
-                                                                    // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
-                                                                    if (index == 4) {
-                                                                        return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
-                                                                    }
-                                                                    return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
-                                                                })
-                                                                .build().name("9 slot inv")
+                                                                        .matrix("III", "III", "III")
+                                                                        .key('I', index -> {
+                                                                            // 4 is the middle slot with a negative priority -> shift click prioritises middle slot
+                                                                            if (index == 4) {
+                                                                                return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).singletonSlotGroup(-100));
+                                                                            }
+                                                                            return new ItemSlot().slot(SyncHandlers.itemSlot(this.bigInventory, index).slotGroup("item_inv"));
+                                                                        })
+                                                                        .build().name("9 slot inv")
+                                                                        .placeSortButtonsTopRightVertical()
                                                                 //.marginBottom(2)
                                                         )
                                                         .child(SlotGroupWidget.builder()
@@ -380,7 +381,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                 .row("FII")
                                                                 .key('F', index -> new FluidSlot().syncHandler("mixer_fluids", index))
                                                                 .key('I', index -> ItemSlot.create(index >= 2).slot(new ModularSlot(this.mixerItems, index).slotGroup("mixer_items")))
-                                                                .build().name("mixer inv"))
+                                                                .build().name("mixer inv")
+                                                                .disableSortButtons())
                                                         .child(new Row()
                                                                 .coverChildrenHeight()
                                                                 .child(new CycleButtonWidget()
