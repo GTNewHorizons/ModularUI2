@@ -12,6 +12,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -115,6 +116,10 @@ public class NetworkUtils {
             buffer.writeVarIntToBuffer(Short.MAX_VALUE + 1);
             return;
         }
+        if (string.isEmpty()) {
+            buffer.writeVarIntToBuffer(0);
+            return;
+        }
         byte[] bytesTest = string.getBytes(StandardCharsets.UTF_8);
         byte[] bytes;
 
@@ -134,9 +139,8 @@ public class NetworkUtils {
 
     public static String readStringSafe(PacketBuffer buffer) {
         int length = buffer.readVarIntFromBuffer();
-        if (length > Short.MAX_VALUE) {
-            return null;
-        }
+        if (length > Short.MAX_VALUE) return null;
+        if (length == 0) return StringUtils.EMPTY;
         String s = buffer.toString(buffer.readerIndex(), length, StandardCharsets.UTF_8);
         buffer.readerIndex(buffer.readerIndex() + length);
         return s;

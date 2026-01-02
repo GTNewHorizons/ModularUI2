@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.utils.item.IItemHandler;
 import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
 import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
 import com.cleanroommc.modularui.utils.item.SlotItemHandler;
+import com.cleanroommc.modularui.widgets.slot.PlayerSlotGroup;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
 
     public static final String AUTO_SYNC_PREFIX = "auto_sync:";
-    protected static final String PLAYER_INVENTORY = "player_inventory";
+
     private static final String CURSOR_KEY = ISyncRegistrar.makeSyncKey("cursor_slot", 255255);
 
     private final Map<String, PanelSyncManager> panelSyncManagerMap = new Object2ObjectOpenHashMap<>();
@@ -52,7 +53,7 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     @ApiStatus.Internal
     public void construct(ModularContainer container, String mainPanelName) {
         this.container = container;
-        if (this.mainPSM.getSlotGroup(PLAYER_INVENTORY) == null) {
+        if (this.mainPSM.getSlotGroup(PlayerSlotGroup.NAME) == null) {
             this.mainPSM.bindPlayerInventory(getPlayer());
         }
         this.mainPSM.syncValue(CURSOR_KEY, this.cursorSlotSyncHandler);
