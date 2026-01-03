@@ -2,6 +2,10 @@ package com.cleanroommc.modularui.api;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.ModularUIConfig;
+import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.network.ModularNetwork;
+import com.cleanroommc.modularui.network.NetworkUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -63,6 +67,7 @@ public class MCHelper {
             // instead they are kept in a stack until all screens are closed
             if (openParentOnClose) {
                 Minecraft.getMinecraft().displayGuiScreen(parent);
+                ModularNetwork.CLIENT.reopenSyncerOf(parent);
             } else {
                 Minecraft.getMinecraft().displayGuiScreen(null);
             }
