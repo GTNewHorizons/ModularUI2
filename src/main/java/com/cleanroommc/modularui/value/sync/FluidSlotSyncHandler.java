@@ -9,10 +9,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.google.common.primitives.Ints.saturatedCast;
 
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
@@ -292,6 +295,16 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         if (freeSpace >= heldFluid.amount) {
             itemStackEmptied = FluidInteractions.getContainerForFilledItem(heldItemSizedOne);
             fluidAmountTaken = heldFluid.amount;
+        }
+
+        if (itemStackEmptied == null && heldItemSizedOne.getItem() instanceof IFluidContainerItem container) {
+            // either partially accepted, or is IFluidContainerItem
+            FluidStack tDrained = container.drain(heldItemSizedOne, saturatedCast(freeSpace), true);
+            if (tDrained != null && tDrained.amount > 0) {
+                // something is actually drained - change the cell and drop it to player
+                itemStackEmptied = heldItemSizedOne;
+                fluidAmountTaken = tDrained.amount;
+            }
         }
 
         if (itemStackEmptied == null) {
