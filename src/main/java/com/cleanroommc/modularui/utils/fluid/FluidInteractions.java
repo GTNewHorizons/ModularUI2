@@ -89,7 +89,8 @@ public class FluidInteractions {
         ItemStack stack = getContainerForFilledItemWithoutIFluidContainerItem(itemStack);
         if (stack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
             stack = itemStack.copy();
-            container.drain(stack, Integer.MAX_VALUE, true);
+             if (container.drain(stack, Integer.MAX_VALUE, true) == null)
+                 return null;
         }
         if (stack == null) {
             stack = FluidContainerRegistry.drainFluidContainer(itemStack.copy());
