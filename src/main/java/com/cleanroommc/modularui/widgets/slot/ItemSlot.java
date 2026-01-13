@@ -223,7 +223,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean isDragPreview = false;
-        boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
+        boolean doDrawItem = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
         int amount = -1;
         String format = null;

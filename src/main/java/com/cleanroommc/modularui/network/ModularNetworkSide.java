@@ -11,8 +11,6 @@ import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
@@ -73,7 +71,7 @@ public abstract class ModularNetworkSide {
         ModularSyncManager msm = activeScreens.get(packet.networkId);
         if (msm == null) return; // silently discard packets for inactive screens
         try {
-            int id = packet.action ? 0 : packet.packet.readVarInt();
+            int id = packet.action ? 0 : packet.packet.readVarIntFromBuffer();
             msm.receiveWidgetUpdate(packet.panel, packet.key, packet.action, id, packet.packet);
         } catch (IndexOutOfBoundsException e) {
             ModularUI.LOGGER.error("Failed to read packet for sync handler {} in panel {}", packet.key, packet.panel);
@@ -125,7 +123,7 @@ public abstract class ModularNetworkSide {
             closeContainer(player);
             player.openContainer = msm.getContainer();
             msm.onOpen();
-            MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, msm.getContainer()));
+            // 1.12.2 fire event here which doesn't exist in 1.7.10
         }
         if (sync) sendPacket(new ReopenGuiPacket(inverseActiveScreens.getInt(msm)), player);
     }

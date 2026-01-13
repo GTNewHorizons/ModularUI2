@@ -8,9 +8,8 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -53,7 +52,7 @@ public abstract class ModularNetwork {
         @Override
         void closeContainer(EntityPlayer player) {
             // mimics EntityPlayerSP.closeScreenAndDropStack() but without closing the screen
-            player.inventory.setItemStack(ItemStack.EMPTY);
+            player.inventory.setItemStack(null);
             player.openContainer = player.inventoryContainer;
         }
 
@@ -64,14 +63,14 @@ public abstract class ModularNetwork {
 
         @SideOnly(Side.CLIENT)
         public void closeAll() {
-            closeAll(Minecraft.getMinecraft().player);
+            closeAll(Minecraft.getMinecraft().thePlayer);
         }
 
         @SideOnly(Side.CLIENT)
         public void reopenSyncerOf(GuiScreen guiScreen) {
             if (guiScreen instanceof IMuiScreen ms && !ms.getScreen().isClientOnly()) {
                 ModularSyncManager msm = ms.getScreen().getSyncManager();
-                reopen(Minecraft.getMinecraft().player, msm, true);
+                reopen(Minecraft.getMinecraft().thePlayer, msm, true);
             }
         }
     }

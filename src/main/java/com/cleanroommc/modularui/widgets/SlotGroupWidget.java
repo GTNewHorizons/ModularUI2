@@ -14,7 +14,6 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.IntFunction;
 
 public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
@@ -61,20 +60,21 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
 
     private String slotGroupName;
     private SlotGroup slotGroup;
-    private boolean sortButtonsAdded = false;
-    private Consumer<SortButtons> sortButtonsEditor;
+    //private boolean sortButtonsAdded = false;
+    //private Consumer<SortButtons> sortButtonsEditor;
 
     @Override
     public void onInit() {
         super.onInit();
-        if (!this.sortButtonsAdded) {
+        // TODO: bogo compat
+        /*if (!this.sortButtonsAdded) {
             SortButtons sb = new SortButtons();
             if (this.sortButtonsEditor == null) placeSortButtonsTopRightHorizontal();
             if (getName() != null) {
                 sb.name(getName() + "_sorter_buttons");
             }
             child(sb);
-        }
+        }*/
     }
 
     @Override
@@ -98,7 +98,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
     @Override
     protected void onChildAdd(IWidget child) {
         super.onChildAdd(child);
-        if (child instanceof SortButtons sortButtons) {
+        /*if (child instanceof SortButtons sortButtons) {
             this.sortButtonsAdded = true;
             if (sortButtons.getSlotGroup() == null && sortButtons.getSlotGroupName() == null) {
                 if (this.slotGroup != null) {
@@ -110,13 +110,13 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
             if (this.sortButtonsEditor != null) {
                 this.sortButtonsEditor.accept(sortButtons);
             }
-        }
+        }*/
     }
 
-    public SlotGroupWidget disableSortButtons() {
+    /*public SlotGroupWidget disableSortButtons() {
         this.sortButtonsAdded = true;
         return this;
-    }
+    }*/
 
     public void setSlotsSynced(String name) {
         int i = 0;
@@ -128,7 +128,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
         }
     }
 
-    public SlotGroupWidget editSortButtons(Consumer<SortButtons> sortButtonsEditor) {
+    /*public SlotGroupWidget editSortButtons(Consumer<SortButtons> sortButtonsEditor) {
         this.sortButtonsEditor = sortButtonsEditor;
         return this;
     }
@@ -153,7 +153,7 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
             sb.horizontal().bottomRelOffset(1f, 1).right(0);
             if (additionalEdits != null) additionalEdits.accept(sb);
         });
-    }
+    }*/
 
     public SlotGroupWidget slotGroup(String slotGroupName) {
         this.slotGroupName = slotGroupName;

@@ -34,13 +34,13 @@ public class ReopenGuiPacket implements IPacket {
 
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        ModularNetwork.CLIENT.reopen(Minecraft.getMinecraft().player, this.networkId, false);
+        ModularNetwork.CLIENT.reopen(Minecraft.getMinecraft().thePlayer, this.networkId, false);
         return null;
     }
 
     @Override
     public @Nullable IPacket executeServer(NetHandlerPlayServer handler) {
-        ModularNetwork.SERVER.reopen(handler.player, this.networkId, false);
+        ModularNetwork.SERVER.reopen(handler.playerEntity, this.networkId, false);
         return null;
     }
 }
