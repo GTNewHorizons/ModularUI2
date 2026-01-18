@@ -218,8 +218,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @SideOnly(Side.CLIENT)
-    protected ItemStack getItemStackForRendering(ModularSlot slotIn) {
-        return slotIn.getStack();
+    protected ItemStack getItemStackForRendering(ItemStack itemstack, boolean dragging) {
+        return itemstack;
     }
 
     @SideOnly(Side.CLIENT)
@@ -229,7 +229,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
-        ItemStack itemstack = getItemStackForRendering(slotIn);
+        ItemStack itemstack = slotIn.getStack();
         boolean isDragPreview = false;
         boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
@@ -274,6 +274,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             if (isDragPreview) {
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
+
+            itemstack = getItemStackForRendering(itemstack, isDragPreview);
 
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
 
