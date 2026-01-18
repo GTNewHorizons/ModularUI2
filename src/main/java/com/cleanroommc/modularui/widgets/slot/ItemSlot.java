@@ -218,13 +218,18 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @SideOnly(Side.CLIENT)
+    protected ItemStack getItemStackForRendering(ModularSlot slotIn) {
+        return slotIn.getStack();
+    }
+
+    @SideOnly(Side.CLIENT)
     private void drawSlot(ModularSlot slotIn) {
         GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
         if (!(guiScreen instanceof GuiContainer guiContainer))
             throw new IllegalStateException("The gui must be an instance of GuiContainer if it contains slots!");
         GuiContainerAccessor acc = (GuiContainerAccessor) guiScreen;
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
-        ItemStack itemstack = slotIn.getStack();
+        ItemStack itemstack = getItemStackForRendering(slotIn);
         boolean isDragPreview = false;
         boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
