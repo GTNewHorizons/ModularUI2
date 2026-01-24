@@ -291,7 +291,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 if (amount < 0) {
                     amount = itemstack.stackSize;
                 }
-                GuiDraw.drawStandardSlotAmountText(amount, format, getArea());
+                drawSlotAmountText(amount, format);
 
                 int cachedCount = itemstack.stackSize;
                 itemstack.stackSize = 1; // required to not render the amount overlay
@@ -306,6 +306,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         ((GuiAccessor) guiScreen).setZLevel(0f);
         renderItem.zLevel = 0f;
+    }
+
+    protected void drawSlotAmountText(int amount, String format) {
+        GuiDraw.drawStandardSlotAmountText(amount, format, getArea());
     }
 
     @Override
