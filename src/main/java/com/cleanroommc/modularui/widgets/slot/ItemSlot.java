@@ -218,6 +218,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @SideOnly(Side.CLIENT)
+    protected ItemStack getItemStackForRendering(ItemStack itemstack, boolean dragging) {
+        return itemstack;
+    }
+
+    @SideOnly(Side.CLIENT)
     private void drawSlot(ModularSlot slotIn) {
         GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
         if (!(guiScreen instanceof GuiContainer guiContainer))
@@ -269,6 +274,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
             if (isDragPreview) {
                 GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
             }
+
+            itemstack = getItemStackForRendering(itemstack, isDragPreview);
 
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
 
