@@ -33,7 +33,8 @@ public class PageButton extends Widget<PageButton> implements Interactable {
     @Override
     protected WidgetTheme getActiveWidgetTheme(WidgetThemeEntry<?> widgetTheme, boolean hover) {
         SelectableTheme selectableTheme = widgetTheme.expectType(SelectableTheme.class).getTheme(hover);
-        return isActive() ^ invertSelected() ? selectableTheme.getSelected() : selectableTheme;
+        boolean shouldShowSelected = this.invert ? !isActive() : isActive();
+        return shouldShowSelected ? selectableTheme.getSelected() : selectableTheme;
     }
 
     @Override
