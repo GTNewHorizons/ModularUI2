@@ -30,40 +30,38 @@ public class FluidInteractions {
         return fluidStack;
     }
 
-    public static ItemStack fillFluidContainer(FluidStack fluidStack, ItemStack itemStack) {
+    public static ItemStack getFilledFluidContainer(FluidStack fluidStack, ItemStack itemStack) {
         ItemStack filledContainer = null;
 
         if (ModularUI.Mods.GT5U.isLoaded()) {
-            filledContainer = GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
+            filledContainer = GTUtility.fillFluidContainer(fluidStack, itemStack, false, false);
         }
 
-        if (filledContainer == null) {
-            filledContainer = fillIFluidContainerItem(fluidStack, itemStack);
+        if (filledContainer == null && itemStack.getItem() instanceof IFluidContainerItem container) {
+            FluidStack containerFluid = container.getFluid(itemStack);
+            int containerFluidAmount = containerFluid != null ? containerFluid.amount : 0;
+
+            if (containerFluid != null && containerFluid.getFluid() != fluidStack.getFluid()) {
+                return null;
+            }
+
+            if (containerFluidAmount + fluidStack.amount >= container.getCapacity(itemStack)) {
+                ItemStack copyStack = itemStack.copy();
+                container.fill(copyStack, fluidStack, true);
+                return copyStack;
+            }
+
+            return null;
         }
 
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
-            if (filledContainer != null) {
-                FluidStack newFluid = getFluidForItem(filledContainer);
-                fluidStack.amount -= newFluid.amount;
-            }
         }
 
         return filledContainer;
     }
 
-    public static ItemStack fillIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (itemStack.getItem() instanceof IFluidContainerItem itemContainer) {
-            int filledAmount = itemContainer.fill(itemStack, fluidStack, true);
-            if (filledAmount > 0) {
-                fluidStack.amount -= filledAmount;
-                return itemStack;
-            }
-        }
-        return null;
-    }
-
-    public static ItemStack getEmptyContainerForFilledItem(ItemStack itemStack) {
+    public static ItemStack getEmptyFluidContainer(ItemStack itemStack) {
         if (ModularUI.Mods.GT5U.isLoaded()) {
             ItemStack stack = GTUtility.getContainerForFilledItem(itemStack, false);
             if (stack != null) {
