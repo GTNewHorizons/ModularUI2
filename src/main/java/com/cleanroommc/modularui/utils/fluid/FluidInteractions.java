@@ -31,31 +31,32 @@ public class FluidInteractions {
     }
 
     public static ItemStack fillFluidContainer(FluidStack fluidStack, ItemStack itemStack) {
-        ItemStack filledContainer = fillFluidContainerWithoutIFluidContainerItem(fluidStack, itemStack);
-        if (filledContainer == null) {
-            filledContainer = fillFluidContainerWithIFluidContainerItem(fluidStack, itemStack);
+        ItemStack filledContainer = null;
+
+        if (ModularUI.Mods.GT5U.isLoaded()) {
+            filledContainer = GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
         }
+
+        if (filledContainer == null) {
+            filledContainer = fillIFluidContainerItem(fluidStack, itemStack);
+        }
+
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
-            if(filledContainer == null) return itemStack; // give up and return original clicked stack
-            FluidStack newFluid = getFluidForItem(filledContainer);
-            fluidStack.amount -= newFluid.amount;
+            if (filledContainer != null) {
+                FluidStack newFluid = getFluidForItem(filledContainer);
+                fluidStack.amount -= newFluid.amount;
+            }
         }
+
         return filledContainer;
     }
 
-    public static ItemStack fillFluidContainerWithoutIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
-        }
-        return null;
-    }
-
-    public static ItemStack fillFluidContainerWithIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
+    public static ItemStack fillIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
         if (itemStack.getItem() instanceof IFluidContainerItem itemContainer) {
-            int tFilledAmount = itemContainer.fill(itemStack, fluidStack, true);
-            if (tFilledAmount > 0) {
-                fluidStack.amount -= tFilledAmount;
+            int filledAmount = itemContainer.fill(itemStack, fluidStack, true);
+            if (filledAmount > 0) {
+                fluidStack.amount -= filledAmount;
                 return itemStack;
             }
         }
