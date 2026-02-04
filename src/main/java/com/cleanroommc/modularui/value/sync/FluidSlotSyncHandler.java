@@ -146,7 +146,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         ItemStack heldItemSizedOne = heldItem.copy();
         heldItemSizedOne.stackSize = 1;
         FluidStack currentFluid = fluidTank.getFluid();
-        FluidStack heldFluid = FluidInteractions.getFluidForRealItem(heldItemSizedOne);
+        FluidStack heldFluid = FluidInteractions.getFluidForItem(heldItemSizedOne);
         if (heldFluid != null && heldFluid.amount <= 0) {
             heldFluid = null;
         }
@@ -195,7 +195,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             } else {
                 ItemStack heldItemSizedOne = cursorStack.copy();
                 heldItemSizedOne.stackSize = 1;
-                FluidStack heldFluid = FluidInteractions.getFluidForPhantomItem(heldItemSizedOne);
+                FluidStack heldFluid = FluidInteractions.getFluidForItem(heldItemSizedOne);
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
                     fillPhantom(heldFluid);
                 } else {

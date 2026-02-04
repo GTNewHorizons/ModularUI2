@@ -13,10 +13,7 @@ import gregtech.api.util.GTUtility;
 
 public class FluidInteractions {
 
-    /**
-     * Gets fluid actually stored in item. Used for transferring fluid.
-     */
-    public static FluidStack getFluidForRealItem(ItemStack itemStack) {
+    public static FluidStack getFluidForItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
@@ -27,28 +24,8 @@ public class FluidInteractions {
         if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
             fluidStack = StackInfo.getFluid(itemStack);
         }
-        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
-        }
-        return fluidStack;
-    }
-
-    /**
-     * Gets fluid for use in phantom slot.
-     */
-    public static FluidStack getFluidForPhantomItem(ItemStack itemStack) {
-        FluidStack fluidStack = null;
-        if (itemStack.getItem() instanceof IFluidContainerItem container) {
-            fluidStack = container.getFluid(itemStack.copy());
-        }
-        if (fluidStack == null) {
-            fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack.copy());
-        }
-        if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
-            fluidStack = StackInfo.getFluid(itemStack.copy());
-        }
-        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
+        if (fluidStack == null && ModularUI.Mods.GT5U.isLoaded()) {
+            fluidStack = GTUtility.getFluidForFilledItem(itemStack, false);
         }
         return fluidStack;
     }
@@ -61,7 +38,7 @@ public class FluidInteractions {
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
             if (filledContainer == null) return itemStack; // give up and return original clicked stack
-            FluidStack newFluid = getFluidForRealItem(filledContainer);
+            FluidStack newFluid = getFluidForItem(filledContainer);
             fluidStack.amount -= newFluid.amount;
         }
         return filledContainer;
