@@ -85,24 +85,26 @@ public class FluidInteractions {
         return null;
     }
 
-    public static ItemStack getContainerForFilledItem(ItemStack itemStack) {
-        ItemStack stack = getContainerForFilledItemWithoutIFluidContainerItem(itemStack);
-        if (stack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
-            stack = itemStack.copy();
-            if (container.drain(stack, Integer.MAX_VALUE, true) == null)
-                return null;
-        }
-        if (stack == null) {
-            stack = FluidContainerRegistry.drainFluidContainer(itemStack.copy());
-        }
-        return stack;
-    }
-
-    public static ItemStack getContainerForFilledItemWithoutIFluidContainerItem(ItemStack itemStack) {
+    public static ItemStack getEmptyContainerForFilledItem(ItemStack itemStack) {
         if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.getContainerForFilledItem(itemStack, false);
+            ItemStack stack = GTUtility.getContainerForFilledItem(itemStack, false);
+            if (stack != null) {
+                return stack;
+            }
         }
-        return null;
+
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
+            ItemStack stack = itemStack.copy();
+            int amount = container.getFluid(itemStack).amount;
+            FluidStack drained = container.drain(stack, Integer.MAX_VALUE, true);
+
+            if (drained == null || drained.amount < amount) {
+                return null;
+            }
+            return stack;
+        }
+
+        return FluidContainerRegistry.drainFluidContainer(itemStack);
     }
 
     public static int getRealCapacity(IFluidTank fluidTank) {

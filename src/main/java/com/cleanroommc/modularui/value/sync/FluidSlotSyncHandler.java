@@ -291,7 +291,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         ItemStack itemStackEmptied = null;
         int fluidAmountTaken = 0;
         if (freeSpace >= heldFluid.amount) {
-            itemStackEmptied = FluidInteractions.getContainerForFilledItem(heldItemSizedOne);
+            itemStackEmptied = FluidInteractions.getEmptyContainerForFilledItem(heldItemSizedOne);
             fluidAmountTaken = heldFluid.amount;
         }
 
