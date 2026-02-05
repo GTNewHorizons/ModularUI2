@@ -74,7 +74,8 @@ public abstract class ModularNetworkSide {
             int id = packet.action ? 0 : packet.packet.readVarIntFromBuffer();
             msm.receiveWidgetUpdate(packet.panel, packet.key, packet.action, id, packet.packet);
         } catch (IndexOutOfBoundsException e) {
-            ModularUI.LOGGER.error("Failed to read packet for sync handler {} in panel {}", packet.key, packet.panel);
+            ModularUI.LOGGER.error("Failed to read packet for sync handler {} in panel {}. Exception: ", packet.key, packet.panel);
+            ModularUI.LOGGER.catching(e);
         } catch (IOException e) {
             ModularUI.LOGGER.throwing(e);
         }
