@@ -85,9 +85,9 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
                 if (Interactable.hasShiftDown()) {
                     if (this.syncHandler.canFillSlot() && this.syncHandler.canDrainSlot()) {
                         tooltip.addLine(IKey.lang("modularui2.fluid.click_combined"));
-                    } else if (this.syncHandler.canDrainSlot()) {
-                        tooltip.addLine(IKey.lang("modularui2.fluid.click_to_fill"));
                     } else if (this.syncHandler.canFillSlot()) {
+                        tooltip.addLine(IKey.lang("modularui2.fluid.click_to_fill"));
+                    } else if (this.syncHandler.canDrainSlot()) {
                         tooltip.addLine(IKey.lang("modularui2.fluid.click_to_empty"));
                     }
                 } else {

@@ -399,6 +399,35 @@ public class GuiDraw {
         textRenderer.setHardWrapOnBorder(true);
     }
 
+    public static void drawStandardSlotAmountText(long amount, String format, Area area) {
+        drawAmountText(amount, format, 1, 1, area.width - 1, area.height - 1, Alignment.BottomRight);
+    }
+
+    public static void drawAmountText(long amount, String format, int x, int y, int width, int height, Alignment alignment) {
+        if (amount > 1 || format != null) {
+            String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
+            if (format != null) {
+                amountText = format + amountText;
+            }
+            float scale = 1f;
+            if (amountText.length() == 3) {
+                scale = 0.8f;
+            } else if (amountText.length() == 4) {
+                scale = 0.6f;
+            } else if (amountText.length() > 4) {
+                scale = 0.5f;
+            }
+            textRenderer.setShadow(true);
+            textRenderer.setScale(scale);
+            textRenderer.setColor(Color.WHITE.main);
+            textRenderer.setAlignment(alignment, width, height);
+            textRenderer.setPos(x, y);
+            textRenderer.setHardWrapOnBorder(false);
+            textRenderer.draw(amountText);
+            textRenderer.setHardWrapOnBorder(true);
+        }
+    }
+
     /*public static void drawSprite(TextureAtlasSprite sprite, float x0, float y0, float w, float h) {
         drawSprite(Minecraft.getMinecraft().getTextureMapBlocks(), sprite, x0, y0, w, h);
     }

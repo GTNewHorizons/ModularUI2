@@ -215,6 +215,11 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @SideOnly(Side.CLIENT)
+    protected ItemStack getItemStackForRendering(ItemStack itemstack, boolean dragging) {
+        return itemstack;
+    }
+
+    @SideOnly(Side.CLIENT)
     private void drawSlot(ModularSlot slotIn) {
         GuiScreen guiScreen = getScreen().getScreenWrapper().getGuiScreen();
         if (!(guiScreen instanceof GuiContainer guiContainer))
@@ -267,6 +272,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, 0x80FFFFFF);
             }
 
+            itemstack = getItemStackForRendering(itemstack, isDragPreview);
+
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
 
             if (itemstack != null) {
@@ -281,7 +288,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 if (amount < 0) {
                     amount = itemstack.stackSize;
                 }
-                GuiDraw.drawStandardSlotAmountText(amount, format, getArea());
+                drawSlotAmountText(amount, format);
 
                 int cachedCount = itemstack.stackSize;
                 itemstack.stackSize = 1; // required to not render the amount overlay
@@ -296,6 +303,10 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
         ((GuiAccessor) guiScreen).setZLevel(0f);
         renderItem.zLevel = 0f;
+    }
+
+    protected void drawSlotAmountText(int amount, String format) {
+        GuiDraw.drawStandardSlotAmountText(amount, format, getArea());
     }
 
     @Override
