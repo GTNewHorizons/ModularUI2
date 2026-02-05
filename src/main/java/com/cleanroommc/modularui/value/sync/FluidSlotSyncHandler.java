@@ -257,17 +257,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             int containerAmount = heldFluid != null ? heldFluid.amount : 0;
             boolean soundPlayed = false;
 
-            if (containerCapacity == containerAmount) {
-                return;
-            }
-
             // 1. Try to fill some containers completely
             if (heldItem.stackSize > 1) {
-                int initialHeldItemsCount = heldItem.stackSize;
-                int drained = drainFluidByFillingContainers(heldItem, heldFluid, processFullStack);
+                int drained = batchDrainFluidToContainers(heldItem, heldFluid, processFullStack);
 
                 if (drained > 0) {
-                    playSound(initialFluid, true);
+                    playSound(initialFluid, false);
                     soundPlayed = true;
                 }
 
@@ -276,8 +271,9 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                     return;
                 }
 
-                // Return if all the containers are filled
-                if (drained == initialHeldItemsCount * (containerCapacity - containerAmount)) {
+                // Return if all the containers are filled.
+                // Note: stackSize = 0 means that the stack got replaced as per replaceCursorItemStack implementation
+                if (heldItem.stackSize == 0) {
                     return;
                 }
             }
@@ -296,29 +292,37 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 replaceCursorItemStack(itemToFill);
 
                 if (!soundPlayed) {
-                    playSound(initialFluid, true);
+                    playSound(initialFluid, false);
                 }
             }
         } else {
-            int filled = this.drainFluidByFillingContainers(heldItem, heldFluid, processFullStack);
+            int filled = this.batchDrainFluidToContainers(heldItem, heldFluid, processFullStack);
             if (filled > 0) {
-                playSound(initialFluid, true);
+                playSound(initialFluid, false);
             }
         }
     }
 
-    private int drainFluidByFillingContainers(ItemStack heldItem, @Nullable FluidStack heldFluid, boolean processFullStack) {
+    private int batchDrainFluidToContainers(ItemStack heldItem, @Nullable FluidStack heldFluid, boolean processFullStack) {
         ItemStack heldItemSizedOne = heldItem.copy();
         heldItemSizedOne.stackSize = 1;
 
         FluidStack tankFluid = fluidTank.getFluid();
-        ItemStack fullContainer = FluidInteractions.getFilledFluidContainer(tankFluid, heldItemSizedOne);
+        ItemStack fullContainer = FluidInteractions.getFullFluidContainer(heldItemSizedOne, tankFluid);
         if (fullContainer == null) {
             return 0;
         }
 
         FluidStack fullContainerFluid = FluidInteractions.getFluidForItem(fullContainer);
+        if (fullContainerFluid == null) {
+            return 0;
+        }
+
         int amountToFill = fullContainerFluid.amount - (heldFluid != null ? heldFluid.amount : 0);
+        if (amountToFill <= 0) {
+            return 0;
+        }
+
         int containersToFill = Math.min(tankFluid.amount / amountToFill, heldItem.stackSize);
 
         if (!processFullStack && containersToFill > 1) {
@@ -356,8 +360,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
             // 1. Try to empty some filled containers completely
             if (heldItem.stackSize > 1) {
-                int initialHeldItemsCount = heldItem.stackSize;
-                int filled = fillFluidUsingFullContainers(heldItem, heldFluid, processFullStack);
+                int filled = batchFillFluidFromContainers(heldItem, heldFluid, processFullStack);
 
                 if (filled > 0) {
                     playSound(heldFluid, true);
@@ -369,8 +372,9 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                     return;
                 }
 
-                // Return if there are no filled containers left
-                if (filled == initialHeldItemsCount * heldFluid.amount) {
+                // Return if there are no filled containers left.
+                // Note: stackSize = 0 means that the stack got replaced as per replaceCursorItemStack implementation
+                if (heldItem.stackSize == 0) {
                     return;
                 }
             }
@@ -394,14 +398,14 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
                 }
             }
         } else {
-            int filled = this.fillFluidUsingFullContainers(heldItem, heldFluid, processFullStack);
+            int filled = this.batchFillFluidFromContainers(heldItem, heldFluid, processFullStack);
             if (filled > 0) {
                 playSound(heldFluid, true);
             }
         }
     }
 
-    private int fillFluidUsingFullContainers(ItemStack heldItem, FluidStack heldFluid, boolean processFullStack) {
+    private int batchFillFluidFromContainers(ItemStack heldItem, FluidStack heldFluid, boolean processFullStack) {
         ItemStack heldItemSizedOne = heldItem.copy();
         heldItemSizedOne.stackSize = 1;
 
@@ -466,7 +470,9 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     /**
-     * Replaces heldStack with resultStack. If player held more items in stack, remaining amount will be kept in its hand.
+     * Replaces heldStack with resultStack.
+     * If player held more items in stack, remaining amount will be kept in its hand.
+     * Guarantees mutating original heldStack stackSize even if it has to be 0.
      * Requires heldStack.stackSize >= resultStack.stackSize
      */
     protected void replaceCursorItemStack(ItemStack resultStack) {
@@ -481,13 +487,14 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             addItemToPlayerInventory(player, resultStack.splitStack(resultStackMaxStackSize));
         }
 
-        if (heldStack.stackSize == resultStack.stackSize) {
+        heldStack.stackSize -= resultStack.stackSize;
+
+        if (heldStack.stackSize == 0) {
             getSyncManager().setCursorItem(resultStack);
         } else {
-            heldStack.stackSize -= resultStack.stackSize;
-            // it's the same held item stack, but we need to sync changed amount
-            getSyncManager().setCursorItem(heldStack);
             addItemToPlayerInventory(player, resultStack);
+            // it's the same held item stack, but we need to sync changed stack size
+            getSyncManager().setCursorItem(heldStack);
         }
     }
 

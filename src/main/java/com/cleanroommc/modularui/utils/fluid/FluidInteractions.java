@@ -30,24 +30,25 @@ public class FluidInteractions {
         return fluidStack;
     }
 
-    public static ItemStack getFilledFluidContainer(FluidStack fluidStack, ItemStack itemStack) {
+    public static ItemStack getFullFluidContainer(ItemStack itemStack, FluidStack fluidToFill) {
         ItemStack filledContainer = null;
 
         if (ModularUI.Mods.GT5U.isLoaded()) {
-            filledContainer = GTUtility.fillFluidContainer(fluidStack, itemStack, false, false);
+            filledContainer = GTUtility.fillFluidContainer(fluidToFill, itemStack, false, false);
         }
 
         if (filledContainer == null && itemStack.getItem() instanceof IFluidContainerItem container) {
             FluidStack containerFluid = container.getFluid(itemStack);
             int containerFluidAmount = containerFluid != null ? containerFluid.amount : 0;
 
-            if (containerFluid != null && containerFluid.getFluid() != fluidStack.getFluid()) {
+            if (containerFluid != null && containerFluid.getFluid() != fluidToFill.getFluid()) {
                 return null;
             }
 
-            if (containerFluidAmount + fluidStack.amount >= container.getCapacity(itemStack)) {
-                ItemStack copyStack = itemStack.copy();
-                container.fill(copyStack, fluidStack, true);
+            ItemStack copyStack = itemStack.copy();
+            int filled = container.fill(copyStack, fluidToFill, true);
+
+            if (containerFluidAmount + filled == container.getCapacity(copyStack)) {
                 return copyStack;
             }
 
@@ -55,7 +56,7 @@ public class FluidInteractions {
         }
 
         if (filledContainer == null) {
-            filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
+            filledContainer = FluidContainerRegistry.fillFluidContainer(fluidToFill, itemStack);
         }
 
         return filledContainer;
@@ -71,10 +72,10 @@ public class FluidInteractions {
 
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
             ItemStack stack = itemStack.copy();
-            int amount = container.getFluid(itemStack).amount;
+            FluidStack fluidStack = container.getFluid(itemStack);
             FluidStack drained = container.drain(stack, Integer.MAX_VALUE, true);
 
-            if (drained == null || drained.amount < amount) {
+            if (drained == null || fluidStack == null || drained.amount < fluidStack.amount) {
                 return null;
             }
             return stack;
