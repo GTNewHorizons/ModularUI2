@@ -10,6 +10,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class SClipboard implements IPacket {
 
@@ -40,6 +42,7 @@ public class SClipboard implements IPacket {
         this.s = NetworkUtils.readStringSafe(buf);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public IPacket executeClient(NetHandlerPlayClient handler) {
         GuiScreen.setClipboardString(this.s);

@@ -8,8 +8,8 @@ public enum Mixins implements IMixins {
 
     MINECRAFT(new MixinBuilder()
             .addClientMixins(
-                    "minecraft.FontRendererAccessor",
                     "forge.ForgeHooksClientMixin",
+                    "minecraft.FontRendererAccessor",
                     "minecraft.GuiAccessor",
                     "minecraft.GuiButtonMixin",
                     "minecraft.GuiContainerAccessor",
@@ -19,8 +19,9 @@ public enum Mixins implements IMixins {
                     "minecraft.MinecraftMixin",
                     "minecraft.SimpleResourceAccessor")
             .addCommonMixins(
-                    "minecraft.EntityAccessor",
                     "minecraft.ContainerAccessor",
+                    "minecraft.EntityAccessor",
+                    "minecraft.EntityPlayerMPMixin",
                     "minecraft.InventoryCraftingAccessor",
                     "forge.SimpleNetworkWrapperMixin")
             .setPhase(Phase.EARLY)),

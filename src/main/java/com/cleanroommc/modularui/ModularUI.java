@@ -12,7 +12,6 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.mariuszgromada.math.mxparser.License;
 
 import java.util.function.Predicate;
 
@@ -44,11 +43,6 @@ public class ModularUI {
     public static final boolean isTestEnv = Launch.blackboard == null;
     public static final boolean isDevEnv = isTestEnv || (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 
-    static {
-        // confirm mXparser license
-        License.iConfirmNonCommercialUse("GTNewHorizons");
-    }
-
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
@@ -69,7 +63,7 @@ public class ModularUI {
         BAUBLES(ModIds.BAUBLES),
         BOGOSORTER(ModIds.BOGOSORTER),
         GT5U(ModIds.GT5U, mod -> !Loader.isModLoaded(ModIds.GT6)),
-        HODGEPODGE(ModIds.BOGOSORTER),
+        HODGEPODGE(ModIds.HODGEPODGE),
         NEI(ModIds.NEI),
         NEA(ModIds.NEA);
 

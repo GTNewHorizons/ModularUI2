@@ -6,18 +6,16 @@ import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.api.drawable.ITextLine;
 import com.cleanroommc.modularui.api.value.IStringValue;
-import com.cleanroommc.modularui.api.value.IValue;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.text.ParsePosition;
 import java.util.function.Consumer;
@@ -43,12 +41,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     public double parse(String num) {
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
-        double value = result.getResult();
         if (result.isFailure()) {
-            this.mathFailMessage = result.getError();
+            this.mathFailMessage = result.getErrorMessage();
             ModularUI.LOGGER.error("Math expression error in {}: {}", this, this.mathFailMessage);
+            return defaultNumber;
         }
-        return value;
+        return result.getResult().getNumberValue().doubleValue();
     }
 
     public IStringValue<?> createMathFailMessageValue() {
@@ -70,26 +68,19 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof IStringValue<?>;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isTypeOrEmpty(IStringValue.class);
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        if (syncHandler instanceof ValueSyncHandler<?> valueSyncHandler) {
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.stringValue = syncOrValue.castNullable(IStringValue.class);
+        if (syncOrValue instanceof ValueSyncHandler<?> valueSyncHandler) {
             valueSyncHandler.setChangeListener(() -> {
                 markTooltipDirty();
                 setText(this.stringValue.getValue().toString());
             });
-        }
-    }
-
-    @Override
-    protected void setValue(IValue<?> value) {
-        super.setValue(value);
-        if (value instanceof IStringValue<?> stringValue1) {
-            this.stringValue = stringValue1;
         }
     }
 
@@ -235,8 +226,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget value(IStringValue<?> stringValue) {
-        this.stringValue = stringValue;
-        setValue(stringValue);
+        setSyncOrValue(ISyncOrValue.orEmpty(stringValue));
         return this;
     }
 

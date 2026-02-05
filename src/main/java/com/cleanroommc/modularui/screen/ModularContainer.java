@@ -9,10 +9,10 @@ import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.utils.item.SlotItemHandler;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
-import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -62,10 +62,10 @@ public class ModularContainer extends Container {
     public ModularContainer() {}
 
     @ApiStatus.Internal
-    public void construct(EntityPlayer player, PanelSyncManager panelSyncManager, UISettings settings, String mainPanelName, GuiData guiData) {
+    public void construct(EntityPlayer player, ModularSyncManager msm, UISettings settings, String mainPanelName, GuiData guiData) {
         this.player = player;
-        this.syncManager = new ModularSyncManager(this);
-        this.syncManager.construct(mainPanelName, panelSyncManager);
+        this.syncManager = msm;
+        this.syncManager.construct(this, mainPanelName);
         this.settings = settings;
         this.guiData = guiData;
         sortShiftClickSlots();
@@ -97,14 +97,16 @@ public class ModularContainer extends Container {
         return (ContainerAccessor) this;
     }
 
-    @MustBeInvokedByOverriders
-    @Override
-    public void onContainerClosed(@NotNull EntityPlayer playerIn) {
-        super.onContainerClosed(playerIn);
-        if (this.syncManager != null) {
-            this.syncManager.onClose();
-        }
-    }
+    public void onModularContainerOpened() {}
+
+    /**
+     * Called when this container closes. This is different to {@link Container#onContainerClosed(EntityPlayer)}, since that one is also
+     * called from {@link GuiContainer#onGuiClosed()}, which means it is called even when the container may still exist.
+     * This happens when a temporary client screen takes over (like JEI,NEI,etc.). This is only called when the container actually closes.
+     */
+    public void onModularContainerClosed() {}
+
+    public void onModularContainerDisposed() {}
 
     @MustBeInvokedByOverriders
     @Override
@@ -116,7 +118,7 @@ public class ModularContainer extends Container {
         this.init = false;
     }
 
-    @ApiStatus.Internal
+    @MustBeInvokedByOverriders
     public void onUpdate() {
         // detectAndSendChanges is potentially called multiple times per tick, while this method is called exactly once per tick
         if (this.syncManager != null) {

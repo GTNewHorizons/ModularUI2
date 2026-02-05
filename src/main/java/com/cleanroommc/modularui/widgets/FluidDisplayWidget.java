@@ -1,68 +1,88 @@
 package com.cleanroommc.modularui.widgets;
 
-import com.cleanroommc.modularui.drawable.text.TextRenderer;
-import com.cleanroommc.modularui.utils.Alignment;
-import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.NumberFormat;
-import com.cleanroommc.modularui.widget.sizer.Area;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
+import com.cleanroommc.modularui.api.value.IValue;
+import com.cleanroommc.modularui.screen.RichTooltip;
+import com.cleanroommc.modularui.value.ObjectValue;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraftforge.fluids.FluidStack;
 
-import com.cleanroommc.modularui.api.ITheme;
-import com.cleanroommc.modularui.api.value.IValue;
-import com.cleanroommc.modularui.drawable.GuiDraw;
-import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
-import com.cleanroommc.modularui.theme.WidgetThemeEntry;
-import com.cleanroommc.modularui.value.ObjectValue;
-import com.cleanroommc.modularui.value.sync.GenericSyncValue;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
-import com.cleanroommc.modularui.widget.Widget;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class FluidDisplayWidget extends Widget<FluidDisplayWidget> {
+import java.util.function.BiConsumer;
+
+public class FluidDisplayWidget extends AbstractFluidDisplayWidget<FluidDisplayWidget> {
 
     private IValue<FluidStack> value;
-    private boolean displayAmount = false;
+    private int capacity = 0;
+    private boolean displayAmount = true;
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        if (syncHandler instanceof GenericSyncValue<?>genericSyncValue && genericSyncValue.isOfType(FluidStack.class)) {
-            this.value = genericSyncValue.cast();
-            return true;
-        }
-        return false;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue.isValueOfType(FluidStack.class);
     }
 
     @Override
-    protected WidgetThemeEntry<?> getWidgetThemeInternal(ITheme theme) {
-        return theme.getItemSlotTheme();
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.value = syncOrValue.castValueNullable(FluidStack.class);
     }
 
     @Override
-    public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
-        FluidStack fluid = value.getValue();
-        if (fluid == null) return;
-        GuiDraw.drawFluidTexture(fluid, 0, 0, getArea().width, getArea().height, context.getCurrentDrawingZ());
-        if (this.displayAmount) {
-            GuiDraw.drawScaledAmountText(fluid.amount, null, 1, 1, this.getArea().width-1,
-                    this.getArea().height-1, Alignment.BottomRight, 1);
-        }
+    protected boolean displayAmountText() {
+        return this.displayAmount;
     }
 
-    public FluidDisplayWidget fluid(IValue<FluidStack> fluidSupplier) {
-        this.value = fluidSupplier;
-        setValue(fluidSupplier);
+    @Override
+    protected @Nullable FluidStack getFluidStack() {
+        return this.value != null ? this.value.getValue() : null;
+    }
+
+    @Override
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public FluidDisplayWidget value(IValue<FluidStack> value) {
+        setSyncOrValue(value);
         return this;
     }
 
-    public FluidDisplayWidget fluid(FluidStack fluidStack) {
-        return fluid(new ObjectValue<>(fluidStack));
+    public FluidDisplayWidget value(FluidStack value) {
+        return value(new ObjectValue<>(FluidStack.class, value));
     }
 
+    /**
+     * Sets the capacity of the slot. This is only used for drawing and doesn't affect the actual capacity in any way. When the capacity is
+     * greater than zero, the fluid will be drawn partially depending on the fill level.
+     *
+     * @param capacity capacity for drawing the fluid
+     * @return this
+     */
+    public FluidDisplayWidget capacity(int capacity) {
+        this.capacity = capacity;
+        return this;
+    }
+
+    /**
+     * Sets whether the amount number should be displayed in the bottom left corner of the slot.
+     *
+     * @param displayAmount true if amount should be displayed
+     * @return this
+     */
     public FluidDisplayWidget displayAmount(boolean displayAmount) {
         this.displayAmount = displayAmount;
         return this;
     }
 
+    /**
+     * Adds additional tooltip lines for the fluid. The function is called every frame.
+     *
+     * @param tooltip tooltip function for additional lines
+     * @return this
+     */
+    public FluidDisplayWidget fluidTooltip(BiConsumer<RichTooltip, FluidStack> tooltip) {
+        return tooltipAutoUpdate(true).tooltipBuilder(t -> tooltip.accept(t, getFluidStack()));
+    }
 }
