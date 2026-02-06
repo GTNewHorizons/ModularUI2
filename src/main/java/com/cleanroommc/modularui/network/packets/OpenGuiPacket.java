@@ -20,13 +20,15 @@ import java.io.IOException;
 public class OpenGuiPacket<T extends GuiData> implements IPacket {
 
     private int windowId;
+    private int networkId;
     private UIFactory<T> factory;
     private PacketBuffer data;
 
     public OpenGuiPacket() {}
 
-    public OpenGuiPacket(int windowId, UIFactory<T> factory, PacketBuffer data) {
+    public OpenGuiPacket(int windowId, int networkId, UIFactory<T> factory, PacketBuffer data) {
         this.windowId = windowId;
+        this.networkId = networkId;
         this.factory = factory;
         this.data = data;
     }
@@ -34,6 +36,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @Override
     public void write(PacketBuffer buf) throws IOException {
         buf.writeVarIntToBuffer(this.windowId);
+        buf.writeVarIntToBuffer(this.networkId);
         NetworkUtils.writeStringSafe(buf, this.factory.getFactoryName());
         NetworkUtils.writeByteBuf(buf, this.data);
     }
@@ -41,6 +44,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @Override
     public void read(PacketBuffer buf) {
         this.windowId = buf.readVarIntFromBuffer();
+        this.networkId = buf.readVarIntFromBuffer();
         this.factory = (UIFactory<T>) GuiManager.getFactory(NetworkUtils.readStringSafe(buf));
         this.data = NetworkUtils.readPacketBuffer(buf);
     }
@@ -48,7 +52,7 @@ public class OpenGuiPacket<T extends GuiData> implements IPacket {
     @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
-        GuiManager.openFromClient(this.windowId, this.factory, this.data, Platform.getClientPlayer());
+        GuiManager.openFromClient(this.windowId, this.networkId, this.factory, this.data, Platform.getClientPlayer());
         return null;
     }
 

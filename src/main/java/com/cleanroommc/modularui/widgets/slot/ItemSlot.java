@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets.slot;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.IThemeApi;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiAccessor;
@@ -20,7 +21,6 @@ import com.cleanroommc.modularui.utils.GlStateManager;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
 
@@ -68,14 +68,15 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof ItemSlotSH;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        // disallow null
+        return syncOrValue instanceof ItemSlotSH;
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        this.syncHandler = castIfTypeElseNull(syncHandler, ItemSlotSH.class);
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castOrThrow(ItemSlotSH.class);
     }
 
     @Override
@@ -98,9 +99,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
 
     protected void drawOverlay() {
         if (isHovering() && (!ModularUI.Mods.NEA.isLoaded() || NEAConfig.itemHoverOverlay)) {
-            GlStateManager.colorMask(true, true, true, false);
             GuiDraw.drawRect(1, 1, 16, 16, getSlotHoverColor());
-            GlStateManager.colorMask(true, true, true, true);
         }
     }
 
@@ -203,9 +202,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot slot(ModularSlot slot) {
-        this.syncHandler = new ItemSlotSH(slot);
-        setSyncHandler(this.syncHandler);
-        return this;
+        return syncHandler(new ItemSlotSH(slot));
     }
 
     public ItemSlot slot(IItemHandlerModifiable itemHandler, int index) {
@@ -213,7 +210,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
     }
 
     public ItemSlot syncHandler(ItemSlotSH syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 
@@ -231,7 +228,7 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         RenderItem renderItem = GuiScreenAccessor.getItemRender();
         ItemStack itemstack = slotIn.getStack();
         boolean isDragPreview = false;
-        boolean flag1 = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
+        boolean doDrawItem = slotIn == acc.getClickedSlot() && acc.getDraggedStack() != null && !acc.getIsRightMouseClick();
         ItemStack itemstack1 = guiScreen.mc.thePlayer.inventory.getItemStack();
         int amount = -1;
         String format = null;
@@ -270,9 +267,9 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
         ((GuiAccessor) guiScreen).setZLevel(z);
         renderItem.zLevel = z;
 
-        if (!flag1) {
+        if (!doDrawItem) {
             if (isDragPreview) {
-                GuiDraw.drawRect(1, 1, 16, 16, -2130706433);
+                GuiDraw.drawRect(1, 1, 16, 16, 0x80FFFFFF);
             }
 
             itemstack = getItemStackForRendering(itemstack, isDragPreview);

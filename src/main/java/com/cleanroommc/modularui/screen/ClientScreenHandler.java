@@ -17,6 +17,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccesso
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.Stencil;
+import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.overlay.OverlayManager;
 import com.cleanroommc.modularui.overlay.OverlayStack;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
@@ -231,6 +232,8 @@ public class ClientScreenHandler {
         } else if (newScreen == null) {
             // closing -> clear stack and dispose every screen
             invalidateMuiStack();
+            // only when all screens are closed dispose all containers in the stack
+            ModularNetwork.CLIENT.closeAll();
         }
 
         OverlayManager.onGuiOpen(newScreen);
@@ -241,7 +244,7 @@ public class ClientScreenHandler {
         if (lastMui != null) {
             ((GuiScreenAccessor) lastMui.getGuiScreen()).setEventButton(-1);
             ((GuiScreenAccessor) lastMui.getGuiScreen()).setLastMouseEvent(-1);
-            lastMui.getScreen().getPanelManager().closeAll();
+            lastMui.getScreen().getPanelManager().closeScreen();
             lastMui = null;
         }
         currentScreen = null;
@@ -600,9 +603,9 @@ public class ClientScreenHandler {
             Area area = hovered.getArea();
             IWidget parent = hovered.getParent();
 
-            GuiDraw.drawBorder(0, 0, area.width, area.height, color, scale);
+            GuiDraw.drawBorderOutsideXYWH(0, 0, area.width, area.height, scale, color);
             if (hovered.hasParent()) {
-                GuiDraw.drawBorder(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, Color.withAlpha(color, 0.3f), scale);
+                GuiDraw.drawBorderOutsideXYWH(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, scale, Color.withAlpha(color, 0.3f));
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);

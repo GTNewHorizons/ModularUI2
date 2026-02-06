@@ -31,7 +31,11 @@
 dependencies {
     api("com.github.GTNewHorizons:GTNHLib:0.9.0:dev")
 
-    shadowImplementation('org.mariuszgromada.math:MathParser.org-mXparser:6.1.0')
+    // used in evalex
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
 
     implementation("com.github.GTNewHorizons:NotEnoughItems:2.8.48-GTNH:dev")
     compileOnly("com.github.GTNewHorizons:Hodgepodge:2.7.39:dev") { transitive = false }

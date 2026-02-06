@@ -1,11 +1,11 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.api.UpOrDown;
+import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
-import com.cleanroommc.modularui.value.sync.SyncHandler;
 
 import net.minecraft.item.ItemStack;
 
@@ -22,14 +22,14 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
     }
 
     @Override
-    public boolean isValidSyncHandler(SyncHandler syncHandler) {
-        return syncHandler instanceof PhantomItemSlotSH;
+    public boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        return syncOrValue instanceof PhantomItemSlotSH;
     }
 
     @Override
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
-        super.setSyncHandler(syncHandler);
-        this.syncHandler = castIfTypeElseNull(syncHandler, PhantomItemSlotSH.class);
+    protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
+        super.setSyncOrValue(syncOrValue);
+        this.syncHandler = syncOrValue.castOrThrow(PhantomItemSlotSH.class);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngred
 
     @Override
     public PhantomItemSlot syncHandler(ItemSlotSH syncHandler) {
-        setSyncHandler(syncHandler);
+        setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
     }
 
