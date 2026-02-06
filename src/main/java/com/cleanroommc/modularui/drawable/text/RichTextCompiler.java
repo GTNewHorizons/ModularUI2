@@ -118,7 +118,7 @@ public class RichTextCompiler {
                 if (i == 0) {
                     // doesn't fit at the end of the line, try new line
                     if (this.x > 0) i = ((FontRendererAccessor) fr).invokeSizeStringToWidth(subText, this.maxWidth);
-                    if (i == 0) throw new IllegalStateException("No space for string '" + subText + "'");
+                    if (i <= 0) i = 1; // force at least one char
                     newLine();
                 } else if (i < subText.length()) {
                     // the whole string doesn't fit
