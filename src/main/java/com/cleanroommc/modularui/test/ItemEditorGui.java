@@ -1,10 +1,12 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.factory.GuiData;
 import com.cleanroommc.modularui.factory.SimpleGuiFactory;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.item.ItemStackHandler;
@@ -38,6 +40,11 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
 
     private void setStack(ItemStack stack) {
         this.stackHandler.setStackInSlot(0, stack);
+    }
+
+    @Override
+    public ModularScreen createScreen(GuiData data, ModularPanel mainPanel) {
+        return new ModularScreen(ModularUI.ID, mainPanel);
     }
 
     @Override

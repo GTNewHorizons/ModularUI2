@@ -1,0 +1,143 @@
+package com.cleanroommc.modularui.value.sync;
+
+import com.cleanroommc.modularui.api.widget.IWidget;
+import com.cleanroommc.modularui.widget.WidgetTree;
+
+import net.minecraft.network.PacketBuffer;
+
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+/**
+ * This is a variation of {@link DynamicSyncHandler} with the difference that this is linked to a {@link ValueSyncHandler}.
+ * This sync handler is automatically notified, when the linked value is updated. The widget provider here has the linked sync handler as an
+ * argument instead of a packet.
+ * To use it simply pass in a registered value sync handler into the constructor and link it to a
+ * {@link com.cleanroommc.modularui.widgets.DynamicSyncedWidget DynamicSyncedWidget}.
+ */
+public class DynamicLinkedSyncHandler<S extends ValueSyncHandler<?>> extends SyncHandler implements IDynamicSyncNotifiable {
+
+    private IWidgetProvider<S> widgetProvider;
+    private Consumer<IWidget> onWidgetUpdate;
+
+    private boolean updateQueued;
+    private IWidget lastRejectedWidget;
+
+    private final S linkedValue;
+
+    public DynamicLinkedSyncHandler(S linkedValue) {
+        this.linkedValue = linkedValue;
+        linkedValue.setChangeListener(() -> notifyUpdate(false));
+    }
+
+    @Override
+    public void readOnClient(int id, PacketBuffer buf) throws IOException {
+        if (id == 0) {
+            updateWidget(parseWidget());
+        }
+    }
+
+    @Override
+    public void readOnServer(int id, PacketBuffer buf) throws IOException {
+        if (id == 0) {
+            // do nothing with the widget on server side
+            parseWidget();
+        }
+    }
+
+    @Override
+    public void init(String key, PanelSyncManager syncManager) {
+        super.init(key, syncManager);
+        if (this.updateQueued) {
+            notifyUpdate(true);
+            this.updateQueued = false;
+        }
+    }
+
+    private IWidget parseWidget() {
+        getSyncManager().allowTemporarySyncHandlerRegistration(true);
+        IWidget widget = this.widgetProvider.createWidget(getSyncManager(), this.linkedValue);
+        getSyncManager().allowTemporarySyncHandlerRegistration(false);
+        // collects any unregistered sync handlers
+        // since the sync manager is currently locked and we no longer allow bypassing the lock it will crash if it finds any
+        int unregistered = WidgetTree.countUnregisteredSyncHandlers(widget);
+        if (unregistered > 0) {
+            throw new IllegalStateException("Widgets created by DynamicSyncHandler can't have implicitly registered sync handlers. All" +
+                    "sync handlers must be registered with a variant of 'PanelSyncManager#getOrCreateSyncHandler(...)'.");
+        }
+        return widget;
+    }
+
+    private void updateWidget(IWidget widget) {
+        if (this.onWidgetUpdate == null) {
+            // no dynamic widget is yet attached
+            // store for later
+            // also ignore previous stored widget
+            this.lastRejectedWidget = widget;
+        } else {
+            this.onWidgetUpdate.accept(widget);
+        }
+    }
+
+    /**
+     * Notifies the sync handler to create a new widget. It is allowed to call this method before this sync handler is initialised.
+     * The packet will be cached until the sync handler is initialised. Only the last call of this method, while this sync handler is not
+     * initialised is effective.
+     */
+    private void notifyUpdate(boolean sync) {
+        if (!isValid()) {
+            // sync handler not yet initialised
+            this.updateQueued = true;
+            return;
+        }
+        IWidget widget = parseWidget();
+        if (getSyncManager().isClient()) {
+            updateWidget(widget);
+        }
+        if (sync) sync(0, b -> {});
+    }
+
+    /**
+     * Sets a widget creator which is called on client and server. {@link SyncHandler}s can be created here using
+     * {@link PanelSyncManager#getOrCreateSyncHandler(String, int, Class, Supplier)}. Returning null in the function will not update the widget.
+     * On client side the result is handed over to a linked {@link com.cleanroommc.modularui.widgets.DynamicSyncedWidget}.
+     *
+     * @param widgetProvider the widget creator function
+     * @return this
+     * @see IWidgetProvider
+     */
+    public DynamicLinkedSyncHandler<S> widgetProvider(IWidgetProvider<S> widgetProvider) {
+        this.widgetProvider = widgetProvider;
+        return this;
+    }
+
+    /**
+     * An internal function which is used to link the {@link com.cleanroommc.modularui.widgets.DynamicSyncedWidget}.
+     */
+    @ApiStatus.Internal
+    @Override
+    public void attachDynamicWidgetListener(Consumer<IWidget> onWidgetUpdate) {
+        this.onWidgetUpdate = onWidgetUpdate;
+        if (this.onWidgetUpdate != null && this.lastRejectedWidget != null) {
+            this.onWidgetUpdate.accept(this.lastRejectedWidget);
+            this.lastRejectedWidget = null;
+        }
+    }
+
+    public interface IWidgetProvider<S extends ValueSyncHandler<?>> {
+
+        /**
+         * This is the function which creates a widget on client and server.
+         * In this method sync handlers can only be registered with {@link PanelSyncManager#getOrCreateSyncHandler(String, int, Class, Supplier)}.
+         *
+         * @param syncManager the sync manager of the current panel
+         * @param value       the linked sync value
+         * @return a new widget or null if widget shouldn't be updated
+         */
+        @Nullable IWidget createWidget(PanelSyncManager syncManager, S value);
+    }
+}

@@ -37,6 +37,7 @@ import com.cleanroommc.modularui.utils.fakeworld.FakeEntity;
 import com.cleanroommc.modularui.utils.fakeworld.ISchema;
 import com.cleanroommc.modularui.value.BoolValue;
 import com.cleanroommc.modularui.value.IntValue;
+import com.cleanroommc.modularui.value.ObjectValue;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.widget.DraggableWidget;
 import com.cleanroommc.modularui.widget.Widget;
@@ -45,6 +46,7 @@ import com.cleanroommc.modularui.widgets.ColorPickerDialog;
 import com.cleanroommc.modularui.widgets.ListWidget;
 import com.cleanroommc.modularui.widgets.RichTextWidget;
 import com.cleanroommc.modularui.widgets.SchemaWidget;
+import com.cleanroommc.modularui.widgets.ScrollingTextWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
 import com.cleanroommc.modularui.widgets.TransformWidget;
@@ -52,6 +54,8 @@ import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
 import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.widgets.menu.ContextMenuButton;
+import com.cleanroommc.modularui.widgets.menu.DropdownWidget;
 import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.client.Minecraft;
@@ -59,26 +63,45 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
+import cpw.mods.fml.common.registry.GameData;
 
-import com.google.common.base.CaseFormat;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.libraries.com.google.common.base.CaseFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TestGuis extends CustomModularScreen {
 
+    public static final IntList LIGHT_COLORS = ColorShade.getAll().stream()
+            .filter(cs -> !cs.name.contains("accent"))
+            .filter(cs -> cs.brighterShadeCount() > 1)
+            .mapToInt(cs -> cs.brighter(1))
+            .filter(c -> Color.getHSLSaturation(c) > 0.4f)
+            .collect(IntArrayList::new, IntList::add, IntList::addAll);
+
     public static boolean withCode = false;
 
+    public TestGuis() {
+        super(ModularUI.ID);
+    }
+
+    /**
+     * This method finds all 'build___UI' methods in this class via reflection and adds a button that opens that UI to a list widget.
+     * This makes it very convenient to add and test test-screens without having to swap out the screen that the diamond item opens.
+     */
     @Override
     public @NotNull ModularPanel buildUI(ModularGuiContext context) {
         // collect all test from all build methods in this class via reflection
@@ -110,6 +133,7 @@ public class TestGuis extends CustomModularScreen {
                                                 try {
                                                     ModularPanel panel = (ModularPanel) m.invoke(null);
                                                     if (TestGuis.withCode) {
+                                                        // WIP: this is meant to put an image of the code next to ui for showcase purpose
                                                         panel.child(UITexture.builder()
                                                                 .location("gui/code/" + codeTextureName)
                                                                 .build()
@@ -117,7 +141,7 @@ public class TestGuis extends CustomModularScreen {
                                                                 .leftRel(1f)
                                                                 .heightRel(1f));
                                                     }
-                                                    ClientGUI.open(new ModularScreen(panel).openParentOnClose(true));
+                                                    ClientGUI.open(new ModularScreen(ModularUI.ID, panel).openParentOnClose(true));
                                                 } catch (IllegalAccessException | InvocationTargetException e) {
                                                     ModularUI.LOGGER.throwing(e);
                                                 }
@@ -189,8 +213,7 @@ public class TestGuis extends CustomModularScreen {
         animator.reset(true);
         animator.animate(true);
         return ModularPanel.defaultPanel("main").size(150)
-                .child(new TransformWidget()
-                        .child(widget)
+                .child(new TransformWidget(widget)
                         .transform(stack -> {
                             double angle = Math.PI;
                             float x = (float) (55 * Math.cos(animator.getValue() * angle));
@@ -274,6 +297,7 @@ public class TestGuis extends CustomModularScreen {
                     @Override
                     public void draw(GuiContext context, int x, int y, int width, int height, WidgetTheme widgetTheme) {
                         GuiDraw.drawEntity(entity, 0, 0, width, height, context.getCurrentDrawingZ(), e -> {
+                            // TODO the drawable doesnt seem to update the rotation
                             float scale = 0.9f;
                             GlStateManager.scale(scale, scale, scale);
                             GlStateManager.translate(0, 7, 0);
@@ -296,7 +320,7 @@ public class TestGuis extends CustomModularScreen {
                                         .asIcon()
                                         .asHoverable()
                                         .tooltip(richTooltip -> richTooltip.addFromItem(new ItemStack(Blocks.grass))
-                                                .add(EnumChatFormatting.GRAY + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.")))
+                                                .add(IKey.GRAY + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.")))
                                 .add(", nice to ")
                                 .add(new ItemDrawable(new ItemStack(Items.porkchop))
                                         .asIcon()
@@ -330,7 +354,7 @@ public class TestGuis extends CustomModularScreen {
                                         IKey.str("underline").style(null, IKey.UNDERLINE)
                                 ).style(IKey.GREEN))
                                 .newLine()
-                                .add(EnumChatFormatting.RESET + "" + EnumChatFormatting.UNDERLINE + "Underlined" + EnumChatFormatting.RESET)
+                                .add(IKey.RESET + "" + IKey.UNDERLINE + "Underlined" + IKey.RESET)
                                 .newLine()
                                 .add("A long line which should wrap around")
                                 .newLine()
@@ -412,26 +436,36 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildSearchTest() {
-        List<String> items = Arrays.asList("Chicken", "Jockey", "Flint", "Steel", "Steve", "Diamond", "Ingot", "Iron", "Armor", "Greg");
         StringValue searchValue = new StringValue("");
-        return ModularPanel.defaultPanel("search", 100, 150)
+        return ModularPanel.defaultPanel("search", 130, 200)
                 .child(Flow.column()
                         .padding(5)
                         .child(new TextFieldWidget()
                                 .value(searchValue)
                                 .height(16)
-                                .widthRel(1f))
+                                .widthRel(1f)
+                                .autoUpdateOnChange(true))
                         .child(new ListWidget<>()
                                 .collapseDisabledChild()
                                 .expanded()
                                 .widthRel(1f)
-                                .children(items.size(), i -> new TextWidget<>(IKey.str(items.get(i)))
-                                        .alignment(Alignment.Center)
-                                        .color(Color.WHITE.main)
-                                        .widthRel(1f)
-                                        .height(16)
-                                        .background(GuiTextures.MC_BUTTON)
-                                        .setEnabledIf(w -> items.get(i).toLowerCase().contains(searchValue.getStringValue())))));
+                                .children((Iterable<Item>) GameData.getItemRegistry(), item -> {
+                                    ItemStack stack = new ItemStack(item);
+                                    String text = stack.getDisplayName();
+                                    return Flow.row()
+                                            .height(20).widthRel(1f)
+                                            .padding(2)
+                                            .widgetTheme(IThemeApi.BUTTON)
+                                            .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                            .setEnabledIf(w -> text.toLowerCase().contains(searchValue.getStringValue()))
+                                            .child(new ItemDrawable(stack).asWidget())
+                                            .child(new ScrollingTextWidget(IKey.str(text))
+                                                    .widgetTheme(IThemeApi.BUTTON)
+                                                    .textAlign(Alignment.CENTER)
+                                                    .expanded()
+                                                    .height(16)
+                                                    .invisible());
+                                })));
     }
 
     public static @NotNull ModularPanel buildColorTheoryUI() {
@@ -520,12 +554,59 @@ public class TestGuis extends CustomModularScreen {
     }
 
     public static @NotNull ModularPanel buildViewportTransformUI() {
-        return new TestPanel("test")
+        return new TestPanel("viewport_transform")
                 .child(new Widget<>()
                         .align(Alignment.Center)
                         .size(50, 50)
                         .background(GuiTextures.MC_BUTTON)
                         .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
+    }
+
+    public static ModularPanel buildContextMenu() {
+        List<String> options1 = IntStream.range(0, 5).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
+        List<String> options2 = IntStream.range(0, 5).mapToObj(i -> "Sub Option " + (i + 1)).collect(Collectors.toList());
+        ObjectValue<ItemStack> itemValue = new ObjectValue<>(ItemStack.class, new ItemStack(Items.wooden_door));
+        return new ModularPanel("context_menu_test")
+                .size(150)
+                .child(new ContextMenuButton<>("menu")
+                        .top(7)
+                        .width(100)
+                        .horizontalCenter()
+                        .height(16)
+                        .overlay(IKey.str("Menu"))
+                        .menuList(l -> l
+                                .maxSize(80)
+                                .children(options1, s -> IKey.str(s).asWidget())
+                                .child(new ContextMenuButton<>("sub_menu")
+                                        .widthRel(1f)
+                                        .height(12)
+                                        .overlay(IKey.str("Sub Menu"))
+                                        .openRightDown()
+                                        .menuList(l1 -> l1
+                                                //.width(90)
+                                                .maxSize(80)
+                                                .children(options2, s -> IKey.str(s).asWidget())))))
+                .child(new DropdownWidget<>("test_dropdown", ItemStack.class)
+                        .top(45)
+                        .width(100)
+                        .horizontalCenter()
+                        .value(itemValue)
+                        .option(new ItemStack(Items.wooden_door))
+                        .option(new ItemStack(Items.gold_ingot))
+                        .option(new ItemStack(Items.apple))
+                        .option(new ItemStack(Items.furnace_minecart))
+                        .option(new ItemStack(Items.iron_shovel))
+                        .option(new ItemStack(Items.stick))
+                        .option(new ItemStack(Items.nether_star))
+                        .optionToWidget((item, forSelected) -> Flow.row()
+                                .coverChildrenHeight()
+                                .padding(4, 1)
+                                .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                .child(new ItemDrawable(item).asWidget())
+                                .child(IKey.str(item.getDisplayName()).asWidget()
+                                        .widgetTheme(IThemeApi.BUTTON)
+                                        .invisible()))
+                );
     }
 
     public static @NotNull ModularPanel buildGraphUI() {
@@ -560,6 +641,42 @@ public class TestGuis extends CustomModularScreen {
                                 .asWidget().size(80)
                                 .overlay(IKey.str("4:3 | height = 45\nBottom Right"))))
                 .overlay();
+    }
+
+    public static @NotNull ModularPanel buildWrappedFlowUI() {
+        IntList colors = new IntArrayList(LIGHT_COLORS);
+        Random rnd = new Random();
+        int minRectSize = 10;
+        int maxRectSize = 40;
+        return new ModularPanel("wrapped_flow")
+                .size(150)
+                .padding(4)
+                .child(Flow.row()
+                        .name("wrap")
+                        .wrap()
+                        .widthRel(1f)
+                        .coverChildrenHeight()
+                        .padding(2)
+                        .crossAxisAlignment(Alignment.CrossAxis.START)
+                        .mainAxisAlignment(Alignment.MainAxis.CENTER)
+                        .childPadding(2)
+                        .crossAxisChildPadding(2)
+                        .background(rndRect(colors, rnd))
+                        .children(5, i -> {
+                            IWidget widget = rndRect(colors, rnd).asWidget()
+                                    .width(rnd.nextInt(maxRectSize - minRectSize) + minRectSize)
+                                    .height(rnd.nextInt(maxRectSize - minRectSize) + minRectSize)
+                                    .name("rect_" + (i + 1));
+                            if (i % 2 == 1) widget.resizer().expanded();
+                            return widget;
+                        }));
+    }
+
+    private static Rectangle rndRect(IntList colors, Random random) {
+        int i = random.nextInt(colors.size());
+        int c = colors.removeInt(i);
+        if (colors.isEmpty()) colors.addAll(LIGHT_COLORS);
+        return new Rectangle().color(c);
     }
 
     private static class TestPanel extends ModularPanel {
