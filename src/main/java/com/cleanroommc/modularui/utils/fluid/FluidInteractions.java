@@ -13,10 +13,7 @@ import gregtech.api.util.GTUtility;
 
 public class FluidInteractions {
 
-    /**
-     * Gets fluid actually stored in item. Used for transferring fluid.
-     */
-    public static FluidStack getFluidForRealItem(ItemStack itemStack) {
+    public static FluidStack getFluidForItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
@@ -27,82 +24,64 @@ public class FluidInteractions {
         if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
             fluidStack = StackInfo.getFluid(itemStack);
         }
-        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
+        if (fluidStack == null && ModularUI.Mods.GT5U.isLoaded()) {
+            fluidStack = GTUtility.getFluidForFilledItem(itemStack, false);
         }
         return fluidStack;
     }
 
-    /**
-     * Gets fluid for use in phantom slot.
-     */
-    public static FluidStack getFluidForPhantomItem(ItemStack itemStack) {
-        FluidStack fluidStack = null;
-        if (itemStack.getItem() instanceof IFluidContainerItem container) {
-            fluidStack = container.getFluid(itemStack.copy());
-        }
-        if (fluidStack == null) {
-            fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack.copy());
-        }
-        if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
-            fluidStack = StackInfo.getFluid(itemStack.copy());
-        }
-        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
-        }
-        return fluidStack;
-    }
+    public static ItemStack getFullFluidContainer(ItemStack itemStack, FluidStack fluidToFill) {
+        ItemStack filledContainer = null;
 
-    public static ItemStack fillFluidContainer(FluidStack fluidStack, ItemStack itemStack) {
-        ItemStack filledContainer = fillFluidContainerWithoutIFluidContainerItem(fluidStack, itemStack);
-        if (filledContainer == null) {
-            filledContainer = fillFluidContainerWithIFluidContainerItem(fluidStack, itemStack);
+        if (ModularUI.Mods.GT5U.isLoaded()) {
+            filledContainer = GTUtility.fillFluidContainer(fluidToFill, itemStack, false, false);
         }
-        if (filledContainer == null) {
-            filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
-            if(filledContainer == null) return itemStack; // give up and return original clicked stack
-            FluidStack newFluid = getFluidForRealItem(filledContainer);
-            fluidStack.amount -= newFluid.amount;
+
+        if (filledContainer == null && itemStack.getItem() instanceof IFluidContainerItem container) {
+            FluidStack containerFluid = container.getFluid(itemStack);
+            int containerFluidAmount = containerFluid != null ? containerFluid.amount : 0;
+
+            if (containerFluid != null && containerFluid.getFluid() != fluidToFill.getFluid()) {
+                return null;
+            }
+
+            ItemStack copyStack = itemStack.copy();
+            int filled = container.fill(copyStack, fluidToFill, true);
+
+            if (containerFluidAmount + filled == container.getCapacity(copyStack)) {
+                return copyStack;
+            }
+
+            return null;
         }
+
+        if (filledContainer == null) {
+            filledContainer = FluidContainerRegistry.fillFluidContainer(fluidToFill, itemStack);
+        }
+
         return filledContainer;
     }
 
-    public static ItemStack fillFluidContainerWithoutIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
+    public static ItemStack getEmptyFluidContainer(ItemStack itemStack) {
         if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
-        }
-        return null;
-    }
-
-    public static ItemStack fillFluidContainerWithIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (itemStack.getItem() instanceof IFluidContainerItem itemContainer) {
-            int tFilledAmount = itemContainer.fill(itemStack, fluidStack, true);
-            if (tFilledAmount > 0) {
-                fluidStack.amount -= tFilledAmount;
-                return itemStack;
+            ItemStack stack = GTUtility.getContainerForFilledItem(itemStack, false);
+            if (stack != null) {
+                return stack;
             }
         }
-        return null;
-    }
 
-    public static ItemStack getContainerForFilledItem(ItemStack itemStack) {
-        ItemStack stack = getContainerForFilledItemWithoutIFluidContainerItem(itemStack);
-        if (stack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
-            stack = itemStack.copy();
-             if (container.drain(stack, Integer.MAX_VALUE, true) == null)
-                 return null;
-        }
-        if (stack == null) {
-            stack = FluidContainerRegistry.drainFluidContainer(itemStack.copy());
-        }
-        return stack;
-    }
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
+            ItemStack stack = itemStack.copy();
+            FluidStack fluidStack = container.getFluid(itemStack);
+            FluidStack drained = container.drain(stack, Integer.MAX_VALUE, true);
 
-    public static ItemStack getContainerForFilledItemWithoutIFluidContainerItem(ItemStack itemStack) {
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.getContainerForFilledItem(itemStack, false);
+            if (drained == null || fluidStack == null || drained.amount < fluidStack.amount) {
+                return null;
+            }
+            return stack;
         }
-        return null;
+
+        return FluidContainerRegistry.drainFluidContainer(itemStack);
     }
 
     public static int getRealCapacity(IFluidTank fluidTank) {
