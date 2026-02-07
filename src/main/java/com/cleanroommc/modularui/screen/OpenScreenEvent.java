@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.screen;
 import com.cleanroommc.modularui.api.IMuiScreen;
 
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.Event;
 
 import org.jetbrains.annotations.Nullable;
 

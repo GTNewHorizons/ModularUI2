@@ -6,10 +6,10 @@ import com.cleanroommc.modularui.api.IThemeApi;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
+import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccessor;
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.factory.ClientGUI;
-import com.cleanroommc.modularui.holoui.HoloUI;
 import com.cleanroommc.modularui.screen.CustomModularScreen;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -22,7 +22,6 @@ import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.ThemeBuilder;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.utils.Color;
-import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
@@ -68,12 +67,12 @@ public class EventHandler {
             if (itemStack.getItem() == Items.diamond) {
                 ClientGUI.open(new TestGuis());
             } // todo: fix ScreenEntityRender / TestGui().
-           //else if (itemStack.getItem() == Items.emerald) {
-           //    HoloUI.builder()
-           //            .inFrontOf(Platform.getClientPlayer(), 5, false)
-           //            .screenScale(0.5f)
-           //            .open(new TestGui());
-           //}
+            //else if (itemStack.getItem() == Items.emerald) {
+            //    HoloUI.builder()
+            //            .inFrontOf(Platform.getClientPlayer(), 5, false)
+            //            .screenScale(0.5f)
+            //            .open(new TestGui());
+            //}
         }
     }
 
@@ -136,8 +135,8 @@ public class EventHandler {
 
             @Override
             public @NotNull ModularPanel buildUI(ModularGuiContext context) {
-                return ModularPanel.defaultPanel("watermark_overlay", gui.getXSize(), gui.getYSize())
-                        .pos(gui.getGuiLeft(), gui.getGuiTop())
+                return ModularPanel.defaultPanel("watermark_overlay", ((GuiContainerAccessor) gui).getXSize(), ((GuiContainerAccessor) gui).getYSize())
+                        .pos(((GuiContainerAccessor) gui).getGuiLeft(), ((GuiContainerAccessor) gui).getGuiTop())
                         .invisible()
                         .child(GuiTextures.MUI_LOGO.asIcon().asWidget()
                                 .top(5).right(5)
@@ -146,8 +145,8 @@ public class EventHandler {
 
             @Override
             public void onResize(int width, int height) {
-                getMainPanel().pos(gui.getGuiLeft(), gui.getGuiTop())
-                        .size(gui.getXSize(), gui.getYSize());
+                getMainPanel().pos(((GuiContainerAccessor) gui).getGuiLeft(), ((GuiContainerAccessor) gui).getGuiTop())
+                        .size(((GuiContainerAccessor) gui).getXSize(), ((GuiContainerAccessor) gui).getYSize());
                 super.onResize(width, height);
             }
         };

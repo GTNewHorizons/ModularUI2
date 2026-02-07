@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.test;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.overlay.ScreenWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
@@ -9,9 +10,6 @@ import com.cleanroommc.modularui.widgets.ButtonWidget;
 
 import org.junit.jupiter.api.AssertionFailureBuilder;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SizerTest {
 

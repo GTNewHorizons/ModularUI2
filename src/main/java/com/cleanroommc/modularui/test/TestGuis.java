@@ -63,14 +63,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
+import cpw.mods.fml.common.registry.GameData;
 
-import com.google.common.base.CaseFormat;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.libraries.com.google.common.base.CaseFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -448,7 +449,7 @@ public class TestGuis extends CustomModularScreen {
                                 .collapseDisabledChild()
                                 .expanded()
                                 .widthRel(1f)
-                                .children(ForgeRegistries.ITEMS, item -> {
+                                .children((Iterable<Item>) GameData.getItemRegistry(), item -> {
                                     ItemStack stack = new ItemStack(item);
                                     String text = stack.getDisplayName();
                                     return Flow.row()
@@ -564,7 +565,7 @@ public class TestGuis extends CustomModularScreen {
     public static ModularPanel buildContextMenu() {
         List<String> options1 = IntStream.range(0, 5).mapToObj(i -> "Option " + (i + 1)).collect(Collectors.toList());
         List<String> options2 = IntStream.range(0, 5).mapToObj(i -> "Sub Option " + (i + 1)).collect(Collectors.toList());
-        ObjectValue<ItemStack> itemValue = new ObjectValue<>(ItemStack.class, new ItemStack(Items.ACACIA_DOOR));
+        ObjectValue<ItemStack> itemValue = new ObjectValue<>(ItemStack.class, new ItemStack(Items.wooden_door));
         return new ModularPanel("context_menu_test")
                 .size(150)
                 .child(new ContextMenuButton<>("menu")
@@ -590,13 +591,13 @@ public class TestGuis extends CustomModularScreen {
                         .width(100)
                         .horizontalCenter()
                         .value(itemValue)
-                        .option(new ItemStack(Items.ACACIA_DOOR))
-                        .option(new ItemStack(Items.GOLD_INGOT))
-                        .option(new ItemStack(Items.APPLE))
-                        .option(new ItemStack(Items.FURNACE_MINECART))
-                        .option(new ItemStack(Items.IRON_SHOVEL))
-                        .option(new ItemStack(Items.STICK))
-                        .option(new ItemStack(Items.NETHER_STAR))
+                        .option(new ItemStack(Items.wooden_door))
+                        .option(new ItemStack(Items.gold_ingot))
+                        .option(new ItemStack(Items.apple))
+                        .option(new ItemStack(Items.furnace_minecart))
+                        .option(new ItemStack(Items.iron_shovel))
+                        .option(new ItemStack(Items.stick))
+                        .option(new ItemStack(Items.nether_star))
                         .optionToWidget((item, forSelected) -> Flow.row()
                                 .coverChildrenHeight()
                                 .padding(4, 1)

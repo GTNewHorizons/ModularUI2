@@ -19,11 +19,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 
-import com.google.common.collect.AbstractIterator;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.spongepowered.libraries.com.google.common.collect.AbstractIterator;
 
 import java.util.ArrayList;
 import java.util.Collections;

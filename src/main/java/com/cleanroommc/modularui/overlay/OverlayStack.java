@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.screen.OpenScreenEvent;
 import com.cleanroommc.modularui.utils.GlStateManager;
 
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.ApiStatus;

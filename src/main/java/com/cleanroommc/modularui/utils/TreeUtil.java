@@ -6,12 +6,12 @@ import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Streams;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.spongepowered.libraries.com.google.common.collect.AbstractIterator;
+import org.spongepowered.libraries.com.google.common.collect.Streams;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -9,8 +9,6 @@ import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.StandardResizer;
 
-import net.minecraft.util.text.TextFormatting;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -121,7 +119,7 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
             if (this.menu == null) {
                 this.menu = new Menu<>()
                         .child(IKey.str("No Menu supplied")
-                                .style(TextFormatting.RED)
+                                .style(IKey.RED)
                                 .asWidget()
                                 .center())
                         .widthRel(1f)

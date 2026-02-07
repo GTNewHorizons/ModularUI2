@@ -22,7 +22,7 @@ public abstract class CustomModularScreen extends ModularScreen {
     @Deprecated
     public CustomModularScreen() {
         super(ModularUI.ID);
-        if (ModularUI.isDev) {
+        if (ModularUI.isDevEnv) {
             ModularUI.LOGGER.error("The single arg ModularScreen constructor should not be used. Use the other one and pass in your mod id.");
         }
     }
