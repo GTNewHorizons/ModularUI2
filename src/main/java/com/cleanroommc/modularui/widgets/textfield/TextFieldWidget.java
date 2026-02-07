@@ -11,12 +11,14 @@ import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
+import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ParseResult;
 import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -34,12 +36,22 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private String mathFailMessage = null;
     private double defaultNumber = 0;
     private boolean tooltipOverride = false;
+    private boolean autoUpdateOnChange = false;
+    private boolean acceptsExpression = true;
     private double scrollStep = 1;
     private double scrollStepCtrl = 0.1;
     private double scrollStepShift = 100;
     private boolean usingScrollStep = false;
 
     public double parse(String num) {
+        if (!this.acceptsExpression) {
+            try {
+                return NumberFormat.AMOUNT_TEXT.format.parse(num).doubleValue();
+            } catch (ParseException ex) {
+                this.mathFailMessage = "Unable to parse number.";
+                return 0.0;
+            }
+        }
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
         if (result.isFailure()) {
             this.mathFailMessage = result.getErrorMessage();
@@ -136,12 +148,50 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @Override
+    protected void onTextChanged() {
+        super.onTextChanged();
+        if (this.autoUpdateOnChange) {
+            String text = this.validator.apply(getText());
+            this.stringValue.setStringValue(this.numbers ? format.parse(text, new ParsePosition(0)).toString() : getText());
+        }
+    }
+
+    @Override
     public boolean canHover() {
         return true;
     }
 
+    public boolean isAutoUpdateOnChange() {
+        return autoUpdateOnChange;
+    }
+
+    public boolean acceptsExpression() {
+        return acceptsExpression;
+    }
+
     public String getMathFailMessage() {
         return mathFailMessage;
+    }
+
+    public IStringValue<?> getStringValue() {
+        return stringValue;
+    }
+
+    public TextFieldWidget acceptsExpressions(boolean acceptsExpression) {
+        this.acceptsExpression = acceptsExpression;
+        return this;
+    }
+
+    /**
+     * Sets if the string value should be updated every time the text changes and not just when the widget is unfocused.
+     * This is useful for search text fields.
+     *
+     * @param autoUpdateOnChange if the string value should be updated when text changes
+     * @return this
+     */
+    public TextFieldWidget autoUpdateOnChange(boolean autoUpdateOnChange) {
+        this.autoUpdateOnChange = autoUpdateOnChange;
+        return this;
     }
 
     public TextFieldWidget setMaxLength(int maxLength) {

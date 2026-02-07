@@ -1,6 +1,7 @@
 {
-  "vanilla": "modularui:vanilla",
-  "vanilla_dark": "modularui:vanilla_dark",
+  "vanilla": "modularui2:vanilla",
+  "vanilla_dark": "modularui2:vanilla_dark",
+  "modularui.context_menu": "modularui2:context_menu",
   "screens": {
     "modularui:test": "vanilla_dark"
   }

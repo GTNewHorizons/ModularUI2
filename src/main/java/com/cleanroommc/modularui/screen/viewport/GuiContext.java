@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.screen.viewport;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.widget.sizer.Area;
 
@@ -45,14 +45,14 @@ public class GuiContext extends GuiViewportStack {
     private long tick = 0;
     private int currentDrawingZ = 0;
 
-    public boolean isAbove(IGuiElement widget) {
+    public boolean isAbove(IWidget widget) {
         return isMouseAbove(widget.getArea());
     }
 
     /**
      * @return true the mouse is anywhere above the widget
      */
-    public boolean isMouseAbove(IGuiElement widget) {
+    public boolean isMouseAbove(IWidget widget) {
         return isMouseAbove(widget.getArea());
     }
 
