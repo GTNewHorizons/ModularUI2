@@ -67,17 +67,17 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     @Override
     public void beforeResize(boolean onOpen) {
         super.beforeResize(onOpen);
-        this.scroll.applyWidgetTheme(getContext().getTheme().getScrollbarTheme().getTheme(isHovering()));
-        if (onOpen) checkScrollbarActive(true);
+        this.scroll.applyWidgetTheme(getPanel().getTheme().getScrollbarTheme().getTheme(isHovering()));
+        checkScrollbarActive(false);
         getScrollArea().getScrollPadding().scrollPaddingAll(0);
         applyAdditionalOffset(this.scroll.getScrollX());
         applyAdditionalOffset(this.scroll.getScrollY());
     }
 
-    private void checkScrollbarActive(boolean onOpen) {
+    protected void checkScrollbarActive(boolean resizeOnChange) {
         boolean scrollYActive = this.scroll.getScrollY() != null && this.scroll.getScrollY().isScrollBarActive(getScrollArea());
-        boolean scrollXActive = this.scroll.getScrollX() != null && this.scroll.getScrollX().isScrollBarActive(getScrollArea(), this.scrollYActive);
-        if (!onOpen && (scrollYActive != this.scrollYActive || scrollXActive != this.scrollXActive)) {
+        boolean scrollXActive = this.scroll.getScrollX() != null && this.scroll.getScrollX().isScrollBarActive(getScrollArea(), scrollYActive);
+        if (resizeOnChange && (scrollYActive != this.scrollYActive || scrollXActive != this.scrollXActive)) {
             scheduleResize();
         }
         this.scrollXActive = scrollXActive;
@@ -123,7 +123,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     @Override
     public void onUpdate() {
         super.onUpdate();
-        checkScrollbarActive(false);
+        checkScrollbarActive(true);
     }
 
     @Override
@@ -137,7 +137,7 @@ public abstract class AbstractScrollWidget<I extends IWidget, W extends Abstract
     public void postDraw(ModularGuiContext context, boolean transformed) {
         if (!transformed) {
             Stencil.remove();
-            WidgetThemeEntry<WidgetTheme> scrollbarTheme = context.getTheme().getScrollbarTheme();
+            WidgetThemeEntry<WidgetTheme> scrollbarTheme = getPanel().getTheme().getScrollbarTheme();
             this.scroll.drawScrollbar(context, scrollbarTheme.getTheme(isHovering()), scrollbarTheme.getTheme().getBackground());
         }
     }

@@ -5,14 +5,12 @@ import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.widget.IDraggable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
-import com.cleanroommc.modularui.api.widget.IGuiElement;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.ResizeDragArea;
 import com.cleanroommc.modularui.screen.DraggablePanelWrapper;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
-import com.cleanroommc.modularui.screen.PanelManager;
 import com.cleanroommc.modularui.screen.RecipeViewerSettingsImpl;
 import com.cleanroommc.modularui.screen.UISettings;
 
@@ -21,11 +19,11 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 
-import com.google.common.collect.AbstractIterator;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.spongepowered.libraries.com.google.common.collect.AbstractIterator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,7 +74,7 @@ public class ModularGuiContext extends GuiContext {
 
     public ModularGuiContext(ModularScreen screen) {
         this.screen = screen;
-        this.hoveredWidgets = new HoveredIterable(this.screen.getPanelManager());
+        this.hoveredWidgets = new HoveredIterable();
     }
 
     public ModularScreen getScreen() {
@@ -107,7 +105,7 @@ public class ModularGuiContext extends GuiContext {
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    public boolean isHovered(IGuiElement guiElement) {
+    public boolean isHovered(IWidget guiElement) {
         return guiElement.isHovering();
     }
 
@@ -120,7 +118,7 @@ public class ModularGuiContext extends GuiContext {
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    public boolean isHoveredFor(IGuiElement guiElement, int ticks) {
+    public boolean isHoveredFor(IWidget guiElement, int ticks) {
         return guiElement.isHoveringFor(ticks);
     }
 
@@ -142,9 +140,9 @@ public class ModularGuiContext extends GuiContext {
     }
 
     /**
-     * @return all widgets which are below the mouse ({@link GuiContext#isAbove(IGuiElement)} is true)
+     * @return all widgets which are below the mouse ({@link GuiContext#isAbove(IWidget)} is true)
      */
-    public Iterable<IGuiElement> getAllBelowMouse() {
+    public Iterable<IWidget> getAllBelowMouse() {
         return this.hoveredWidgets;
     }
 
@@ -332,7 +330,7 @@ public class ModularGuiContext extends GuiContext {
                 draggable = new LocatedElement<>(iDraggable, hovered.getTransformationMatrix());
             } else if (widget instanceof ModularPanel panel) {
                 if (panel.isDraggable()) {
-                    if (!panel.flex().hasFixedSize()) {
+                    if (!panel.resizer().hasFixedSize()) {
                         throw new IllegalStateException("Panel must have a fixed size. It can't specify left AND right or top AND bottom!");
                     }
                     draggable = new LocatedElement<>(new DraggablePanelWrapper(panel), TransformationMatrix.EMPTY);
@@ -488,39 +486,27 @@ public class ModularGuiContext extends GuiContext {
         }
     }
 
-    private static class HoveredIterable implements Iterable<IGuiElement> {
+    public boolean hasSettings() {
+        return this.settings != null;
+    }
 
-        private final PanelManager panelManager;
-
-        private HoveredIterable(PanelManager panelManager) {
-            this.panelManager = panelManager;
-        }
+    private class HoveredIterable implements Iterable<IWidget> {
 
         @NotNull
         @Override
-        public Iterator<IGuiElement> iterator() {
-            return new Iterator<>() {
+        public Iterator<IWidget> iterator() {
+            return new AbstractIterator<>() {
 
-                private final Iterator<ModularPanel> panelIt = HoveredIterable.this.panelManager.getOpenPanels().iterator();
+                private final Iterator<ModularPanel> panelIt = ModularGuiContext.this.getScreen().getPanelManager().getOpenPanels().iterator();
                 private Iterator<LocatedWidget> widgetIt;
 
                 @Override
-                public boolean hasNext() {
-                    if (this.widgetIt == null) {
-                        if (!this.panelIt.hasNext()) {
-                            return false;
-                        }
-                        this.widgetIt = this.panelIt.next().getHovering().iterator();
+                protected IWidget computeNext() {
+                    while (widgetIt == null || !widgetIt.hasNext()) {
+                        if (!panelIt.hasNext()) return endOfData();
+                        widgetIt = panelIt.next().getHovering().iterator();
                     }
-                    return this.widgetIt.hasNext();
-                }
-
-                @Override
-                public IGuiElement next() {
-                    if (this.widgetIt == null || !this.widgetIt.hasNext()) {
-                        this.widgetIt = this.panelIt.next().getHovering().iterator();
-                    }
-                    return this.widgetIt.next().getElement();
+                    return widgetIt.next().getElement();
                 }
             };
         }
