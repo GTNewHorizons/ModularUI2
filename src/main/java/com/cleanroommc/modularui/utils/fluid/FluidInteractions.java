@@ -9,7 +9,6 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 
 import codechicken.nei.recipe.StackInfo;
-import gregtech.api.util.GTUtility;
 
 public class FluidInteractions {
 
@@ -24,26 +23,13 @@ public class FluidInteractions {
         if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
             fluidStack = StackInfo.getFluid(itemStack);
         }
-        if (fluidStack == null && ModularUI.Mods.GT5U.isLoaded()) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, false);
-        }
         return fluidStack;
     }
 
     public static ItemStack getFullFluidContainer(ItemStack itemStack, FluidStack fluidToFill) {
-        ItemStack filledContainer = null;
-
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            filledContainer = GTUtility.fillFluidContainer(fluidToFill, itemStack, false, false);
-        }
-
-        if (filledContainer == null && itemStack.getItem() instanceof IFluidContainerItem container) {
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
             FluidStack containerFluid = container.getFluid(itemStack);
             int containerFluidAmount = containerFluid != null ? containerFluid.amount : 0;
-
-            if (containerFluid != null && containerFluid.getFluid() != fluidToFill.getFluid()) {
-                return null;
-            }
 
             ItemStack copyStack = itemStack.copy();
             int filled = container.fill(copyStack, fluidToFill, true);
@@ -55,27 +41,20 @@ public class FluidInteractions {
             return null;
         }
 
-        if (filledContainer == null) {
-            filledContainer = FluidContainerRegistry.fillFluidContainer(fluidToFill, itemStack);
-        }
-
-        return filledContainer;
+        return FluidContainerRegistry.fillFluidContainer(fluidToFill, itemStack);
     }
 
     public static ItemStack getEmptyFluidContainer(ItemStack itemStack) {
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            ItemStack stack = GTUtility.getContainerForFilledItem(itemStack, false);
-            if (stack != null) {
-                return stack;
-            }
-        }
-
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
-            ItemStack stack = itemStack.copy();
             FluidStack fluidStack = container.getFluid(itemStack);
+            if (fluidStack == null) {
+                return null;
+            }
+
+            ItemStack stack = itemStack.copy();
             FluidStack drained = container.drain(stack, Integer.MAX_VALUE, true);
 
-            if (drained == null || fluidStack == null || drained.amount < fluidStack.amount) {
+            if (drained == null || drained.amount < fluidStack.amount) {
                 return null;
             }
             return stack;
