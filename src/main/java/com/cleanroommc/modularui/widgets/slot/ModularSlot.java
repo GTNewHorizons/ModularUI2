@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 public class ModularSlot extends SlotItemHandler {
 
     private boolean enabled = true;
-    private boolean canTake = true, canPut = true, canDragInto;
+    private boolean canTake = true, canPut = true, canDragInto = true;
     private Predicate<ItemStack> filter = stack -> true;
     private IOnSlotChanged changeListener = IOnSlotChanged.DEFAULT;
     private boolean ignoreMaxStackSize = false;
