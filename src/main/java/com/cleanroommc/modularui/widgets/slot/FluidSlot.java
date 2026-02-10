@@ -15,6 +15,7 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.SlotTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.GlStateManager;
+import com.cleanroommc.modularui.utils.IMultiFluidTankHandler;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
@@ -231,9 +232,21 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
         return syncHandler(new FluidSlotSyncHandler(fluidTank));
     }
 
+    public FluidSlot syncHandler(IMultiFluidTankHandler fluidTank, int index) {
+        return syncHandler(fluidTank.getFluidTank(index));
+    }
+
     public FluidSlot syncHandler(FluidSlotSyncHandler syncHandler) {
         setSyncOrValue(ISyncOrValue.orEmpty(syncHandler));
         return this;
+    }
+
+    public FluidSlot tank(IFluidTank fluidTank) {
+        return syncHandler(fluidTank);
+    }
+
+    public FluidSlot tank(IMultiFluidTankHandler fluidTank, int index) {
+        return syncHandler(fluidTank, index);
     }
 
     /* === Recipe viewer ghost slot === */

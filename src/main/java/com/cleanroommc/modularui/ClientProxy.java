@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
-import com.cleanroommc.modularui.test.EventHandler;
 import com.cleanroommc.modularui.test.TestItem;
 import com.cleanroommc.modularui.theme.ThemeManager;
 import com.cleanroommc.modularui.theme.ThemeReloadCommand;
@@ -68,7 +67,6 @@ public class ClientProxy extends CommonProxy {
         AnimatorManager.init();
 
         if (ModularUIConfig.enableTestGuis) {
-            MinecraftForge.EVENT_BUS.register(new EventHandler());
             testKey = new KeyBinding("key.test", Keyboard.KEY_NUMPAD4, "key.categories.modularui");
             ClientRegistry.registerKeyBinding(testKey);
         }

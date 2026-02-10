@@ -12,6 +12,7 @@ import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.value.DoubleValue;
 import com.cleanroommc.modularui.widget.Widget;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.DoubleSupplier;
@@ -163,6 +164,8 @@ public class ProgressWidget extends Widget<ProgressWidget> {
         return this;
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     public ProgressWidget progress(DoubleSupplier progress) {
         return value(new DoubleValue.Dynamic(progress, null));
     }
