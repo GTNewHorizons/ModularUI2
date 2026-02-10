@@ -5,7 +5,6 @@ import com.cleanroommc.modularui.api.IGuiHolder;
 import com.cleanroommc.modularui.api.IPanelHandler;
 import com.cleanroommc.modularui.api.drawable.IKey;
 import com.cleanroommc.modularui.drawable.Circle;
-import com.cleanroommc.modularui.drawable.FluidDrawable;
 import com.cleanroommc.modularui.drawable.GuiTextures;
 import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.factory.PosGuiData;
@@ -57,8 +56,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
 import cpw.mods.fml.common.registry.GameData;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -351,7 +348,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
-                        .overlay((new FluidDrawable().setFluid(new FluidStack(FluidRegistry.WATER, 100))), IKey.str("3"))
+                        .overlay(IKey.str("O"))
+                        .addTooltipLine("Opens another sub panel")
                         .onMousePressed(mouseButton -> {
                             panelSyncHandler.openPanel();
                             return true;
@@ -371,18 +369,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                         .stateOverlay(0, IKey.str("1"))
                         .stateOverlay(1, IKey.str("2"))
                         .stateOverlay(2, IKey.str("3"))
-                        .addTooltipLine(IKey.str("Hyper Visor test")))
-                .child(new ButtonWidget<>()
-                        .bottom(5)
-                        .right(5)
-                        .tooltip(richTooltip -> richTooltip.textColor(Color.RED.main).add("WARNING! Very Dangerous"))
-                        .onMousePressed(mouseButton -> {
-                            if (!panelSyncHandler.isPanelOpen()) {
-                                panelSyncHandler.deleteCachedPanel();
-                                number.incrementAndGet();
-                            }
-                            return true;
-                        }));
+                        .addTooltipLine(IKey.str("Hyper Visor test")));
         return panel;
     }
 
