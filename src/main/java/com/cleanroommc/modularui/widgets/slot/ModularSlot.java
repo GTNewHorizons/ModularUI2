@@ -104,6 +104,7 @@ public class ModularSlot extends SlotItemHandler {
     public void putStack(ItemStack stack) {
         if (ItemStack.areItemStacksEqual(stack, getStack())) return;
         super.putStack(stack);
+        if (this.syncHandler != null) this.syncHandler.checkUpdate();
     }
 
     @SideOnly(Side.CLIENT)
