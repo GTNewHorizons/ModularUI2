@@ -48,6 +48,7 @@ public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
         this.equals = equals != null ? IEquals.wrapNullSafe(equals) : Objects::equals;
         this.keyCopy = keyCopy != null ? keyCopy : ICopy.ofSerializer(keySerializer, keyDeserializer);
         this.valueCopy = valueCopy != null ? valueCopy : ICopy.ofSerializer(valueSerializer, valueDeserializer);
+        setCache(this.getter.get());
     }
 
     @Override
