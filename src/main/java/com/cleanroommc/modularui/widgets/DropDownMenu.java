@@ -29,8 +29,8 @@ public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Int
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
     private IDrawable arrowOpened;
-    private static int offsetArrow = 5;
-    private static int offsetLeft = 5;
+    private static final int offsetArrow = 5;
+    private static final int offsetLeft = 5;
 
     public DropDownMenu() {
         menu.setEnabled(false);

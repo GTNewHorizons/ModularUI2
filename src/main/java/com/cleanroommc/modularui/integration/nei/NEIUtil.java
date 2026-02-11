@@ -1,10 +1,10 @@
 package com.cleanroommc.modularui.integration.nei;
 
-import codechicken.nei.ItemPanels;
-
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 
 import net.minecraft.item.ItemStack;
+
+import codechicken.nei.ItemPanels;
 
 public class NEIUtil {
 

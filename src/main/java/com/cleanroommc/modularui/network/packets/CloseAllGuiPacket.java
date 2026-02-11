@@ -3,12 +3,12 @@ package com.cleanroommc.modularui.network.packets;
 import com.cleanroommc.modularui.network.IPacket;
 import com.cleanroommc.modularui.network.ModularNetwork;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Nullable;
 

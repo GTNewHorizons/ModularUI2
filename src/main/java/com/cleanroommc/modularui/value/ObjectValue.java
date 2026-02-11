@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.value;
 
 import com.cleanroommc.modularui.api.value.IValue;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.atomic.AtomicReference;

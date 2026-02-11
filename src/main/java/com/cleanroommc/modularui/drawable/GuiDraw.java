@@ -15,7 +15,6 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -28,8 +27,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import com.mitchej123.hodgepodge.textures.IPatchedTextureAtlasSprite;
 import org.jetbrains.annotations.ApiStatus;
@@ -351,7 +348,7 @@ public class GuiDraw {
             }
             FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
 
-            float maxWidth = width - border * 2 ;
+            float maxWidth = width - border * 2;
             float textWidth = fontRenderer.getStringWidth(amountText);
             float scale = Math.min(1f, maxWidth / textWidth);
             if (amountText.length() > 4) scale = Math.max(scale, 0.5f);
@@ -807,18 +804,17 @@ public class GuiDraw {
         float f4 = entity.rotationYawHead;
 
         //the 180 comes from the fact that this has him turned backwords :D i hate math :/
-        float mouseYaw = (float)(Math.atan2(mouseX- (x+w / 2),  40.0f) * 180F / Math.PI - 180);
+        float mouseYaw = (float) (Math.atan2(mouseX - (x + w / 2), 40.0f) * 180F / Math.PI - 180);
 
         //yaw
-        GlStateManager.rotate(((float) Math.atan2(mouseY , 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(((float) Math.atan2(mouseY, 40.0F)) * 20.0F, 1.0F, 0.0F, 0.0F);
         entity.renderYawOffset = -mouseYaw;
         entity.rotationYaw = -mouseYaw;
 
         GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-        entity.rotationPitch = ((float) Math.atan2(mouseY , 40.0F)) * 20.0F;
+        entity.rotationPitch = ((float) Math.atan2(mouseY, 40.0F)) * 20.0F;
         entity.rotationYawHead = entity.rotationYaw;
         entity.prevRotationYawHead = entity.rotationYaw;
-
 
 
         drawEntityRaw(entity);

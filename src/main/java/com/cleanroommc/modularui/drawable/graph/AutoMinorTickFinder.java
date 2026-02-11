@@ -5,7 +5,7 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public class AutoMinorTickFinder implements MinorTickFinder {
 
-    private int amountBetweenMajors;
+    private final int amountBetweenMajors;
 
     public AutoMinorTickFinder(int amountBetweenMajors) {
         this.amountBetweenMajors = amountBetweenMajors;

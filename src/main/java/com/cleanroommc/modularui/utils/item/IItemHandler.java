@@ -7,9 +7,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
 import cpw.mods.fml.common.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.Nullable;
 
 @Optional.Interface(iface = "com.gtnewhorizons.modularui.api.forge.IItemHandler", modid = "modularui")
 public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IItemHandler {

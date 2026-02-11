@@ -36,7 +36,7 @@ public class FluidTankLong implements IFluidTankLong {
     }
 
     public FluidTankLong(long capacity) {
-        this((Fluid) null, capacity);
+        this(null, capacity);
     }
 
     public FluidTankLong(FluidStack fluid, long capacity, long amount) {

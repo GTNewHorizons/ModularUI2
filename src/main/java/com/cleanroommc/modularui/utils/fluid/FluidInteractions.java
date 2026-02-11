@@ -60,7 +60,7 @@ public class FluidInteractions {
         }
         if (filledContainer == null) {
             filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
-            if(filledContainer == null) return itemStack; // give up and return original clicked stack
+            if (filledContainer == null) return itemStack; // give up and return original clicked stack
             FluidStack newFluid = getFluidForRealItem(filledContainer);
             fluidStack.amount -= newFluid.amount;
         }
@@ -89,8 +89,8 @@ public class FluidInteractions {
         ItemStack stack = getContainerForFilledItemWithoutIFluidContainerItem(itemStack);
         if (stack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
             stack = itemStack.copy();
-             if (container.drain(stack, Integer.MAX_VALUE, true) == null)
-                 return null;
+            if (container.drain(stack, Integer.MAX_VALUE, true) == null)
+                return null;
         }
         if (stack == null) {
             stack = FluidContainerRegistry.drainFluidContainer(itemStack.copy());

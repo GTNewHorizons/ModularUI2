@@ -1,7 +1,5 @@
 package com.cleanroommc.modularui.utils;
 
-import codechicken.nei.LayoutManager;
-
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.drawable.BufferBuilder;
 
@@ -18,6 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import codechicken.nei.LayoutManager;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 

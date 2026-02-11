@@ -26,13 +26,13 @@ public class StringSyncValue extends AbstractGenericSyncValue<String> implements
 
     @Contract("null, null -> fail")
     public StringSyncValue(@Nullable Supplier<String> clientGetter,
-                            @Nullable Supplier<String> serverGetter) {
+                           @Nullable Supplier<String> serverGetter) {
         this(clientGetter, null, serverGetter, null);
     }
 
     @Contract("null, _, null, _ -> fail")
     public StringSyncValue(@Nullable Supplier<String> clientGetter, @Nullable Consumer<String> clientSetter,
-                            @Nullable Supplier<String> serverGetter, @Nullable Consumer<String> serverSetter) {
+                           @Nullable Supplier<String> serverGetter, @Nullable Consumer<String> serverSetter) {
         super(String.class, clientGetter, clientSetter, serverGetter, serverSetter);
     }
 

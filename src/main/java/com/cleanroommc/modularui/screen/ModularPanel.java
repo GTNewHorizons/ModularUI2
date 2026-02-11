@@ -36,7 +36,6 @@ import com.cleanroommc.neverenoughanimations.NEAConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 
-import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;

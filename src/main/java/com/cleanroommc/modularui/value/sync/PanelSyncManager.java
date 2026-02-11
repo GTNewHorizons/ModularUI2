@@ -12,7 +12,6 @@ import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import cpw.mods.fml.relauncher.Side;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap;

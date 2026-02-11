@@ -10,7 +10,6 @@ import com.cleanroommc.modularui.value.sync.PhantomItemSlotSH;
 import net.minecraft.item.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class PhantomItemSlot extends ItemSlot implements RecipeViewerGhostIngredientSlot<ItemStack> {
 

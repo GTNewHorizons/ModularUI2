@@ -252,6 +252,6 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     }
 
     enum State {
-        INIT, OPEN, CLOSED, DISPOSED;
+        INIT, OPEN, CLOSED, DISPOSED
     }
 }
