@@ -72,8 +72,12 @@ public abstract class AbstractGenericSyncValue<T> extends ValueSyncHandler<T> {
     @Override
     public void setValue(T value, boolean setSource, boolean sync) {
         this.cache = createDeepCopyOf(value);
+        onSetCache(setSource, sync);
+    }
+
+    protected void onSetCache(boolean setSource, boolean sync) {
         if (setSource && this.setter != null) {
-            this.setter.accept(value);
+            this.setter.accept(this.cache);
         }
         onValueChanged();
         if (sync) sync();
@@ -135,5 +139,26 @@ public abstract class AbstractGenericSyncValue<T> extends ValueSyncHandler<T> {
     @SuppressWarnings("unchecked")
     public <V> AbstractGenericSyncValue<V> cast() {
         return (AbstractGenericSyncValue<V>) this;
+    }
+
+    /**
+     * Allows safe modification of the cached value. Normally modifying the cached value can cause the value to never be synced.
+     * This method forces a sync after the modification.
+     *
+     * @param consumer function that operates on the current cached value
+     */
+    public void modifyValue(Consumer<T> consumer) {
+        modifyValue(true, true, consumer);
+    }
+
+    /**
+     * Allows safe modification of the cached value. Normally modifying the cached value can cause the value to never be synced.
+     * This method can automatically sync the cache after the modification. Be careful with potential issues when the sync arg is false.
+     *
+     * @param consumer function that operates on the current cached value
+     */
+    public void modifyValue(boolean setSource, boolean sync, Consumer<T> consumer) {
+        consumer.accept(this.cache);
+        onSetCache(setSource, sync);
     }
 }

@@ -72,7 +72,7 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     }
 
     public void detectConflictingConfiguration() {
-        if (!ModularUI.isDev) return;
+        if (!ModularUI.isDevEnv) return;
         if (this.expanded && !(getParent() instanceof IExpander)) {
             ModularUI.LOGGER.warn("Resizer '{}' has expanded() but the parent is not a Flow!", this);
         }
