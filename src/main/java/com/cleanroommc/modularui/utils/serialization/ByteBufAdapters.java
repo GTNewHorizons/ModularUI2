@@ -25,6 +25,15 @@ public class ByteBufAdapters {
     public static final IByteBufAdapter<ByteBuf> BYTE_BUF = makeAdapter(NetworkUtils::readByteBuf, NetworkUtils::writeByteBuf, null);
     public static final IByteBufAdapter<PacketBuffer> PACKET_BUFFER = makeAdapter(NetworkUtils::readPacketBuffer, NetworkUtils::writeByteBuf, null);
 
+    public static final IByteBufAdapter<Integer> INT = makeAdapter(PacketBuffer::readInt, PacketBuffer::writeInt, null);
+    public static final IByteBufAdapter<Long> LONG = makeAdapter(PacketBuffer::readLong, PacketBuffer::writeLong, null);
+    public static final IByteBufAdapter<Float> FLOAT = makeAdapter(PacketBuffer::readFloat, PacketBuffer::writeFloat, null);
+    public static final IByteBufAdapter<Double> DOUBLE = makeAdapter(PacketBuffer::readDouble, PacketBuffer::writeDouble, null);
+    public static final IByteBufAdapter<Boolean> BOOL = makeAdapter(PacketBuffer::readBoolean, PacketBuffer::writeBoolean, null);
+    public static final IByteBufAdapter<Byte> BYTE = makeAdapter(PacketBuffer::readByte, (buffer, b) -> buffer.writeByte(b), null);
+    public static final IByteBufAdapter<Short> SHORT = makeAdapter(PacketBuffer::readShort, (buffer, b) -> buffer.writeShort(b), null);
+    public static final IByteBufAdapter<Character> CHAR = makeAdapter(PacketBuffer::readChar, (buffer, b) -> buffer.writeChar(b), null);
+
     public static final IByteBufAdapter<byte[]> BYTE_ARR = new IByteBufAdapter<>() {
         @Override
         public byte[] deserialize(PacketBuffer buffer) throws IOException {
