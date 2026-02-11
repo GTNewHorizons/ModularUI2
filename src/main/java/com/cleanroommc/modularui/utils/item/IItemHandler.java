@@ -9,7 +9,7 @@ import cpw.mods.fml.common.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Optional.Interface(iface = "com.gtnewhorizons.modularui.api.forge.IItemHandler", modid = "modularui")
 public interface IItemHandler extends com.gtnewhorizons.modularui.api.forge.IItemHandler {
