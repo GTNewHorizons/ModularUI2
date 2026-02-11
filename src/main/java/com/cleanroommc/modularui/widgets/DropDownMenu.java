@@ -23,6 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @deprecated Deprecated in favor of the new {@link com.cleanroommc.modularui.widgets.menu.DropdownWidget DropdownWidget}.
+ */
+@Deprecated
 public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Interactable {
 
     private static final IKey NONE = IKey.str("None");
