@@ -1,7 +1,6 @@
 package com.cleanroommc.modularui.integration.nei;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
-import com.cleanroommc.modularui.screen.GuiContainerWrapper;
 import com.cleanroommc.modularui.screen.ModularContainer;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -11,12 +10,11 @@ import codechicken.nei.recipe.GuiOverlayButton;
 import codechicken.nei.recipe.IRecipeHandler;
 
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class ModularUIGuiContainerStackOverlay implements IOverlayHandler {
 
     private interface Action<T, G extends GuiContainer & IMuiScreen> {
+
         T doAction(G gui, INEIRecipeTransfer<G> tr);
     }
 

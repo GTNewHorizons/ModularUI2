@@ -230,6 +230,11 @@ public class ModularContainer extends Container {
     public void onSlotChanged(ModularSlot slot, ItemStack stack, boolean onlyAmountChanged) {}
 
     @Override
+    public boolean canDragIntoSlot(@NotNull Slot slotIn) {
+        return !(slotIn instanceof ModularSlot slot) || slot.canDragIntoSlot();
+    }
+
+    @Override
     public boolean canInteractWith(@NotNull EntityPlayer playerIn) {
         return this.settings.canPlayerInteractWithUI(playerIn);
     }

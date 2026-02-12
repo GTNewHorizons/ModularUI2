@@ -305,29 +305,32 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     /**
-     *  Sets the values by which to increment the field when the player uses the scroll wheel.
-     *  Scrolling up increases value, and scrolling down decreases value.
-     *  Also enables the usingScrollStep flag.
-     *  Default values: 1, 0.1, 100 in order.
-     * @param baseStep - By how much to change the value when no modifier key is held
-     * @param ctrlStep - By how much to change the value when the ctrl key is held
+     * Sets the values by which to increment the field when the player uses the scroll wheel.
+     * Scrolling up increases value, and scrolling down decreases value.
+     * Also enables the usingScrollStep flag.
+     * Default values: 1, 0.1, 100 in order.
+     *
+     * @param baseStep  - By how much to change the value when no modifier key is held
+     * @param ctrlStep  - By how much to change the value when the ctrl key is held
      * @param shiftStep - By how much to change the value when the shift key is held
      * @return this
      */
     public TextFieldWidget setScrollValues(double baseStep, double ctrlStep, double shiftStep) {
-            this.scrollStep = baseStep;
-            this.scrollStepCtrl = ctrlStep;
-            this.scrollStepShift = shiftStep;
-            this.usingScrollStep = true;
-            return this;
+        this.scrollStep = baseStep;
+        this.scrollStepCtrl = ctrlStep;
+        this.scrollStepShift = shiftStep;
+        this.usingScrollStep = true;
+        return this;
     }
+
     /**
-     *  Sets the usingScrollStep flag
+     * Sets the usingScrollStep flag
+     *
      * @return this
      */
     public TextFieldWidget usingScrollStep(boolean usingScrollStep) {
-            this.usingScrollStep = true;
-            return this;
+        this.usingScrollStep = true;
+        return this;
     }
 
     /**

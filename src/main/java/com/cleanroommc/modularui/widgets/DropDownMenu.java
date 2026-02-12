@@ -23,14 +23,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @deprecated Deprecated in favor of the new {@link com.cleanroommc.modularui.widgets.menu.DropdownWidget DropdownWidget}.
+ */
+@Deprecated
 public class DropDownMenu extends SingleChildWidget<DropDownMenu> implements Interactable {
 
     private static final IKey NONE = IKey.str("None");
     private final DropDownWrapper menu = new DropDownWrapper();
     private IDrawable arrowClosed;
     private IDrawable arrowOpened;
-    private static int offsetArrow = 5;
-    private static int offsetLeft = 5;
+    private static final int offsetArrow = 5;
+    private static final int offsetLeft = 5;
 
     public DropDownMenu() {
         menu.setEnabled(false);

@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.utils.IMultiFluidTankHandler;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.fluid.FluidInteractions;
 
@@ -40,6 +41,10 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         this.fluidTank = fluidTank;
     }
 
+    public FluidSlotSyncHandler(IMultiFluidTankHandler fluidHandler, int index) {
+        this(fluidHandler.getFluidTank(index));
+    }
+
     @Nullable
     @Override
     public FluidStack getValue() {
@@ -61,10 +66,8 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public boolean needsSync() {
         FluidStack current = this.fluidTank.getFluid();
-        if (current == this.cache)
-            return false;
-        if (current == null || this.cache == null)
-            return true;
+        if (current == this.cache) return false;
+        if (current == null || this.cache == null) return true;
         return current.amount != this.cache.amount || !current.isFluidEqual(this.cache);
     }
 

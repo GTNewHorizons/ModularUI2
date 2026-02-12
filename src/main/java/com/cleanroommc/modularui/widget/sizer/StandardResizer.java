@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widget.sizer;
 
 import com.cleanroommc.modularui.GuiError;
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.layout.IResizeable;
@@ -9,6 +10,7 @@ import com.cleanroommc.modularui.api.widget.IPositioned;
 import com.cleanroommc.modularui.api.widget.IVanillaSlot;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.utils.Alignment;
+import com.cleanroommc.modularui.widgets.layout.IExpander;
 
 import net.minecraft.inventory.Slot;
 
@@ -53,6 +55,9 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
         this.childrenResized = false;
         this.layoutResized = false;
         super.initResizing(onOpen);
+        if (onOpen) {
+            detectConflictingConfiguration();
+        }
     }
 
     @Override
@@ -64,6 +69,15 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
     public void resetPosition() {
         this.x.resetPosition();
         this.y.resetPosition();
+    }
+
+    public void detectConflictingConfiguration() {
+        if (!ModularUI.isDevEnv) return;
+        if (this.expanded && !(getParent() instanceof IExpander)) {
+            ModularUI.LOGGER.warn("Resizer '{}' has expanded() but the parent is not a Flow!", this);
+        }
+        this.x.detectConflictingConfiguration();
+        this.y.detectConflictingConfiguration();
     }
 
     @Override

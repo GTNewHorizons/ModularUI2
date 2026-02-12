@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.utils.item;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerArmorInvWrapper extends RangedWrapper {
 

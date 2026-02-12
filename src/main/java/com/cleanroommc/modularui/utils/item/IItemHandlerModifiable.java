@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.utils.item;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.Optional;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Optional.Interface(iface = "com.gtnewhorizons.modularui.api.forge.IItemHandlerModifiable", modid = "modularui")
 public interface IItemHandlerModifiable extends IItemHandler, com.gtnewhorizons.modularui.api.forge.IItemHandlerModifiable {

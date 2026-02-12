@@ -9,6 +9,7 @@ import java.util.Objects;
 
 /**
  * A key used to identify widget themes.
+ *
  * @param <T> type of associated widget theme
  */
 public class WidgetThemeKey<T extends WidgetTheme> implements Comparable<WidgetThemeKey<?>> {

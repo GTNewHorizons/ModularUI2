@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 public class ModularSlot extends SlotItemHandler {
 
     private boolean enabled = true;
-    private boolean canTake = true, canPut = true;
+    private boolean canTake = true, canPut = true, canDragInto = true;
     private Predicate<ItemStack> filter = stack -> true;
     private IOnSlotChanged changeListener = IOnSlotChanged.DEFAULT;
     private boolean ignoreMaxStackSize = false;
@@ -85,6 +85,10 @@ public class ModularSlot extends SlotItemHandler {
         return this.canTake && super.canTakeStack(playerIn);
     }
 
+    public boolean canDragIntoSlot() {
+        return this.canDragInto;
+    }
+
     @Override
     public int getItemStackLimit(@NotNull ItemStack stack) {
         return this.ignoreMaxStackSize ? getSlotStackLimit() : super.getItemStackLimit(stack);
@@ -104,6 +108,7 @@ public class ModularSlot extends SlotItemHandler {
     public void putStack(ItemStack stack) {
         if (ItemStack.areItemStacksEqual(stack, getStack())) return;
         super.putStack(stack);
+        if (this.syncHandler != null) this.syncHandler.checkUpdate();
     }
 
     @SideOnly(Side.CLIENT)
@@ -180,6 +185,30 @@ public class ModularSlot extends SlotItemHandler {
     public ModularSlot accessibility(boolean canPut, boolean canTake) {
         this.canPut = canPut;
         this.canTake = canTake;
+        return this;
+    }
+
+    public ModularSlot canPut(boolean canPut) {
+        this.canPut = canPut;
+        return this;
+    }
+
+    public ModularSlot canTake(boolean canTake) {
+        this.canTake = canTake;
+        return this;
+    }
+
+    /**
+     * Sets if this slots accepts items which are dragged across the screen. This is useful to disable when the filter depends on the items
+     * in the other slots. When dragging, the item in the slot is not real and its only updated once the dragging is completed.
+     * This method is by default called from {@link com.cleanroommc.modularui.screen.ModularContainer#canDragIntoSlot(Slot) ModularContainer.canDragIntoSlot(Slot)} which can be
+     * overridden for other custom behavior.
+     *
+     * @param canDragInto if items can be dragged into this slot
+     * @return this
+     */
+    public ModularSlot canDragInto(boolean canDragInto) {
+        this.canDragInto = canDragInto;
         return this;
     }
 

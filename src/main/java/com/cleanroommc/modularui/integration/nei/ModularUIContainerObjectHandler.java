@@ -2,7 +2,6 @@ package com.cleanroommc.modularui.integration.nei;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.widget.IGuiElement;
-
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerIngredientProvider;
 
 import net.minecraft.client.gui.inventory.GuiContainer;

@@ -62,8 +62,8 @@ public class ItemDisplayWidget extends Widget<ItemDisplayWidget> implements Reci
                     getArea().height - 2 * contentOffsetY,
                     context.getCurrentDrawingZ());
             if (this.displayAmount) {
-                GuiDraw.drawScaledAmountText(item.stackSize, null, 1, 1, this.getArea().width-1,
-                        this.getArea().height-1, Alignment.BottomRight, 0);
+                GuiDraw.drawScaledAmountText(item.stackSize, null, 1, 1, this.getArea().width - 1,
+                        this.getArea().height - 1, Alignment.BottomRight, 0);
             }
         }
     }

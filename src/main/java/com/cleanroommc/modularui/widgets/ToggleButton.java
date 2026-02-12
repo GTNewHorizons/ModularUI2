@@ -3,11 +3,13 @@ package com.cleanroommc.modularui.widgets;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IBoolValue;
+import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.theme.SelectableTheme;
 import com.cleanroommc.modularui.theme.WidgetTheme;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
+import com.cleanroommc.modularui.value.BoolValue;
 
 import java.util.function.Consumer;
 
@@ -41,6 +43,10 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
     public ToggleButton value(IBoolValue<?> boolValue) {
         return super.value(boolValue);
+    }
+
+    public ToggleButton valueWrapped(IIntValue<?> intValue, int trueValue) {
+        return value(new BoolValue.Dynamic(() -> intValue.getIntValue() == trueValue, v -> intValue.setIntValue(trueValue)));
     }
 
     public ToggleButton selectedBackground(IDrawable... selectedBackground) {

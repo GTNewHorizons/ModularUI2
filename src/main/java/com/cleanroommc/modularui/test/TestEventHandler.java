@@ -31,12 +31,15 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EventHandler {
+public class TestEventHandler {
 
     public static boolean enabledRichTooltipEventTest = false;
     public static final String TEST_THEME = "mui:test_theme";
@@ -60,6 +63,7 @@ public class EventHandler {
         }
     }.asIcon().height(3);
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onItemUse(PlayerInteractEvent event) {
         if (event.entityPlayer.getEntityWorld().isRemote && event.entityPlayer.getHeldItem() != null) {
@@ -76,6 +80,7 @@ public class EventHandler {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onRichTooltip(RichTooltipEvent.Pre event) {
         if (enabledRichTooltipEventTest) {
@@ -91,11 +96,13 @@ public class EventHandler {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onThemeReload(ReloadThemeEvent.Pre event) {
         IThemeApi.get().registerTheme(testTheme);
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onOpenScreen(OpenScreenEvent event) {
         if (ModularUIConfig.enableTestOverlays) {
@@ -107,6 +114,7 @@ public class EventHandler {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     private ModularScreen getMainMenuOverlayTest(GuiMainMenu gui) {
         TextWidget<?> title = new TextWidget<>(IKey.str("ModularUI"));
         int[] colors = {Color.WHITE.main, Color.AMBER.main, Color.BLUE.main, Color.GREEN.main, Color.DEEP_PURPLE.main, Color.RED.main};
@@ -130,6 +138,7 @@ public class EventHandler {
                                 })));
     }
 
+    @SideOnly(Side.CLIENT)
     private ModularScreen getContainerOverlayTest(GuiContainer gui) {
         return new CustomModularScreen(ModularUI.ID) {
 
@@ -150,5 +159,13 @@ public class EventHandler {
                 super.onResize(width, height);
             }
         };
+    }
+
+    public static void preInit() {
+        TestBlock.testBlock.setBlockName("test_block").setBlockTextureName("stone");
+        GameRegistry.registerBlock(TestBlock.testBlock, "test_block");
+        GameRegistry.registerTileEntity(TestTile.class, "test_block");
+        TestItem.testItem.setUnlocalizedName("test_item").setTextureName("diamond");
+        GameRegistry.registerItem(TestItem.testItem, "test_item");
     }
 }

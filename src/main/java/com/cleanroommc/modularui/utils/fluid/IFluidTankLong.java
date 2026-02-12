@@ -5,7 +5,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
-
 import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +70,7 @@ public interface IFluidTankLong extends IFluidTank {
 
     void loadFromNBT(NBTTagCompound fluidTag);
 
-    public static void writeToBuffer(PacketBuffer buffer, IFluidTankLong currentFluid) {
+    static void writeToBuffer(PacketBuffer buffer, IFluidTankLong currentFluid) {
         if (currentFluid == null) {
             buffer.writeBoolean(true);
         } else {
@@ -85,7 +84,7 @@ public interface IFluidTankLong extends IFluidTank {
         }
     }
 
-    public static void readFromBuffer(PacketBuffer buffer, IFluidTankLong currentTank) throws IOException {
+    static void readFromBuffer(PacketBuffer buffer, IFluidTankLong currentTank) throws IOException {
         currentTank.loadFromNBT(buffer.readBoolean() ? null : buffer.readNBTTagCompoundFromBuffer());
     }
 }
