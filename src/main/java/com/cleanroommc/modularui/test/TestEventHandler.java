@@ -63,6 +63,7 @@ public class TestEventHandler {
         }
     }.asIcon().height(3);
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onItemUse(PlayerInteractEvent event) {
         if (event.entityPlayer.getEntityWorld().isRemote && event.entityPlayer.getHeldItem() != null) {

@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -32,6 +34,7 @@ public class ReopenGuiPacket implements IPacket {
         this.networkId = buf.readInt();
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public @Nullable IPacket executeClient(NetHandlerPlayClient handler) {
         ModularNetwork.CLIENT.reopen(Minecraft.getMinecraft().thePlayer, this.networkId, false);
