@@ -9,14 +9,10 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 
 import codechicken.nei.recipe.StackInfo;
-import gregtech.api.util.GTUtility;
 
 public class FluidInteractions {
 
-    /**
-     * Gets fluid actually stored in item. Used for transferring fluid.
-     */
-    public static FluidStack getFluidForRealItem(ItemStack itemStack) {
+    public static FluidStack getFluidForItem(ItemStack itemStack) {
         FluidStack fluidStack = null;
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
@@ -27,82 +23,44 @@ public class FluidInteractions {
         if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
             fluidStack = StackInfo.getFluid(itemStack);
         }
-        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
-        }
         return fluidStack;
     }
 
-    /**
-     * Gets fluid for use in phantom slot.
-     */
-    public static FluidStack getFluidForPhantomItem(ItemStack itemStack) {
-        FluidStack fluidStack = null;
+    public static ItemStack getFullFluidContainer(ItemStack itemStack, FluidStack fluidToFill) {
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
-            fluidStack = container.getFluid(itemStack.copy());
-        }
-        if (fluidStack == null) {
-            fluidStack = FluidContainerRegistry.getFluidForFilledItem(itemStack.copy());
-        }
-        if (fluidStack == null && ModularUI.Mods.NEI.isLoaded()) {
-            fluidStack = StackInfo.getFluid(itemStack.copy());
-        }
-        if (ModularUI.Mods.GT5U.isLoaded() && fluidStack == null) {
-            fluidStack = GTUtility.getFluidForFilledItem(itemStack, true);
-        }
-        return fluidStack;
-    }
+            FluidStack containerFluid = container.getFluid(itemStack);
+            int containerFluidAmount = containerFluid != null ? containerFluid.amount : 0;
 
-    public static ItemStack fillFluidContainer(FluidStack fluidStack, ItemStack itemStack) {
-        ItemStack filledContainer = fillFluidContainerWithoutIFluidContainerItem(fluidStack, itemStack);
-        if (filledContainer == null) {
-            filledContainer = fillFluidContainerWithIFluidContainerItem(fluidStack, itemStack);
-        }
-        if (filledContainer == null) {
-            filledContainer = FluidContainerRegistry.fillFluidContainer(fluidStack, itemStack);
-            if (filledContainer == null) return itemStack; // give up and return original clicked stack
-            FluidStack newFluid = getFluidForRealItem(filledContainer);
-            fluidStack.amount -= newFluid.amount;
-        }
-        return filledContainer;
-    }
+            ItemStack copyStack = itemStack.copy();
+            int filled = container.fill(copyStack, fluidToFill, true);
 
-    public static ItemStack fillFluidContainerWithoutIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.fillFluidContainer(fluidStack, itemStack, true, false);
-        }
-        return null;
-    }
-
-    public static ItemStack fillFluidContainerWithIFluidContainerItem(FluidStack fluidStack, ItemStack itemStack) {
-        if (itemStack.getItem() instanceof IFluidContainerItem itemContainer) {
-            int tFilledAmount = itemContainer.fill(itemStack, fluidStack, true);
-            if (tFilledAmount > 0) {
-                fluidStack.amount -= tFilledAmount;
-                return itemStack;
+            if (containerFluidAmount + filled == container.getCapacity(copyStack)) {
+                return copyStack;
             }
+
+            return null;
         }
-        return null;
+
+        return FluidContainerRegistry.fillFluidContainer(fluidToFill, itemStack);
     }
 
-    public static ItemStack getContainerForFilledItem(ItemStack itemStack) {
-        ItemStack stack = getContainerForFilledItemWithoutIFluidContainerItem(itemStack);
-        if (stack == null && itemStack.getItem() instanceof IFluidContainerItem container) {
-            stack = itemStack.copy();
-            if (container.drain(stack, Integer.MAX_VALUE, true) == null)
+    public static ItemStack getEmptyFluidContainer(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof IFluidContainerItem container) {
+            FluidStack fluidStack = container.getFluid(itemStack);
+            if (fluidStack == null) {
                 return null;
-        }
-        if (stack == null) {
-            stack = FluidContainerRegistry.drainFluidContainer(itemStack.copy());
-        }
-        return stack;
-    }
+            }
 
-    public static ItemStack getContainerForFilledItemWithoutIFluidContainerItem(ItemStack itemStack) {
-        if (ModularUI.Mods.GT5U.isLoaded()) {
-            return GTUtility.getContainerForFilledItem(itemStack, false);
+            ItemStack stack = itemStack.copy();
+            FluidStack drained = container.drain(stack, Integer.MAX_VALUE, true);
+
+            if (drained == null || drained.amount < fluidStack.amount) {
+                return null;
+            }
+            return stack;
         }
-        return null;
+
+        return FluidContainerRegistry.drainFluidContainer(itemStack);
     }
 
     public static int getRealCapacity(IFluidTank fluidTank) {
