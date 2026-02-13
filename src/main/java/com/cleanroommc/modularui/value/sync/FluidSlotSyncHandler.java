@@ -474,14 +474,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
      * Replaces heldStack with resultStack.
      * If player held more items in stack, remaining amount will be kept in its hand.
      * Guarantees mutating original heldStack stackSize even if it has to be 0.
-     * Requires heldStack.stackSize >= resultStack.stackSize
+     * Expects heldStack.stackSize >= resultStack.stackSize
      */
     protected void replaceCursorItemStack(ItemStack resultStack) {
         EntityPlayer player = getSyncManager().getPlayer();
         ItemStack heldStack = getSyncManager().getCursorItem();
         int resultStackMaxStackSize = resultStack.getMaxStackSize();
-
-        assert heldStack.stackSize >= resultStack.stackSize;
 
         while (resultStack.stackSize > resultStackMaxStackSize) {
             heldStack.stackSize -= resultStackMaxStackSize;
@@ -490,7 +488,8 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
         heldStack.stackSize -= resultStack.stackSize;
 
-        if (heldStack.stackSize == 0) {
+        if (heldStack.stackSize <= 0) {
+            heldStack.stackSize = 0;
             getSyncManager().setCursorItem(resultStack);
         } else {
             addItemToPlayerInventory(player, resultStack);
