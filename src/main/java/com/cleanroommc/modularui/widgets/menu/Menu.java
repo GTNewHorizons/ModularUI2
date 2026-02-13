@@ -17,13 +17,13 @@ public class Menu<W extends Menu<W>> extends ParentWidget<W> implements IMenuPar
     @Override
     public void onMouseLeaveArea() {
         super.onMouseLeaveArea();
-        checkClose();
+        checkClose(true);
     }
 
-    protected void checkClose() {
+    public void checkClose(boolean soft) {
         if (this.menuSource != null && !this.menuSource.isBelowMouse() && !isSelfOrChildHovered()) {
-            this.menuSource.closeMenu(true);
-            this.menuSource.checkClose();
+            this.menuSource.closeMenu(soft);
+            this.menuSource.checkClose(soft);
         }
     }
 

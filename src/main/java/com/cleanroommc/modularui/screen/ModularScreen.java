@@ -18,6 +18,7 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 import com.cleanroommc.modularui.widget.sizer.ScreenResizeNode;
+import com.cleanroommc.modularui.widgets.menu.MenuPanel;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -371,12 +372,21 @@ public class ModularScreen {
      * @return true if the action was consumed and further processing should be canceled
      */
     public boolean onMousePressed(int mouseButton) {
+        // call all action listeners
         for (IGuiAction.MousePressed action : getGuiActionListeners(IGuiAction.MousePressed.class)) {
             action.press(mouseButton);
         }
+        // check if any context menu is open and close them if they or their children are not hovered
+        for (ModularPanel panel : this.panelManager.getOpenPanels()) {
+            if (panel instanceof MenuPanel menuPanel) {
+                menuPanel.closeAllMenus(false);
+            }
+        }
+        // handle dragging of draggable widgets
         if (this.context.onMousePressed(mouseButton)) {
             return true;
         }
+        // finally click hovered widgets
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {
             if (panel.onMousePressed(mouseButton)) {
                 return true;

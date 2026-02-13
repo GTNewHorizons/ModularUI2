@@ -2,8 +2,11 @@ package com.cleanroommc.modularui.widgets.menu;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.screen.ModularPanel;
+import com.cleanroommc.modularui.widget.WidgetTree;
 
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.List;
 
 @ApiStatus.Experimental
 public class MenuPanel extends ModularPanel {
@@ -33,5 +36,14 @@ public class MenuPanel extends ModularPanel {
     @Override
     public boolean closeOnOutOfBoundsClick() {
         return true;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void closeAllMenus(boolean soft) {
+        // need to collect menus first instead of closing while iterating to avoid CME
+        List<Menu> menus = WidgetTree.flatListByType(this, Menu.class);
+        for (Menu<?> menu : menus) {
+            menu.checkClose(soft);
+        }
     }
 }
