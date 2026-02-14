@@ -119,6 +119,14 @@ public interface ISyncRegistrar<S extends ISyncRegistrar<S>> {
 
     <T extends SyncHandler> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier);
 
+    default <T extends SyncHandler> T getOrCreateSH(String name, Class<T> clazz, Supplier<T> supplier) {
+        return getOrCreateSyncHandler(name, 0, clazz, supplier);
+    }
+
+    default <T extends SyncHandler> T getOrCreateSH(String name, int id, Class<T> clazz, Supplier<T> supplier) {
+        return getOrCreateSyncHandler(name, id, clazz, supplier);
+    }
+
     default ModularSlot getOrCreateSlot(String name, Supplier<ModularSlot> slotSupplier) {
         return getOrCreateSlot(name, 0, slotSupplier);
     }
