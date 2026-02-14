@@ -379,7 +379,7 @@ public class ModularScreen {
         // check if any context menu is open and close them if they or their children are not hovered
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {
             if (panel instanceof MenuPanel menuPanel) {
-                menuPanel.closeAllMenus(false);
+                menuPanel.closeAllMenus(false, true);
             }
         }
         // handle dragging of draggable widgets

@@ -23,6 +23,13 @@ public class MenuPanel extends ModularPanel {
     }
 
     @Override
+    public void onClose() {
+        super.onClose();
+        // close all menus that are related to this panel
+        closeAllMenus(false, false);
+    }
+
+    @Override
     protected void onChildAdd(IWidget child) {
         super.onChildAdd(child);
         child.scheduleResize();
@@ -39,11 +46,11 @@ public class MenuPanel extends ModularPanel {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void closeAllMenus(boolean soft) {
+    public void closeAllMenus(boolean soft, boolean requireNoHover) {
         // need to collect menus first instead of closing while iterating to avoid CME
         List<Menu> menus = WidgetTree.flatListByType(this, Menu.class);
         for (Menu<?> menu : menus) {
-            menu.checkClose(soft);
+            menu.checkClose(soft, requireNoHover);
         }
     }
 }

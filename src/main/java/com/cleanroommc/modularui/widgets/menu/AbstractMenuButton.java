@@ -104,9 +104,9 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
 
     public void closeMenu(boolean soft) {
         if (!this.open || (!this.softOpen && soft)) return;
-        if (getPanel() instanceof MenuPanel menuPanel) {
+        if (isValid() && getPanel() instanceof MenuPanel menuPanel) {
             menuPanel.remove(getMenu());
-        } else {
+        } else if (getPanelHandler().isPanelOpen()) {
             getPanelHandler().closePanel();
         }
         this.open = false;
@@ -181,15 +181,15 @@ public abstract class AbstractMenuButton<W extends AbstractMenuButton<W>> extend
     @Override
     public void onMouseLeaveArea() {
         super.onMouseLeaveArea();
-        checkClose(true);
+        checkClose(true, true);
     }
 
-    protected void checkClose(boolean soft) {
+    protected void checkClose(boolean soft, boolean requireNoHover) {
         if ((this.openOnHover || !soft) && !isSelfOrChildHovered()) {
             closeMenu(soft);
             Menu<?> menuParent = WidgetTree.findParent(this, Menu.class);
             if (menuParent != null) {
-                menuParent.checkClose(soft);
+                menuParent.checkClose(soft, requireNoHover);
             }
         }
     }
