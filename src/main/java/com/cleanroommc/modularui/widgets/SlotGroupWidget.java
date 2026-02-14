@@ -92,13 +92,13 @@ public class SlotGroupWidget extends ParentWidget<SlotGroupWidget> {
             if (this.sortButtonsEditor != null) {
                 this.sortButtonsEditor.accept(sortButtons);
             }
-        } else if (child instanceof ItemSlot slot && slot.isSynced() && slot.getSlot() != null) {
+        } else */if (child instanceof ItemSlot slot && slot.isSynced() && slot.getSlot() != null) {
             if (this.slotGroup != null) {
                 slot.getSlot().slotGroup(this.slotGroup);
             } else if (this.slotGroupName != null) {
                 slot.getSlot().slotGroup(this.slotGroupName);
             }
-        }*/
+        }
     }
 
     /*public SlotGroupWidget disableSortButtons() {
