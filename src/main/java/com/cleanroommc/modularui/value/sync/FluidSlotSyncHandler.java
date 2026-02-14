@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidTank;
 
 import org.jetbrains.annotations.NotNull;
@@ -146,7 +147,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         ItemStack heldItemSizedOne = heldItem.copy();
         heldItemSizedOne.stackSize = 1;
         FluidStack currentFluid = fluidTank.getFluid();
-        FluidStack heldFluid = FluidInteractions.getFluidForRealItem(heldItemSizedOne);
+        FluidStack heldFluid = FluidInteractions.getFluidForItem(heldItemSizedOne);
         if (heldFluid != null && heldFluid.amount <= 0) {
             heldFluid = null;
         }
@@ -170,12 +171,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             if (!canDrainSlot) {
                 return;
             }
-            drainFluid(processFullStack);
+            drainFluid(heldFluid, processFullStack);
         } else {
             if (!canDrainSlot) {
                 return;
             }
-            drainFluid(processFullStack);
+            drainFluid(heldFluid, processFullStack);
         }
     }
 
@@ -195,7 +196,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
             } else {
                 ItemStack heldItemSizedOne = cursorStack.copy();
                 heldItemSizedOne.stackSize = 1;
-                FluidStack heldFluid = FluidInteractions.getFluidForPhantomItem(heldItemSizedOne);
+                FluidStack heldFluid = FluidInteractions.getFluidForItem(heldItemSizedOne);
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
                     fillPhantom(heldFluid);
                 } else {
@@ -238,7 +239,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
     }
 
-    protected void drainFluid(boolean processFullStack) {
+    protected void drainFluid(@Nullable FluidStack heldFluid, boolean processFullStack) {
+        FluidStack initialFluid = fluidTank.getFluid();
+        if (initialFluid == null) {
+            return;
+        }
+
         ItemStack heldItem = getSyncManager().getCursorItem();
         if (heldItem == null || heldItem.stackSize == 0) {
             return;
@@ -246,67 +252,186 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
         ItemStack heldItemSizedOne = heldItem.copy();
         heldItemSizedOne.stackSize = 1;
-        FluidStack currentFluid = fluidTank.getFluid();
-        if (currentFluid == null) {
-            return;
-        }
-        currentFluid = currentFluid.copy();
 
-        int originalFluidAmount = fluidTank.getFluidAmount();
-        ItemStack filledContainer = FluidInteractions.fillFluidContainer(currentFluid, heldItemSizedOne);
-        if (filledContainer != null) {
-            int filledAmount = originalFluidAmount - currentFluid.amount;
-            if (filledAmount < 1) {
+        if (heldItem.getItem() instanceof IFluidContainerItem container) {
+            int containerCapacity = container.getCapacity(heldItemSizedOne);
+            int containerAmount = heldFluid != null ? heldFluid.amount : 0;
+            boolean soundPlayed = false;
+
+            // 1. Try to fill some containers completely
+            if (heldItem.stackSize > 1) {
+                int drained = batchDrainFluidToContainers(heldItem, heldFluid, processFullStack);
+
+                if (drained > 0) {
+                    playSound(initialFluid, false);
+                    soundPlayed = true;
+                }
+
+                // Return if we already filled one container and we don't want to fill others
+                if (drained > 0 && !processFullStack) {
+                    return;
+                }
+
+                // Return if all the containers are filled.
+                // Note: stackSize = 0 means that the stack got replaced as per replaceCursorItemStack implementation
+                if (heldItem.stackSize == 0) {
+                    return;
+                }
+            }
+
+            // 2. Try to fill one container in a stack
+            int amountToFill = Math.min(containerCapacity - containerAmount, fluidTank.getFluidAmount());
+            if (amountToFill <= 0) {
                 return;
             }
-            fluidTank.drain(filledAmount, true);
-            if (processFullStack) {
-                int additionalParallel = Math.min(heldItem.stackSize - 1, currentFluid.amount / filledAmount);
-                fluidTank.drain(filledAmount * additionalParallel, true);
-                filledContainer.stackSize += additionalParallel;
+
+            ItemStack itemToFill = heldItemSizedOne.copy();
+            int filled = container.fill(itemToFill, new FluidStack(initialFluid, amountToFill), true);
+
+            if (filled > 0) {
+                fluidTank.drain(filled, true);
+                replaceCursorItemStack(itemToFill);
+
+                if (!soundPlayed) {
+                    playSound(initialFluid, false);
+                }
             }
-            replaceCursorItemStack(filledContainer);
-            playSound(currentFluid, false);
+        } else {
+            int filled = this.batchDrainFluidToContainers(heldItem, heldFluid, processFullStack);
+            if (filled > 0) {
+                playSound(initialFluid, false);
+            }
         }
     }
 
-    protected void fillFluid(@NotNull FluidStack heldFluid, boolean processFullStack) {
-        ItemStack heldItem = getSyncManager().getCursorItem();
-        if (heldItem == null || heldItem.stackSize == 0) {
-            return;
-        }
-
+    private int batchDrainFluidToContainers(ItemStack heldItem, @Nullable FluidStack heldFluid, boolean processFullStack) {
         ItemStack heldItemSizedOne = heldItem.copy();
         heldItemSizedOne.stackSize = 1;
+
+        FluidStack tankFluid = fluidTank.getFluid();
+        ItemStack fullContainer = FluidInteractions.getFullFluidContainer(heldItemSizedOne, tankFluid);
+        if (fullContainer == null) {
+            return 0;
+        }
+
+        FluidStack fullContainerFluid = FluidInteractions.getFluidForItem(fullContainer);
+        if (fullContainerFluid == null) {
+            return 0;
+        }
+
+        int amountToFill = fullContainerFluid.amount - (heldFluid != null ? heldFluid.amount : 0);
+        if (amountToFill <= 0) {
+            return 0;
+        }
+
+        int containersToFill = Math.min(tankFluid.amount / amountToFill, heldItem.stackSize);
+
+        if (!processFullStack && containersToFill > 1) {
+            containersToFill = 1;
+        }
+
+        if (containersToFill == 0) {
+            return 0;
+        }
+
+        fullContainer.stackSize = containersToFill;
+        replaceCursorItemStack(fullContainer);
+
+        int amountToDrain = containersToFill * amountToFill;
+        fluidTank.drain(amountToDrain, true);
+        return amountToDrain;
+    }
+
+    protected void fillFluid(@NotNull FluidStack heldFluid, boolean processFullStack) {
         FluidStack currentFluid = fluidTank.getFluid();
         if (currentFluid != null && !currentFluid.isFluidEqual(heldFluid)) {
             return;
         }
 
+        ItemStack heldItem = getSyncManager().getCursorItem();
+        if (heldItem == null || heldItem.stackSize == 0) {
+            return;
+        }
+
+        ItemStack heldItemSizedOne = heldItem.copy();
+        heldItemSizedOne.stackSize = 1;
+
+        if (heldItem.getItem() instanceof IFluidContainerItem container) {
+            boolean soundPlayed = false;
+
+            // 1. Try to empty some filled containers completely
+            if (heldItem.stackSize > 1) {
+                int filled = batchFillFluidFromContainers(heldItem, heldFluid, processFullStack);
+
+                if (filled > 0) {
+                    playSound(heldFluid, true);
+                    soundPlayed = true;
+                }
+
+                // Return if we already drained one container and we don't want to drain others
+                if (filled > 0 && !processFullStack) {
+                    return;
+                }
+
+                // Return if there are no filled containers left.
+                // Note: stackSize = 0 means that the stack got replaced as per replaceCursorItemStack implementation
+                if (heldItem.stackSize == 0) {
+                    return;
+                }
+            }
+
+            // 2. Try to drain one container in a stack
+            int freeSpace = fluidTank.getCapacity() - fluidTank.getFluidAmount();
+            int amountToDrain = Math.min(heldFluid.amount, freeSpace);
+            if (amountToDrain <= 0) {
+                return;
+            }
+
+            ItemStack itemToDrain = heldItemSizedOne.copy();
+            FluidStack drained = container.drain(itemToDrain, amountToDrain, true);
+
+            if (drained != null && drained.amount > 0) {
+                fluidTank.fill(drained, true);
+                replaceCursorItemStack(itemToDrain);
+
+                if (!soundPlayed) {
+                    playSound(heldFluid, true);
+                }
+            }
+        } else {
+            int filled = this.batchFillFluidFromContainers(heldItem, heldFluid, processFullStack);
+            if (filled > 0) {
+                playSound(heldFluid, true);
+            }
+        }
+    }
+
+    private int batchFillFluidFromContainers(ItemStack heldItem, FluidStack heldFluid, boolean processFullStack) {
+        ItemStack heldItemSizedOne = heldItem.copy();
+        heldItemSizedOne.stackSize = 1;
+
+        ItemStack emptyContainer = FluidInteractions.getEmptyFluidContainer(heldItemSizedOne);
+        if (emptyContainer == null) {
+            return 0;
+        }
+
         int freeSpace = fluidTank.getCapacity() - fluidTank.getFluidAmount();
-        if (freeSpace <= 0) {
-            return;
+        int containersToEmpty = Math.min(freeSpace / heldFluid.amount, heldItem.stackSize);
+
+        if (!processFullStack && containersToEmpty > 1) {
+            containersToEmpty = 1;
         }
 
-        ItemStack itemStackEmptied = null;
-        int fluidAmountTaken = 0;
-        if (freeSpace >= heldFluid.amount) {
-            itemStackEmptied = FluidInteractions.getContainerForFilledItem(heldItemSizedOne);
-            fluidAmountTaken = heldFluid.amount;
+        if (containersToEmpty == 0) {
+            return 0;
         }
 
-        if (itemStackEmptied == null) {
-            return;
-        }
+        emptyContainer.stackSize = containersToEmpty;
+        replaceCursorItemStack(emptyContainer);
 
-        int parallel = processFullStack ? Math.min(freeSpace / fluidAmountTaken, heldItem.stackSize) : 1;
-        FluidStack copiedFluidStack = heldFluid.copy();
-        copiedFluidStack.amount = fluidAmountTaken * parallel;
-        fluidTank.fill(copiedFluidStack, true);
-
-        itemStackEmptied.stackSize = parallel;
-        replaceCursorItemStack(itemStackEmptied);
-        playSound(heldFluid, true);
+        int amountToFill = heldFluid.amount * containersToEmpty;
+        fluidTank.fill(new FluidStack(heldFluid.getFluid(), amountToFill), true);
+        return amountToFill;
     }
 
     public void tryScrollPhantom(MouseData mouseData) {
@@ -345,20 +470,31 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     private void playSound(FluidStack fluid, boolean fill) {
     }
 
+    /**
+     * Replaces heldStack with resultStack.
+     * If player held more items in stack, remaining amount will be kept in its hand.
+     * Guarantees mutating original heldStack stackSize even if it has to be 0.
+     * Expects heldStack.stackSize >= resultStack.stackSize
+     */
     protected void replaceCursorItemStack(ItemStack resultStack) {
         EntityPlayer player = getSyncManager().getPlayer();
+        ItemStack heldStack = getSyncManager().getCursorItem();
         int resultStackMaxStackSize = resultStack.getMaxStackSize();
+
         while (resultStack.stackSize > resultStackMaxStackSize) {
-            player.inventory.getItemStack().stackSize -= resultStackMaxStackSize;
+            heldStack.stackSize -= resultStackMaxStackSize;
             addItemToPlayerInventory(player, resultStack.splitStack(resultStackMaxStackSize));
         }
-        if (getSyncManager().getCursorItem().stackSize == resultStack.stackSize) {
+
+        heldStack.stackSize -= resultStack.stackSize;
+
+        if (heldStack.stackSize <= 0) {
+            heldStack.stackSize = 0;
             getSyncManager().setCursorItem(resultStack);
         } else {
-            ItemStack heldItem = getSyncManager().getCursorItem();
-            heldItem.stackSize -= resultStack.stackSize;
-            getSyncManager().setCursorItem(heldItem);
             addItemToPlayerInventory(player, resultStack);
+            // it's the same held item stack, but we need to sync changed stack size
+            getSyncManager().setCursorItem(heldStack);
         }
     }
 
