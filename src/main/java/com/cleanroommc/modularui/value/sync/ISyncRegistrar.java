@@ -127,13 +127,12 @@ public interface ISyncRegistrar<S extends ISyncRegistrar<S>> {
         return getOrCreateSyncHandler(name, id, clazz, supplier);
     }
 
-    default ModularSlot getOrCreateSlot(String name, Supplier<ModularSlot> slotSupplier) {
+    default ItemSlotSH getOrCreateSlot(String name, Supplier<ModularSlot> slotSupplier) {
         return getOrCreateSlot(name, 0, slotSupplier);
     }
 
-    default ModularSlot getOrCreateSlot(String name, int id, Supplier<ModularSlot> slotSupplier) {
-        ItemSlotSH sh = getOrCreateSyncHandler(name, id, ItemSlotSH.class, () -> new ItemSlotSH(slotSupplier.get()));
-        return sh.getSlot();
+    default ItemSlotSH getOrCreateSlot(String name, int id, Supplier<ModularSlot> slotSupplier) {
+        return getOrCreateSyncHandler(name, id, ItemSlotSH.class, () -> new ItemSlotSH(slotSupplier.get()));
     }
 
     @Nullable SyncHandler findSyncHandlerNullable(String name, int id);
