@@ -127,10 +127,7 @@ public class MCHelper {
         List<String> tooltip = new ArrayList<>();
         tooltip.add(fluid.getLocalizedName());
         if (ModularUI.Mods.GT5U.isLoaded()) {
-            String formula = ItemFluidDisplay.getChemicalFormula(fluid);
-            if (!formula.isEmpty()) {
-                tooltip.add(EnumChatFormatting.YELLOW + formula);
-            }
+            ItemFluidDisplay.addTooltipForFluid(fluid.getFluid(), tooltip);
         }
         if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips) {
             tooltip.add(StatCollector.translateToLocalFormatted("modularui2.fluid.registry", fluid.getFluid().getName()));
