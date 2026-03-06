@@ -52,6 +52,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
                 return 0.0;
             }
         }
+        num = num.replaceAll("\\D+", "");
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
         if (result.isFailure()) {
             this.mathFailMessage = result.getErrorMessage();
