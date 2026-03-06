@@ -32,7 +32,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
 
     private IStringValue<?> stringValue;
     private Function<String, String> validator = val -> val;
-    private boolean numbers = false;
+    private boolean isNumber = false;
     private String mathFailMessage = null;
     private double defaultNumber = 0;
     private boolean tooltipOverride = false;
@@ -144,7 +144,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         } else {
             throw new IllegalStateException("TextFieldWidget can only have one line!");
         }
-        this.stringValue.setStringValue(this.numbers ? format.parse(getText(), new ParsePosition(0)).toString() : getText());
+        this.stringValue.setStringValue(this.isNumber ? format.parse(getText(), new ParsePosition(0)).toString() : getText());
     }
 
     @Override
@@ -152,7 +152,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         super.onTextChanged();
         if (this.autoUpdateOnChange) {
             String text = this.validator.apply(getText());
-            this.stringValue.setStringValue(this.numbers ? format.parse(text, new ParsePosition(0)).toString() : getText());
+            this.stringValue.setStringValue(this.isNumber ? format.parse(text, new ParsePosition(0)).toString() : getText());
         }
     }
 
@@ -210,7 +210,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
-        this.numbers = true;
+        this.isNumber = true;
         setValidator(val -> {
             long num;
             if (val.isEmpty()) {
@@ -224,7 +224,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
-        this.numbers = true;
+        this.isNumber = true;
         return setValidator(val -> {
             int num;
             if (val.isEmpty()) {
@@ -237,7 +237,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
-        this.numbers = true;
+        this.isNumber = true;
         return setValidator(val -> {
             double num;
             if (val.isEmpty()) {
@@ -271,6 +271,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setFormatAsInteger(boolean formatAsInteger) {
+        if (formatAsInteger && !this.isNumber) {
+            setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
+        }
         this.renderer.setFormatAsInteger(formatAsInteger);
         return getThis();
     }
@@ -287,7 +290,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     @Override
     public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
         // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is focused
-        if (!this.usingScrollStep || !this.numbers || !isFocused()) return super.onMouseScroll(scrollDirection, amount);
+        if (!this.usingScrollStep || !this.isNumber || !isFocused()) return super.onMouseScroll(scrollDirection, amount);
 
         double value;
         if (Interactable.hasControlDown()) value = scrollDirection.modifier * scrollStepCtrl;
