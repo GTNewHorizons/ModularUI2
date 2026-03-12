@@ -277,7 +277,7 @@ public class TestGuis extends CustomModularScreen {
                 .child(new DraggableWidget<>()
                         //.background(new SpriteDrawable(sprite))
                         .size(20)
-                        .alignX(0.5f)
+                        .horizontalCenter()
                         .top(20)
                         .tooltipBuilder(tooltip -> {
                             tooltip.addLine(
@@ -303,7 +303,7 @@ public class TestGuis extends CustomModularScreen {
                             GlStateManager.rotate(360 * (Minecraft.getSystemTime() % period) / period, 0, 1, 0);
                         }, null);
                     }
-                }.asWidget().alignX(0.5f).bottom(10).size(100, 75));
+                }.asWidget().horizontalCenter().bottom(10).size(100, 75));
     }
 
     public static @NotNull ModularPanel buildRichTextUI() {
@@ -554,7 +554,7 @@ public class TestGuis extends CustomModularScreen {
     public static @NotNull ModularPanel buildViewportTransformUI() {
         return new TestPanel("viewport_transform")
                 .child(new Widget<>()
-                        .align(Alignment.Center)
+                        .center()
                         .size(50, 50)
                         .background(GuiTextures.MC_BUTTON)
                         .hoverBackground(GuiTextures.MC_BUTTON_HOVERED));
@@ -682,7 +682,7 @@ public class TestGuis extends CustomModularScreen {
         public TestPanel(String name) {
             super(name);
             //background(GuiTextures.BACKGROUND);
-            align(Alignment.Center).size(100, 100);
+            size(100, 100);
         }
 
         @Override

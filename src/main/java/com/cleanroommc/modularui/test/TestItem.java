@@ -9,7 +9,6 @@ import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
-import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.ISimpleBauble;
 import com.cleanroommc.modularui.utils.ItemStackItemHandler;
 import com.cleanroommc.modularui.utils.Platform;
@@ -61,14 +60,13 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
                                 .row("II")
                                 .row("II")
                                 .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
-                                                .ignoreMaxStackSize(true)
-                                                .slotGroup("mixer_items")
+                                        .ignoreMaxStackSize(true)
+                                        .slotGroup("mixer_items")
                                         // do not allow putting items which can hold other items into the item
                                         // some mods don't do this on their backpacks, so it won't catch those cases // TODO 1.7.10
                                         //.filter(stack -> !stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
                                 ))
-                                .build()
-                                .align(Alignment.Center)))
+                                .build()))
                 .child(SlotGroupWidget.playerInventory(false)));
 
         return panel;
