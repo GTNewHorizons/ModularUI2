@@ -276,4 +276,20 @@ public class ModularSlot extends SlotItemHandler {
         return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper ||
                 slot.getItemHandler() instanceof com.gtnewhorizons.modularui.api.forge.PlayerMainInvWrapper;
     }
+
+    public boolean isCanTake() {
+        return canTake;
+    }
+
+    public boolean isCanPut() {
+        return canPut;
+    }
+
+    public boolean isCanDragInto() {
+        return canDragInto;
+    }
+
+    public Predicate<ItemStack> getFilter() {
+        return filter;
+    }
 }

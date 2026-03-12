@@ -657,4 +657,12 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         this.clickSound = clickSound;
         return getThis();
     }
+
+    public int getStateCount() {
+        return stateCount;
+    }
+
+    public IIntValue<?> getIntValue() {
+        return intValue;
+    }
 }
