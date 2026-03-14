@@ -81,7 +81,7 @@ public class ClientProxy extends CommonProxy {
         }
 
         // Create resize window cursors
-        try {
+        /*try {
             String ver = Sys.getVersion();
             ClientProxy.majorLwjgl = Integer.parseInt(ver.split("\\.")[0]);
 
@@ -104,7 +104,7 @@ public class ClientProxy extends CommonProxy {
         } catch (Throwable e) {
             ModularUI.LOGGER.info("Custom Cursors failed to load.");
             // lwjgl3: currently it seems this is not even triggered and the cursors are created correctly, but when the cursors are set nothing happens
-        }
+        }*/
     }
 
     public static IntBuffer readPixel(BufferedImage img, boolean inverse, boolean transpose) {
@@ -139,30 +139,22 @@ public class ClientProxy extends CommonProxy {
             resetCursorIcon();
             return;
         }
-        try {
-            Cursor cursor = switch (dragArea) {
-                case TOP_LEFT, BOTTOM_RIGHT -> resizeCursorDiagInverse;
-                case TOP_RIGHT, BOTTOM_LEFT -> resizeCursorDiag;
-                case TOP, BOTTOM -> resizeCursorV;
-                case LEFT, RIGHT -> resizeCursorH;
-            };
-            currentCursor = Mouse.setNativeCursor(cursor);
-        } catch (LWJGLException e) {
-            throw new RuntimeException(e);
-        }
+        Cursor cursor = switch (dragArea) {
+            case TOP_LEFT, BOTTOM_RIGHT -> resizeCursorDiagInverse;
+            case TOP_RIGHT, BOTTOM_LEFT -> resizeCursorDiag;
+            case TOP, BOTTOM -> resizeCursorV;
+            case LEFT, RIGHT -> resizeCursorH;
+        };
+        currentCursor = Mouse.setNativeCursor(cursor);
     }
 
     public static void resetCursorIcon() {
         if (resizeCursorV == null) return; // cursors failed to initialized
-        try {
-            if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
-                currentCursor = null;
-            }
-            Mouse.setNativeCursor(currentCursor);
+        if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
             currentCursor = null;
-        } catch (LWJGLException e) {
-            throw new RuntimeException(e);
         }
+        Mouse.setNativeCursor(currentCursor);
+        currentCursor = null;
     }
 
     @Override

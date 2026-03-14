@@ -19,6 +19,10 @@ import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 import com.cleanroommc.modularui.widget.sizer.ScreenResizeNode;
 
+import cpw.mods.fml.common.Optional;
+
+import me.eigenraven.lwjgl3ify.api.InputEvents;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -509,6 +513,32 @@ public class ModularScreen {
             }
         }
         return false;
+    }
+
+    /** Lwjgl3 key press event */
+    @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
+    public void onKeyEvent(InputEvents.KeyEvent event) {
+        for (ModularPanel panel : this.panelManager.getOpenPanels()) {
+            if (panel.onKeyEvent(event)) {
+                return;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
+            }
+        }
+    }
+
+    /** Lwjgl3 text input event */
+    @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
+    public void onTextEvent(InputEvents.TextEvent event) {
+        for (ModularPanel panel : this.panelManager.getOpenPanels()) {
+            if (panel.onTextEvent(event)) {
+                return;
+            }
+            if (panel.disablePanelsBelow()) {
+                break;
+            }
+        }
     }
 
     /**
