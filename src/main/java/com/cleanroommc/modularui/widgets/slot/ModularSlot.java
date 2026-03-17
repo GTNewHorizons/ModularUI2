@@ -57,14 +57,6 @@ public class ModularSlot extends SlotItemHandler {
         this.phantom = phantom;
     }
 
-    protected boolean canPut() {
-        return canPut;
-    }
-
-    protected boolean canTake() {
-        return canTake;
-    }
-
     @ApiStatus.Internal
     public void dispose() {
         this.syncHandler = null;
@@ -275,6 +267,28 @@ public class ModularSlot extends SlotItemHandler {
     public static boolean isPlayerSlot(SlotItemHandler slot) {
         return slot.getItemHandler() instanceof PlayerInvWrapper || slot.getItemHandler() instanceof PlayerMainInvWrapper ||
                 slot.getItemHandler() instanceof com.gtnewhorizons.modularui.api.forge.PlayerMainInvWrapper;
+    }
+
+    public static EntityPlayer getPlayerSlotPlayer(Slot slot) {
+        return slot.inventory instanceof InventoryPlayer inv ? inv.player : null;
+    }
+
+    public static EntityPlayer getPlayerSlotPlayer(SlotItemHandler slot) {
+        if (slot.getItemHandler() instanceof PlayerInvWrapper inv) {
+            for (IItemHandlerModifiable ih : ((CombinedInvWrapperAccessor) inv).getItemHandler()) {
+                if (ih instanceof PlayerMainInvWrapper mainInv) {
+                    return mainInv.getInventoryPlayer().player;
+                }
+            }
+            return null;
+        }
+        if (slot.getItemHandler() instanceof PlayerMainInvWrapper wrapper) {
+            return wrapper.getInventoryPlayer().player;
+        }
+        if (slot.getItemHandler() instanceof PlayerArmorInvWrapper wrapper) {
+            return wrapper.getInventoryPlayer().player;
+        }
+        return null;
     }
 
     public boolean isCanTake() {
