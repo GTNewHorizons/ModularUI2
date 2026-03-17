@@ -37,6 +37,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEventHandler {
@@ -62,6 +63,18 @@ public class TestEventHandler {
             GuiDraw.drawHorizontalGradientRect(x + width / 2f, y + 1, width / 2f, 1, high, low);
         }
     }.asIcon().height(3);
+
+    private static NonNullList<ItemStack> allItems = null;
+
+    public static ItemStack getRandomItem() {
+        if (allItems == null) {
+            allItems = NonNullList.create();
+            for (Item item : ForgeRegistries.ITEMS) {
+                item.getSubItems(CreativeTabs.SEARCH, allItems);
+            }
+        }
+        return allItems.get(new Random().nextInt(allItems.size())).copy();
+    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent

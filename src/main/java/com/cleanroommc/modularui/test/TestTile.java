@@ -54,7 +54,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import cpw.mods.fml.common.registry.GameData;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -62,7 +61,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -108,13 +106,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
         settings.customGui(() -> TestGuiContainer::new);
-
-        syncManager.addOpenListener(player -> {
-            ModularUI.LOGGER.info("Test Tile panel open by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
-        });
-        syncManager.addCloseListener(player -> {
-            ModularUI.LOGGER.info("Test Tile panel closed by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
-        });
+        
         syncManager.registerSlotGroup("item_inv", 3);
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         syncManager.getHyperVisor().syncValue("cycle_state", cycleStateValue);
@@ -394,10 +386,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     public void updateEntity() {
         if (!this.worldObj.isRemote) {
             if (this.time++ % 20 == 0) {
-                Collection<String> vals = GameData.getItemRegistry().getKeys();
-                String s = vals.stream().skip(new Random().nextInt(vals.size())).findFirst().orElse("minecraft:diamond");
-                Item item = GameData.getItemRegistry().getObject(s);
-                this.displayItem = new ItemStack(item, 26735987);
+                this.displayItem = TestEventHandler.getRandomItem();
+                this.displayItem.setCount(26735987);
             }
             if (++this.time % 60 == 0) {
                 Random rnd = new Random();
