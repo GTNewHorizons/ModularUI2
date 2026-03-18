@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.api.value.sync.IIntSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IShortSyncValue;
 import com.cleanroommc.modularui.api.value.sync.IStringSyncValue;
 import com.cleanroommc.modularui.network.NetworkUtils;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class ShortSyncValue extends ValueSyncHandler<Short> implements IShortSyncValue<Short>, IStringSyncValue<Short> {
+public class ShortSyncValue extends ValueSyncHandler<Short> implements IShortSyncValue<Short>, IIntSyncValue<Short>, IStringSyncValue<Short> {
 
     private short cache;
     private final ShortValue.Supplier getter;
@@ -114,5 +115,15 @@ public class ShortSyncValue extends ValueSyncHandler<Short> implements IShortSyn
     @Override
     public Class<Short> getValueType() {
         return Short.class;
+    }
+
+    @Override
+    public void setIntValue(int value, boolean setSource, boolean sync) {
+        setShortValue((short) value, setSource, sync);
+    }
+
+    @Override
+    public int getIntValue() {
+        return this.cache;
     }
 }

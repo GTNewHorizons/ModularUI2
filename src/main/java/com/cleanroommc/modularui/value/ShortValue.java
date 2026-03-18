@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.value;
 
+import com.cleanroommc.modularui.api.value.IIntValue;
 import com.cleanroommc.modularui.api.value.IShortValue;
 
-public class ShortValue implements IShortValue<Short> {
+public class ShortValue implements IShortValue<Short>, IIntValue<Short> {
 
     public static Dynamic wrap(IShortValue<?> val) {
         return new Dynamic(val::getShortValue, val::setShortValue);
@@ -33,6 +34,16 @@ public class ShortValue implements IShortValue<Short> {
     @Override
     public Class<Short> getValueType() {
         return Short.class;
+    }
+
+    @Override
+    public int getIntValue() {
+        return value;
+    }
+
+    @Override
+    public void setIntValue(int val) {
+        setShortValue((short) val);
     }
 
     public static class Dynamic extends ShortValue {
