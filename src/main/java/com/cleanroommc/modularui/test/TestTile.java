@@ -250,7 +250,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                         .valueWrapped(cycleStateValue, 0)
                                                                         .tooltipBuilder(false, t -> {
                                                                             t.addLine("Wow! This button sure isnt selected! Not one bit!");
-                                                                            if (!this.oversizedStorage.getStackInSlot(this.cycleState).isEmpty()) {
+                                                                            if (this.oversizedStorage.getStackInSlot(this.cycleState) != null) {
                                                                                 t.addLine("Here is a cool item: ");
                                                                                 t.add(new ItemDrawable(this.oversizedStorage.getStackInSlot(this.cycleState)));
                                                                             }
@@ -393,7 +393,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         if (!this.worldObj.isRemote) {
             if (this.time++ % 20 == 0) {
                 this.displayItem = TestEventHandler.getRandomItem();
-                this.displayItem.setCount(26735987);
+                this.displayItem.stackSize = 26735987;
             }
             if (++this.time % 60 == 0) {
                 Random rnd = new Random();

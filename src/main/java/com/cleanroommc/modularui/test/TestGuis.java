@@ -709,7 +709,7 @@ public class TestGuis extends CustomModularScreen {
                                         .coverChildren()))
                         .child(SlotGroupWidget.builder()
                                 .matrix("IIIIII", "IIIIII")
-                                .key('I', i -> new ItemDisplayWidget().item(ItemStack.EMPTY))
+                                .key('I', i -> new ItemDisplayWidget().item((ItemStack) null))
                                 .build()
                                 .coverChildren()
                                 .name("play_inventory_mimic")))

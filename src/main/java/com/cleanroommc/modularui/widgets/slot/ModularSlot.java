@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.widgets.slot;
 
 import com.cleanroommc.modularui.utils.item.IItemHandler;
+import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
+import com.cleanroommc.modularui.utils.item.PlayerArmorInvWrapper;
 import com.cleanroommc.modularui.utils.item.PlayerInvWrapper;
 import com.cleanroommc.modularui.utils.item.PlayerMainInvWrapper;
 import com.cleanroommc.modularui.utils.item.SlotItemHandler;
@@ -275,7 +277,7 @@ public class ModularSlot extends SlotItemHandler {
 
     public static EntityPlayer getPlayerSlotPlayer(SlotItemHandler slot) {
         if (slot.getItemHandler() instanceof PlayerInvWrapper inv) {
-            for (IItemHandlerModifiable ih : ((CombinedInvWrapperAccessor) inv).getItemHandler()) {
+            for (IItemHandlerModifiable ih : inv) {
                 if (ih instanceof PlayerMainInvWrapper mainInv) {
                     return mainInv.getInventoryPlayer().player;
                 }
