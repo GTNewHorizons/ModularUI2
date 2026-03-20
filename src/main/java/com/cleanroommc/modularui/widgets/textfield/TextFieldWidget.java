@@ -23,7 +23,6 @@ import java.text.ParsePosition;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -45,23 +44,20 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private boolean usingScrollStep = false;
 
     public double parse(String num) {
-        Pattern pattern = Pattern.compile("-?\\d+(?:[.,]\\d+)?");
-        Matcher mmatcher = pattern.matcher(num);
-        double fallbackDefaultNumber = this.defaultNumber;
-        if (mmatcher.find()) {
-            String cleaned = mmatcher.group().replace(',', '.');
-            fallbackDefaultNumber = Double.parseDouble(cleaned);
-        }
-
         if (!this.acceptsExpression) {
-            return fallbackDefaultNumber;
+            try {
+                return NumberFormat.AMOUNT_TEXT.format.parse(num).doubleValue();
+            } catch (ParseException ex) {
+                this.mathFailMessage = "Unable to parse number.";
+                return 0.0;
+            }
         }
 
-        ParseResult result = MathUtils.parseExpression(num, fallbackDefaultNumber, true);
+        ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
         if (result.isFailure()) {
             this.mathFailMessage = result.getErrorMessage();
             ModularUI.LOGGER.error("Math expression error in {}: {}", this, this.mathFailMessage);
-            return fallbackDefaultNumber;
+            return defaultNumber;
         }
         return result.getResult().getNumberValue().doubleValue();
     }
