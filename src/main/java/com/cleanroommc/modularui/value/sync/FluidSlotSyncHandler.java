@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
-        return fluidStack == null || fluidStack.amount < 0;
+        return fluidStack == null || fluidStack.amount <= 0;
     }
 
     @Nullable
@@ -57,7 +57,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         this.cache = copyFluid(value);
         if (setSource) {
             this.fluidTank.drain(Integer.MAX_VALUE, true);
-            if (!isFluidEmpty(value) && canDisplayThisStack(value)) {
+            if (canDisplayThisStack(value)) {
                 this.fluidTank.fill(value.copy(), true);
             }
         }
@@ -66,7 +66,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     }
 
     public boolean canDisplayThisStack(FluidStack fluidStack) {
-        return canDisplayEmptyFluid ? (fluidStack.amount >= 0) : (fluidStack.amount > 0);
+        return fluidStack != null && (canDisplayEmptyFluid ? (fluidStack.amount >= 0) : (fluidStack.amount > 0));
     }
 
     public boolean needsSync() {
