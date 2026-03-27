@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
-        return fluidStack == null || fluidStack.amount <= 0;
+        return fluidStack == null;
     }
 
     @Nullable
@@ -34,7 +34,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
     @Nullable
     private FluidStack cache;
     private final IFluidTank fluidTank;
-    private boolean canFillSlot = true, canDrainSlot = true, controlsAmount = true, phantom = false, canDisplayEmptyFluid = false;
+    private boolean canFillSlot = true, canDrainSlot = true, controlsAmount = true, phantom = false;
     @Nullable
     private FluidStack lastStoredPhantomFluid;
 
@@ -57,16 +57,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         this.cache = copyFluid(value);
         if (setSource) {
             this.fluidTank.drain(Integer.MAX_VALUE, true);
-            if (canDisplayThisStack(value)) {
+            if (!isFluidEmpty(value)) {
                 this.fluidTank.fill(value.copy(), true);
             }
         }
         onValueChanged();
         if (sync) sync();
-    }
-
-    public boolean canDisplayThisStack(FluidStack fluidStack) {
-        return fluidStack != null && (canDisplayEmptyFluid ? (fluidStack.amount >= 0) : (fluidStack.amount > 0));
     }
 
     public boolean needsSync() {
@@ -533,11 +529,6 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public FluidSlotSyncHandler phantom(boolean phantom) {
         this.phantom = phantom;
-        return this;
-    }
-
-    public FluidSlotSyncHandler canDisplayEmptyFluid(boolean canDisplayEmptyFluid) {
-        this.canDisplayEmptyFluid = canDisplayEmptyFluid;
         return this;
     }
 
