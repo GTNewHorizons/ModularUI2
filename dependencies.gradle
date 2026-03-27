@@ -47,7 +47,7 @@ dependencies {
     compileOnly("com.github.GTNewHorizons:ModularUI:1.3.1:dev") { transitive = false }
     implementation("com.github.GTNewHorizons:Baubles-Expanded:2.2.6-GTNH:dev")  { transitive = false }
     compileOnly("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
-    compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:7624765-sources-7624766")
+    compileOnlyApi rfg.deobf("curse.maven:neverenoughanimation-1062347:7664003-sources-7663978")
 
     //runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.8.68-GTNH:dev")
     // For Thaumcraft runtime

@@ -52,6 +52,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
                 return 0.0;
             }
         }
+
         ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
         if (result.isFailure()) {
             this.mathFailMessage = result.getErrorMessage();
@@ -271,6 +272,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget setFormatAsInteger(boolean formatAsInteger) {
+        if (formatAsInteger && !this.numbers) {
+            setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
+        }
         this.renderer.setFormatAsInteger(formatAsInteger);
         return getThis();
     }
