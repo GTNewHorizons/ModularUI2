@@ -14,6 +14,7 @@ import com.cleanroommc.modularui.api.widget.IDragResizeable;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.api.widget.ModernInteractable;
 import com.cleanroommc.modularui.api.widget.ResizeDragArea;
 import com.cleanroommc.modularui.integration.nei.NEIUtil;
 import com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerGhostIngredientSlot;
@@ -32,6 +33,10 @@ import com.cleanroommc.modularui.widget.WidgetTree;
 import com.cleanroommc.modularui.widget.sizer.Area;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.neverenoughanimations.NEAConfig;
+
+import cpw.mods.fml.common.Optional;
+
+import me.eigenraven.lwjgl3ify.api.InputEvents;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -636,11 +641,83 @@ public class ModularPanel extends ParentWidget<ModularPanel> implements IViewpor
         });
     }
 
+    /** Lwjgl3 key press event */
+    @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
+    public boolean onKeyEvent(InputEvents.KeyEvent event) {
+        return doSafeBool(() -> {
+            switch (modernInteractFocused(w -> w.onKeyEvent(event), Interactable.Result.IGNORE)) {
+                case STOP:
+                    this.keyboard.pressed(LocatedWidget.EMPTY, event.sdlKeyCode);
+                    return true;
+                case SUCCESS:
+                    this.keyboard.pressed(getContext().getFocusedWidget(), event.sdlKeyCode);
+                    return true;
+            }
+            LocatedWidget pressed = null;
+            boolean result = false;
+            for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
+                if (widget.getElement() instanceof ModernInteractable interactable) {
+                    widget.applyMatrix(getContext());
+                    Interactable.Result interactResult = interactable.onKeyEvent(event);
+                    widget.unapplyMatrix(getContext());
+                    if (interactResult.accepts) {
+                        this.keyboard.addAcceptedInteractable((Interactable) interactable);
+                        pressed = widget;
+                    } else if (interactResult.stops) {
+                        pressed = null;
+                    }
+                    if (interactResult.stops) {
+                        result = true;
+                        break;
+                    }
+                }
+                if (!widget.getElement().canClickThrough()) break;
+            }
+            this.keyboard.pressed(pressed, event.sdlKeyCode);
+            return result;
+        });
+    }
+
+    /** Lwjgl3 text input event */
+    @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
+    public boolean onTextEvent(InputEvents.TextEvent event) {
+        return doSafeBool(() -> {
+            if (modernInteractFocused(w -> w.onTextInput(event), false)) {
+                return true;
+            }
+            for (LocatedWidget widget : this.hovering) {
+                if (widget.getElement() == null || !widget.getElement().isValid()) continue;
+                if (widget.getElement() instanceof ModernInteractable interactable) {
+                    widget.applyMatrix(getContext());
+                    boolean res = interactable.onTextInput(event);
+                    widget.unapplyMatrix(getContext());
+                    if (res) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+    }
+
     @SuppressWarnings("unchecked")
     private <T, W extends IWidget & IFocusedWidget & Interactable> T interactFocused(Function<W, T> function, T defaultValue) {
         LocatedWidget focused = this.getContext().getFocusedWidget();
         T result = defaultValue;
         if (focused.getElement() instanceof Interactable interactable && focused.getElement().isValid()) {
+            focused.applyMatrix(getContext());
+            result = function.apply((W) interactable);
+            focused.unapplyMatrix(getContext());
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T, W extends IWidget & IFocusedWidget & ModernInteractable> T modernInteractFocused(Function<W, T> function, T defaultValue) {
+        LocatedWidget focused = this.getContext().getFocusedWidget();
+        T result = defaultValue;
+        if (focused.getElement() instanceof ModernInteractable interactable && focused.getElement().isValid()) {
             focused.applyMatrix(getContext());
             result = function.apply((W) interactable);
             focused.unapplyMatrix(getContext());

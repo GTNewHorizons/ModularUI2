@@ -15,6 +15,7 @@ import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import me.eigenraven.lwjgl3ify.api.InputEvents;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,10 +28,15 @@ import java.util.function.IntConsumer;
  * Additionally, the GuiScreen MUST call {@link ModularScreen#construct(IMuiScreen)} in its constructor.
  * See {@link com.cleanroommc.modularui.screen.GuiScreenWrapper GuiScreenWrapper} and {@link com.cleanroommc.modularui.screen.GuiContainerWrapper GuiContainerWrapper}
  * for default implementations.
+ * <p>
+ * {@link InputEvents.KeyboardListener} is implemented for Lwjgl3ify compat.
  */
-@Optional.Interface(modid = ModularUI.ModIds.NEA, iface = "com.cleanroommc.neverenoughanimations.api.IAnimatedScreen")
+@Optional.InterfaceList({
+        @Optional.Interface(modid = ModularUI.ModIds.NEA, iface = "com.cleanroommc.neverenoughanimations.api.IAnimatedScreen"),
+        @Optional.Interface(modid = ModularUI.ModIds.LWJGL3IFY, iface = "me.eigenraven.lwjgl3ify.api.InputEvents$KeyboardListener")
+})
 @SideOnly(Side.CLIENT)
-public interface IMuiScreen extends IAnimatedScreen {
+public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListener {
 
     /**
      * Returns the {@link ModularScreen} that is being wrapped. This should return a final instance field.
@@ -132,5 +138,17 @@ public interface IMuiScreen extends IAnimatedScreen {
     @Override
     default int nea$getHeight() {
         return getScreen().getMainPanel().getArea().height;
+    }
+
+    @ApiStatus.Internal
+    @Override
+    default void onKeyEvent(InputEvents.KeyEvent event) {
+        getScreen().onKeyEvent(event);
+    }
+
+    @ApiStatus.Internal
+    @Override
+    default void onTextEvent(InputEvents.TextEvent event) {
+        getScreen().onTextEvent(event);
     }
 }
