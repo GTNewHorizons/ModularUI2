@@ -32,7 +32,7 @@ public class ItemDrawable implements IDrawable, IJsonSerializable {
 
     public ItemDrawable() {}
 
-    public ItemDrawable(@NotNull ItemStack item) {
+    public ItemDrawable(@Nullable ItemStack item) {
         setItem(item);
     }
 

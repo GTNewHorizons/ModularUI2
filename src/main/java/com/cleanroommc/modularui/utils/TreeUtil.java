@@ -3,7 +3,6 @@ package com.cleanroommc.modularui.utils;
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.ITreeNode;
 import com.cleanroommc.modularui.api.widget.IWidget;
-import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.widget.sizer.ResizeNode;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
@@ -289,6 +288,7 @@ public class TreeUtil {
      * @param test   test which the widget has to pass
      * @return the first matching widget
      */
+    @Nullable
     public static <T extends ITreeNode<T>> T findFirst(T parent, @NotNull Predicate<T> test) {
         return foreachChildWithResult(parent, w -> {
             if (test.test(w)) {
@@ -306,6 +306,7 @@ public class TreeUtil {
      * @param test   test which the widget has to pass
      * @return the first matching widget
      */
+    @Nullable
     @SuppressWarnings("unchecked")
     public static <T extends ITreeNode<T>, R extends ITreeNode<T>> R findFirst(T parent, Class<R> type, @Nullable Predicate<R> test) {
         return foreachChildWithResult(parent, t -> {
@@ -318,31 +319,32 @@ public class TreeUtil {
         }, true);
     }
 
+    @Nullable
     public static <T extends ITreeNode<T>> T findParent(T parent, Predicate<T> filter) {
-        if (parent == null) return null;
-        while (!(parent instanceof ModularPanel)) {
+        while (parent != null) {
             if (filter.test(parent)) {
                 return parent;
             }
             parent = parent.getParent();
         }
-        return filter.test(parent) ? parent : null;
+        return null;
     }
 
+    @Nullable
     public static <T extends ITreeNode<T>, R extends ITreeNode<T>> R findParent(T parent, Class<R> type) {
         return findParent(parent, type, null);
     }
 
+    @Nullable
     @SuppressWarnings("unchecked")
     public static <T extends ITreeNode<T>, R extends ITreeNode<T>> R findParent(T parent, Class<R> type, @Nullable Predicate<R> test) {
-        if (parent == null) return null;
-        while (!(parent instanceof ModularPanel)) {
+        while (parent != null) {
             if (type.isAssignableFrom(parent.getClass()) && (test == null || test.test((R) parent))) {
                 return (R) parent;
             }
             parent = parent.getParent();
         }
-        return type.isAssignableFrom(parent.getClass()) && (test == null || test.test((R) parent)) ? (R) parent : null;
+        return null;
     }
 
     /**

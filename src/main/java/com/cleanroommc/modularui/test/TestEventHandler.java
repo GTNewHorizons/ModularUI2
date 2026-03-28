@@ -25,9 +25,12 @@ import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.TextWidget;
 
+import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -37,6 +40,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEventHandler {
@@ -62,6 +68,18 @@ public class TestEventHandler {
             GuiDraw.drawHorizontalGradientRect(x + width / 2f, y + 1, width / 2f, 1, high, low);
         }
     }.asIcon().height(3);
+
+    private static List<ItemStack> allItems = null;
+
+    public static ItemStack getRandomItem() {
+        if (allItems == null) {
+            allItems = new ArrayList<>();
+            for (Item item : GameData.getItemRegistry().typeSafeIterable()) {
+                item.getSubItems(item, CreativeTabs.tabAllSearch, allItems);
+            }
+        }
+        return allItems.get(new Random().nextInt(allItems.size())).copy();
+    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent

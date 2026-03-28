@@ -182,22 +182,22 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     @Override
-    public IDrawable getCurrentBackground(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
+    public IDrawable getCurrentBackground(WidgetThemeEntry<?> widgetTheme) {
         // make sure texture is up-to-date
         int state = getState();
         if (isHovering() && this.hoverBackground != null && this.hoverBackground[state] != null && this.hoverBackground[state] != IDrawable.NONE) {
             return this.hoverBackground[state];
         }
-        return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(theme, widgetTheme);
+        return this.background != null && this.background[state] != null ? this.background[state] : super.getCurrentBackground(widgetTheme);
     }
 
     @Override
-    public IDrawable getCurrentOverlay(ITheme theme, WidgetThemeEntry<?> widgetTheme) {
+    public IDrawable getCurrentOverlay(WidgetThemeEntry<?> widgetTheme) {
         int state = getState();
         if (isHovering() && this.hoverOverlay != null && this.hoverOverlay[state] != null && this.hoverOverlay[state] != IDrawable.NONE) {
             return this.hoverOverlay[state];
         }
-        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(theme, widgetTheme);
+        return this.overlay != null && this.overlay[state] != null ? this.overlay[state] : super.getCurrentOverlay(widgetTheme);
     }
 
     @Override
@@ -234,7 +234,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
             Arrays.fill(this.hoverBackground, IDrawable.NONE);
         }
         if (getHoverBackground() == null) {
-            super.hoverBackground(IDrawable.NONE);
+            super.hoverBackgroundOverlay(IDrawable.NONE);
         }
         return getThis();
     }
@@ -257,7 +257,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
             Arrays.fill(this.background, IDrawable.EMPTY);
         }
         if (getBackground() == null) {
-            super.background(IDrawable.EMPTY);
+            super.backgroundOverlay(IDrawable.EMPTY);
         }
         return disableHoverBackground();
     }
@@ -480,6 +480,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipAlignment(Alignment alignment) {
+        super.tooltipAlignment(alignment);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.alignment(alignment);
@@ -495,6 +496,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipPos(RichTooltip.Pos pos) {
+        super.tooltipPos(pos);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.pos(pos);
@@ -511,6 +513,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipPos(int x, int y) {
+        super.tooltipPos(x, y);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.pos(x, y);
@@ -526,6 +529,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipScale(float scale) {
+        super.tooltipScale(scale);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.scale(scale);
@@ -541,6 +545,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipTextColor(int textColor) {
+        super.tooltipTextColor(textColor);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.textColor(textColor);
@@ -556,6 +561,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipTextShadow(boolean textShadow) {
+        super.tooltipTextShadow(textShadow);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.textShadow(textShadow);
@@ -571,9 +577,26 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
      */
     @Override
     public W tooltipShowUpTimer(int showUpTimer) {
+        super.tooltipShowUpTimer(showUpTimer);
         expectCount();
         for (RichTooltip tooltip : this.tooltip) {
             tooltip.showUpTimer(showUpTimer);
+        }
+        return getThis();
+    }
+
+    /**
+     * Sets the tooltip auto update value for all states.
+     *
+     * @param update true if tooltips should automatically update
+     * @return this
+     */
+    @Override
+    public W tooltipAutoUpdate(boolean update) {
+        super.tooltipAutoUpdate(update);
+        expectCount();
+        for (RichTooltip tooltip : this.tooltip) {
+            tooltip.setAutoUpdate(update);
         }
         return getThis();
     }
@@ -607,8 +630,8 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     protected static void splitTexture(UITexture texture, IDrawable[] dest) {
+        float a = 1f / dest.length;
         for (int i = 0; i < dest.length; i++) {
-            float a = 1f / dest.length;
             dest[i] = texture.getSubArea(0, i * a, 1, i * a + a);
         }
     }
@@ -633,5 +656,13 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     public W clickSound(Runnable clickSound) {
         this.clickSound = clickSound;
         return getThis();
+    }
+
+    public int getStateCount() {
+        return stateCount;
+    }
+
+    public IIntValue<?> getIntValue() {
+        return intValue;
     }
 }

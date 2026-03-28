@@ -47,6 +47,21 @@ public interface IPositioned<W extends IPositioned<W>> {
         return coverChildrenWidth().coverChildrenHeight();
     }
 
+    /**
+     * Sets if this resizer is decoration. Decoration will be ignored during coverChildren and margin/padding calculations.
+     *
+     * @param decoration true if this resizer is decoration
+     * @return this
+     */
+    default W decoration(boolean decoration) {
+        resizer().decoration(decoration);
+        return getThis();
+    }
+
+    default W decoration() {
+        return decoration(true);
+    }
+
     default W expanded() {
         resizer().expanded();
         return getThis();
@@ -353,6 +368,11 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    default W posRel(Alignment alignment) {
+        leftRel(alignment.x).topRel(alignment.y);
+        return getThis();
+    }
+
     default W size(int w, int h) {
         width(w).height(h);
         return getThis();
@@ -403,44 +423,59 @@ public interface IPositioned<W extends IPositioned<W>> {
         return getThis();
     }
 
+    /**
+     * @deprecated This will get removed due to this method being missused often.
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     default W anchor(Alignment alignment) {
         resizer().anchor(alignment);
         return getThis();
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     default W alignX(float val) {
         leftRel(val).anchorLeft(val);
         return getThis();
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     default W alignX(Alignment alignment) {
         return alignX(alignment.x);
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     default W alignY(float val) {
         topRel(val).anchorTop(val);
         return getThis();
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     default W alignY(Alignment alignment) {
         return alignY(alignment.y);
     }
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
+    @Deprecated
     default W align(Alignment alignment) {
         return alignX(alignment).
                 alignY(alignment);
     }
 
     default W horizontalCenter() {
-        return alignX(Alignment.CENTER);
+        return leftRel(0.5f);
     }
 
     default W verticalCenter() {
-        return alignY(Alignment.CENTER);
+        return topRel(0.5f);
     }
 
     default W center() {
-        return align(Alignment.Center);
+        return horizontalCenter().verticalCenter();
     }
 
     default W resizer(Consumer<StandardResizer> flexConsumer) {
