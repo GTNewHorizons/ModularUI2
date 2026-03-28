@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
-        return fluidStack == null || fluidStack.amount <= 0;
+        return fluidStack == null;
     }
 
     @Nullable
