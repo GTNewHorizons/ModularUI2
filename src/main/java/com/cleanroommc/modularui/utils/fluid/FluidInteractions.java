@@ -13,6 +13,8 @@ import codechicken.nei.recipe.StackInfo;
 public class FluidInteractions {
 
     public static FluidStack getFluidForItem(ItemStack itemStack) {
+        if (itemStack == null) return null;
+
         FluidStack fluidStack = null;
         if (itemStack.getItem() instanceof IFluidContainerItem container) {
             fluidStack = container.getFluid(itemStack);
