@@ -137,7 +137,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
     }
 
-    private void tryClickContainer(MouseData mouseData) {
+    protected void tryClickContainer(MouseData mouseData) {
         boolean processFullStack = mouseData.shift;
         ItemStack heldItem = getSyncManager().getCursorItem();
         if (heldItem == null || heldItem.stackSize == 0) {
@@ -180,12 +180,12 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
         }
     }
 
-    private void tryClickPhantom(MouseData mouseData) {
+    protected void tryClickPhantom(MouseData mouseData) {
         ItemStack cursorStack = getSyncManager().getCursorItem();
         tryClickPhantom(mouseData, cursorStack);
     }
 
-    private void tryClickPhantom(MouseData mouseData, ItemStack cursorStack) {
+    protected void tryClickPhantom(MouseData mouseData, ItemStack cursorStack) {
         FluidStack currentFluid = fluidTank.getFluid();
 
         if (mouseData.mouseButton == 0) {
