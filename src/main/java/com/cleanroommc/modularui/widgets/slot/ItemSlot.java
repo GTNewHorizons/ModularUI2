@@ -36,6 +36,8 @@ import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import codechicken.nei.guihook.GuiContainerManager;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -272,6 +274,8 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GuiDraw.drawRect(1, 1, 16, 16, 0x80FFFFFF);
             }
 
+            renderSlotUnderlayNEI(guiContainer, slotIn);
+
             itemstack = getItemStackForRendering(itemstack, isDragPreview);
 
             itemstack = NEAAnimationHandler.injectVirtualStack(itemstack, guiContainer, slotIn);
@@ -299,10 +303,42 @@ public class ItemSlot extends Widget<ItemSlot> implements IVanillaSlot, Interact
                 GlStateManager.disableDepth();
                 GlStateManager.disableLighting();
             }
+
+            renderSlotOverlayNEI(guiContainer, slotIn);
         }
 
         ((GuiAccessor) guiScreen).setZLevel(0f);
         renderItem.zLevel = 0f;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void renderSlotUnderlayNEI(GuiContainer guiContainer, Slot slotIn) {
+        if (!ModularUI.Mods.NEI.isLoaded()) return;
+        GuiContainerManager manager = GuiContainerManager.getManager();
+        if (manager != null && manager.window == guiContainer) {
+            int xOld = slotIn.xDisplayPosition;
+            int yOld = slotIn.yDisplayPosition;
+            slotIn.xDisplayPosition = 1;
+            slotIn.yDisplayPosition = 1;
+            manager.renderSlotUnderlay(slotIn);
+            slotIn.xDisplayPosition = xOld;
+            slotIn.yDisplayPosition = yOld;
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void renderSlotOverlayNEI(GuiContainer guiContainer, Slot slotIn) {
+        if (!ModularUI.Mods.NEI.isLoaded()) return;
+        GuiContainerManager manager = GuiContainerManager.getManager();
+        if (manager != null && manager.window == guiContainer) {
+            int xOld = slotIn.xDisplayPosition;
+            int yOld = slotIn.yDisplayPosition;
+            slotIn.xDisplayPosition = 1;
+            slotIn.yDisplayPosition = 1;
+            manager.renderSlotOverlay(slotIn);
+            slotIn.xDisplayPosition = xOld;
+            slotIn.yDisplayPosition = yOld;
+        }
     }
 
     protected void drawSlotAmountText(int amount, String format) {
