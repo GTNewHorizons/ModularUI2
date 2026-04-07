@@ -87,7 +87,7 @@ public class TextFieldRenderer extends TextRenderer {
         drawMarked(measuredLines);
         super.drawMeasuredLines(measuredLines);
         // draw cursor
-        if (this.renderCursor) {
+        if (this.renderCursor && !this.simulate) {
             Point main = this.handler.getMainCursor();
             Point2D.Float start = getPosOf(measuredLines, main);
             if (this.handler.getText().get(main.y).isEmpty()) {

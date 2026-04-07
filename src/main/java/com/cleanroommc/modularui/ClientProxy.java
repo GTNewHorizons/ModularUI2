@@ -139,13 +139,13 @@ public class ClientProxy extends CommonProxy {
             resetCursorIcon();
             return;
         }
+        Cursor cursor = switch (dragArea) {
+            case TOP_LEFT, BOTTOM_RIGHT -> resizeCursorDiagInverse;
+            case TOP_RIGHT, BOTTOM_LEFT -> resizeCursorDiag;
+            case TOP, BOTTOM -> resizeCursorV;
+            case LEFT, RIGHT -> resizeCursorH;
+        };
         try {
-            Cursor cursor = switch (dragArea) {
-                case TOP_LEFT, BOTTOM_RIGHT -> resizeCursorDiagInverse;
-                case TOP_RIGHT, BOTTOM_LEFT -> resizeCursorDiag;
-                case TOP, BOTTOM -> resizeCursorV;
-                case LEFT, RIGHT -> resizeCursorH;
-            };
             currentCursor = Mouse.setNativeCursor(cursor);
         } catch (LWJGLException e) {
             throw new RuntimeException(e);
@@ -154,14 +154,15 @@ public class ClientProxy extends CommonProxy {
 
     public static void resetCursorIcon() {
         if (resizeCursorV == null) return; // cursors failed to initialized
-        try {
-            if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
-                currentCursor = null;
-            }
-            Mouse.setNativeCursor(currentCursor);
+        if (currentCursor == resizeCursorDiag || currentCursor == resizeCursorDiagInverse || currentCursor == resizeCursorH || currentCursor == resizeCursorV) {
             currentCursor = null;
+        }
+        try {
+            Mouse.setNativeCursor(currentCursor);
         } catch (LWJGLException e) {
             throw new RuntimeException(e);
+        } finally {
+            currentCursor = null;
         }
     }
 

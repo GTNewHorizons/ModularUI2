@@ -60,6 +60,7 @@ public class ModularUI {
 
     public enum Mods {
 
+        LWJGL3IFY(ModIds.LWJGL3IFY),
         BAUBLES(ModIds.BAUBLES),
         BOGOSORTER(ModIds.BOGOSORTER),
         GT5U(ModIds.GT5U, mod -> !Loader.isModLoaded(ModIds.GT6)),
@@ -95,6 +96,7 @@ public class ModularUI {
 
     public static class ModIds {
 
+        public static final String LWJGL3IFY = "lwjgl3ify";
         public static final String BOGOSORTER = "bogosorter";
         public static final String GT5U = "gregtech";
         public static final String GT6 = "gregapi_post";
