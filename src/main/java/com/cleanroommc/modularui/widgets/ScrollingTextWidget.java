@@ -41,14 +41,18 @@ public class ScrollingTextWidget extends TextWidget<ScrollingTextWidget> {
     @Override
     public void onMouseStartHover() {
         super.onMouseStartHover();
-        this.animator.resume(false);
+        if (this.animator != null) {
+            this.animator.resume(false);
+        }
     }
 
     @Override
     public void onMouseEndHover() {
         super.onMouseEndHover();
-        this.animator.stop(true);
-        this.animator.reset();
+        if (this.animator != null) {
+            this.animator.stop(true);
+            this.animator.reset();
+        }
         this.progress = 0;
     }
 

@@ -88,6 +88,7 @@ public class TestEventHandler {
             ItemStack itemStack = event.entityPlayer.getHeldItem();
             if (itemStack.getItem() == Items.diamond) {
                 ClientGUI.open(new TestGuis());
+                event.setCanceled(true);
             } // todo: fix ScreenEntityRender / TestGui().
             //else if (itemStack.getItem() == Items.emerald) {
             //    HoloUI.builder()

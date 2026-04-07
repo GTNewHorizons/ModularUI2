@@ -229,11 +229,14 @@ public class ClientScreenHandler {
                 muiStack.remove(lastLastMui);
                 lastLastMui.getScreen().getPanelManager().dispose();
             }
+            Keyboard.enableRepeatEvents(true);
         } else if (newScreen == null) {
             // closing -> clear stack and dispose every screen
             invalidateMuiStack();
             // only when all screens are closed dispose all containers in the stack
             ModularNetwork.CLIENT.closeAll();
+            // in game key binds assume this is disabled
+            Keyboard.enableRepeatEvents(false);
         }
 
         OverlayStack.onGuiOpen(newScreen);

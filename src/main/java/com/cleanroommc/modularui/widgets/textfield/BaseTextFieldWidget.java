@@ -1,10 +1,12 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.widget.IFocusedWidget;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.api.widget.Interactable;
+import com.cleanroommc.modularui.api.widget.ModernInteractable;
 import com.cleanroommc.modularui.drawable.Stencil;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.TextFieldTheme;
@@ -18,6 +20,7 @@ import com.cleanroommc.modularui.widgets.VoidWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
+import me.eigenraven.lwjgl3ify.api.InputEvents;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
@@ -30,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  * The base of a text input widget. Handles mouse/keyboard input and rendering.
  */
-public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends AbstractScrollWidget<VoidWidget, W> implements IFocusedWidget {
+public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends AbstractScrollWidget<VoidWidget, W> implements IFocusedWidget, ModernInteractable {
 
     public static final DecimalFormat format = new DecimalFormat("###.###");
 
@@ -152,6 +155,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         this.cursorTimer = 0;
         this.renderer.setCursor(true);
         this.lastText = new ArrayList<>(this.handler.getText());
+        if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
+            InputEvents.beginTextInput();
+        }
     }
 
     @Override
@@ -160,6 +166,9 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         this.cursorTimer = 0;
         this.scrollOffset = 0;
         this.handler.setCursor(0, 0, true, true);
+        if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
+            InputEvents.endTextInput();
+        }
     }
 
     @Override
@@ -281,7 +290,11 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             // mark whole text
             this.handler.markAll();
             return Result.SUCCESS;
-        } else if (BASE_PATTERN.matcher(String.valueOf(character)).matches() && handler.test(String.valueOf(character))) {
+        }
+        if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
+            return Result.ACCEPT;
+        }
+        if (BASE_PATTERN.matcher(String.valueOf(character)).matches() && handler.test(String.valueOf(character))) {
             if (this.handler.hasTextMarked()) {
                 this.handler.delete();
             }
@@ -290,6 +303,24 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             return Result.SUCCESS;
         }
         return Result.STOP;
+    }
+
+    @Override
+    public Result onKeyEvent(InputEvents.KeyEvent event) {
+        return ModernInteractable.super.onKeyEvent(event);
+    }
+
+    @Override
+    public boolean onTextInput(InputEvents.TextEvent event) {
+        String t = event.text.replaceAll("§", "");
+        if (!t.isEmpty() && handler.test(t)) {
+            if (this.handler.hasTextMarked()) {
+                this.handler.delete();
+            }
+            // insert typed char
+            this.handler.insert(t, canScrollHorizontally());
+        }
+        return true;
     }
 
     protected void onTextChanged() {}
