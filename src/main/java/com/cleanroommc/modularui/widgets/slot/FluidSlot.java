@@ -263,4 +263,16 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
     protected void setPhantomValue(@NotNull ItemStack draggedStack) {
         this.syncHandler.setValue(FluidContainerRegistry.getFluidForFilledItem(draggedStack));
     }
+
+    @Override
+    public @NotNull FluidSlotSyncHandler getSyncHandler() {
+        if (this.syncHandler == null) {
+            throw new IllegalStateException("Widget is not initialised or not synced!");
+        }
+        return syncHandler;
+    }
+
+    public boolean isAlwaysShowFull() {
+        return alwaysShowFull;
+    }
 }

@@ -13,8 +13,8 @@ import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
 import com.cleanroommc.modularui.widgets.Dialog;
 import com.cleanroommc.modularui.widgets.SortableListWidget;
+import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Grid;
-import com.cleanroommc.modularui.widgets.layout.Row;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -55,7 +55,7 @@ public class TestGui extends CustomModularScreen {
         for (String line : this.lines) {
             items.put(line, new SortableListWidget.Item<>(line)
                     .name("item_" + line)
-                    .child(item -> new Row().name("row_" + line)
+                    .child(item -> Flow.row().name("row_" + line)
                             .child(new Widget<>()
                                     .addTooltipLine(line)
                                     .widgetTheme(IThemeApi.BUTTON)
@@ -119,7 +119,7 @@ public class TestGui extends CustomModularScreen {
         private final IDrawable background = GuiTextures.SLOT_FLUID;
 
         @Override
-        public AvailableElement background(IDrawable... background) {
+        public AvailableElement backgroundOverlay(IDrawable... background) {
             throw new UnsupportedOperationException("Use overlay()");
         }
 

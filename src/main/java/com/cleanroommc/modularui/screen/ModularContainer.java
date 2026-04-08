@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
 import com.cleanroommc.modularui.utils.item.SlotItemHandler;
 import com.cleanroommc.modularui.value.sync.ModularSyncManager;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.PlayerSlotGroup;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -358,6 +359,16 @@ public class ModularContainer extends Container {
             }
             detectAndSendChanges();
             return returnable;
+        } else if (clickTypeIn == ClickType.SWAP && mouseButton >= 0 && mouseButton < 9) {
+            // minecraft does not check if the hotbar slot can actually take and put items
+            Slot hotbarSlot = findPlayerSlot(player, mouseButton); // mouseButton is the slot index here
+            if (hotbarSlot != null) {
+                Slot fromSlot = getSlot(slotId);
+                ItemStack fromItem = fromSlot.getStack();
+                ItemStack hotbarStack = hotbarSlot.getStack();
+                if (fromItem != null && !hotbarSlot.isItemValid(fromItem)) return null;
+                if (hotbarStack != null && !hotbarSlot.canTakeStack(player)) return null;
+            }
         }
 
         return superSlotClick(slotId, mouseButton, mode, player);
@@ -379,6 +390,33 @@ public class ModularContainer extends Container {
 
     protected final @NotNull ItemStack superSlotClick(int slotId, int mouseButton, int mode, @NotNull EntityPlayer player) {
         return super.slotClick(slotId, mouseButton, mode, player);
+    }
+
+    protected Slot findPlayerSlot(EntityPlayer player, int index) {
+        if (player == this.player || player.getEntityId() == this.player.getEntityId()) {
+            // if we want a slot of the player who opened the ui, we can just use the slot group
+            SlotGroup slotGroup = this.syncManager.getSlotGroup(PlayerSlotGroup.NAME);
+            if (slotGroup == null) return findExternalPlayerSlot(player, index);
+            for (Slot slot : slotGroup.getSlots()) {
+                if (slot.getSlotIndex() == index) {
+                    return slot;
+                }
+            }
+        }
+        return findExternalPlayerSlot(player, index);
+    }
+
+    protected Slot findExternalPlayerSlot(EntityPlayer player, int index) {
+        // go through all slots and find a slot with a matching player and index
+        for (Slot slot : this.inventorySlots) {
+            EntityPlayer slotPlayer = ModularSlot.getPlayerSlotPlayer(slot);
+            if (slotPlayer != null &&
+                    (player == slotPlayer || player.getEntityId() == slotPlayer.getEntityId()) &&
+                    slot.getSlotIndex() == index) {
+                return slot;
+            }
+        }
+        return null;
     }
 
     public final ItemStack handleQuickMove(EntityPlayer player, int slotId, Slot fromSlot) {

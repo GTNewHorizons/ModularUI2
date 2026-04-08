@@ -192,15 +192,9 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
             flow.layout(this.axis, size, padding, maa, this.childPadding);
         }
         for (IWidget widget : this.ignoredWidgets) {
-            // ignore disabled child if configured as such
+            widget.resizer().updateResized();
             if (shouldIgnoreChildSize(widget)) {
-                widget.resizer().updateResized();
                 widget.resizer().setMarginPaddingApplied(true);
-                continue;
-            }
-            // exclude children whose position of main axis is fixed
-            if (widget.resizer().hasPos(this.axis)) {
-                widget.resizer().updateResized(); // this is required when the widget has a pos on the main axis, but not on the cross axis
             }
         }
         return true;
@@ -269,6 +263,14 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
         }
     }
 
+    public boolean isRow() {
+        return getAxis().isHorizontal();
+    }
+
+    public boolean isColumn() {
+        return getAxis().isVertical();
+    }
+
     public Flow children(Iterable<IWidget> widgets) {
         for (IWidget widget : widgets) {
             child(widget);
@@ -288,6 +290,34 @@ public class Flow extends ParentWidget<Flow> implements ILayoutWidget {
             child(widgetCreator.apply(t));
         }
         return getThis();
+    }
+
+    public Alignment.MainAxis getMaa() {
+        return maa;
+    }
+
+    public Alignment.CrossAxis getCaa() {
+        return caa;
+    }
+
+    public int getChildPadding() {
+        return childPadding;
+    }
+
+    public int getCrossAxisChildPadding() {
+        return crossAxisChildPadding;
+    }
+
+    public boolean isCollapseDisabledChild() {
+        return collapseDisabledChild;
+    }
+
+    public boolean isReverseLayout() {
+        return reverseLayout;
+    }
+
+    public boolean isWrap() {
+        return wrap;
     }
 
     /**

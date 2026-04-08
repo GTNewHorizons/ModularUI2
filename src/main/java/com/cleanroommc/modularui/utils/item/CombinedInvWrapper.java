@@ -1,10 +1,15 @@
 package com.cleanroommc.modularui.utils.item;
 
+import com.google.common.collect.Iterators;
+
 import net.minecraft.item.ItemStack;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CombinedInvWrapper implements IItemHandlerModifiable {
+import java.util.Iterator;
+
+public class CombinedInvWrapper implements IItemHandlerModifiable, Iterable<IItemHandlerModifiable> {
 
     protected final IItemHandlerModifiable[] itemHandler; // the handlers
     protected final int[] baseIndex; // index-offsets of the different handlers
@@ -103,5 +108,10 @@ public class CombinedInvWrapper implements IItemHandlerModifiable {
         IItemHandlerModifiable handler = getHandlerFromIndex(index);
         int localSlot = getSlotFromIndex(slot, index);
         return handler.isItemValid(localSlot, stack);
+    }
+
+    @Override
+    public @NotNull Iterator<IItemHandlerModifiable> iterator() {
+        return Iterators.forArray(this.itemHandler);
     }
 }

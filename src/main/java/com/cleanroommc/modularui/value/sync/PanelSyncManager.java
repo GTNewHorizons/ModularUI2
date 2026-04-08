@@ -166,7 +166,8 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
     @Override
     public boolean hasSyncHandler(SyncHandler syncHandler) {
-        return syncHandler.isValid() && syncHandler.getSyncManager() == this && this.reverseSyncHandlers.containsKey(syncHandler);
+        if (this.reverseSyncHandlers.containsKey(syncHandler)) return true;
+        return this != getHyperVisor() && getHyperVisor().hasSyncHandler(syncHandler);
     }
 
     private void putSyncValue(String name, int id, SyncHandler syncHandler) {

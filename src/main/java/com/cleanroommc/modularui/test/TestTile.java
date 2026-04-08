@@ -26,6 +26,7 @@ import com.cleanroommc.modularui.value.sync.GenericSyncValue;
 import com.cleanroommc.modularui.value.sync.IntSyncValue;
 import com.cleanroommc.modularui.value.sync.ItemSlotSH;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
+import com.cleanroommc.modularui.value.sync.StringSyncValue;
 import com.cleanroommc.modularui.widget.EmptyWidget;
 import com.cleanroommc.modularui.widget.ParentWidget;
 import com.cleanroommc.modularui.widgets.ButtonWidget;
@@ -39,15 +40,14 @@ import com.cleanroommc.modularui.widgets.PagedWidget;
 import com.cleanroommc.modularui.widgets.ProgressWidget;
 import com.cleanroommc.modularui.widgets.SlotGroupWidget;
 import com.cleanroommc.modularui.widgets.ToggleButton;
-import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
-import com.cleanroommc.modularui.widgets.layout.Row;
 import com.cleanroommc.modularui.widgets.slot.FluidSlot;
 import com.cleanroommc.modularui.widgets.slot.ItemSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularCraftingSlot;
 import com.cleanroommc.modularui.widgets.slot.ModularSlot;
 import com.cleanroommc.modularui.widgets.slot.PhantomItemSlot;
 import com.cleanroommc.modularui.widgets.slot.SlotGroup;
+import com.cleanroommc.modularui.widgets.textfield.TextFieldWidget;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -56,7 +56,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import cpw.mods.fml.common.registry.GameData;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -64,7 +63,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -89,6 +87,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     private final int duration = 80;
     private int progress = 0;
     private int cycleState = 0;
+    private String s = "";
     private List<Integer> serverInts = new ArrayList<>();
     private ItemStack displayItem = new ItemStack(Items.diamond);
     private final ItemStackHandler storage = new ItemStackHandler(9);
@@ -110,13 +109,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     public ModularPanel buildUI(PosGuiData guiData, PanelSyncManager syncManager, UISettings settings) {
         settings.customContainer(() -> new CraftingModularContainer(3, 3, this.craftingInventory));
         settings.customGui(() -> TestGuiContainer::new);
-
-        syncManager.addOpenListener(player -> {
-            ModularUI.LOGGER.info("Test Tile panel open by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
-        });
-        syncManager.addCloseListener(player -> {
-            ModularUI.LOGGER.info("Test Tile panel closed by {} on {}", player.getGameProfile().getName(), Thread.currentThread().getName());
-        });
+        
         syncManager.registerSlotGroup("item_inv", 3);
         IntSyncValue cycleStateValue = new IntSyncValue(() -> this.cycleState, val -> this.cycleState = val);
         syncManager.getHyperVisor().syncValue("cycle_state", cycleStateValue);
@@ -151,7 +144,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         DynamicLinkedSyncHandler<GenericListSyncHandler<Integer>> dynamicLinkedSyncHandler = new DynamicLinkedSyncHandler<>(numberListSyncHandler)
                 .widgetProvider((syncManager1, value1) -> {
                     List<Integer> vals = value1.getValue();
-                    return new Row()
+                    return Flow.row()
                             .widthRel(1f)
                             .coverChildrenHeight()
                             .mainAxisAlignment(Alignment.MainAxis.SPACE_AROUND)
@@ -163,11 +156,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel", true, this::openSecondWindow);
 
         PagedWidget.Controller tabController = new PagedWidget.Controller();
-        panel.resizer()                        // returns object which is responsible for sizing
-                .size(176, 210)       // set a static size for the main panel
-                .align(Alignment.Center);    // center the panel in the screen
-        panel
-                .child(new Row()
+        panel.size(176, 210)
+                .child(Flow.row()
                         .name("Tab row")
                         .coverChildren()
                         .topRel(0f, 4, 1f)
@@ -252,12 +242,21 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                     return true;
                                                                 })
                                                                 .overlay(IKey.str("Open Sub Panel").scale(0.75f)))
-                                                        .child(new Row()
+                                                        .child(Flow.row()
                                                                 .name("cycle_button_row")
                                                                 .coverChildrenWidth().height(18)
                                                                 .reverseLayout(false)
                                                                 .child(new ToggleButton()
                                                                         .valueWrapped(cycleStateValue, 0)
+                                                                        .tooltipBuilder(false, t -> {
+                                                                            t.addLine("Wow! This button sure isnt selected! Not one bit!");
+                                                                            if (this.oversizedStorage.getStackInSlot(this.cycleState) != null) {
+                                                                                t.addLine("Here is a cool item: ");
+                                                                                t.add(new ItemDrawable(this.oversizedStorage.getStackInSlot(this.cycleState)));
+                                                                            }
+                                                                        })
+                                                                        .tooltipBuilder(true, t -> t.addLine("Wow! This button IS selected! How cool!"))
+                                                                        .tooltipAutoUpdate(true)
                                                                         .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 0, 1, 1 / 3f)))
                                                                 .child(new ToggleButton()
                                                                         .valueWrapped(cycleStateValue, 1)
@@ -265,7 +264,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                                                 .child(new ToggleButton()
                                                                         .valueWrapped(cycleStateValue, 2)
                                                                         .overlay(GuiTextures.CYCLE_BUTTON_DEMO.getSubArea(0, 2 / 3f, 1, 1))))
-                                                        .child(new Row()
+                                                        .child(Flow.row()
                                                                 .name("progress_row")
                                                                 .height(18)
                                                                 .mainAxisAlignment(Alignment.MainAxis.SPACE_AROUND)
@@ -307,7 +306,7 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
                                 .addPage(new ParentWidget<>()
                                         .name("dynamic_sync_page")
                                         .sizeRel(1f)
-                                        .child(new Column()
+                                        .child(Flow.col()
                                                 .name("page 4 col, dynamic widgets")
                                                 .child(IKey.str("Dynamic synced widget demo. Items act as keys to a unique storage with different amount of slots.").asWidget().scale(0.7f))
                                                 .child(new ItemSlot()
@@ -345,6 +344,9 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
         IPanelHandler panelSyncHandler = syncManager.syncedPanel("other_panel_2", true, (syncManager1, syncHandler1) ->
                 openThirdWindow(syncManager1, syncHandler1, number));
         IntSyncValue num = syncManager.getHyperVisor().findSyncHandler("cycle_state", IntSyncValue.class);
+        panel.child(new TextFieldWidget()
+                .size(60, 14).pos(10, 80)
+                .value(new StringSyncValue(() -> s, v -> s = v)));
         panel.child(ButtonWidget.panelCloseButton())
                 .child(new ButtonWidget<>()
                         .size(10).top(14).right(4)
@@ -390,10 +392,8 @@ public class TestTile extends TileEntity implements IGuiHolder<PosGuiData> {
     public void updateEntity() {
         if (!this.worldObj.isRemote) {
             if (this.time++ % 20 == 0) {
-                Collection<String> vals = GameData.getItemRegistry().getKeys();
-                String s = vals.stream().skip(new Random().nextInt(vals.size())).findFirst().orElse("minecraft:diamond");
-                Item item = GameData.getItemRegistry().getObject(s);
-                this.displayItem = new ItemStack(item, 26735987);
+                this.displayItem = TestEventHandler.getRandomItem();
+                this.displayItem.stackSize = 26735987;
             }
             if (++this.time % 60 == 0) {
                 Random rnd = new Random();
