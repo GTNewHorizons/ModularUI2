@@ -191,11 +191,13 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onUnloadWorld(WorldEvent.Unload event) {
-        ModularNetwork.CLIENT.onPlayerLeave(Minecraft.getMinecraft().thePlayer);
+        if (Minecraft.getMinecraft().thePlayer != null) {
+            ModularNetwork.CLIENT.onPlayerLeave(Minecraft.getMinecraft().thePlayer);
 
-        if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
-            // we need to handle single player here, since PlayerLoggedOutEvent is not triggered for some reason
-            ModularNetwork.SERVER.onPlayerLeave(Minecraft.getMinecraft().thePlayer);
+            if (Minecraft.getMinecraft().isIntegratedServerRunning()) {
+                // we need to handle single player here, since PlayerLoggedOutEvent is not triggered for some reason
+                ModularNetwork.SERVER.onPlayerLeave(Minecraft.getMinecraft().thePlayer);
+            }
         }
     }
 
