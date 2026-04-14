@@ -281,7 +281,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
     }
 
     protected UITexture copy() {
-        return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType);
+        return new UITexture(this.location, this.u0, this.v0, this.u1, this.v1, this.colorType, this.nonOpaque);
     }
 
     public UITexture withColorOverride(int color) {
