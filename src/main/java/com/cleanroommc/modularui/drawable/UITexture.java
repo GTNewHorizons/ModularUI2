@@ -254,8 +254,8 @@ public class UITexture implements IDrawable, IJsonSerializable {
         if (JsonHelper.getBoolean(json, false, "nonOpaque")) {
             builder.nonOpaque();
         }
-        builder.colorOverride(JsonHelper.getColor(json, 0, "colorOverride"));
         UITexture uiTexture = builder.build();
+        uiTexture.withColorOverride(JsonHelper.getColor(json, 0, "colorOverride"));
         return uiTexture;
     }
 
@@ -583,16 +583,6 @@ public class UITexture implements IDrawable, IJsonSerializable {
          */
         public Builder nonOpaque() {
             this.nonOpaque = true;
-            return this;
-        }
-
-        /**
-         * Sets the color override for this texture.
-         *
-         * @param colorOverride color override in ARGB format, 0 (no override) by default.
-         */
-        public Builder colorOverride(int colorOverride) {
-            this.colorOverride = colorOverride;
             return this;
         }
 
