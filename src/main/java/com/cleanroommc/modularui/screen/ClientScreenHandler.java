@@ -747,6 +747,12 @@ public class ClientScreenHandler {
         GuiDraw.drawRect(5, y, 140 * scale, 1 * scale, color);
     }
 
+    private static int parseDebugColor(String color, int fallback) {
+        String parsed = color == null ? "" : color.trim();
+        if (parsed.isEmpty()) return fallback;
+        return Color.ofJson(new JsonPrimitive(parsed));
+    }
+
     public static void updateGuiArea(GuiContainer container, Rectangle area) {
         GuiContainerAccessor acc = (GuiContainerAccessor) container;
         acc.setGuiLeft(area.x);
