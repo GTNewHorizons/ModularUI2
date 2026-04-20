@@ -29,10 +29,10 @@ public class ModularUIConfig {
     public static boolean useDarkThemeByDefault = false;
 
     @Config.Comment("Debug text color.")
-    public static String debugTextColor = "0xDCB42873";
+    public static String debugTextColor = "DCB42873";
 
     @Config.Comment("Debug outline color.")
-    public static String debugOutlineColor = "0xDCB42873";
+    public static String debugOutlineColor = "DCB42873";
 
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")

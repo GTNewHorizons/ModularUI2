@@ -60,7 +60,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import codechicken.nei.LayoutManager;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerDrawHandler;
-import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -750,7 +749,8 @@ public class ClientScreenHandler {
     private static int parseDebugColor(String color, int fallback) {
         String parsed = color == null ? "" : color.trim();
         if (parsed.isEmpty()) return fallback;
-        return Color.ofJson(new JsonPrimitive(parsed));
+        if (!parsed.matches("(?i)[0-9a-f]{8}")) return fallback;
+        return (int) Long.parseLong(parsed, 16);
     }
 
     public static void updateGuiArea(GuiContainer container, Rectangle area) {
