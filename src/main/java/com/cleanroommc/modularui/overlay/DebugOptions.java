@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.value.IntValue;
 public class DebugOptions {
 
     public static final DebugOptions INSTANCE = new DebugOptions();
+    public static final int DEFAULT_DEBUG_COLOR = Color.argb(180, 40, 115, 220);
 
     public BoolValue showHovered = new BoolValue(true);
     public BoolValue showPos = new BoolValue(true);
@@ -22,7 +23,7 @@ public class DebugOptions {
     public BoolValue showParentWidgetTheme = new BoolValue(false);
     public BoolValue showParentOutline = new BoolValue(true);
 
-    public IntValue textColor = new IntValue(Color.argb(180, 40, 115, 220));
+    public IntValue textColor = new IntValue(DEFAULT_DEBUG_COLOR);
     public IntValue outlineColor = new IntValue(textColor.getIntValue());
     public IntValue cursorColor = new IntValue(Color.withAlpha(Color.GREEN.main, 0.8f));
     public FloatValue scale = new FloatValue(0.8f);

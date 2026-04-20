@@ -72,6 +72,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
@@ -585,8 +586,12 @@ public class ClientScreenHandler {
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
-        int outlineColor = DebugOptions.INSTANCE.outlineColor.getIntValue();//Color.argb(180, 40, 115, 220);
-        int textColor = DebugOptions.INSTANCE.textColor.getIntValue();//Color.argb(180, 40, 115, 220);
+        int defaultDebugTextColor = DebugOptions.DEFAULT_DEBUG_COLOR;
+        int outlineColor = parseDebugHexColor(ModularUIConfig.debugOutlineColorHex, defaultDebugTextColor);
+        int localizedTextColor = parseDebugHexColor(ModularUIConfig.debugTextColorHex, defaultDebugTextColor);
+        int localizedNumberColor = parseDebugHexColor(ModularUIConfig.debugNumericValueColorHex, defaultDebugTextColor);
+        int localizedStringColor = parseDebugHexColor(ModularUIConfig.debugStringValueColorHex, defaultDebugTextColor);
+        int localizedOtherValueColor = parseDebugHexColor(ModularUIConfig.debugOtherValueColorHex, defaultDebugTextColor);
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;
@@ -595,11 +600,30 @@ public class ClientScreenHandler {
                 muiScreen.getContext().getRecipeViewerSettings().isEnabled(muiScreen)) {
             lineY -= 20;
         }
-        GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.mouse_pos", mouseX, mouseY),
-                5, lineY, scale, outlineColor, true);
+        drawLocalizedDebugText(
+                "modularui2.debug.mouse_pos",
+                5,
+                lineY,
+                scale,
+                true,
+                localizedTextColor,
+                localizedNumberColor,
+                localizedStringColor,
+                localizedOtherValueColor,
+                mouseX,
+                mouseY);
         lineY -= shift;
-        GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.fps", fpsCounter.getFps()),
-                5, lineY, scale, outlineColor, true);
+        drawLocalizedDebugText(
+                "modularui2.debug.fps",
+                5,
+                lineY,
+                scale,
+                true,
+                localizedTextColor,
+                localizedNumberColor,
+                localizedStringColor,
+                localizedOtherValueColor,
+                fpsCounter.getFps());
         lineY -= shift;
 
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
@@ -611,11 +635,20 @@ public class ClientScreenHandler {
         } else {
             theme = context.getTheme();
         }
-        GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.theme_id", theme.getId()),
-                5, lineY, scale, outlineColor, true);
+        drawLocalizedDebugText(
+                "modularui2.debug.theme_id",
+                5,
+                lineY,
+                scale,
+                true,
+                localizedTextColor,
+                localizedNumberColor,
+                localizedStringColor,
+                localizedOtherValueColor,
+                theme.getId());
 
         if (locatedHovered != null && (showHovered || showParent)) {
-            drawSegmentLine(lineY -= 4, scale, outlineColor);
+            drawSegmentLine(lineY -= 4, scale, localizedTextColor);
             lineY -= 10;
 
             IWidget hovered = locatedHovered.getElement();
@@ -642,96 +675,190 @@ public class ClientScreenHandler {
             locatedHovered.unapplyMatrix(context);
             if (showHovered) {
                 if (DebugOptions.INSTANCE.showWidgetTheme.getBoolValue()) {
-                    GuiDraw.drawText(
-                            StatCollector.translateToLocalFormatted(
-                                    "modularui2.debug.widget_theme",
-                                    hovered.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName()),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.widget_theme",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            hovered.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName());
                     lineY -= shift;
                 }
                 if (DebugOptions.INSTANCE.showSize.getBoolValue()) {
-                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.size", area.width, area.height),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.size",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            area.width,
+                            area.height);
                     lineY -= shift;
                 }
                 if (DebugOptions.INSTANCE.showPos.getBoolValue()) {
-                    GuiDraw.drawText(
-                            StatCollector.translateToLocalFormatted(
-                                    "modularui2.debug.pos_rel",
-                                    area.x,
-                                    area.y,
-                                    area.rx,
-                                    area.ry),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.pos_rel",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            area.x,
+                            area.y,
+                            area.rx,
+                            area.ry);
                     lineY -= shift;
                 }
-                GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.widget", hovered),
-                        5, lineY, scale, textColor, true);
+                drawLocalizedDebugText(
+                        "modularui2.debug.widget",
+                        5,
+                        lineY,
+                        scale,
+                        true,
+                        localizedTextColor,
+                        localizedNumberColor,
+                        localizedStringColor,
+                        localizedOtherValueColor,
+                        hovered);
             }
             if (hovered.hasParent() && showParent) {
                 if (showHovered) {
-                    drawSegmentLine(lineY -= 4, scale, textColor);
+                    drawSegmentLine(lineY -= 4, scale, localizedTextColor);
                     lineY -= 10;
                 }
                 if (DebugOptions.INSTANCE.showParentWidgetTheme.getBoolValue()) {
-                    GuiDraw.drawText(
-                            StatCollector.translateToLocalFormatted(
-                                    "modularui2.debug.widget_theme",
-                                    parent.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName()),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.widget_theme",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            parent.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName());
                     lineY -= shift;
                 }
                 area = parent.getArea();
                 if (DebugOptions.INSTANCE.showParentSize.getBoolValue()) {
-                    GuiDraw.drawText(
-                            StatCollector.translateToLocalFormatted("modularui2.debug.parent_size", area.width, area.height),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.parent_size",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            area.width,
+                            area.height);
                     lineY -= shift;
                 }
                 if (DebugOptions.INSTANCE.showParentPos.getBoolValue()) {
-                    GuiDraw.drawText(
-                            StatCollector.translateToLocalFormatted(
-                                    "modularui2.debug.parent_pos_rel",
-                                    area.x,
-                                    area.y,
-                                    area.rx,
-                                    area.ry),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.parent_pos_rel",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            area.x,
+                            area.y,
+                            area.rx,
+                            area.ry);
                     lineY -= shift;
                 }
-                GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.parent", parent),
-                        5, lineY, scale, outlineColor, true);
+                drawLocalizedDebugText(
+                        "modularui2.debug.parent",
+                        5,
+                        lineY,
+                        scale,
+                        true,
+                        localizedTextColor,
+                        localizedNumberColor,
+                        localizedStringColor,
+                        localizedOtherValueColor,
+                        parent);
             }
             if (showHovered && DebugOptions.INSTANCE.showExtra.getBoolValue()) {
                 if (hovered instanceof ItemSlot slotWidget) {
-                    drawSegmentLine(lineY -= 4, scale, textColor);
+                    drawSegmentLine(lineY -= 4, scale, localizedTextColor);
                     lineY -= 10;
                     ModularSlot slot = slotWidget.getSlot();
-                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.slot_index", slot.getSlotIndex()),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.slot_index",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            slot.getSlotIndex());
                     lineY -= shift;
-                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.slot_number", slot.slotNumber),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.slot_number",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            slot.slotNumber);
                     lineY -= shift;
                     if (slotWidget.isSynced()) {
                         SlotGroup slotGroup = slot.getSlotGroup();
                         boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
-                        GuiDraw.drawText(
-                                StatCollector.translateToLocalFormatted(
-                                        "modularui2.debug.shift_click_priority",
-                                        allowShiftTransfer
-                                                ? slotGroup.getShiftClickPriority()
-                                                : StatCollector.translateToLocal("modularui2.debug.disabled")),
-                                5, lineY, scale, textColor, true);
+                        drawLocalizedDebugText(
+                                "modularui2.debug.shift_click_priority",
+                                5,
+                                lineY,
+                                scale,
+                                true,
+                                localizedTextColor,
+                                localizedNumberColor,
+                                localizedStringColor,
+                                localizedOtherValueColor,
+                                allowShiftTransfer
+                                        ? slotGroup.getShiftClickPriority()
+                                        : StatCollector.translateToLocal("modularui2.debug.disabled"));
                     }
                 } else if (hovered instanceof RichTextWidget richTextWidget) {
-                    drawSegmentLine(lineY -= 4, scale, outlineColor);
+                    drawSegmentLine(lineY -= 4, scale, localizedTextColor);
                     lineY -= 10;
                     locatedHovered.applyMatrix(context);
                     Object hoveredElement = richTextWidget.getHoveredElement();
                     locatedHovered.unapplyMatrix(context);
-                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.hovered", hoveredElement),
-                            5, lineY, scale, textColor, true);
+                    drawLocalizedDebugText(
+                            "modularui2.debug.hovered",
+                            5,
+                            lineY,
+                            scale,
+                            true,
+                            localizedTextColor,
+                            localizedNumberColor,
+                            localizedStringColor,
+                            localizedOtherValueColor,
+                            hoveredElement);
                 }
             }
         }
@@ -742,6 +869,111 @@ public class ClientScreenHandler {
 
     private static void drawSegmentLine(int y, float scale, int color) {
         GuiDraw.drawRect(5, y, 140 * scale, 1 * scale, color);
+    }
+
+    private static void drawLocalizedDebugText(String key,
+                                               float x,
+                                               float y,
+                                               float scale,
+                                               boolean shadow,
+                                               int textColor,
+                                               int numericValueColor,
+                                               int stringValueColor,
+                                               int otherValueColor,
+                                               Object... args) {
+        String template = StatCollector.translateToLocal(key);
+        if (template == null || template.isEmpty()) {
+            GuiDraw.drawText(StatCollector.translateToLocalFormatted(key, args), x, y, scale, textColor, shadow);
+            return;
+        }
+        float xOffset = 0f;
+        int start = 0;
+        int argIndex = 0;
+        int i = 0;
+        while (i < template.length()) {
+            char current = template.charAt(i);
+            if (current != '%') {
+                i++;
+                continue;
+            }
+            if (i + 1 < template.length() && template.charAt(i + 1) == '%') {
+                if (start < i) {
+                    String literal = template.substring(start, i);
+                    xOffset += drawDebugTextSegment(literal, x + xOffset, y, scale, textColor, shadow);
+                }
+                xOffset += drawDebugTextSegment("%", x + xOffset, y, scale, textColor, shadow);
+                i += 2;
+                start = i;
+                continue;
+            }
+            int specEnd = i + 1;
+            while (specEnd < template.length() && !Character.isLetter(template.charAt(specEnd))) {
+                specEnd++;
+            }
+            if (specEnd >= template.length()) {
+                break;
+            }
+            if (start < i) {
+                String literal = template.substring(start, i);
+                xOffset += drawDebugTextSegment(literal, x + xOffset, y, scale, textColor, shadow);
+            }
+            String placeholder = template.substring(i, specEnd + 1);
+            char conversion = Character.toLowerCase(template.charAt(specEnd));
+            Object value = argIndex < args.length ? args[argIndex++] : placeholder;
+            String rendered;
+            try {
+                rendered = String.format(Locale.ROOT, placeholder, value);
+            } catch (Exception ignored) {
+                rendered = String.valueOf(value);
+            }
+            int valueColor;
+            if (isNumericConversion(conversion) || (conversion == 's' && value instanceof Number)) {
+                valueColor = numericValueColor;
+            } else if (conversion == 's') {
+                valueColor = stringValueColor;
+            } else {
+                valueColor = otherValueColor;
+            }
+            xOffset += drawDebugTextSegment(rendered, x + xOffset, y, scale, valueColor, shadow);
+            i = specEnd + 1;
+            start = i;
+        }
+        if (start < template.length()) {
+            String trailing = template.substring(start);
+            drawDebugTextSegment(trailing, x + xOffset, y, scale, textColor, shadow);
+        }
+    }
+
+    private static float drawDebugTextSegment(String text, float x, float y, float scale, int color, boolean shadow) {
+        if (text.isEmpty()) return 0f;
+        GuiDraw.drawText(text, x, y, scale, color, shadow);
+        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+        return fontRenderer.getStringWidth(text) * scale;
+    }
+
+    private static boolean isNumericConversion(char conversion) {
+        return switch (conversion) {
+            case 'd', 'o', 'x', 'e', 'f', 'g', 'a' -> true;
+            default -> false;
+        };
+    }
+
+    private static int parseDebugHexColor(String input, int fallbackColor) {
+        if (input == null) return fallbackColor;
+        String hex = input.trim();
+        if (hex.startsWith("#")) hex = hex.substring(1);
+        if (hex.length() == 10) {
+            hex = hex.substring(2);
+        }
+        if (hex.length() == 6) {
+            hex = "FF" + hex;
+        }
+        if (hex.length() != 8) return fallbackColor;
+        try {
+            return (int) Long.parseLong(hex, 16);
+        } catch (NumberFormatException ignored) {
+            return fallbackColor;
+        }
     }
 
     public static void updateGuiArea(GuiContainer container, Rectangle area) {

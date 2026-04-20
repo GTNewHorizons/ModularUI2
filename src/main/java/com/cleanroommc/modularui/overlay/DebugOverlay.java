@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.overlay;
 
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.api.drawable.IIcon;
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -43,7 +44,9 @@ public class DebugOverlay extends CustomModularScreen {
                         .bottom(0)
                         .height(12)
                         .width(160)
-                        .background(new Rectangle().color(Color.withAlpha(DebugOptions.INSTANCE.outlineColor.getIntValue(), 0.4f)).cornerRadius(4))
+                        .background(new Rectangle()
+                                .color(Color.withAlpha(getDebugOutlineColor(), 0.4f))
+                                .cornerRadius(4))
                         .disableHoverBackground()
                         .overlay(IKey.str("Debug Options"))
                         .openUp()
@@ -124,5 +127,27 @@ public class DebugOverlay extends CustomModularScreen {
             WidgetTree.print(panel);
         }
         return true;
+    }
+
+    private static int getDebugOutlineColor() {
+        return parseDebugHexColor(ModularUIConfig.debugOutlineColorHex, DebugOptions.DEFAULT_DEBUG_COLOR);
+    }
+
+    private static int parseDebugHexColor(String input, int fallbackColor) {
+        if (input == null) return fallbackColor;
+        String hex = input.trim();
+        if (hex.startsWith("#")) hex = hex.substring(1);
+        if (hex.length() == 10) {
+            hex = hex.substring(2);
+        }
+        if (hex.length() == 6) {
+            hex = "FF" + hex;
+        }
+        if (hex.length() != 8) return fallbackColor;
+        try {
+            return (int) Long.parseLong(hex, 16);
+        } catch (NumberFormatException ignored) {
+            return fallbackColor;
+        }
     }
 }
