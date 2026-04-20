@@ -585,8 +585,8 @@ public class ClientScreenHandler {
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
-        int outlineColor = DebugOptions.INSTANCE.outlineColor.getIntValue();//Color.argb(180, 40, 115, 220);
-        int textColor = DebugOptions.INSTANCE.textColor.getIntValue();//Color.argb(180, 40, 115, 220);
+        int outlineColor = ModularUIConfig.debugOutlineColor;
+        int textColor = ModularUIConfig.debugTextColor;
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;

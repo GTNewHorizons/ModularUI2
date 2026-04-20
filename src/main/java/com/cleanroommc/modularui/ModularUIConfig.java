@@ -28,6 +28,12 @@ public class ModularUIConfig {
     @Config.Comment("If true and not specified otherwise, screens will try to use the 'vanilla_dark' theme.")
     public static boolean useDarkThemeByDefault = false;
 
+    @Config.Comment("Debug text color (ARGB).")
+    public static int debugTextColor = 0xDCB42873;
+
+    @Config.Comment("Debug outline color (ARGB).")
+    public static int debugOutlineColor = 0xDCB42873;
+
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")
     public static boolean enableTestGuis = ModularUI.isDevEnv;
