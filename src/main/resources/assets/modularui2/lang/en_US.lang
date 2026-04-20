@@ -20,3 +20,20 @@ modularui2.item.phantom.control=§7Scroll wheel up increases amount, down decrea
 modularui2.fluid.click_to_fill=§bLeft §7Click with a Fluid Container to §bfill §7the tank (Shift-click for a full stack).
 modularui2.fluid.click_combined=§cRight §7or §bLeft §7Click with a Fluid Container to §cempty §7or §bfill §7the tank (Shift-click for a full stack).
 modularui2.fluid.click_to_empty=§cRight §7Click with a Fluid Container to §cempty §7the tank (Shift-click for a full stack).
+
+# Debug Screen
+modularui2.debug.mouse_pos=Mouse Pos: %d, %d
+modularui2.debug.fps=FPS: %d
+modularui2.debug.theme_id=Theme ID: %s
+modularui2.debug.widget_theme=Widget Theme: %s
+modularui2.debug.size=Size: %s, %s
+modularui2.debug.pos_rel=Post: %d, %d  Rel: %d, %d
+modularui2.debug.widget=Widget: %s
+modularui2.debug.parent_size=Parent size: %s, %s
+modularui2.debug.parent_pos_rel=Parent pos: %d, %d  Rel: %d, %d
+modularui2.debug.parent=Parent: %s
+modularui2.debug.slot_index=Slot Index: %d
+modularui2.debug.slot_number=Slot Number: %d
+modularui2.debug.shift_click_priority=Shift-Click Priority: %s
+modularui2.debug.disabled=DISABLED
+modularui2.debug.hovered=Hovered: %s
