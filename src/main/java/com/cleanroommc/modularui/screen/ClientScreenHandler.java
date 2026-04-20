@@ -60,6 +60,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import codechicken.nei.LayoutManager;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.guihook.IContainerDrawHandler;
+import com.google.gson.JsonPrimitive;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -79,6 +80,8 @@ import java.util.function.Predicate;
 public class ClientScreenHandler {
 
     private static final GuiContext defaultContext = new GuiContext();
+    private static final int DEFAULT_DEBUG_TEXT_COLOR = 0xDCB42873;
+    private static final int DEFAULT_DEBUG_OUTLINE_COLOR = 0xDCB42873;
 
     private static ModularScreen currentScreen = null;
     private static Character lastChar = null;
@@ -585,8 +588,8 @@ public class ClientScreenHandler {
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
-        int outlineColor = ModularUIConfig.debugOutlineColor;
-        int textColor = ModularUIConfig.debugTextColor;
+        int outlineColor = parseDebugColor(ModularUIConfig.debugOutlineColor, DEFAULT_DEBUG_OUTLINE_COLOR);
+        int textColor = parseDebugColor(ModularUIConfig.debugTextColor, DEFAULT_DEBUG_TEXT_COLOR);
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;
