@@ -598,10 +598,10 @@ public class ClientScreenHandler {
             lineY -= 20;
         }
         GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.mouse_pos", mouseX, mouseY),
-                5, lineY, scale, outlineColor, true);
+                5, lineY, scale, textColor, true);
         lineY -= shift;
         GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.fps", fpsCounter.getFps()),
-                5, lineY, scale, outlineColor, true);
+                5, lineY, scale, textColor, true);
         lineY -= shift;
 
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
@@ -614,10 +614,10 @@ public class ClientScreenHandler {
             theme = context.getTheme();
         }
         GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.theme_id", theme.getId()),
-                5, lineY, scale, outlineColor, true);
+                5, lineY, scale, textColor, true);
 
         if (locatedHovered != null && (showHovered || showParent)) {
-            drawSegmentLine(lineY -= 4, scale, outlineColor);
+            drawSegmentLine(lineY -= 4, scale, textColor);
             lineY -= 10;
 
             IWidget hovered = locatedHovered.getElement();
@@ -702,7 +702,7 @@ public class ClientScreenHandler {
                     lineY -= shift;
                 }
                 GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.parent", parent),
-                        5, lineY, scale, outlineColor, true);
+                        5, lineY, scale, textColor, true);
             }
             if (showHovered && DebugOptions.INSTANCE.showExtra.getBoolValue()) {
                 if (hovered instanceof ItemSlot slotWidget) {
@@ -748,9 +748,8 @@ public class ClientScreenHandler {
 
     private static int parseDebugColor(String color, int fallback) {
         String parsed = color == null ? "" : color.trim();
-        if (parsed.isEmpty()) return fallback;
-        if (!parsed.matches("(?i)[0-9a-f]{8}")) return fallback;
-        return (int) Long.parseLong(parsed, 16);
+            if (!parsed.matches("(?i)^[0-9a-f]{8}$")) return fallback;
+            return (int) Long.parseLong(parsed, 16);
     }
 
     public static void updateGuiArea(GuiContainer container, Rectangle area) {
