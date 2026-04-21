@@ -29,7 +29,7 @@ public class ModularUIConfig {
     public static boolean useDarkThemeByDefault = false;
 
     @Config.Comment("Debug text color.")
-    public static String debugTextColor = "DCB42873";
+    public static String debugTextColor = "FFAAAAAA";
 
     @Config.Comment("Debug outline color.")
     public static String debugOutlineColor = "DCB42873";
