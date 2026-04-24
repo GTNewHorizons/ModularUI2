@@ -48,6 +48,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -78,6 +79,8 @@ import java.util.function.Predicate;
 public class ClientScreenHandler {
 
     private static final GuiContext defaultContext = new GuiContext();
+    private static final int DEFAULT_DEBUG_TEXT_COLOR = 0xFFAAAAAA;
+    private static final int DEFAULT_DEBUG_OUTLINE_COLOR = 0xDCB42873;
 
     private static ModularScreen currentScreen = null;
     private static Character lastChar = null;
@@ -584,8 +587,8 @@ public class ClientScreenHandler {
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
-        int outlineColor = DebugOptions.INSTANCE.outlineColor.getIntValue();//Color.argb(180, 40, 115, 220);
-        int textColor = DebugOptions.INSTANCE.textColor.getIntValue();//Color.argb(180, 40, 115, 220);
+        int outlineColor = Color.parseString(ModularUIConfig.debugOutlineColor, DEFAULT_DEBUG_OUTLINE_COLOR, true);
+        int textColor = Color.parseString(ModularUIConfig.debugTextColor, DEFAULT_DEBUG_TEXT_COLOR, true);
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;
@@ -594,9 +597,11 @@ public class ClientScreenHandler {
                 muiScreen.getContext().getRecipeViewerSettings().isEnabled(muiScreen)) {
             lineY -= 20;
         }
-        GuiDraw.drawText("Mouse Pos: " + mouseX + ", " + mouseY, 5, lineY, scale, outlineColor, true);
+        GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.mouse_pos", mouseX, mouseY),
+                5, lineY, scale, textColor, true);
         lineY -= shift;
-        GuiDraw.drawText("FPS: " + fpsCounter.getFps(), 5, lineY, scale, outlineColor, true);
+        GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.fps", fpsCounter.getFps()),
+                5, lineY, scale, textColor, true);
         lineY -= shift;
 
         LocatedWidget locatedHovered = muiScreen.getPanelManager().getTopWidgetLocated(true);
@@ -608,10 +613,11 @@ public class ClientScreenHandler {
         } else {
             theme = context.getTheme();
         }
-        GuiDraw.drawText("Theme ID: " + theme.getId(), 5, lineY, scale, outlineColor, true);
+        GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.theme_id", theme.getId()),
+                5, lineY, scale, textColor, true);
 
         if (locatedHovered != null && (showHovered || showParent)) {
-            drawSegmentLine(lineY -= 4, scale, outlineColor);
+            drawSegmentLine(lineY -= 4, scale, textColor);
             lineY -= 10;
 
             IWidget hovered = locatedHovered.getElement();
@@ -626,24 +632,43 @@ public class ClientScreenHandler {
                 GuiDraw.drawBorderOutsideXYWH(0, 0, area.width, area.height, scale, outlineColor);
             }
             if (hovered.hasParent() && showParent && DebugOptions.INSTANCE.showParentOutline.getBoolValue()) {
-                GuiDraw.drawBorderOutsideXYWH(-area.rx, -area.ry, parent.getArea().width, parent.getArea().height, scale, Color.withAlpha(outlineColor, 0.3f));
+                GuiDraw.drawBorderOutsideXYWH(
+                        -area.rx,
+                        -area.ry,
+                        parent.getArea().width,
+                        parent.getArea().height,
+                        scale,
+                        Color.withAlpha(outlineColor, 0.3f));
             }
             GlStateManager.popMatrix();
             locatedHovered.unapplyMatrix(context);
             if (showHovered) {
                 if (DebugOptions.INSTANCE.showWidgetTheme.getBoolValue()) {
-                    GuiDraw.drawText("Widget Theme: " + hovered.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName(), 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(
+                            StatCollector.translateToLocalFormatted(
+                                    "modularui2.debug.widget_theme",
+                                    hovered.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName()),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                 }
                 if (DebugOptions.INSTANCE.showSize.getBoolValue()) {
-                    GuiDraw.drawText("Size: " + area.width + ", " + area.height, 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.size", area.width, area.height),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                 }
                 if (DebugOptions.INSTANCE.showPos.getBoolValue()) {
-                    GuiDraw.drawText("Pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(
+                            StatCollector.translateToLocalFormatted(
+                                    "modularui2.debug.pos_rel",
+                                    area.x,
+                                    area.y,
+                                    area.rx,
+                                    area.ry),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                 }
-                GuiDraw.drawText("Widget: " + hovered, 5, lineY, scale, textColor, true);
+                GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.widget", hovered),
+                        5, lineY, scale, textColor, true);
             }
             if (hovered.hasParent() && showParent) {
                 if (showHovered) {
@@ -651,41 +676,64 @@ public class ClientScreenHandler {
                     lineY -= 10;
                 }
                 if (DebugOptions.INSTANCE.showParentWidgetTheme.getBoolValue()) {
-                    GuiDraw.drawText("Widget Theme: " + parent.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName(), 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(
+                            StatCollector.translateToLocalFormatted(
+                                    "modularui2.debug.widget_theme",
+                                    parent.getWidgetTheme(muiScreen.getCurrentTheme()).getKey().getFullName()),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                 }
                 area = parent.getArea();
                 if (DebugOptions.INSTANCE.showParentSize.getBoolValue()) {
-                    GuiDraw.drawText("Parent size: " + area.width + ", " + area.height, 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(
+                            StatCollector.translateToLocalFormatted("modularui2.debug.parent_size", area.width, area.height),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                 }
                 if (DebugOptions.INSTANCE.showParentPos.getBoolValue()) {
-                    GuiDraw.drawText("Parent pos: " + area.x + ", " + area.y + "  Rel: " + area.rx + ", " + area.ry, 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(
+                            StatCollector.translateToLocalFormatted(
+                                    "modularui2.debug.parent_pos_rel",
+                                    area.x,
+                                    area.y,
+                                    area.rx,
+                                    area.ry),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                 }
-                GuiDraw.drawText("Parent: " + parent, 5, lineY, scale, outlineColor, true);
+                GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.parent", parent),
+                        5, lineY, scale, textColor, true);
             }
             if (showHovered && DebugOptions.INSTANCE.showExtra.getBoolValue()) {
                 if (hovered instanceof ItemSlot slotWidget) {
                     drawSegmentLine(lineY -= 4, scale, textColor);
                     lineY -= 10;
                     ModularSlot slot = slotWidget.getSlot();
-                    GuiDraw.drawText("Slot Index: " + slot.getSlotIndex(), 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.slot_index", slot.getSlotIndex()),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
-                    GuiDraw.drawText("Slot Number: " + slot.slotNumber, 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.slot_number", slot.slotNumber),
+                            5, lineY, scale, textColor, true);
                     lineY -= shift;
                     if (slotWidget.isSynced()) {
                         SlotGroup slotGroup = slot.getSlotGroup();
                         boolean allowShiftTransfer = slotGroup != null && slotGroup.allowShiftTransfer();
-                        GuiDraw.drawText("Shift-Click Priority: " + (allowShiftTransfer ? slotGroup.getShiftClickPriority() : "DISABLED"), 5, lineY, scale, textColor, true);
+                        GuiDraw.drawText(
+                                StatCollector.translateToLocalFormatted(
+                                        "modularui2.debug.shift_click_priority",
+                                        allowShiftTransfer
+                                                ? slotGroup.getShiftClickPriority()
+                                                : StatCollector.translateToLocal("modularui2.debug.disabled")),
+                                5, lineY, scale, textColor, true);
                     }
                 } else if (hovered instanceof RichTextWidget richTextWidget) {
-                    drawSegmentLine(lineY -= 4, scale, outlineColor);
+                    drawSegmentLine(lineY -= 4, scale, textColor);
                     lineY -= 10;
                     locatedHovered.applyMatrix(context);
                     Object hoveredElement = richTextWidget.getHoveredElement();
                     locatedHovered.unapplyMatrix(context);
-                    GuiDraw.drawText("Hovered: " + hoveredElement, 5, lineY, scale, textColor, true);
+                    GuiDraw.drawText(StatCollector.translateToLocalFormatted("modularui2.debug.hovered", hoveredElement),
+                            5, lineY, scale, textColor, true);
                 }
             }
         }
