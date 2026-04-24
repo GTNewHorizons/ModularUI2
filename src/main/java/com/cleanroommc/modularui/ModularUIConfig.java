@@ -4,7 +4,6 @@ import com.cleanroommc.modularui.screen.RichTooltip;
 
 import com.gtnewhorizon.gtnhlib.config.Config;
 
-
 @Config(modid = ModularUI.ID)
 public class ModularUIConfig {
 
@@ -28,11 +27,11 @@ public class ModularUIConfig {
     @Config.Comment("If true and not specified otherwise, screens will try to use the 'vanilla_dark' theme.")
     public static boolean useDarkThemeByDefault = false;
 
-    @Config.Comment("Debug text color.")
-    public static String debugTextColor = "FFAAAAAA";
+    @Config.Comment("Debug text color. Prefix Hex values with a #. Common colors can be referred by their name.")
+    public static String debugTextColor = "#FFAAAAAA";
 
-    @Config.Comment("Debug outline color.")
-    public static String debugOutlineColor = "DCB42873";
+    @Config.Comment("Debug outline color. Prefix Hex values with a #. Common colors can be referred by their name.")
+    public static String debugOutlineColor = "#DCB42873";
 
     @Config.RequiresMcRestart
     @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")

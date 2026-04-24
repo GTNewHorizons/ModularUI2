@@ -79,7 +79,7 @@ import java.util.function.Predicate;
 public class ClientScreenHandler {
 
     private static final GuiContext defaultContext = new GuiContext();
-    private static final int DEFAULT_DEBUG_TEXT_COLOR = 0xDCB42873;
+    private static final int DEFAULT_DEBUG_TEXT_COLOR = 0xFFAAAAAA;
     private static final int DEFAULT_DEBUG_OUTLINE_COLOR = 0xDCB42873;
 
     private static ModularScreen currentScreen = null;
@@ -587,8 +587,8 @@ public class ClientScreenHandler {
         ModularGuiContext context = muiScreen.getContext();
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
         int screenH = muiScreen.getScreenArea().height;
-        int outlineColor = parseDebugColor(ModularUIConfig.debugOutlineColor, DEFAULT_DEBUG_OUTLINE_COLOR);
-        int textColor = parseDebugColor(ModularUIConfig.debugTextColor, DEFAULT_DEBUG_TEXT_COLOR);
+        int outlineColor = Color.parseString(ModularUIConfig.debugOutlineColor, DEFAULT_DEBUG_OUTLINE_COLOR, true);
+        int textColor = Color.parseString(ModularUIConfig.debugTextColor, DEFAULT_DEBUG_TEXT_COLOR, true);
         float scale = DebugOptions.INSTANCE.scale.getFloatValue();
         int shift = (int) (11 * scale + 0.5f);
         int lineY = screenH - shift - 2;
@@ -727,7 +727,7 @@ public class ClientScreenHandler {
                                 5, lineY, scale, textColor, true);
                     }
                 } else if (hovered instanceof RichTextWidget richTextWidget) {
-                    drawSegmentLine(lineY -= 4, scale, outlineColor);
+                    drawSegmentLine(lineY -= 4, scale, textColor);
                     lineY -= 10;
                     locatedHovered.applyMatrix(context);
                     Object hoveredElement = richTextWidget.getHoveredElement();
@@ -744,12 +744,6 @@ public class ClientScreenHandler {
 
     private static void drawSegmentLine(int y, float scale, int color) {
         GuiDraw.drawRect(5, y, 140 * scale, 1 * scale, color);
-    }
-
-    private static int parseDebugColor(String color, int fallback) {
-        String parsed = color == null ? "" : color.trim();
-            if (!parsed.matches("(?i)^[0-9a-f]{8}$")) return fallback;
-            return (int) Long.parseLong(parsed, 16);
     }
 
     public static void updateGuiArea(GuiContainer container, Rectangle area) {
