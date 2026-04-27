@@ -28,6 +28,7 @@ public enum Mixins implements IMixins {
     THAUMCRAFT(new MixinBuilder()
             .addClientMixins("thaumcraft.ClientTickEventsFMLMixin")
             .setPhase(Phase.LATE)
+            .addExcludedMod(TargetedMod.SALISARCANA)
             .addRequiredMod(TargetedMod.THAUMCRAFT)),
     NEI(new MixinBuilder()
             .addCommonMixins("nei.RecipeInfoMixin")

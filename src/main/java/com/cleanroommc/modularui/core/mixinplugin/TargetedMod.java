@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum TargetedMod implements ITargetMod {
 
+    SALISARCANA("salisarcana"),
     THAUMCRAFT("Thaumcraft"),
     NEI("NotEnoughItems");
 
