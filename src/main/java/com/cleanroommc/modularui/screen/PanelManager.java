@@ -215,12 +215,42 @@ public class PanelManager {
         getTopMostPanel().closeIfOpen();
     }
 
+    /**
+     * Closes all panels. Note that this won't close the screen and can put the screen and main panel into an invalid state if used
+     * incorrectly. Use {@link #closePanelsAndScreen()} to actually close all panels and the screen properly.
+     *
+     * @return if the screen was open
+     */
     public boolean closeAll() {
         if (this.state.isOpen) {
             // any open panel will be set to closed, but will not actually be removed, so it can be reopened
             this.panels.forEach(this::finalizePanel);
             setState(State.CLOSED);
             this.screen.onClose();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Closes all panels and the screen. Should not be used for overlays or embeds.
+     *
+     * @return if this screen was open
+     */
+    public boolean closePanelsAndScreen() {
+        if (this.state.isOpen) {
+            // create a list with non-main panels
+            // looping directly over panels may cause CME
+            List<ModularPanel> subPanels = new ArrayList<>();
+            for (ModularPanel panel : this.panels) {
+                if (panel != this.mainPanel) subPanels.add(panel);
+            }
+            // close all non-main panels
+            for (ModularPanel panel : subPanels) {
+                panel.closeIfOpen();
+            }
+            // finally close main panel
+            this.mainPanel.closeIfOpen();
             return true;
         }
         return false;
