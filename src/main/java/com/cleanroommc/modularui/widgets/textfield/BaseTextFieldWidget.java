@@ -291,10 +291,10 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             this.handler.markAll();
             return Result.SUCCESS;
         }
-        if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
-            return Result.ACCEPT;
-        }
         if (BASE_PATTERN.matcher(String.valueOf(character)).matches() && handler.test(String.valueOf(character))) {
+            if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
+                return Result.SUCCESS;
+            }
             if (this.handler.hasTextMarked()) {
                 this.handler.delete();
             }
@@ -307,11 +307,17 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     @Override
     public Result onKeyEvent(InputEvents.KeyEvent event) {
-        return ModernInteractable.super.onKeyEvent(event);
+        if (!isFocused()) {
+            return Result.IGNORE;
+        }
+        return Result.SUCCESS;
     }
 
     @Override
     public boolean onTextInput(InputEvents.TextEvent event) {
+        if (!isFocused()) {
+            return false;
+        }
         String t = event.text.replaceAll("§", "");
         if (!t.isEmpty() && handler.test(t)) {
             if (this.handler.hasTextMarked()) {

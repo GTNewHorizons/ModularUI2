@@ -340,16 +340,25 @@ public class ClientScreenHandler {
     private static boolean keyTyped(GuiScreen screen, char typedChar, int keyCode) throws IOException {
         if (currentScreen == null) return false;
         // debug mode C + CTRL + SHIFT + ALT
-        if (keyCode == 46 && GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() && Interactable.hasAltDown()) {
+        if (keyCode == Keyboard.KEY_C && GuiScreen.isCtrlKeyDown() && GuiScreen.isShiftKeyDown() && Interactable.hasAltDown()) {
             ModularUIConfig.guiDebugMode = !ModularUIConfig.guiDebugMode;
             return true;
         }
-        if (keyCode == 1 || keyCode == Minecraft.getMinecraft().gameSettings.keyBindInventory.getKeyCode()) {
+        // drop draggable or close top panel on esc
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             if (currentScreen.getContext().hasDraggable()) {
                 currentScreen.getContext().dropDraggable(true);
             } else {
                 currentScreen.getPanelManager().closeTopPanel();
             }
+            return true;
+        }
+        // drop draggable and close all screens when in world and inventory keybind is pressed
+        if (Minecraft.getMinecraft().theWorld != null && keyCode == Minecraft.getMinecraft().gameSettings.keyBindInventory.getKeyCode()) {
+            if (currentScreen.getContext().hasDraggable()) {
+                currentScreen.getContext().dropDraggable(true);
+            }
+            currentScreen.getPanelManager().closePanelsAndScreen();
             return true;
         }
         return false;
