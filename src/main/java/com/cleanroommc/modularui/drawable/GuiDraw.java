@@ -33,7 +33,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class GuiDraw {
@@ -322,11 +324,18 @@ public class GuiDraw {
             return;
         }
         Fluid fluid = content.getFluid();
+        int fluidColor = fluid.getColor(content);
         IIcon fluidStill = fluid.getIcon(content);
+        if (fluidStill == null) {
+            if (Color.getAlpha(fluidColor) == 0) {
+                fluidColor = Color.withAlpha(fluidColor, 255);
+            }
+            drawRect(x0, y0, width, height, fluidColor);
+            return;
+        }
         if (ModularUI.Mods.HODGEPODGE.isLoaded() && fluidStill instanceof IPatchedTextureAtlasSprite) {
             ((IPatchedTextureAtlasSprite) fluidStill).markNeedsAnimationUpdate();
         }
-        int fluidColor = fluid.getColor(content);
         float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
         a = a == 0f ? 1f : a;
         GlStateManager.color(r, g, b, a);
