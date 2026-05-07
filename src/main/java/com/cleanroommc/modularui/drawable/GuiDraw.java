@@ -323,6 +323,9 @@ public class GuiDraw {
         }
         Fluid fluid = content.getFluid();
         IIcon fluidStill = fluid.getIcon(content);
+        if (fluidStill == null) {
+            fluidStill = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("missingno");
+        }
         if (ModularUI.Mods.HODGEPODGE.isLoaded() && fluidStill instanceof IPatchedTextureAtlasSprite) {
             ((IPatchedTextureAtlasSprite) fluidStill).markNeedsAnimationUpdate();
         }
