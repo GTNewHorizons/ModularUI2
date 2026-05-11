@@ -21,6 +21,9 @@ public class ModularUIConfig {
     @Config.Comment("If true, pressing ESC key in the text field will restore the last text instead of confirming current one.")
     public static boolean escRestoreLastText = false;
 
+    @Config.Comment("If true, display the slot overlay when the slot is occupied.")
+    public static boolean showSlotOverlay = true;
+
     @Config.Comment("If true, widget outlines and widget information will be drawn.")
     public static boolean guiDebugMode = ModularUI.isDevEnv;
 
