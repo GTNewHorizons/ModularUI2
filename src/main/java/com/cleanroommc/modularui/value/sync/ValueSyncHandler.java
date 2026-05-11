@@ -6,7 +6,7 @@ import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
 
-public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueSyncHandler<T> {
+public abstract class ValueSyncHandler<T, S extends ValueSyncHandler<T, S>> extends SyncHandler<S> implements IValueSyncHandler<T> {
 
     public static final int SYNC_VALUE = 0;
 
@@ -43,6 +43,11 @@ public abstract class ValueSyncHandler<T> extends SyncHandler implements IValueS
 
     public void setChangeListener(Runnable changeListener) {
         this.changeListener = changeListener;
+    }
+
+    public S changeListener(Runnable changeListener) {
+        setChangeListener(changeListener);
+        return self();
     }
 
     public Runnable getChangeListener() {

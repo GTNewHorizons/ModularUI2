@@ -9,7 +9,7 @@ import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
 
-public class InteractionSyncHandler extends SyncHandler {
+public class InteractionSyncHandler extends SyncHandler<InteractionSyncHandler> {
 
     private IServerMouseAction mousePressed;
     private IServerMouseAction mouseReleased;

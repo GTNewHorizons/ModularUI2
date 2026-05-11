@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPacketWriter;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.network.ModularNetwork;
@@ -10,6 +11,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
+import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
@@ -22,10 +24,11 @@ import java.util.Objects;
  * A sync handler must exist on client and server.
  * It must be configured exactly the same to avoid issues.
  */
-public abstract class SyncHandler implements ISyncOrValue {
+public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrValue {
 
     private PanelSyncManager syncManager;
     private String key;
+    private boolean allowC2S;
 
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
@@ -66,6 +69,10 @@ public abstract class SyncHandler implements ISyncOrValue {
      */
     @SideOnly(Side.CLIENT)
     public final void syncToServer(int id, @NotNull IPacketWriter bufferConsumer) {
+        if (!isAllowC2S()) {
+            ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Sync handler is unable to send packets to server!"));
+            return;
+        }
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarIntToBuffer(id);
         try {
@@ -83,6 +90,10 @@ public abstract class SyncHandler implements ISyncOrValue {
      * @param bufferConsumer the package builder
      */
     public final void sync(int id, @NotNull IPacketWriter bufferConsumer) {
+        if (getSyncManager().isClient() && !isAllowC2S()) {
+            ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Sync handler is unable to send packets to server!"));
+            return;
+        }
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarIntToBuffer(id);
         try {
@@ -183,6 +194,24 @@ public abstract class SyncHandler implements ISyncOrValue {
     @Override
     public boolean isSyncHandler() {
         return true;
+    }
+
+    public boolean isAllowC2S() {
+        return allowC2S;
+    }
+
+    public S allowC2S(boolean allowC2S) {
+        this.allowC2S = allowC2S;
+        return self();
+    }
+
+    public S allowC2S() {
+        return allowC2S(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public S self() {
+        return (S) this;
     }
 
     private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {

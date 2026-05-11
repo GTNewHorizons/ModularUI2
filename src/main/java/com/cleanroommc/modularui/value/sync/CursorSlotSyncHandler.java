@@ -6,7 +6,7 @@ import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
 
-public class CursorSlotSyncHandler extends SyncHandler {
+public class CursorSlotSyncHandler extends SyncHandler<CursorSlotSyncHandler> {
 
     public void sync() {
         sync(0, buffer -> NetworkUtils.writeItemStack(buffer, getSyncManager().getPlayer().inventory.getItemStack()));

@@ -89,7 +89,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
         super.setSyncOrValue(syncOrValue);
         this.stringValue = syncOrValue.castNullable(IStringValue.class);
-        if (syncOrValue instanceof ValueSyncHandler<?> valueSyncHandler) {
+        if (syncOrValue instanceof ValueSyncHandler<?, ?> valueSyncHandler) {
             valueSyncHandler.setChangeListener(() -> {
                 markTooltipDirty();
                 setText(this.stringValue.getValue().toString());

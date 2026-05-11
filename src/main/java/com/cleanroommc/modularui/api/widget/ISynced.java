@@ -39,7 +39,7 @@ public interface ISynced<W extends IWidget> {
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    default boolean isValidSyncHandler(SyncHandler syncHandler) {
+    default boolean isValidSyncHandler(SyncHandler<?> syncHandler) {
         return false;
     }
 
@@ -53,7 +53,7 @@ public interface ISynced<W extends IWidget> {
      * @return if the value or sync handler is valid for this class
      */
     default boolean isValidSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
-        return !(syncOrValue instanceof SyncHandler syncHandler) || isValidSyncHandler(syncHandler);
+        return !(syncOrValue instanceof SyncHandler<?> syncHandler) || isValidSyncHandler(syncHandler);
     }
 
     /**
@@ -73,14 +73,14 @@ public interface ISynced<W extends IWidget> {
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    default <T> T castIfTypeElseNull(SyncHandler syncHandler, Class<T> clazz) {
+    default <T> T castIfTypeElseNull(SyncHandler<?> syncHandler, Class<T> clazz) {
         return castIfTypeElseNull(syncHandler, clazz, null);
     }
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
     @SuppressWarnings("unchecked")
-    default <T> T castIfTypeElseNull(SyncHandler syncHandler, Class<T> clazz, @Nullable Consumer<T> setup) {
+    default <T> T castIfTypeElseNull(SyncHandler<?> syncHandler, Class<T> clazz, @Nullable Consumer<T> setup) {
         if (syncHandler != null && clazz.isAssignableFrom(syncHandler.getClass())) {
             T t = (T) syncHandler;
             if (setup != null) setup.accept(t);
@@ -91,13 +91,13 @@ public interface ISynced<W extends IWidget> {
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    default <T> GenericSyncValue<T> castIfTypeGenericElseNull(SyncHandler syncHandler, Class<T> clazz) {
+    default <T> GenericSyncValue<T> castIfTypeGenericElseNull(SyncHandler<?> syncHandler, Class<T> clazz) {
         return castIfTypeGenericElseNull(syncHandler, clazz, null);
     }
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    default <T> GenericSyncValue<T> castIfTypeGenericElseNull(SyncHandler syncHandler, Class<T> clazz,
+    default <T> GenericSyncValue<T> castIfTypeGenericElseNull(SyncHandler<?> syncHandler, Class<T> clazz,
                                                               @Nullable Consumer<GenericSyncValue<T>> setup) {
         if (syncHandler instanceof GenericSyncValue<?> genericSyncValue && genericSyncValue.isOfType(clazz)) {
             GenericSyncValue<T> t = genericSyncValue.cast();
@@ -117,7 +117,7 @@ public interface ISynced<W extends IWidget> {
      * @throws IllegalStateException if this widget has no valid sync handler
      */
     @NotNull
-    SyncHandler getSyncHandler();
+    SyncHandler<?> getSyncHandler();
 
     /**
      * Sets the sync handler key. The sync handler will be obtained in {@link #initialiseSyncHandler(ModularSyncManager, boolean)}

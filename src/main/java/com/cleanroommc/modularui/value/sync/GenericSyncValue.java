@@ -45,7 +45,7 @@ import java.util.function.Supplier;
  *
  * @param <T> type of the value to sync
  */
-public class GenericSyncValue<T> extends AbstractGenericSyncValue<T> {
+public class GenericSyncValue<T> extends AbstractGenericSyncValue<T, GenericSyncValue<T>> {
 
     public static GenericSyncValue<ItemStack> forItem(@NotNull Supplier<ItemStack> getter, @Nullable Consumer<ItemStack> setter) {
         return new GenericSyncValue<>(getter, setter, ByteBufAdapters.ITEM_STACK);
