@@ -200,11 +200,26 @@ public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrVa
         return allowC2S;
     }
 
+    /**
+     * Sets this sync handler to accept C2S (client to server) packets. This value MUST be the same on client and server.
+     * By default, this is false to prevent clients from force updating values. Values which the player can control through a button for
+     * example are completely fine to allow C2S updates.
+     *
+     * @param allowC2S whether this sync handler should allow client to server updates
+     * @return this
+     */
     public S allowC2S(boolean allowC2S) {
         this.allowC2S = allowC2S;
         return self();
     }
 
+    /**
+     * Sets this sync handler whether to accept C2S (client to server) packets or not. This value MUST be the same on client and server.
+     * By default, this is false to prevent clients from force updating values. Values which the player can control through a button for
+     * example are completely fine to allow C2S updates.
+     *
+     * @return this
+     */
     public S allowC2S() {
         return allowC2S(true);
     }
@@ -214,7 +229,7 @@ public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrVa
         return (S) this;
     }
 
-    private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler<?> syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
@@ -223,12 +238,12 @@ public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrVa
         network.sendSyncHandlerPacket(panel, syncHandler, buffer, syncHandler.syncManager.getPlayer());
     }
 
-    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler<?> syncHandler) {
         send(ModularNetwork.SERVER, panel, buffer, syncHandler);
     }
 
     @SideOnly(Side.CLIENT)
-    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler<?> syncHandler) {
         send(ModularNetwork.CLIENT, panel, buffer, syncHandler);
     }
 }
