@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.ITheme;
 import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
@@ -137,6 +138,14 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
     public int getSlotHoverColor() {
         WidgetThemeEntry<SlotTheme> theme = getWidgetTheme(getPanel().getTheme(), SlotTheme.class);
         return theme.getTheme().getSlotHoverColor();
+    }
+
+    @Override
+    public @Nullable IDrawable getCurrentBackground(WidgetThemeEntry<?> widgetTheme) {
+        if (getFluidStack() != null && !ModularUIConfig.showSlotOverlay) {
+            return null;
+        }
+        return super.getCurrentBackground(widgetTheme);
     }
 
     @Override
