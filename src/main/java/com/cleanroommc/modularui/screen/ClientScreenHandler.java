@@ -344,24 +344,34 @@ public class ClientScreenHandler {
             ModularUIConfig.guiDebugMode = !ModularUIConfig.guiDebugMode;
             return true;
         }
-        // drop draggable or close top panel on esc
+        boolean hasLevel = Minecraft.getMinecraft().theWorld != null;
         if (keyCode == Keyboard.KEY_ESCAPE) {
-            if (currentScreen.getContext().hasDraggable()) {
-                currentScreen.getContext().dropDraggable(true);
-            } else {
-                currentScreen.getPanelManager().closeTopPanel();
+            if (hasLevel) {
+                // close everything in world
+                if (currentScreen.getContext().hasDraggable()) {
+                    currentScreen.getContext().dropDraggable(true);
+                }
+                currentScreen.getPanelManager().closePanelsAndScreen();
+            } else if (!currentScreen.getPanelManager().getTopMostPanel().isMainPanel()) {
+                // close top panel if screen can be close or the top panel is not a main panel
+                dropOrClosePanel();
             }
             return true;
         }
-        // drop draggable and close all screens when in world and inventory keybind is pressed
-        if (Minecraft.getMinecraft().theWorld != null && keyCode == Minecraft.getMinecraft().gameSettings.keyBindInventory.getKeyCode()) {
-            if (currentScreen.getContext().hasDraggable()) {
-                currentScreen.getContext().dropDraggable(true);
-            }
-            currentScreen.getPanelManager().closePanelsAndScreen();
+        if (!hasLevel) return false; // E only closes in world
+        if (keyCode == Minecraft.getMinecraft().gameSettings.keyBindInventory.getKeyCode()) {
+            dropOrClosePanel();
             return true;
         }
         return false;
+    }
+
+    private static void dropOrClosePanel() {
+        if (currentScreen.getContext().hasDraggable()) {
+            currentScreen.getContext().dropDraggable(true);
+        } else {
+            currentScreen.getPanelManager().closeTopPanel();
+        }
     }
 
     public static void dragSlot(long timeSinceLastClick) {
