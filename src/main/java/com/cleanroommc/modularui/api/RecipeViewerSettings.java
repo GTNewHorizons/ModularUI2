@@ -46,7 +46,7 @@ public interface RecipeViewerSettings {
      * Checks if recipe viewer is enabled for a given screen
      *
      * @param screen modular screen
-     * @return true if jei is enabled
+     * @return true if recipe viewer is enabled
      */
     boolean isEnabled(ModularScreen screen);
 
