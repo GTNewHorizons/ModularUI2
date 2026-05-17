@@ -68,7 +68,7 @@ public interface IPositioned<W extends IPositioned<W>> {
     }
 
     default W disableCoverChildrenHeight() {
-        return coverChildrenWidth(-1);
+        return coverChildrenHeight(-1);
     }
 
     default W disableCoverChildren() {
