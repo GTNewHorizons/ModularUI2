@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 
 import org.jetbrains.annotations.ApiStatus;
 
+// TODO
 /**
  * This class can handle opening and closing of a {@link ModularPanel}. It makes sure, that the same panel is not created multiple
  * times and instead reused.
@@ -87,7 +88,7 @@ public interface IPanelHandler {
     /**
      * If this is a sub panel of another panel. A sub panel will be closed when its parent is closed.
      *
-     * @return true if this is a sub panel
+     * @return {@code true} if this is a sub panel
      */
     boolean isSubPanel();
 }
