@@ -2,24 +2,25 @@ package com.cleanroommc.modularui.test;
 
 import com.cleanroommc.modularui.ClientProxy;
 import com.cleanroommc.modularui.ModularUI;
+import com.cleanroommc.modularui.animation.Animator;
+import com.cleanroommc.modularui.animation.IAnimatable;
+import com.cleanroommc.modularui.animation.MutableObjectAnimator;
 import com.cleanroommc.modularui.api.IGuiHolder;
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.PlayerInventoryGuiData;
-import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.ModularScreen;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.utils.ISimpleBauble;
-import com.cleanroommc.modularui.utils.ItemStackItemHandler;
+import com.cleanroommc.modularui.utils.Interpolation;
+import com.cleanroommc.modularui.utils.Interpolations;
 import com.cleanroommc.modularui.utils.Platform;
-import com.cleanroommc.modularui.utils.item.IItemHandlerModifiable;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import com.cleanroommc.modularui.value.sync.SyncHandlers;
-import com.cleanroommc.modularui.widget.ParentWidget;
-import com.cleanroommc.modularui.widgets.SlotGroupWidget;
-import com.cleanroommc.modularui.widgets.layout.Flow;
-import com.cleanroommc.modularui.widgets.slot.ItemSlot;
-import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+
+import com.cleanroommc.modularui.widgets.ItemDisplayWidget;
+import com.cleanroommc.modularui.widgets.TransformWidget;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -42,34 +43,64 @@ public class TestItem extends Item implements IGuiHolder<PlayerInventoryGuiData>
 
     @Override
     public ModularPanel buildUI(PlayerInventoryGuiData guiData, PanelSyncManager guiSyncManager, UISettings settings) {
-        IItemHandlerModifiable itemHandler = new ItemStackItemHandler(guiData, 4);
-        guiSyncManager.registerSlotGroup("mixer_items", 2);
+        return ModularPanel.defaultPanel("main").size(150)
+                .child(getFallingItem(TestEventHandler.getRandomItem(), 38, 65))
+                .child(getFallingItem(TestEventHandler.getRandomItem(), 48, 65))
+                .child(getFallingItem(TestEventHandler.getRandomItem(), 56, 65));
+    }
 
-        // if the player slot is the slot with this item, then disallow any interaction
-        // if the item is not in the player inventory (bauble for example), then this items slot is not on the screen, and we don't need to
-        // limit accessibility
-        if (guiData.getInventoryType() == InventoryTypes.PLAYER) {
-            guiSyncManager.bindPlayerInventory(guiData.getPlayer(), (inv, index) -> index == guiData.getSlotIndex() ?
-                    new ModularSlot(inv, index).accessibility(false, false) :
-                    new ModularSlot(inv, index));
+    static class Pos implements IAnimatable<Pos> {
+
+        private int x, y;
+
+        public Pos(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
-        ModularPanel panel = ModularPanel.defaultPanel("knapping_gui").resizeableOnDrag(true);
-        panel.child(Flow.col().margin(7)
-                .child(new ParentWidget<>().widthRel(1f).expanded()
-                        .child(SlotGroupWidget.builder()
-                                .row("II")
-                                .row("II")
-                                .key('I', index -> new ItemSlot().slot(SyncHandlers.itemSlot(itemHandler, index)
-                                        .ignoreMaxStackSize(true)
-                                        .slotGroup("mixer_items")
-                                        // do not allow putting items which can hold other items into the item
-                                        // some mods don't do this on their backpacks, so it won't catch those cases // TODO 1.7.10
-                                        //.filter(stack -> !stack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
-                                ))
-                                .build()))
-                .child(SlotGroupWidget.playerInventory(false)));
 
-        return panel;
+        @Override
+        public Pos interpolate(Pos start, Pos end, float t) {
+            this.x = Interpolations.lerp(start.x, end.x, t);
+            this.y = Interpolations.lerp(start.y, end.y, t);
+            return this;
+        }
+
+        @Override
+        public Pos copyOrImmutable() {
+            return new Pos(x, y);
+        }
+
+        public void set(Pos other) {
+            this.x = other.x;
+            this.y = other.y;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+    }
+
+    private static TransformWidget getFallingItem(ItemStack itemStack, int xPos, int yPos) {
+        Pos fallingPosition = getAnimatedPosition(new Pos(0, 0), new Pos(0, -80), Interpolation.BOUNCE_IN, 1000);
+        ItemDisplayWidget widget = new ItemDisplayWidget().item(itemStack).background(IDrawable.NONE).hoverBackground(IDrawable.NONE).pos(xPos, yPos);
+        return new TransformWidget(widget)
+                .transform(stack -> {
+                    stack.translate((float) fallingPosition.getX(), (float) fallingPosition.getY());
+                });
+    }
+
+    private static Pos getAnimatedPosition(Pos fromPos, Pos toPos, Interpolation interpolation, int duration) {
+        Animator animator = new MutableObjectAnimator<>(fromPos, fromPos.copyOrImmutable(), toPos)
+                .bounds(0, 1)
+                .curve(interpolation)
+                .duration(duration);
+        animator.reset(true);
+        animator.animate(true);
+        return fromPos;
     }
 
     @Override
