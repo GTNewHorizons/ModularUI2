@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
 
-// TODO
 /**
  * A rectangular widget area, composed of a starting position in the top-left corner and a size.
  * Also has fields for a relative position, a layer and margin & padding.<br>
@@ -145,14 +144,14 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     public void setPanelLayer(byte panelLayer) {}
 
     /**
-     * Calculate X based on another OpenGL anchor value
+     * @return calculated x-coordinate based on another OpenGL anchor value
      */
     public int x(float anchor) {
         return this.x + (int) (this.width * anchor);
     }
 
     /**
-     * Calculate X based on another OpenGL anchor value
+     * @return calculated y-coordinate based on another OpenGL anchor value
      */
     public int y(float anchor) {
         return this.y + (int) (this.height * anchor);
@@ -272,15 +271,16 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Check whether given position is inside the rect.
      * Use {@link com.cleanroommc.modularui.api.widget.IWidget#isInside(IViewportStack, int, int)} rather than this!
+     * @return whether given position is inside the rect.
      */
+    //TODO consider deprecating this, to really warn the user of this function to use the alternative(s)
     public boolean isInside(int x, int y) {
         return x >= this.x && x < this.x + this.width && y >= this.y && y < this.y + this.height;
     }
 
     /**
-     * Check whether given rect intersects this rect
+     * @return whether given rectangle intersects this rect
      */
     public boolean intersects(Rectangle2D area) {
         return this.x < area.getX() + area.getWidth() && this.y < area.getY() + area.getHeight()
@@ -539,9 +539,9 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * This creates a copy with size, pos, margin padding and z layer.
+     * Creates a copy with size, pos, margin padding and z layer.
      *
-     * @return copy
+     * @return the copy
      */
     public Area createCopy() {
         return new Area(this);
