@@ -61,7 +61,7 @@ public interface IDrawable {
     }
 
     /**
-     * Draws this drawable in a given area. The padding of the area is not applied here.
+     * Draws this drawable in a given area without any padding.
      *
      * @param context     current context to draw with
      * @param area        draw area
@@ -97,6 +97,16 @@ public interface IDrawable {
         draw(context, 0, 0, area.width, area.height, widgetTheme);
     }
 
+    //TODO: I'd like to know what the documentation actually should say here
+    //      as it's imo unclear if the padding is drawn outside or inside of the current (0|0), assuming rn it depends on the padding value
+    //      and that padding is always supposed to be positive resulting in the actual drawable being moved to "inwards" and
+    //      shrinking in size, as padding behaves in CSS for example without enforcement or documentation
+    //      Does GL here mean OpenGL's context & thus (0|0) the middle of the screen? Just making sure to properly document.
+    //      What does the original documentation suddenly mean with "padding of the area is not applied here"?
+    ///**
+    // *  Draws this drawable always with padding applied at the current (0|0) shifting the actual drawable being drawn at
+    // *  (0 + padding.left | 0 + padding.top)
+    // */
     /**
      * Draws this drawable at the current (0|0) with the given area's size and its padding applied (this means its technically not at 0|0).
      * This is useful inside widgets since GL is transformed to their position when they are drawing. The padding of the area is not applied

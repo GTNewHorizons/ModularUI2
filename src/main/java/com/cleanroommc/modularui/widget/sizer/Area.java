@@ -12,17 +12,29 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Objects;
 
+// TODO
 /**
- * A rectangular widget area, composed of a position and a size.
- * Also has fields for a relative position, a layer and margin & padding.
+ * A rectangular widget area, composed of a starting position in the top-left corner and a size.
+ * Also has fields for a relative position, a layer and margin & padding.<br>
+ * Functions, variables or parameters prefixed
+ * <ul>
+ *     <li>with s usually mean start(ing)</li>
+ *     <li>with m usually mean middle/mid</li>
+ *     <li>with e usually mean end(ing)</li>
+ *     <li>with r usually mean relative</li>
+ * </ul>
  */
 public class Area extends Rectangle implements IAnimatable<Area> {
 
     public static boolean isInside(int x, int y, int w, int h, int px, int py) {
+        // why does this even need a static object for a simple check?
+        // if at all, instances may use a shared & stateless static method
         SHARED.set(x, y, w, h);
         return SHARED.isInside(px, py);
     }
 
+    //TODO: explain for what SHARED is actually used for, as it has no warnings about side effects caused by
+    //      the function above for example.
     public static final Area SHARED = new Area();
 
     public static final Area ZERO = new Area();
@@ -133,14 +145,14 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     public void setPanelLayer(byte panelLayer) {}
 
     /**
-     * Calculate X based on anchor value
+     * Calculate X based on another OpenGL anchor value
      */
     public int x(float anchor) {
         return this.x + (int) (this.width * anchor);
     }
 
     /**
-     * Calculate X based on anchor value
+     * Calculate X based on another OpenGL anchor value
      */
     public int y(float anchor) {
         return this.y + (int) (this.height * anchor);
@@ -215,6 +227,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
         this.y = parentY + this.ry;
     }
 
+    /**
+     *
+     * @return this width with margin applied
+     */
     public int requestedWidth() {
         return this.width + getMargin().horizontal();
     }
@@ -223,6 +239,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
         return this.width - getPadding().horizontal();
     }
 
+    /**
+     *
+     * @return this height with margin applied
+     */
     public int requestedHeight() {
         return this.height + getMargin().vertical();
     }
@@ -231,6 +251,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
         return this.height - getPadding().vertical();
     }
 
+    /**
+     *
+     * @return this size with margin applied
+     */
     public int requestedSize(GuiAxis axis) {
         return axis.isHorizontal() ? requestedWidth() : requestedHeight();
     }
@@ -282,10 +306,15 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Increases or decreases the size of this area. The position will change so that the center of the new
-     * area is in the same place.
-     * The size will change with double of the given value. The position will change with the negative of the given value.
+     * area is at the same place.
+     * The size will change by double of the given value. The position will change by the negative of the given value.
      * <br>
-     * In short, it will push or pull all four edges by the given amount.
+     * In short, it will push or pull all four edges equally by the given amount.
+     *
+     * <ul>
+     *     <li>see {@link #offset(int)} for only modifying the position</li>
+     *     <li>see {@link #grow(int)} for only modifying the size</li>
+     * </ul>
      *
      * @param expand amount to expand area by (no restrictions)
      */
@@ -296,13 +325,13 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Increases or decreases the size of this area. The position will change so that the center of the new
-     * area is in the same place.
-     * The size will change with double of the given value. The position will change with the negative of the given value.
+     * area is at the same place.
+     * The size will change by double of the given values. The position will change by the negative of the given values.
      * <br>
-     * In short, it will push or pull all four edges by the given amount.
+     * In short, it will push or pull all four edges by the given amounts.
      *
-     * @param expandX amount to expand x-axis by (no restrictions)
-     * @param expandY amount to expand y-axis by (no restrictions)
+     * @param expandX amount to expand the x-axis by (no restrictions)
+     * @param expandY amount to expand the y-axis by (no restrictions)
      */
     public void expand(int expandX, int expandY) {
         this.expandX(expandX);
@@ -311,12 +340,12 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Increases or decreases the width of this area. The x position will change so that the center of the new
-     * area is in the same place.
-     * The width will change with double of the given value. The x position will change with the negative of the given value.
+     * area is at the same place.
+     * The width will change by double of the given value. The x position will change by the negative of the given value.
      * <br>
      * In short, it will push or pull the left and right edges by the given amount.
      *
-     * @param expand amount to expand x-axis by (no restrictions)
+     * @param expand amount to expand the x-axis by (no restrictions)
      */
     public void expandX(int expand) {
         offsetX(-expand);
@@ -325,12 +354,12 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Increases or decreases the height of this area. The y position will change so that the center of the new
-     * area is in the same place.
-     * The height will change with double of the given value. The y position will change with the negative of the given value.
+     * area is at the same place.
+     * The height will change by double of the given value. The y position will change by the negative of the given value.
      * <br>
      * In short, it will push or pull the top and bottom edges by the given amount.
      *
-     * @param expand amount to expand y-axis by (no restrictions)
+     * @param expand amount to expand the y-axis by (no restrictions)
      */
     public void expandY(int expand) {
         offsetY(-expand);
@@ -338,9 +367,14 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the position of the area by the given amount, but doesn't change its size.
+     * Increases or decreases the starting position of the area by the given amount, but doesn't change its size.
      *
-     * @param offset amount to change position by (no restrictions)
+     * <ul>
+     *     <li>see {@link #grow(int)} for only modifying the size</li>
+     *     <li>see {@link #expand(int)} for modifying both</li>
+     * </ul>
+     *
+     * @param offset amount to change the position by (no restrictions)
      */
     public void offset(int offset) {
         offsetX(offset);
@@ -348,10 +382,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the position of the area by the given amount, but doesn't change its size.
+     * Increases or decreases the position of the area by the given amounts, but doesn't change its size.
      *
-     * @param offsetX amount to change x position by (no restrictions)
-     * @param offsetY amount to change y position by (no restrictions)
+     * @param offsetX amount to change the x position by (no restrictions)
+     * @param offsetY amount to change the y position by (no restrictions)
      */
     public void offset(int offsetX, int offsetY) {
         offsetX(offsetX);
@@ -361,7 +395,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     /**
      * Increases or decreases the x position of the area by the given amount, but doesn't change its size.
      *
-     * @param offset amount to change x position by (no restrictions)
+     * @param offset amount to change the x position by (no restrictions)
      */
     public void offsetX(int offset) {
         this.x += offset;
@@ -370,7 +404,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     /**
      * Increases or decreases the y position of the area by the given amount, but doesn't change its size.
      *
-     * @param offset amount to change y position by (no restrictions)
+     * @param offset amount to change the y position by (no restrictions)
      */
     public void offsetY(int offset) {
         this.y += offset;
@@ -379,7 +413,12 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     /**
      * Increases or decreases the size of the area by the given amount, but doesn't change its position.
      *
-     * @param grow amount to change size by (no restrictions)
+     * <ul>
+     *     <li>see {@link #offset(int)} for only modifying the position</li>
+     *     <li>see {@link #expand(int)} for modifying both</li>
+     * </ul>
+     *
+     * @param grow amount to change the size by (no restrictions)
      */
     public void grow(int grow) {
         growW(grow);
@@ -387,10 +426,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the size of the area by the given amount, but doesn't change its position.
+     * Increases or decreases the size of the area by the given amounts, but doesn't change its position.
      *
-     * @param growW amount to change width by (no restrictions)
-     * @param growH amount to change height by (no restrictions)
+     * @param growW amount to change the width by (no restrictions)
+     * @param growH amount to change the height by (no restrictions)
      */
     public void grow(int growW, int growH) {
         growW(growW);
@@ -400,7 +439,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     /**
      * Increases or decreases the width of the area by the given amount, but doesn't change its position.
      *
-     * @param grow amount to change width by (no restrictions)
+     * @param grow amount to change the width by (no restrictions)
      */
     public void growW(int grow) {
         this.width += grow;
@@ -409,14 +448,14 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     /**
      * Increases or decreases the height of the area by the given amount, but doesn't change its position.
      *
-     * @param grow amount to change height by (no restrictions)
+     * @param grow amount to change the height by (no restrictions)
      */
     public void growH(int grow) {
         this.height += grow;
     }
 
     /**
-     * Set all values
+     * Sets all values
      */
     public void set(int x, int y, int w, int h) {
         this.setPos(x, y);
@@ -424,7 +463,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Set the position
+     * Sets the position
      */
     public void setPos(int x, int y) {
         this.x = x;
@@ -432,7 +471,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Set the size
+     * Sets the size
      */
     public void setSize(int w, int h) {
         this.width = w;
@@ -450,10 +489,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     /**
      * Sets position and size by specifying top left and bottom right corner position.
      *
-     * @param sx x position of top left corner
-     * @param sy y position of top left corner
-     * @param ex x position of bottom right corner
-     * @param ey y position of bottom right corner
+     * @param sx x position of the top left corner
+     * @param sy y position of the top left corner
+     * @param ex x position of the bottom right corner
+     * @param ey y position of the bottom right corner
      */
     public void setPos(int sx, int sy, int ex, int ey) {
         int x0 = Math.min(sx, ex);
