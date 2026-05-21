@@ -69,7 +69,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * Creates a translated text.
      *
      * @param key translation key
-     * @return text key
+     * @return the text key
      */
     static IKey lang(@NotNull String key) {
         return new LangKey(key);
@@ -80,7 +80,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      *
      * @param key  translation key
      * @param args translation arguments
-     * @return text key
+     * @return the text key
      */
     static IKey lang(@NotNull String key, @Nullable Object... args) {
         return new LangKey(key, args);
@@ -91,7 +91,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      *
      * @param key          translation key
      * @param argsSupplier translation arguments supplier
-     * @return text key
+     * @return the text key
      */
     static IKey lang(@NotNull String key, @NotNull Supplier<Object[]> argsSupplier) {
         return new LangKey(key, argsSupplier);
@@ -101,7 +101,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * Creates a translated text.
      *
      * @param keySupplier translation key supplier
-     * @return text key
+     * @return the text key
      */
     static IKey lang(@NotNull Supplier<String> keySupplier) {
         return new LangKey(keySupplier);
@@ -112,7 +112,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      *
      * @param keySupplier  translation key supplier
      * @param argsSupplier translation arguments supplier
-     * @return text key
+     * @return the text key
      */
     static IKey lang(@NotNull Supplier<String> keySupplier, @NotNull Supplier<Object[]> argsSupplier) {
         return new LangKey(keySupplier, argsSupplier);
@@ -122,7 +122,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * Creates a string literal text.
      *
      * @param key string
-     * @return text key
+     * @return the text key
      */
     static IKey str(@NotNull String key) {
         return new StringKey(key);
@@ -134,14 +134,14 @@ public interface IKey extends IDrawable, IJsonSerializable {
      *
      * @param key  string
      * @param args arguments
-     * @return text key
+     * @return the text key
      */
     static IKey str(@NotNull String key, @Nullable Object... args) {
         return new StringKey(key, args);
     }
 
     /**
-     * @deprecated renamed to str()
+     * @deprecated renamed to {@link #str(String, Object...)}
      */
     @Deprecated
     static IKey format(@NotNull String key, @Nullable Object... args) {
@@ -152,7 +152,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * Creates a composed text key.
      *
      * @param keys text keys
-     * @return composed text key.
+     * @return the composed text key.
      */
     static IKey comp(@NotNull IKey... keys) {
         return new CompoundKey(keys);
@@ -162,7 +162,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * Creates a dynamic text key.
      *
      * @param getter string supplier
-     * @return dynamic text key
+     * @return the dynamic text key
      */
     static IKey dynamic(@NotNull Supplier<@NotNull String> getter) {
         return dynamicKey(() -> IKey.str(getter.get()));
@@ -172,7 +172,7 @@ public interface IKey extends IDrawable, IJsonSerializable {
      * Creates a dynamic text key.
      *
      * @param getter key supplier
-     * @return dynamic text key
+     * @return the dynamic text key
      */
     static IKey dynamicKey(@NotNull Supplier<@NotNull IKey> getter) {
         return new DynamicKey(getter);
@@ -258,8 +258,9 @@ public interface IKey extends IDrawable, IJsonSerializable {
     }
 
     /**
-     * @return a formatting state of this key
+     * @return the formatting state of this key
      */
+    //TODO: consider un-defaulting this, as this looks like to be just a normal abstract function of an interface
     default @Nullable FormattingState getFormatting() {
         return null;
     }

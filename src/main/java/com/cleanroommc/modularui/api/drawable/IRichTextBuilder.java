@@ -34,9 +34,9 @@ public interface IRichTextBuilder<T extends IRichTextBuilder<T>> {
     }
 
     /**
-     * Adds a drawable to the current line. If the drawable is not a {@link IIcon} it will convert to one with {@link IDrawable#asIcon()}.
-     * If that icon then has no default height (<=0) then it is set to the default text height (9 pixel). If the width of the icon is not
-     * set, then the width of the widest tooltip line is used.
+     * Adds a drawable to the current line. If the drawable is not an {@link IIcon}, it will be converted to (be) one using {@link IDrawable#asIcon()}.
+     * If that resulting icon has no default height ({@code <=0}) then it is set to the default text height (of {@code 9} pixels). If the width of the icon is not
+     * set, then the width of the widest tooltip line will be used.
      *
      * @param drawable drawable to add.
      * @return this
@@ -70,7 +70,7 @@ public interface IRichTextBuilder<T extends IRichTextBuilder<T>> {
     }
 
     /**
-     * Starts a new line. This is always preferred over {@code "\n"} or {@code IKey.str("\n)}, it reduces computation a lot and maybe saves
+     * Starts a new line. This is always preferred over {@code "\n"} or {@code IKey.str("\n")}, it reduces computation a lot and maybe saves
      * a tiny bit of memory.
      *
      * @return this
