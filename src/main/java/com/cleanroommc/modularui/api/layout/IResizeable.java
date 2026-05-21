@@ -4,7 +4,7 @@ import com.cleanroommc.modularui.api.GuiAxis;
 
 /**
  * An interface that handles resizing of widgets.
- * Usually this interface is not implemented by the users of this library or will even interact with it.
+ * Usually this interface doesn't have to be implemented or interacted with, by the users of this library.
  */
 public interface IResizeable extends IResizeParent {
 
@@ -19,18 +19,19 @@ public interface IResizeable extends IResizeParent {
      * @param isParentLayout if the parent is a layout widget
      * @return true if element is fully resized
      */
+    //TODO: this seems like another of the per-frame animation situations?
     boolean resize(boolean isParentLayout);
 
     /**
-     * Called if {@link #resize(boolean)} returned false after children have been resized.
+     * Called if {@link #resize(boolean)} returned {@code false} after children have been resized.
      *
      * @return if element is fully resized
      */
     boolean postResize();
 
     /**
-     * Called after all elements in the tree are resized and the absolute positions needs to be calculated from the
-     * relative postion.
+     * Called after all elements in the tree are resized and the absolute positions needs to be calculated from their
+     * relative positions.
      */
     default void preApplyPos() {}
 
@@ -112,24 +113,33 @@ public interface IResizeable extends IResizeParent {
     }
 
     /**
-     * Sets if margin and padding on the x-axis is applied
+     * Sets whether margin and padding should be applied on the x-axis.
      *
-     * @param b true if margin and padding are applied
+     * @param b true if margin and padding should be applied
      */
     void setXMarginPaddingApplied(boolean b);
 
     /**
-     * Sets if margin and padding on the y-axis is applied
+     * Sets whether margin and padding should be applied on the y-axis.
      *
-     * @param b true if margin and padding are applied
+     * @param b true if margin and padding should be applied
      */
     void setYMarginPaddingApplied(boolean b);
 
+    /**
+     * Sets whether margin and padding should be applied on the x- and y-axis.
+     * @param b true if margin and padding should be applied
+     */
     default void setMarginPaddingApplied(boolean b) {
         setXMarginPaddingApplied(b);
         setYMarginPaddingApplied(b);
     }
 
+    /**
+     * Sets whether margin and padding should be applied on the given axis.
+     * @param axis the axis to apply to
+     * @param b true if margin and padding should be applied
+     */
     default void setMarginPaddingApplied(GuiAxis axis, boolean b) {
         if (axis.isHorizontal()) {
             setXMarginPaddingApplied(b);
