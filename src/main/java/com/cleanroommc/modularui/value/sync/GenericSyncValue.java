@@ -45,13 +45,13 @@ import java.util.function.Supplier;
  *
  * @param <T> type of the value to sync
  */
-public class GenericSyncValue<T> extends AbstractGenericSyncValue<T, GenericSyncValue<T>> {
+public class GenericSyncValue<T, S extends GenericSyncValue<T, S>> extends AbstractGenericSyncValue<T, GenericSyncValue<T, S>> {
 
-    public static GenericSyncValue<ItemStack> forItem(@NotNull Supplier<ItemStack> getter, @Nullable Consumer<ItemStack> setter) {
+    public static GenericSyncValue<ItemStack, ?> forItem(@NotNull Supplier<ItemStack> getter, @Nullable Consumer<ItemStack> setter) {
         return new GenericSyncValue<>(getter, setter, ByteBufAdapters.ITEM_STACK);
     }
 
-    public static GenericSyncValue<FluidStack> forFluid(@NotNull Supplier<FluidStack> getter, @Nullable Consumer<FluidStack> setter) {
+    public static GenericSyncValue<FluidStack, ?> forFluid(@NotNull Supplier<FluidStack> getter, @Nullable Consumer<FluidStack> setter) {
         return new GenericSyncValue<>(getter, setter, ByteBufAdapters.FLUID_STACK);
     }
 
@@ -264,8 +264,8 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T, GenericSync
 
     @Override
     @SuppressWarnings("unchecked")
-    public <V> GenericSyncValue<V> cast() {
-        return (GenericSyncValue<V>) this;
+    public <V> GenericSyncValue<V, ?> cast() {
+        return (GenericSyncValue<V, ?>) this;
     }
 
     /**
@@ -472,7 +472,7 @@ public class GenericSyncValue<T> extends AbstractGenericSyncValue<T, GenericSync
          * @throws NullPointerException     if the getter, serializer or deserializer is null
          * @throws IllegalArgumentException if the value type is null and the getter returns null
          */
-        public GenericSyncValue<T> build() {
+        public GenericSyncValue<T, ?> build() {
             return new GenericSyncValue<>(type, getter, setter, deserializer, serializer, equals, copy, nullable);
         }
     }

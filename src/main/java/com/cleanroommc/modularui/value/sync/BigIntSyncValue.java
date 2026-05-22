@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class BigIntSyncValue extends GenericSyncValue<BigInteger> implements IStringValue<BigInteger> {
+public class BigIntSyncValue extends GenericSyncValue<BigInteger, BigIntSyncValue> implements IStringValue<BigInteger> {
 
     public BigIntSyncValue(@NotNull Supplier<BigInteger> getter, @Nullable Consumer<BigInteger> setter) {
         this(getter, setter, false);

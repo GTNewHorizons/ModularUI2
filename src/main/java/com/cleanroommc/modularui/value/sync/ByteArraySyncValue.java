@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ByteArraySyncValue extends GenericSyncValue<byte[]> {
+public class ByteArraySyncValue extends GenericSyncValue<byte[], ByteArraySyncValue> {
 
     public ByteArraySyncValue(@NotNull Supplier<byte[]> getter, @Nullable Consumer<byte[]> setter) {
         this(getter, setter, false);

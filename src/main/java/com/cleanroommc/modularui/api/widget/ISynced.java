@@ -91,16 +91,16 @@ public interface ISynced<W extends IWidget> {
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    default <T> GenericSyncValue<T> castIfTypeGenericElseNull(SyncHandler<?> syncHandler, Class<T> clazz) {
+    default <T> GenericSyncValue<T, ?> castIfTypeGenericElseNull(SyncHandler<?> syncHandler, Class<T> clazz) {
         return castIfTypeGenericElseNull(syncHandler, clazz, null);
     }
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    default <T> GenericSyncValue<T> castIfTypeGenericElseNull(SyncHandler<?> syncHandler, Class<T> clazz,
-                                                              @Nullable Consumer<GenericSyncValue<T>> setup) {
-        if (syncHandler instanceof GenericSyncValue<?> genericSyncValue && genericSyncValue.isOfType(clazz)) {
-            GenericSyncValue<T> t = genericSyncValue.cast();
+    default <T> GenericSyncValue<T, ?> castIfTypeGenericElseNull(SyncHandler<?> syncHandler, Class<T> clazz,
+                                                                 @Nullable Consumer<GenericSyncValue<T, ?>> setup) {
+        if (syncHandler instanceof GenericSyncValue<?, ?> genericSyncValue && genericSyncValue.isOfType(clazz)) {
+            GenericSyncValue<T, ?> t = genericSyncValue.cast();
             if (setup != null) setup.accept(t);
             return t;
         }
