@@ -14,7 +14,11 @@ import java.util.Objects;
 
 /**
  * A rectangular widget area, composed of a starting position in the top-left corner and a size.
- * Also has fields for a relative position, a layer and margin & padding.<br>
+ * Also has fields for a relative position, a layer and margin & padding.<p />
+ *
+ * For modifying the margin or padding of an Area, please use the respective
+ * getters {@link #getMargin()} and {@link #getPadding()} to then call their setters like {@link Box#all(int, int, int, int)}.<p />
+ *
  * Functions, variables or parameters prefixed
  * <ul>
  *     <li>with s usually mean start(ing)</li>
@@ -32,8 +36,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
         return SHARED.isInside(px, py);
     }
 
-    //TODO: explain for what SHARED is actually used for, as it has no warnings about side effects caused by
-    //      the function above for example.
+    @Deprecated
     public static final Area SHARED = new Area();
 
     public static final Area ZERO = new Area();
@@ -144,17 +147,23 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     public void setPanelLayer(byte panelLayer) {}
 
     /**
-     * @return calculated x-coordinate based on another OpenGL anchor value
+     * Positive values shift to the right, and negative values to the left.<br>
+     * Note: percentage is expected in its decimal representation, so {@code 1.0f} would be 100%.
+     * @return shifts x-coordinate by a percentage of the current width
+     * @see #offsetX(int)
      */
-    public int x(float anchor) {
-        return this.x + (int) (this.width * anchor);
+    public int x(float shiftByWidth) {
+        return this.x + (int) (this.width * shiftByWidth);
     }
 
     /**
-     * @return calculated y-coordinate based on another OpenGL anchor value
+     * Positive values shift to the bottom, and negative values to the top.<br>
+     * Note: percentage is expected in its decimal representation, so {@code 1.0f} would be 100%.
+     * @return shifts y-coordinate by a percentage of the current height
+     * @see #offsetY(int)
      */
-    public int y(float anchor) {
-        return this.y + (int) (this.height * anchor);
+    public int y(float shiftByHeight) {
+        return this.y + (int) (this.height * shiftByHeight);
     }
 
     public int getPoint(GuiAxis axis) {
