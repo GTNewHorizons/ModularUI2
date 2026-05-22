@@ -16,15 +16,19 @@ import java.util.Objects;
  * A rectangular widget area, composed of a starting position in the top-left corner and a size.
  * Also has fields for a relative position, a layer and margin & padding.<p />
  *
- * For modifying the margin or padding of an Area, please use the respective
- * getters {@link #getMargin()} and {@link #getPadding()} to then call their setters like {@link Box#all(int, int, int, int)}.<p />
+ * <p>
+ * To modify the margin or padding, use {@link #getMargin()} or {@link #getPadding()}
+ * and then call their respective setters, such as {@link Box#all(int, int, int, int)}.
+ * </p>
  *
- * Functions, variables or parameters prefixed
+ * <p>
+ * Common naming conventions used by methods, variables, and parameters may include the following:
+ * </p>
  * <ul>
- *     <li>with s usually mean start(ing)</li>
- *     <li>with m usually mean middle/mid</li>
- *     <li>with e usually mean end(ing)</li>
- *     <li>with r usually mean relative</li>
+ *     <li>{@code s}: start or starting coordinate</li>
+ *     <li>{@code m}: middle or midpoint coordinate</li>
+ *     <li>{@code e}: end coordinate</li>
+ *     <li>{@code r}: relative coordinate</li>
  * </ul>
  */
 public class Area extends Rectangle implements IAnimatable<Area> {
@@ -148,8 +152,8 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Positive values shift to the right, and negative values to the left.<br>
-     * Note: percentage is expected in its decimal representation, so {@code 1.0f} would be 100%.
-     * @return shifts x-coordinate by a percentage of the current width
+     * Note: the fraction is expected to be a float, so {@code 1.0f} would be 100%.
+     * @return shifts x-coordinate by a fraction of the current width
      * @see #offsetX(int)
      */
     public int x(float shiftByWidth) {
@@ -158,8 +162,8 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Positive values shift to the bottom, and negative values to the top.<br>
-     * Note: percentage is expected in its decimal representation, so {@code 1.0f} would be 100%.
-     * @return shifts y-coordinate by a percentage of the current height
+     * Note: the fraction is expected to be a float, so {@code 1.0f} would be 100%.
+     * @return shifts y-coordinate by a fraction of the current height
      * @see #offsetY(int)
      */
     public int y(float shiftByHeight) {
@@ -281,7 +285,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
 
     /**
      * Use {@link com.cleanroommc.modularui.api.widget.IWidget#isInside(IViewportStack, int, int)} rather than this!
-     * @return whether given position is inside the rect.
+     * @return whether a given position is inside this rect.
      */
     //TODO consider deprecating this, to really warn the user of this function to use the alternative(s)
     public boolean isInside(int x, int y) {
@@ -289,7 +293,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * @return whether given rectangle intersects this rect
+     * @return whether a given rectangle intersects this rect
      */
     public boolean intersects(Rectangle2D area) {
         return this.x < area.getX() + area.getWidth() && this.y < area.getY() + area.getHeight()
@@ -297,7 +301,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Clamp given area inside of this one
+     * Clamp given area inside this one
      */
     public void clamp(Area area) {
         int x1 = area.x();
@@ -314,8 +318,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the size of this area. The position will change so that the center of the new
-     * area is at the same place.
+     * Expands or shrinks the size of this area in both axes. The center position will remain at the same coordinates.
      * The size will change by double of the given value. The position will change by the negative of the given value.
      * <br>
      * In short, it will push or pull all four edges equally by the given amount.
@@ -333,8 +336,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the size of this area. The position will change so that the center of the new
-     * area is at the same place.
+     * Expands or shrinks the size of this area axis-independently. The center position will remain at the same coordinates.
      * The size will change by double of the given values. The position will change by the negative of the given values.
      * <br>
      * In short, it will push or pull all four edges by the given amounts.
@@ -348,8 +350,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the width of this area. The x position will change so that the center of the new
-     * area is at the same place.
+     * Expands or shrinks the width of this area. The center position will remain at the same coordinates.
      * The width will change by double of the given value. The x position will change by the negative of the given value.
      * <br>
      * In short, it will push or pull the left and right edges by the given amount.
@@ -362,8 +363,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Increases or decreases the height of this area. The y position will change so that the center of the new
-     * area is at the same place.
+     * Expands or shrinks the height of this area. The center position will remain at the same coordinates.
      * The height will change by double of the given value. The y position will change by the negative of the given value.
      * <br>
      * In short, it will push or pull the top and bottom edges by the given amount.
@@ -496,12 +496,13 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Sets position and size by specifying top left and bottom right corner position.
+     * Sets position and size by specifying two opposing corner positions, their ordering doesn't matter.
+     * The given coordinates will always be recalculated to be top-left and bottom-right.
      *
-     * @param sx x position of the top left corner
-     * @param sy y position of the top left corner
-     * @param ex x position of the bottom right corner
-     * @param ey y position of the bottom right corner
+     * @param sx x-coordinate of the first corner
+     * @param sy y coordinate of the first corner
+     * @param ex x-coordinate of the second corner
+     * @param ey y-coordinate of the second corner
      */
     public void setPos(int sx, int sy, int ex, int ey) {
         int x0 = Math.min(sx, ex);
@@ -524,8 +525,10 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Transforms the four corners of this rectangle with the given pose stack. The new rectangle can be rotated.
-     * Then a min fit rectangle, which is aligned with the screen axis, is put around the corners.
+     * Transforms the four corners of this rectangle with the given viewport stack.
+     * The resulting transformed rectangle may be rotated or skewed.
+     * So a minimum-fit bounding box will be applied around the transformation result,
+     * which will always be aligned with the screen axis and contain all corners.
      *
      * @param stack pose stack
      */
@@ -548,7 +551,7 @@ public class Area extends Rectangle implements IAnimatable<Area> {
     }
 
     /**
-     * Creates a copy with size, pos, margin padding and z layer.
+     * Creates a copy with size, pos, margin padding, and z layer.
      *
      * @return the copy
      */
