@@ -14,23 +14,23 @@ public interface IResizeable extends IResizeParent {
     void initResizing(boolean onOpen);
 
     /**
-     * Resizes the given element
+     * Attempts to resize this element.
      *
      * @param isParentLayout if the parent is a layout widget
-     * @return true if element is fully resized
+     * @return {@code true} if this element is fully resized, or {@code false} if it requires another pass
      */
-    //TODO: this seems like another of the per-frame animation situations?
+    //TODO: this seems like another of the per-iteration situations?
     boolean resize(boolean isParentLayout);
 
     /**
-     * Called if {@link #resize(boolean)} returned {@code false} after children have been resized.
+     * Called when {@link #resize(boolean)} returned {@code false} after children have been resized.
      *
-     * @return if element is fully resized
+     * @return {@code true} if the element is fully resized
      */
     boolean postResize();
 
     /**
-     * Called after all elements in the tree are resized and the absolute positions needs to be calculated from their
+     * Called after all elements in the tree are resized and the absolute positions need to be calculated from their
      * relative positions.
      */
     default void preApplyPos() {}
