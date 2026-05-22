@@ -35,6 +35,7 @@ public interface RecipeViewerSettings {
 
     /**
      * Only enable recipe viewer in synced GUIs
+     * @see com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerState#DEFAULT RecipeViewerState#DEFAULT
      */
     void defaultState();
 
