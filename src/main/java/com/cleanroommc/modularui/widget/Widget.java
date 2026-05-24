@@ -53,7 +53,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     // syncing
     @Nullable private IValue<?> value;
     @Nullable private String syncKey;
-    @Nullable private SyncHandler syncHandler;
+    @Nullable private SyncHandler<?> syncHandler;
     // rendering
     private boolean disableThemeBackground = false;
     private boolean disableHoverThemeBackground = false;
@@ -101,7 +101,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      */
     @Override
     public void initialiseSyncHandler(ModularSyncManager syncManager, boolean late) {
-        SyncHandler handler = this.syncHandler;
+        SyncHandler<?> handler = this.syncHandler;
         if (handler == null && this.syncKey != null) {
             handler = syncManager.getSyncHandler(getPanel().getName(), this.syncKey);
             if (handler == null && !syncManager.getMainPSM().getPanelName().equals(getPanel().getName())) {
@@ -109,7 +109,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
             }
         }
         if (handler != null) setSyncOrValue(handler);
-        if (this.syncHandler instanceof ValueSyncHandler<?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
+        if (this.syncHandler instanceof ValueSyncHandler<?, ?> valueSyncHandler && valueSyncHandler.getChangeListener() == null) {
             valueSyncHandler.setChangeListener(this::markTooltipDirty);
         }
     }
@@ -361,7 +361,6 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
         return widgetTheme.getTheme(hover);
     }
 
-    @ApiStatus.NonExtendable
     @Override
     public final WidgetThemeEntry<?> getWidgetTheme(ITheme theme) {
         if (this.widgetThemeOverride != null) {
@@ -384,7 +383,6 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      * @throws IllegalStateException if the received widget theme type doesn't match the expected type
      */
     @SuppressWarnings("unchecked")
-    @ApiStatus.NonExtendable
     public final <T extends WidgetTheme> WidgetThemeEntry<T> getWidgetTheme(ITheme theme, Class<T> expectedType) {
         WidgetThemeEntry<?> entry = getWidgetTheme(theme);
         if (entry.getKey().isOfType(expectedType)) {
@@ -699,7 +697,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      * @throws IllegalStateException if this widget has no sync handler ({@link #isSynced()} returns false)
      */
     @Override
-    public @NotNull SyncHandler getSyncHandler() {
+    public @NotNull SyncHandler<?> getSyncHandler() {
         if (this.syncHandler == null) {
             throw new IllegalStateException("Widget is not initialised or not synced!");
         }
@@ -739,7 +737,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     @Deprecated
     protected void setValue(IValue<?> value) {
         this.value = value;
-        if (value instanceof SyncHandler handler) {
+        if (value instanceof SyncHandler<?> handler) {
             setSyncHandler(handler);
         }
     }
@@ -749,7 +747,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    protected void setSyncHandler(@Nullable SyncHandler syncHandler) {
+    protected void setSyncHandler(@Nullable SyncHandler<?> syncHandler) {
         if (syncHandler != null) checkValidSyncOrValue(syncHandler);
         this.syncHandler = syncHandler;
     }
@@ -758,7 +756,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     protected void setSyncOrValue(@NotNull ISyncOrValue syncOrValue) {
         if (!syncOrValue.isSyncHandler() && !syncOrValue.isValueHandler()) return;
         checkValidSyncOrValue(syncOrValue);
-        if (syncOrValue instanceof SyncHandler syncHandler1) setSyncHandler(syncHandler1);
+        if (syncOrValue instanceof SyncHandler<?> syncHandler1) setSyncHandler(syncHandler1);
         if (syncOrValue instanceof IValue<?> value1) setValue(value1);
     }
 

@@ -80,7 +80,7 @@ public abstract class ModularNetworkSide {
     }
 
     @ApiStatus.Internal
-    public void sendSyncHandlerPacket(String panel, SyncHandler syncHandler, PacketBuffer buffer, EntityPlayer player) {
+    public void sendSyncHandlerPacket(String panel, SyncHandler<?> syncHandler, PacketBuffer buffer, EntityPlayer player) {
         ModularSyncManager msm = syncHandler.getSyncManager().getModularSyncManager();
         if (!inverseActiveScreens.containsKey(msm)) return;
         int id = inverseActiveScreens.getInt(msm);

@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  * To use it simply pass in a registered value sync handler into the constructor and link it to a
  * {@link com.cleanroommc.modularui.widgets.DynamicSyncedWidget DynamicSyncedWidget}.
  */
-public class DynamicLinkedSyncHandler<S extends ValueSyncHandler<?>> extends SyncHandler implements IDynamicSyncNotifiable {
+public class DynamicLinkedSyncHandler<S extends ValueSyncHandler<?, ?>> extends SyncHandler<DynamicLinkedSyncHandler<S>> implements IDynamicSyncNotifiable {
 
     private IWidgetProvider<S> widgetProvider;
     private Consumer<IWidget> onWidgetUpdate;
@@ -120,7 +120,7 @@ public class DynamicLinkedSyncHandler<S extends ValueSyncHandler<?>> extends Syn
         }
     }
 
-    public interface IWidgetProvider<S extends ValueSyncHandler<?>> {
+    public interface IWidgetProvider<S extends ValueSyncHandler<?, ?>> {
 
         /**
          * This is the function which creates a widget on client and server.

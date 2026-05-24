@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class FloatSyncValue extends ValueSyncHandler<Float> implements IFloatSyncValue<Float>, IDoubleSyncValue<Float>, IStringSyncValue<Float> {
+public class FloatSyncValue extends ValueSyncHandler<Float, FloatSyncValue> implements IFloatSyncValue<Float>, IDoubleSyncValue<Float>, IStringSyncValue<Float> {
 
     private final FloatSupplier getter;
     private final FloatConsumer setter;

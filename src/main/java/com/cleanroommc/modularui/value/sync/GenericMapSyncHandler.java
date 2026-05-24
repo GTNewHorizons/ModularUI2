@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>> {
+public class GenericMapSyncHandler<K, V> extends ValueSyncHandler<Map<K, V>, GenericMapSyncHandler<K, V>> {
 
     private final Supplier<Map<K, V>> getter;
     private final Consumer<Map<K, V>> setter;
