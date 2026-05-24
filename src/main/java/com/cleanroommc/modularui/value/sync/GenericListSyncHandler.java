@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
-public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, List<T>> {
+public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, List<T>, GenericListSyncHandler<T>> {
 
     private final ObjectList<T> cache = ObjectList.create();
 

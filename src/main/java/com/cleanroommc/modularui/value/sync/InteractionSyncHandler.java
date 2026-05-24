@@ -9,7 +9,7 @@ import net.minecraft.network.PacketBuffer;
 
 import java.io.IOException;
 
-public class InteractionSyncHandler extends SyncHandler {
+public class InteractionSyncHandler extends SyncHandler<InteractionSyncHandler> {
 
     private IServerMouseAction mousePressed;
     private IServerMouseAction mouseReleased;
@@ -18,6 +18,10 @@ public class InteractionSyncHandler extends SyncHandler {
     private IServerKeyboardAction keyPressed;
     private IServerKeyboardAction keyReleased;
     private IServerKeyboardAction keyTapped;
+
+    public InteractionSyncHandler(){
+        allowC2S();
+    }
 
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {

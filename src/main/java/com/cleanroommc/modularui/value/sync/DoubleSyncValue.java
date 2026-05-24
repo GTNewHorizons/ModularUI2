@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
-public class DoubleSyncValue extends ValueSyncHandler<Double> implements IDoubleSyncValue<Double>, IFloatSyncValue<Double>, IStringSyncValue<Double> {
+public class DoubleSyncValue extends ValueSyncHandler<Double, DoubleSyncValue> implements IDoubleSyncValue<Double>, IFloatSyncValue<Double>, IStringSyncValue<Double> {
 
     private final DoubleSupplier getter;
     private final DoubleConsumer setter;

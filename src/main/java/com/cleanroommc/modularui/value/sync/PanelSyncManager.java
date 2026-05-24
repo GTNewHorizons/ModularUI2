@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,9 +34,9 @@ import java.util.function.Supplier;
 
 public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
-    private final Map<String, SyncHandler> syncHandlers = new Object2ReferenceLinkedOpenHashMap<>();
+    private final Map<String, SyncHandler<?>> syncHandlers = new Object2ReferenceLinkedOpenHashMap<>();
     private final Map<String, SlotGroup> slotGroups = new Object2ReferenceOpenHashMap<>();
-    private final Map<SyncHandler, String> reverseSyncHandlers = new Reference2ObjectOpenHashMap<>();
+    private final Map<SyncHandler<?>, String> reverseSyncHandlers = new Reference2ObjectOpenHashMap<>();
     private final Map<String, SyncedAction> syncedActions = new Object2ReferenceOpenHashMap<>();
     private final Map<String, PanelSyncHandler> subPanels = new Object2ReferenceArrayMap<>();
     private final ModularSyncManager modularSyncManager;
@@ -65,9 +66,9 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         this.subPanels.forEach((s, syncHandler) -> this.modularSyncManager.getMainPSM().registerPanelSyncHandler(s, syncHandler));
     }
 
-    private void registerPanelSyncHandler(String name, SyncHandler syncHandler) {
+    private void registerPanelSyncHandler(String name, SyncHandler<?> syncHandler) {
         // only called on main psm
-        SyncHandler currentSh = this.syncHandlers.get(name);
+        SyncHandler<?> currentSh = this.syncHandlers.get(name);
         if (currentSh != null && currentSh != syncHandler) {
             throw new IllegalStateException("Failed to register panel sync handler during initialization. " +
                     "There already exists a sync handler for the name '" + name + "'.");
@@ -109,7 +110,7 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
     void detectAndSendChanges(boolean init) {
         if (!isClient()) {
-            for (SyncHandler syncHandler : this.syncHandlers.values()) {
+            for (SyncHandler<?> syncHandler : this.syncHandlers.values()) {
                 syncHandler.detectAndSendChanges(init || this.init);
             }
         }
@@ -130,11 +131,13 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
             ModularUI.LOGGER.warn("SyncHandler '{}' does not exist for panel '{}'! ID was {}.", mapKey, panelName, id);
             return;
         }
-        SyncHandler syncHandler = this.syncHandlers.get(mapKey);
+        SyncHandler<?> syncHandler = this.syncHandlers.get(mapKey);
         if (isClient()) {
             syncHandler.readOnClient(id, buf);
-        } else {
+        } else if (syncHandler.isAllowC2S()) {
             syncHandler.readOnServer(id, buf);
+        } else {
+            ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Tried to send a packet to server, but the sync handler does not accept client packets."));
         }
     }
 
@@ -165,12 +168,12 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
     }
 
     @Override
-    public boolean hasSyncHandler(SyncHandler syncHandler) {
+    public boolean hasSyncHandler(SyncHandler<?> syncHandler) {
         if (this.reverseSyncHandlers.containsKey(syncHandler)) return true;
         return this != getHyperVisor() && getHyperVisor().hasSyncHandler(syncHandler);
     }
 
-    private void putSyncValue(String name, int id, SyncHandler syncHandler) {
+    private void putSyncValue(String name, int id, SyncHandler<?> syncHandler) {
         if (isLocked()) {
             // registration of sync handlers forbidden
             if (this.allowSyncHandlerRegistration) {
@@ -202,7 +205,7 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
     }
 
     @Override
-    public PanelSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
+    public PanelSyncManager syncValue(String name, int id, SyncHandler<?> syncHandler) {
         Objects.requireNonNull(name, "Name must not be null");
         Objects.requireNonNull(syncHandler, "Sync Handler must not be null");
         putSyncValue(name, id, syncHandler);
@@ -215,7 +218,7 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
     @ApiStatus.ScheduledForRemoval(inVersion = "3.3.0")
     @Deprecated
     public IPanelHandler panel(String key, PanelSyncHandler.IPanelBuilder panelBuilder, boolean subPanel) {
-        SyncHandler sh = this.subPanels.get(key);
+        SyncHandler<?> sh = this.subPanels.get(key);
         if (sh != null) return (IPanelHandler) sh;
         PanelSyncHandler syncHandler = new PanelSyncHandler(panelBuilder, subPanel);
         this.subPanels.put(key, syncHandler);
@@ -338,8 +341,8 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
     }
 
     @Override
-    public <T extends SyncHandler> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
-        SyncHandler syncHandler = findSyncHandlerNullable(name, id);
+    public <T extends SyncHandler<?>> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
+        SyncHandler<?> syncHandler = findSyncHandlerNullable(name, id);
         if (syncHandler == null) {
             if (isLocked() && !this.allowSyncHandlerRegistration) {
                 // registration is locked, and we don't have permission to temporarily bypass lock
@@ -369,16 +372,16 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")
     @Deprecated
-    public @Nullable SyncHandler getSyncHandler(String mapKey) {
+    public @Nullable SyncHandler<?> getSyncHandler(String mapKey) {
         return getSyncHandlerFromMapKey(mapKey);
     }
 
-    public @Nullable SyncHandler getSyncHandlerFromMapKey(String mapKey) {
+    public @Nullable SyncHandler<?> getSyncHandlerFromMapKey(String mapKey) {
         return this.syncHandlers.get(mapKey);
     }
 
     @Override
-    public @Nullable SyncHandler findSyncHandlerNullable(String name, int id) {
+    public @Nullable SyncHandler<?> findSyncHandlerNullable(String name, int id) {
         return this.syncHandlers.get(makeSyncKey(name, id));
     }
 

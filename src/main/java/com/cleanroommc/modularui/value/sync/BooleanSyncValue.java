@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
-public class BooleanSyncValue extends ValueSyncHandler<Boolean> implements IBoolSyncValue<Boolean>, IStringSyncValue<Boolean> {
+public class BooleanSyncValue extends ValueSyncHandler<Boolean, BooleanSyncValue> implements IBoolSyncValue<Boolean>, IStringSyncValue<Boolean> {
 
     private final BooleanSupplier getter;
     private final BooleanConsumer setter;
