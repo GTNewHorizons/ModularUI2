@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.value.sync;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPacketWriter;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.ModularNetworkSide;
@@ -11,12 +12,16 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
+
+import net.minecraft.util.ChatComponentText;
+
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -71,6 +76,9 @@ public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrVa
     public final void syncToServer(int id, @NotNull IPacketWriter bufferConsumer) {
         if (!isAllowC2S()) {
             ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Sync handler is unable to send packets to server!"));
+            if (MCHelper.getPlayer() != null)
+                MCHelper.getPlayer().addChatMessage(new ChatComponentText("Sync handler is unable to send packets to server! " +
+                        "Please report this issue on Discord (or GitHub) with the fml-client-latest.log file attached!"));
             return;
         }
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
@@ -92,6 +100,9 @@ public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrVa
     public final void sync(int id, @NotNull IPacketWriter bufferConsumer) {
         if (getSyncManager().isClient() && !isAllowC2S()) {
             ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Sync handler is unable to send packets to server!"));
+            if (MCHelper.getPlayer() != null)
+                MCHelper.getPlayer().addChatMessage(new ChatComponentText("Sync handler is unable to send packets to server! " +
+                        "Please report this issue on Discord (or GitHub) with the fml-client-latest.log file attached!"));
             return;
         }
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
