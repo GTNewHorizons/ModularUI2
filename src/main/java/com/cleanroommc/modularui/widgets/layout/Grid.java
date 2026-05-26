@@ -129,8 +129,8 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     int ys = getMarginStart(area, GuiAxis.Y, yBorder);
                     int ye = getMarginEnd(area, GuiAxis.Y, yBorder);
                     Alignment alignment = this.alignment;
-                    if(rowAlignmentOverride) alignment = rowAlignments[r];
-                    if(colAlignmentOverride) alignment = colAlignments[c];
+                    if (rowAlignmentOverride) alignment = rowAlignments[r];
+                    if (colAlignmentOverride) alignment = colAlignments[c];
 
                     child.getArea().rx = (int) (x + xs + (width - xs - xe - area.width) * alignment.x);
                     child.getArea().ry = (int) (y + ys + (height - ys - ye - area.height) * alignment.y);
@@ -420,7 +420,7 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         return this;
     }
 
-    public Grid colAlignments(Alignment[] colAlignments) {
+    public Grid columnAlignments(Alignment[] colAlignments) {
         this.colAlignments = colAlignments;
         this.colAlignmentOverride = true;
         this.rowAlignmentOverride = false;
