@@ -113,7 +113,7 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         throw new NullPointerException("No PanelSyncManager found for name '" + panelName + "'!");
     }
 
-    public @Nullable SyncHandler getSyncHandler(String panelName, String syncKey) {
+    public @Nullable SyncHandler<?> getSyncHandler(String panelName, String syncKey) {
         return getPanelSyncManager(panelName).getSyncHandlerFromMapKey(syncKey);
     }
 
@@ -182,12 +182,12 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     }
 
     @Override
-    public boolean hasSyncHandler(SyncHandler syncHandler) {
+    public boolean hasSyncHandler(SyncHandler<?> syncHandler) {
         return this.mainPSM.hasSyncHandler(syncHandler);
     }
 
     @Override
-    public ModularSyncManager syncValue(String name, int id, SyncHandler syncHandler) {
+    public ModularSyncManager syncValue(String name, int id, SyncHandler<?> syncHandler) {
         this.mainPSM.syncValue(name, id, syncHandler);
         return this;
     }
@@ -215,12 +215,12 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
     }
 
     @Override
-    public <T extends SyncHandler> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
+    public <T extends SyncHandler<?>> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
         return this.mainPSM.getOrCreateSyncHandler(name, id, clazz, supplier);
     }
 
     @Override
-    public @Nullable SyncHandler findSyncHandlerNullable(String name, int id) {
+    public @Nullable SyncHandler<?> findSyncHandlerNullable(String name, int id) {
         return this.mainPSM.findSyncHandlerNullable(name, id);
     }
 

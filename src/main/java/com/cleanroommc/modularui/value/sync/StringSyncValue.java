@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class StringSyncValue extends AbstractGenericSyncValue<String> implements IStringSyncValue<String> {
+public class StringSyncValue extends AbstractGenericSyncValue<String, StringSyncValue> implements IStringSyncValue<String> {
 
     public StringSyncValue(Supplier<String> getter, Consumer<String> setter) {
         super(String.class, getter, setter);

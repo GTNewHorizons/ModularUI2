@@ -119,7 +119,7 @@ public abstract class ModularNetwork {
         }
 
         @Override
-        public void sendSyncHandlerPacket(String panel, SyncHandler syncHandler, PacketBuffer buffer, EntityPlayer player) {
+        public void sendSyncHandlerPacket(String panel, SyncHandler<?> syncHandler, PacketBuffer buffer, EntityPlayer player) {
             get(player).sendSyncHandlerPacket(panel, syncHandler, buffer, player);
         }
 

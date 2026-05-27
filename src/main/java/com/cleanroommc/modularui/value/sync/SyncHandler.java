@@ -1,6 +1,8 @@
 package com.cleanroommc.modularui.value.sync;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.IPacketWriter;
+import com.cleanroommc.modularui.api.MCHelper;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.network.ModularNetworkSide;
@@ -10,11 +12,16 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import io.netty.buffer.Unpooled;
+
+import net.minecraft.util.ChatComponentText;
+
+import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -22,10 +29,11 @@ import java.util.Objects;
  * A sync handler must exist on client and server.
  * It must be configured exactly the same to avoid issues.
  */
-public abstract class SyncHandler implements ISyncOrValue {
+public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrValue {
 
     private PanelSyncManager syncManager;
     private String key;
+    private boolean allowC2S;
 
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
@@ -66,6 +74,13 @@ public abstract class SyncHandler implements ISyncOrValue {
      */
     @SideOnly(Side.CLIENT)
     public final void syncToServer(int id, @NotNull IPacketWriter bufferConsumer) {
+        if (!isAllowC2S()) {
+            ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Sync handler is unable to send packets to server!"));
+            if (MCHelper.getPlayer() != null)
+                MCHelper.getPlayer().addChatMessage(new ChatComponentText("Sync handler is unable to send packets to server! " +
+                        "Please report this issue on Discord (or GitHub) with the fml-client-latest.log file attached!"));
+            return;
+        }
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarIntToBuffer(id);
         try {
@@ -83,6 +98,13 @@ public abstract class SyncHandler implements ISyncOrValue {
      * @param bufferConsumer the package builder
      */
     public final void sync(int id, @NotNull IPacketWriter bufferConsumer) {
+        if (getSyncManager().isClient() && !isAllowC2S()) {
+            ModularUI.LOGGER.throwing(Level.WARN, new SecurityException("Sync handler is unable to send packets to server!"));
+            if (MCHelper.getPlayer() != null)
+                MCHelper.getPlayer().addChatMessage(new ChatComponentText("Sync handler is unable to send packets to server! " +
+                        "Please report this issue on Discord (or GitHub) with the fml-client-latest.log file attached!"));
+            return;
+        }
         PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
         buffer.writeVarIntToBuffer(id);
         try {
@@ -185,7 +207,40 @@ public abstract class SyncHandler implements ISyncOrValue {
         return true;
     }
 
-    private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public boolean isAllowC2S() {
+        return allowC2S;
+    }
+
+    /**
+     * Sets this sync handler to accept C2S (client to server) packets. This value MUST be the same on client and server.
+     * By default, this is false to prevent clients from force updating values. Values which the player can control through a button for
+     * example are completely fine to allow C2S updates.
+     *
+     * @param allowC2S whether this sync handler should allow client to server updates
+     * @return this
+     */
+    public S allowC2S(boolean allowC2S) {
+        this.allowC2S = allowC2S;
+        return self();
+    }
+
+    /**
+     * Sets this sync handler whether to accept C2S (client to server) packets or not. This value MUST be the same on client and server.
+     * By default, this is false to prevent clients from force updating values. Values which the player can control through a button for
+     * example are completely fine to allow C2S updates.
+     *
+     * @return this
+     */
+    public S allowC2S() {
+        return allowC2S(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public S self() {
+        return (S) this;
+    }
+
+    private static void send(ModularNetworkSide network, String panel, PacketBuffer buffer, SyncHandler<?> syncHandler) {
         Objects.requireNonNull(buffer);
         Objects.requireNonNull(syncHandler);
         if (!syncHandler.isValid()) {
@@ -194,12 +249,12 @@ public abstract class SyncHandler implements ISyncOrValue {
         network.sendSyncHandlerPacket(panel, syncHandler, buffer, syncHandler.syncManager.getPlayer());
     }
 
-    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToClient(String panel, PacketBuffer buffer, SyncHandler<?> syncHandler) {
         send(ModularNetwork.SERVER, panel, buffer, syncHandler);
     }
 
     @SideOnly(Side.CLIENT)
-    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler syncHandler) {
+    public static void sendToServer(String panel, PacketBuffer buffer, SyncHandler<?> syncHandler) {
         send(ModularNetwork.CLIENT, panel, buffer, syncHandler);
     }
 }

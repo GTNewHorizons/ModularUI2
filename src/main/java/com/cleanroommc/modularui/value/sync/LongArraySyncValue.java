@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class LongArraySyncValue extends GenericSyncValue<long[]> {
+public class LongArraySyncValue extends GenericSyncValue<long[], LongArraySyncValue> {
 
     public LongArraySyncValue(@NotNull Supplier<long[]> getter, @Nullable Consumer<long[]> setter) {
         this(getter, setter, false);

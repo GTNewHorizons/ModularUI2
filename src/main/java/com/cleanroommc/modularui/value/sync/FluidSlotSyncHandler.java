@@ -16,7 +16,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
+public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlotSyncHandler> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
         return fluidStack == null;
@@ -40,6 +40,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack> {
 
     public FluidSlotSyncHandler(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
+        allowC2S();
     }
 
     public FluidSlotSyncHandler(IMultiFluidTankHandler fluidHandler, int index) {

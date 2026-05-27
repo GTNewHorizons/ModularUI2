@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class BigDecimalSyncValue extends GenericSyncValue<BigDecimal> implements IStringValue<BigDecimal> {
+public class BigDecimalSyncValue extends GenericSyncValue<BigDecimal, BigDecimalSyncValue> implements IStringValue<BigDecimal> {
 
     public BigDecimalSyncValue(@NotNull Supplier<BigDecimal> getter, @Nullable Consumer<BigDecimal> setter) {
         this(getter, setter, false);
