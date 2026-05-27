@@ -1,5 +1,6 @@
 package com.cleanroommc.modularui.widgets.layout;
 
+import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.layout.ILayoutWidget;
 import com.cleanroommc.modularui.api.widget.IParentWidget;
@@ -33,6 +34,8 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     private final Box minElementMargin = new Box();
     private int minRowHeight = 5, minColWidth = 5;
     private Alignment alignment = Alignment.Center;
+    private Alignment[] rowAlignments, colAlignments;
+    private boolean rowAlignmentOverride = false, colAlignmentOverride = false;
     private boolean collapseDisabledChild = false;
     private boolean dirty = false, unsanitized = false;
 
@@ -85,6 +88,8 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
     @Override
     public boolean layoutWidgets() {
         sanitizeMatrix();
+        checkAlignmentOverride();
+
         IntList rowSizes = new IntArrayList();
         IntList colSizes = new IntArrayList();
 
@@ -123,6 +128,10 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
                     int xe = getMarginEnd(area, GuiAxis.X, xBorder);
                     int ys = getMarginStart(area, GuiAxis.Y, yBorder);
                     int ye = getMarginEnd(area, GuiAxis.Y, yBorder);
+                    Alignment alignment = this.alignment;
+                    if (rowAlignmentOverride) alignment = rowAlignments[r];
+                    if (colAlignmentOverride) alignment = colAlignments[c];
+
                     child.getArea().rx = (int) (x + xs + (width - xs - xe - area.width) * alignment.x);
                     child.getArea().ry = (int) (y + ys + (height - ys - ye - area.height) * alignment.y);
                     child.resizer().setPosResized(true, true);
@@ -404,6 +413,20 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
         return this;
     }
 
+    public Grid rowAlignments(Alignment[] rowAlignments) {
+        this.rowAlignments = rowAlignments;
+        this.rowAlignmentOverride = true;
+        this.colAlignmentOverride = false;
+        return this;
+    }
+
+    public Grid columnAlignments(Alignment[] colAlignments) {
+        this.colAlignments = colAlignments;
+        this.colAlignmentOverride = true;
+        this.rowAlignmentOverride = false;
+        return this;
+    }
+
     public Grid scrollable() {
         return scrollable(new VerticalScrollData(), new HorizontalScrollData());
     }
@@ -574,6 +597,17 @@ public class Grid extends AbstractScrollWidget<IWidget, Grid> implements ILayout
             }
         }
         this.unsanitized = false;
+    }
+
+    private void checkAlignmentOverride() {
+        if (rowAlignmentOverride && rowAlignments.length != matrix.size()) {
+            ModularUI.LOGGER.warn("Grid row alignment override cannot be applied, # of rows does not match overriding array size!");
+            rowAlignmentOverride = false;
+        }
+        if (colAlignmentOverride && colAlignments.length != matrix.get(0).size()) {
+            ModularUI.LOGGER.warn("Grid column alignment override cannot be applied, # of column does not match overriding array size!");
+            colAlignmentOverride = false;
+        }
     }
 
     private static void foreachRow(Iterable<IWidget> row, Consumer<IWidget> consumer) {
