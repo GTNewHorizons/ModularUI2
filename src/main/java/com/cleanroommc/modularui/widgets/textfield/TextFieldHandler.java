@@ -304,8 +304,10 @@ public class TextFieldHandler {
             text.addAll(insertion);
             return new Point(text.get(text.size() - 1).length(), text.size() - 1);
         }
-        String lineStart = text.get(this.cursor.y).substring(0, this.cursor.x);
-        String lineEnd = text.get(this.cursor.y).substring(this.cursor.x);
+        String line = text.get(this.cursor.y);
+        int cursorX = Math.min(this.cursor.x, line.length());
+        String lineStart = line.substring(0, cursorX);
+        String lineEnd = line.substring(cursorX);
         if (insertion.size() == 1 && text.size() == 1 && !test(lineStart + insertion.get(0) + lineEnd)) {
             return null;
         }
@@ -315,7 +317,7 @@ public class TextFieldHandler {
                 return null;
             }
             text.set(this.cursor.y, text.get(this.cursor.y) + lineEnd);
-            return new Point(this.cursor.x + insertion.get(0).length(), this.cursor.y);
+            return new Point(cursorX + insertion.get(0).length(), this.cursor.y);
         } else {
             text.add(this.cursor.y + 1, insertion.get(insertion.size() - 1) + lineEnd);
             x = insertion.get(insertion.size() - 1).length();
