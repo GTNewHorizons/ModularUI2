@@ -73,6 +73,7 @@ public interface GuiTextures {
     UITexture SOUND = icon("sound", 144, 48);
     UITexture SEARCH = icon("search", 160, 48);
     UITexture CHECKMARK = icon("checkmark", 176, 48);
+    UITexture FAVORITE_OUTLINE = icon("favorite_outline", 192, 48);
 
     UITexture CHECKBOARD = icon("checkboard", 0, 240);
     UITexture DISABLED = icon("disabled", 16, 240);
