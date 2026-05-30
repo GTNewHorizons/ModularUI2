@@ -292,7 +292,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
      * @param max       optional upper limit, if this is specified, then values that evaluate to a noninteger are multiplied by the max
      */
     public TextFieldWidget numbersLong(MathUtils.UnaryLongOperator validator, @Nullable LongSupplier min, @Nullable LongSupplier max) {
-        setFormatAsInteger(true);
+        formatAsInteger(true);
         defaultWholeNumberScrollValues();
         numberParser(MathUtils.PARSER_WHOLE_NUMBER);
         return numbersDouble(d -> {
@@ -389,17 +389,27 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    @Deprecated
     public TextFieldWidget setDefaultNumber(double defaultNumber) {
+        return defaultNumber(defaultNumber);
+    }
+
+    public TextFieldWidget defaultNumber(double defaultNumber) {
         this.defaultNumber = defaultNumber;
         return this;
     }
 
+    @Deprecated
     public TextFieldWidget setFormatAsInteger(boolean formatAsInteger) {
         if (formatAsInteger && !this.numbers) {
             setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
         }
+        return formatAsInteger(formatAsInteger);
+    }
+
+    public TextFieldWidget formatAsInteger(boolean formatAsInteger) {
         this.renderer.setFormatAsInteger(formatAsInteger);
-        return getThis();
+        return this;
     }
 
     public TextFieldWidget value(IStringValue<?> stringValue) {

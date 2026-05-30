@@ -84,7 +84,7 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
                                             if (!syncManager.isClient())
                                                 getStack().setItemDamage(val);
                                         }))
-                                        .setNumbers(0, Short.MAX_VALUE - 1))
+                                        .numbersInt(0, Short.MAX_VALUE - 1))
                                 .child(IKey.str("  Amount: ").asWidget())
                                 .child(new TextFieldWidget()
                                         .size(30, 16)
@@ -95,7 +95,7 @@ public class ItemEditorGui implements IGuiHolder<GuiData> {
                                             if (!syncManager.isClient())
                                                 getStack().stackSize = value;
                                         }))
-                                        .setNumbers(1, 127)))
+                                        .numbersInt(1, 127)))
                         .child(new TextFieldWidget()
                                 .height(20)
                                 .widthRel(1f)
