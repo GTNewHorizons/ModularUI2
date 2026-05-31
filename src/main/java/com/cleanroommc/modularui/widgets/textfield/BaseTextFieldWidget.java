@@ -258,11 +258,19 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
                 this.handler.moveCursorDown(Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
             }
+            case Keyboard.KEY_HOME: {
+                this.handler.moveCursorStart(Interactable.hasControlDown(), Interactable.hasShiftDown());
+                return Result.SUCCESS;
+            }
+            case Keyboard.KEY_END: {
+                this.handler.moveCursorEnd(Interactable.hasControlDown(), Interactable.hasShiftDown());
+                return Result.SUCCESS;
+            }
             case Keyboard.KEY_DELETE:
-                this.handler.delete(true);
+                this.handler.delete(true, Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
             case Keyboard.KEY_BACK:
-                this.handler.delete();
+                this.handler.delete(Interactable.hasControlDown(), Interactable.hasShiftDown());
                 return Result.SUCCESS;
         }
 
@@ -275,16 +283,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             GuiScreen.setClipboardString(this.handler.getSelectedText());
             return Result.SUCCESS;
         } else if (Interactable.isKeyComboCtrlV(keyCode)) {
-            if (this.handler.hasTextMarked()) {
-                this.handler.delete();
-            }
+            this.handler.deleteMarked();
             // paste copied text in marked text
             this.handler.insert(GuiScreen.getClipboardString().replace("§", ""), canScrollHorizontally());
             return Result.SUCCESS;
         } else if (Interactable.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
             GuiScreen.setClipboardString(this.handler.getSelectedText());
-            this.handler.delete();
+            this.handler.deleteMarked();
             return Result.SUCCESS;
         } else if (Interactable.isKeyComboCtrlA(keyCode)) {
             // mark whole text
@@ -295,9 +301,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
             if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
                 return Result.SUCCESS;
             }
-            if (this.handler.hasTextMarked()) {
-                this.handler.delete();
-            }
+            this.handler.deleteMarked();
             // insert typed char
             this.handler.insert(String.valueOf(character), canScrollHorizontally());
             return Result.SUCCESS;
@@ -320,9 +324,7 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         }
         String t = event.text.replaceAll("§", "");
         if (!t.isEmpty() && handler.test(t)) {
-            if (this.handler.hasTextMarked()) {
-                this.handler.delete();
-            }
+            this.handler.deleteMarked();
             // insert typed char
             this.handler.insert(t, canScrollHorizontally());
         }

@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.api.value.ISyncOrValue;
 import com.cleanroommc.modularui.api.widget.Interactable;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
+import com.cleanroommc.modularui.utils.DAM;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.ParseResult;
@@ -17,11 +18,14 @@ import com.cleanroommc.modularui.value.StringValue;
 import com.cleanroommc.modularui.value.sync.ValueSyncHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 import java.util.function.Function;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -41,7 +45,9 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     private double scrollStep = 1;
     private double scrollStepCtrl = 0.1;
     private double scrollStepShift = 100;
+    private double scrollStepAlt = 10000;
     private boolean usingScrollStep = false;
+    private INumberParser parser;
 
     public double parse(String num) {
         if (!this.acceptsExpression) {
@@ -53,7 +59,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             }
         }
 
-        ParseResult result = MathUtils.parseExpression(num, this.defaultNumber, true);
+        ParseResult result = (this.parser == null ? MathUtils.PARSER_WITH_SI : this.parser).parse(num, this.defaultNumber);
         if (result.isFailure()) {
             this.mathFailMessage = result.getErrorMessage();
             ModularUI.LOGGER.error("Math expression error in {}: {}", this, this.mathFailMessage);
@@ -70,7 +76,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     public void onInit() {
         super.onInit();
         if (this.stringValue == null) {
-            this.stringValue = new StringValue("");
+            this.stringValue = new StringValue(this.validator.apply(""));
         }
         setText(this.stringValue.getStringValue());
         if (!hasTooltip() && !tooltipOverride) {
@@ -133,6 +139,29 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             this.handler.getText().set(0, text);
         }
     }
+
+    /**
+     * Allows for setting the numeric values with mouse scrolling.
+     * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is focused
+     */
+    @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is focused
+        if (!this.usingScrollStep || !this.numbers || !isFocused()) return super.onMouseScroll(scrollDirection, amount);
+
+        double step = this.scrollStep;
+        if (Interactable.hasControlDown()) step *= this.scrollStepCtrl;
+        if (Interactable.hasShiftDown()) step *= this.scrollStepShift;
+        if (Interactable.hasAltDown()) step *= this.scrollStepAlt;
+        step *= scrollDirection.modifier;
+        double number = this.parse(getText()) + step;
+        String representation = validator.apply(Double.toString(number));
+        this.stringValue.setStringValue(representation);
+        this.setText(representation);
+        markTooltipDirty();
+        return true;
+    }
+
 
     @Override
     public void onRemoveFocus(ModularGuiContext context) {
@@ -210,33 +239,123 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return this;
     }
 
-    public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
-        this.numbers = true;
-        setValidator(val -> {
-            long num;
-            if (val.isEmpty()) {
-                num = (long) this.defaultNumber;
-            } else {
-                num = (long) parse(val);
-            }
-            return format.format(validator.apply(num));
-        });
+    public TextFieldWidget numberParser(INumberParser parser) {
+        this.parser = parser;
         return this;
     }
 
-    public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
+    public TextFieldWidget numbersDouble(DAM.UnaryDoubleOperator validator) {
         this.numbers = true;
         return setValidator(val -> {
-            int num;
+            double num;
             if (val.isEmpty()) {
-                num = (int) this.defaultNumber;
+                num = this.defaultNumber;
             } else {
-                num = (int) parse(val);
+                num = parse(val);
             }
             return format.format(validator.apply(num));
         });
     }
 
+    public TextFieldWidget numbersDouble(DAM.UnaryDoubleOperator validator, @Nullable DoubleSupplier min, @Nullable DoubleSupplier max) {
+        return numbersDouble(d -> {
+            d = validator.apply(d);
+            if (max != null) d = Math.min(d, max.getAsDouble());
+            if (min != null) d = Math.max(d, min.getAsDouble());
+            return d;
+        });
+    }
+
+    public TextFieldWidget numbersDouble(@Nullable DoubleSupplier min, @Nullable DoubleSupplier max) {
+        return numbersDouble(DAM.UnaryDoubleOperator.IDENTITY, min, max);
+    }
+
+    public TextFieldWidget numbersDouble(double min, double max) {
+        return numbersDouble(() -> min, () -> max);
+    }
+
+    public TextFieldWidget numbersDouble() {
+        return numbersDouble(DAM.UnaryDoubleOperator.IDENTITY);
+    }
+
+    public TextFieldWidget numbersLong(MathUtils.UnaryLongOperator validator) {
+        numberParser(MathUtils.PARSER_WHOLE_NUMBER);
+        defaultWholeNumberScrollValues();
+        return numbersDouble(d -> validator.apply(Math.round(d)));
+    }
+
+    /**
+     * Sets this text number to accept whole numbers.
+     *
+     * @param validator allow further validation of the number
+     * @param min       optional lower limit
+     * @param max       optional upper limit, if this is specified, then values that evaluate to a noninteger are multiplied by the max
+     */
+    public TextFieldWidget numbersLong(MathUtils.UnaryLongOperator validator, @Nullable LongSupplier min, @Nullable LongSupplier max) {
+        formatAsInteger(true);
+        defaultWholeNumberScrollValues();
+        numberParser(MathUtils.PARSER_WHOLE_NUMBER);
+        return numbersDouble(d -> {
+            long l;
+            if (max != null) {
+                long maxValue = max.getAsLong();
+                l = MathUtils.percentOrSelf(d, maxValue);
+                l = Math.min(validator.apply(l), maxValue);
+            } else {
+                l = validator.apply(Math.round(d));
+            }
+            if (min != null) {
+                l = Math.max(l, min.getAsLong());
+            }
+            return l;
+        });
+    }
+
+    public TextFieldWidget numbersLong(@Nullable LongSupplier min, @Nullable LongSupplier max) {
+        return numbersLong(MathUtils.UnaryLongOperator.IDENTITY, min, max);
+    }
+
+    public TextFieldWidget numbersLong(final long min, final long max) {
+        return numbersLong(() -> min, () -> max);
+    }
+
+    public TextFieldWidget numbersLong() {
+        return numbersLong(MathUtils.UnaryLongOperator.IDENTITY);
+    }
+
+    public TextFieldWidget numbersInt(MathUtils.UnaryIntOperator validator) {
+        numberParser(MathUtils.PARSER_WHOLE_NUMBER);
+        defaultWholeNumberScrollValues();
+        return numbersDouble(d -> validator.apply(MathUtils.castToIntSaturated(Math.round(d))));
+    }
+
+    public TextFieldWidget numbersInt(MathUtils.UnaryIntOperator validator, @Nullable LongSupplier min, @Nullable LongSupplier max) {
+        return numbersLong(l -> validator.apply(MathUtils.castToIntSaturated(l)), min, max);
+    }
+
+    public TextFieldWidget numbersInt(@Nullable LongSupplier min, @Nullable LongSupplier max) {
+        return numbersLong(MathUtils.UnaryLongOperator.IDENTITY, min, max);
+    }
+
+    public TextFieldWidget numbersInt(final int min, final int max) {
+        return numbersLong(() -> min, () -> max);
+    }
+
+    public TextFieldWidget numbersInt() {
+        return numbersInt(MathUtils.UnaryIntOperator.IDENTITY);
+    }
+
+    @Deprecated
+    public TextFieldWidget setNumbersLong(Function<Long, Long> validator) {
+        return numbersDouble(d -> validator.apply((long) d));
+    }
+
+    @Deprecated
+    public TextFieldWidget setNumbers(Function<Integer, Integer> validator) {
+        return numbersDouble(d -> validator.apply((int) d));
+    }
+
+    @Deprecated
     public TextFieldWidget setNumbersDouble(Function<Double, Double> validator) {
         this.numbers = true;
         return setValidator(val -> {
@@ -250,33 +369,47 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         });
     }
 
+    @Deprecated
     public TextFieldWidget setNumbers(Supplier<Integer> min, Supplier<Integer> max) {
         return setNumbers(val -> Math.min(max.get(), Math.max(min.get(), val)));
     }
 
+    @Deprecated
     public TextFieldWidget setNumbersLong(Supplier<Long> min, Supplier<Long> max) {
         return setNumbersLong(val -> Math.min(max.get(), Math.max(min.get(), val)));
     }
 
+    @Deprecated
     public TextFieldWidget setNumbers(int min, int max) {
         return setNumbers(val -> Math.min(max, Math.max(min, val)));
     }
 
+    @Deprecated
     public TextFieldWidget setNumbers() {
         return setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    @Deprecated
     public TextFieldWidget setDefaultNumber(double defaultNumber) {
+        return defaultNumber(defaultNumber);
+    }
+
+    public TextFieldWidget defaultNumber(double defaultNumber) {
         this.defaultNumber = defaultNumber;
         return this;
     }
 
+    @Deprecated
     public TextFieldWidget setFormatAsInteger(boolean formatAsInteger) {
         if (formatAsInteger && !this.numbers) {
             setNumbers(Integer.MIN_VALUE, Integer.MAX_VALUE);
         }
+        return formatAsInteger(formatAsInteger);
+    }
+
+    public TextFieldWidget formatAsInteger(boolean formatAsInteger) {
         this.renderer.setFormatAsInteger(formatAsInteger);
-        return getThis();
+        return this;
     }
 
     public TextFieldWidget value(IStringValue<?> stringValue) {
@@ -284,47 +417,42 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return this;
     }
 
-    /**
-     * Allows for setting the numeric values with mouse scrolling.
-     * Will only allow for this behavior when number formatting is enabled, the scroll step is enabled, and the field is focused
-     */
-    @Override
-    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
-        // default to basic behavior if scroll step isn't on, if the widget is not using numbers, and if it is focused
-        if (!this.usingScrollStep || !this.numbers || !isFocused()) return super.onMouseScroll(scrollDirection, amount);
+    @Deprecated
+    public TextFieldWidget setScrollValues(double baseStep, double ctrlStep, double shiftStep) {
+        return scrollValues(baseStep, shiftStep, ctrlStep, 0);
+    }
 
-        double value;
-        if (Interactable.hasControlDown()) value = scrollDirection.modifier * scrollStepCtrl;
-        else if (Interactable.hasShiftDown()) value = scrollDirection.modifier * scrollStepShift;
-        else value = scrollDirection.modifier * scrollStep;
-
-        double number = this.parse(getText()) + value;
-        String representation = validator.apply(Double.toString(number));
-
-        this.stringValue.setStringValue(representation);
-        this.setText(representation);
-        markTooltipDirty();
-
-        return true;
+    private void defaultWholeNumberScrollValues() {
+        if (!this.usingScrollStep) {
+            scrollValues(1, 100, 10_000, 1_000_000);
+            this.usingScrollStep = false;
+        }
     }
 
     /**
      * Sets the values by which to increment the field when the player uses the scroll wheel.
-     * Scrolling up increases value, and scrolling down decreases value.
+     * Scrolling up increases value, and scrolling down decreases value. When multiple modifiers are held at the same time, the increments
+     * will be multiplied with each other.
      * Also enables the usingScrollStep flag.
-     * Default values: 1, 0.1, 100 in order.
+     * Default values: 1, 100, 0.1, 10000 in order. For whole numbers: 1, 100, 10_000, 1_000_000
      *
-     * @param baseStep  - By how much to change the value when no modifier key is held
-     * @param ctrlStep  - By how much to change the value when the ctrl key is held
-     * @param shiftStep - By how much to change the value when the shift key is held
+     * @param baseStep  By how much to change the value when no modifier key is held
+     * @param ctrlStep  By how much to change the value when the ctrl key is held
+     * @param shiftStep By how much to change the value when the shift key is held
+     * @param altStep   By how much to change the value when the alt key is held
      * @return this
      */
-    public TextFieldWidget setScrollValues(double baseStep, double ctrlStep, double shiftStep) {
+    public TextFieldWidget scrollValues(double baseStep, double shiftStep, double ctrlStep, double altStep) {
         this.scrollStep = baseStep;
         this.scrollStepCtrl = ctrlStep;
         this.scrollStepShift = shiftStep;
+        this.scrollStepAlt = altStep;
         this.usingScrollStep = true;
         return this;
+    }
+
+    public TextFieldWidget usingScrollStep() {
+        return usingScrollStep(true);
     }
 
     /**
@@ -333,7 +461,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
      * @return this
      */
     public TextFieldWidget usingScrollStep(boolean usingScrollStep) {
-        this.usingScrollStep = true;
+        this.usingScrollStep = usingScrollStep;
         return this;
     }
 
