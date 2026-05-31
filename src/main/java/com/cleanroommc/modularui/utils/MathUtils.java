@@ -253,7 +253,7 @@ public class MathUtils {
 
     public static long percentOrSelf(double value, long maxValue) {
         long rounded = Math.round(value);
-        if (Math.abs(value - rounded) < 0.0000001) return rounded;
+        if (value > 1 || Math.abs(value - rounded) < 0.0000001) return rounded;
         return Math.round(value * maxValue);
     }
 
