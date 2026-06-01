@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets.textfield;
 
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
+import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
 
 import com.google.common.base.Joiner;
@@ -135,6 +136,17 @@ public class TextFieldHandler {
         setOffsetCursor(cursor);
     }
 
+    private void clampCursor(Point p) {
+        p.y = MathUtils.clamp(p.y, 0, this.text.size() - 1);
+        String line = this.text.get(p.y);
+        p.x = MathUtils.clamp(p.x, 0, line.length());
+    }
+
+    public void clampCursors() {
+        clampCursor(getMainCursor());
+        setOffsetCursor(getMainCursor());
+    }
+
     public void putMainCursorAtStart() {
         if (hasTextMarked() && getMainCursor() != getStartCursor()) {
             switchCursors();
@@ -155,20 +167,8 @@ public class TextFieldHandler {
             setCursor(main.y - 1, this.text.get(main.y - 1).length(), !shift, true);
         } else {
             int newPos = main.x - 1;
-            if (ctrl && newPos > 0) {
-                String line = this.text.get(main.y);
-                boolean found = false;
-                for (int i = newPos; i >= 0; i--) {
-                    char c = line.charAt(i);
-                    if (!Character.isLetter(c) && !Character.isDigit(c)) {
-                        if (i < newPos) newPos = i + 1;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    newPos = 0;
-                }
+            if (ctrl) {
+                newPos = searchWord(this.text.get(main.y), newPos, true);
             }
             setCursor(main.y, newPos, !shift, true);
         }
@@ -183,22 +183,34 @@ public class TextFieldHandler {
             setCursor(main.y + 1, 0, !shift, true);
         } else {
             int newPos = main.x + 1;
-            if (ctrl && newPos < line.length()) {
-                boolean found = false;
-                for (int i = main.x; i < line.length(); i++) {
-                    char c = line.charAt(i);
-                    if (!Character.isLetter(c) && !Character.isDigit(c)) {
-                        if (newPos < i) newPos = i;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    newPos = line.length();
-                }
+            if (ctrl) {
+                newPos = searchWord(this.text.get(main.y), newPos - 1, false);
             }
             setCursor(main.y, newPos, !shift, true);
         }
+    }
+
+    public int searchWord(String line, int start, boolean reverse) {
+        if (reverse) {
+            if (start <= 1) return 0;
+            for (int i = start; i >= 0; i--) {
+                if (!canMoveCursorPastChar(line.charAt(i))) {
+                    return i == start ? i : i + 1;
+                }
+            }
+            return 0;
+        }
+        if (start >= line.length() - 1) return line.length();
+        for (int i = start; i < line.length(); i++) {
+            if (!canMoveCursorPastChar(line.charAt(i))) {
+                return i == start ? i + 1 : i;
+            }
+        }
+        return line.length();
+    }
+
+    private boolean canMoveCursorPastChar(char c) {
+        return Character.isLetter(c) || Character.isDigit(c) || c == ',' || c == '_';
     }
 
     public void moveCursorUp(boolean ctrl, boolean shift) {
@@ -219,6 +231,17 @@ public class TextFieldHandler {
         } else {
             setCursor(main.y, this.text.get(main.y).length(), !shift, true);
         }
+    }
+
+    public void moveCursorStart(boolean ctrl, boolean shift) {
+        int y = ctrl ? 0 : getMainCursor().y;
+        setCursor(y, 0, !shift, true);
+    }
+
+    public void moveCursorEnd(boolean ctrl, boolean shift) {
+        int y = ctrl ? this.text.size() - 1 : getMainCursor().y;
+        String line = this.text.get(y);
+        setCursor(y, line.length(), !shift, true);
     }
 
     public void markAll() {
@@ -295,7 +318,7 @@ public class TextFieldHandler {
         }
         int x, y = this.cursor.y;
         if (hasTextMarked()) {
-            delete(false);
+            delete(false, false, false);
         }
         if (text.isEmpty()) {
             if (insertion.size() == 1 && !test(insertion.get(0))) {
@@ -332,9 +355,7 @@ public class TextFieldHandler {
     }
 
     public void newLine() {
-        if (hasTextMarked()) {
-            delete(false);
-        }
+        deleteMarked();
         String line = this.text.get(this.cursor.y);
         this.text.set(this.cursor.y, line.substring(0, this.cursor.x));
         this.text.add(this.cursor.y + 1, line.substring(this.cursor.x));
@@ -343,14 +364,20 @@ public class TextFieldHandler {
 
     public void clear() {
         markAll();
-        delete();
+        deleteMarked();
     }
 
-    public void delete() {
-        delete(false);
+    public void deleteMarked() {
+        if (hasTextMarked()) {
+            delete(false, false, false);
+        }
     }
 
-    public void delete(boolean inFront) {
+    public void delete(boolean ctrl, boolean shift) {
+        delete(false, ctrl, shift);
+    }
+
+    public void delete(boolean inFront, boolean ctrl, boolean shift) {
         if (hasTextMarked()) {
             Point min = getStartCursor();
             Point max = getEndCursor();
@@ -374,8 +401,19 @@ public class TextFieldHandler {
                         this.text.remove(this.cursor.y + 1);
                     }
                 } else {
-                    line = line.substring(0, this.cursor.x) + line.substring(this.cursor.x + 1);
-                    this.text.set(this.cursor.y, line);
+                    if (shift) {
+                        this.text.remove(this.cursor.y);
+                        if (this.text.isEmpty()) this.text.add("");
+                        clampCursors();
+                    } else {
+                        int p1 = this.cursor.x;
+                        int p2 = p1 + 1;
+                        if (ctrl) {
+                            p2 = searchWord(line, p2, false);
+                        }
+                        line = line.substring(0, p1) + line.substring(p2);
+                        this.text.set(this.cursor.y, line);
+                    }
                 }
             } else {
                 if (this.cursor.x == 0) {
@@ -386,9 +424,14 @@ public class TextFieldHandler {
                         setCursor(this.cursor.y - 1, lineAbove.length(), false);
                     }
                 } else {
-                    line = line.substring(0, this.cursor.x - 1) + line.substring(this.cursor.x);
+                    int p2 = this.cursor.x;
+                    int p1 = p2 - 1;
+                    if (ctrl) {
+                        p1 = searchWord(line, p1, true);
+                    }
+                    line = line.substring(0, p1) + line.substring(p2);
                     this.text.set(this.cursor.y, line);
-                    setCursor(this.cursor.y, this.cursor.x - 1, false);
+                    setCursor(this.cursor.y, p1, false);
                 }
             }
         }

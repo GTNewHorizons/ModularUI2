@@ -16,6 +16,8 @@ import net.minecraftforge.fluids.IFluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Predicate;
+
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlotSyncHandler> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
@@ -37,6 +39,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
     private boolean canFillSlot = true, canDrainSlot = true, controlsAmount = true, phantom = false;
     @Nullable
     private FluidStack lastStoredPhantomFluid;
+    private Predicate<FluidStack> filter = fluidStack -> true;
 
     public FluidSlotSyncHandler(IFluidTank fluidTank) {
         this.fluidTank = fluidTank;
@@ -198,6 +201,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
                 ItemStack heldItemSizedOne = cursorStack.copy();
                 heldItemSizedOne.stackSize = 1;
                 FluidStack heldFluid = FluidInteractions.getFluidForItem(heldItemSizedOne);
+                if (!filter.test(heldFluid)) return;
                 if ((controlsAmount || currentFluid == null) && heldFluid != null) {
                     fillPhantom(heldFluid);
                 } else {
@@ -345,7 +349,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
 
     protected void fillFluid(@NotNull FluidStack heldFluid, boolean processFullStack) {
         FluidStack currentFluid = fluidTank.getFluid();
-        if (currentFluid != null && !currentFluid.isFluidEqual(heldFluid)) {
+        if (currentFluid != null && !currentFluid.isFluidEqual(heldFluid) || !filter.test(heldFluid)) {
             return;
         }
 
@@ -528,6 +532,10 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
         return this.phantom;
     }
 
+    public Predicate<FluidStack> getFilter() {
+        return filter;
+    }
+
     public FluidSlotSyncHandler phantom(boolean phantom) {
         this.phantom = phantom;
         return this;
@@ -548,6 +556,11 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
 
     public FluidSlotSyncHandler canFillSlot(boolean canFillSlot) {
         this.canFillSlot = canFillSlot;
+        return this;
+    }
+
+    public FluidSlotSyncHandler filter(Predicate<FluidStack> filter) {
+        this.filter = filter;
         return this;
     }
 }
