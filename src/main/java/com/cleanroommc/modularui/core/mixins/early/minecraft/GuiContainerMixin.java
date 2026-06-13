@@ -2,8 +2,11 @@ package com.cleanroommc.modularui.core.mixins.early.minecraft;
 
 import com.cleanroommc.modularui.api.IMuiScreen;
 import com.cleanroommc.modularui.screen.IClickableGuiContainer;
+import com.cleanroommc.modularui.widgets.slot.ModularSlot;
+import com.cleanroommc.modularui.widgets.slot.SlotGroup;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 
 import org.spongepowered.asm.lib.Opcodes;
@@ -13,6 +16,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GuiContainer.class)
@@ -58,5 +62,18 @@ public class GuiContainerMixin implements IClickableGuiContainer {
             at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/inventory/Slot;slotNumber:I"), ordinal = 1)
     protected boolean mouseClickedOnSlot(boolean flag1) {
         return false;
+    }
+
+    @Redirect(
+            method = "mouseMovedOrUp",
+            at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/inventory/Slot;inventory:Lnet/minecraft/inventory/IInventory;")
+    )
+    private IInventory checkSlotGroup(Slot slot) {
+        if (slot instanceof ModularSlot ms) {
+            SlotGroup slotGroup = ms.getSlotGroup();
+            if (slotGroup == null) return null;
+            return slotGroup.getDummyInventoryForComparison();
+        }
+        return slot.inventory;
     }
 }
