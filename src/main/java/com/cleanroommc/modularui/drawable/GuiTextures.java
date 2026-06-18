@@ -74,6 +74,7 @@ public interface GuiTextures {
     UITexture SEARCH = icon("search", 160, 48);
     UITexture CHECKMARK = icon("checkmark", 176, 48);
     UITexture FAVORITE_OUTLINE = icon("favorite_outline", 192, 48);
+    UITexture COLOR_WHEEL = icon("color_wheel", 208, 48);
 
     UITexture CHECKBOARD = icon("checkboard", 0, 240);
     UITexture DISABLED = icon("disabled", 16, 240);
