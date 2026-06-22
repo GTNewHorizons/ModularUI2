@@ -100,7 +100,7 @@ public class TextFieldHandler {
                 this.scrollArea.getScrollX().setScrollSize((int) this.renderer.getLastActualWidth());
                 if (this.scrollArea.getScrollX().isScrollBarActive(this.scrollArea)) {
                     String line = this.text.get(main.y);
-                    int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), main).x;
+                    int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), new Point(main.x, 0)).x;
                     scrollTo -= this.scrollArea.getScrollX().getFullVisibleSize(this.scrollArea) / 2;
                     if (animate) {
                         this.scrollArea.getScrollX().animateTo(this.scrollArea, scrollTo);
@@ -217,7 +217,7 @@ public class TextFieldHandler {
         if (this.text.isEmpty()) return;
         Point main = getMainCursor();
         if (main.y > 0) {
-            setCursor(main.y - 1, main.x, !shift, true);
+            setCursor(main.y - 1, Math.min(text.get(main.y - 1).length(), main.x), !shift, true);
         } else {
             setCursor(main.y, 0, !shift, true);
         }
@@ -227,7 +227,7 @@ public class TextFieldHandler {
         if (this.text.isEmpty()) return;
         Point main = getMainCursor();
         if (main.y < this.text.size() - 1) {
-            setCursor(main.y + 1, main.x, !shift, true);
+            setCursor(main.y + 1, Math.min(text.get(main.y + 1).length(), main.x), !shift, true);
         } else {
             setCursor(main.y, this.text.get(main.y).length(), !shift, true);
         }
@@ -287,6 +287,7 @@ public class TextFieldHandler {
         if (max.y > min.y + 2) {
             for (int i = min.y + 1; i < max.y - 1; i++) {
                 builder.append(this.text.get(i));
+                builder.append("\n");
             }
         }
         builder.append(this.text.get(max.y), 0, max.x);
@@ -360,6 +361,7 @@ public class TextFieldHandler {
         this.text.set(this.cursor.y, line.substring(0, this.cursor.x));
         this.text.add(this.cursor.y + 1, line.substring(this.cursor.x));
         setCursor(this.cursor.y + 1, 0, false);
+        onChanged();
     }
 
     public void clear() {
