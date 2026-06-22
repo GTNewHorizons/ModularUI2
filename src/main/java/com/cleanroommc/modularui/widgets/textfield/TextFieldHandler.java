@@ -283,11 +283,10 @@ public class TextFieldHandler {
             return this.text.get(min.y).substring(min.x, max.x);
         }
         StringBuilder builder = new StringBuilder();
-        builder.append(this.text.get(min.y).substring(min.x));
-        if (max.y > min.y + 2) {
-            for (int i = min.y + 1; i < max.y - 1; i++) {
-                builder.append(this.text.get(i));
-                builder.append("\n");
+        builder.append(this.text.get(min.y).substring(min.x)).append("\n");
+        if (max.y > min.y + 1) {
+            for (int i = min.y + 1; i < max.y; i++) {
+                builder.append(this.text.get(i)).append("\n");
             }
         }
         builder.append(this.text.get(max.y), 0, max.x);
@@ -348,8 +347,7 @@ public class TextFieldHandler {
             y += 1;
             if (insertion.size() > 2) {
                 text.addAll(this.cursor.y + 1, text.subList(1, insertion.size() - 1));
-                x = insertion.get(insertion.size() - 1).length();
-                y += insertion.size() - 1;
+                y += insertion.size() - 2;
             }
             return new Point(x, y);
         }
