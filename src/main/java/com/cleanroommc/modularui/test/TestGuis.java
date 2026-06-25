@@ -765,15 +765,19 @@ public class TestGuis extends CustomModularScreen {
     public static @NotNull ModularPanel buildCoverChildrenDraggableUI() {
         int minSize = 8;
 
-        ParentWidget<?> p = new ParentWidget<>()
-                .coverChildren(minSize);
+        ParentWidget<?> draggableParent = new ParentWidget<>()
+                .coverChildren(minSize)
+                .marginTop(18);
+
+        ParentWidget<?> subParent = new ParentWidget<>();
+
+//        subParent = Flow.col().center();
 
         Supplier<DraggableWidget<?>> draggableSupplier = () -> new DraggableWidget<>().size(18).background(GuiTextures.MC_BUTTON);
 
         return ModularPanel.defaultPanel("main")
                 .size(500)
-                .child(Flow.col()
-                        .center()
+                .child(subParent
                         .coverChildren()
                         .child(Flow.row()
                                 .coverChildrenHeight()
@@ -781,16 +785,16 @@ public class TestGuis extends CustomModularScreen {
                                 .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
                                 .child(new ButtonWidget<>().overlay(GuiTextures.REMOVE)
                                         .onMousePressed(i -> {
-                                            if(!p.getChildren().isEmpty())
-                                                p.remove(0);
+                                            if (!draggableParent.getChildren().isEmpty())
+                                                draggableParent.remove(0);
                                             return true;
                                         }))
                                 .child(new ButtonWidget<>().overlay(GuiTextures.ADD)
                                         .onMousePressed(i -> {
-                                            p.child(draggableSupplier.get());
+                                            draggableParent.child(draggableSupplier.get());
                                             return true;
                                         })))
-                        .child(p
+                        .child(draggableParent
                                 .child(draggableSupplier.get())
                                 .child(draggableSupplier.get())));
     }
