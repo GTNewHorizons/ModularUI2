@@ -414,7 +414,7 @@ public class ClientScreenHandler {
     }
 
     public static void drawDarkBackground(GuiScreen screen, int tint) {
-        if (hasScreen()) {
+        if (hasScreen() && currentScreen.shouldDrawDarkBackground()) {
             float alpha = ModularUI.Mods.NEA.isLoaded() ? OpeningAnimation.getValue(screen) : 1f;
             // vanilla color values as hex
             int color = 0x101010;
