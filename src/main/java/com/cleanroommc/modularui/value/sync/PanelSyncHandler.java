@@ -112,8 +112,11 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
     @ApiStatus.Internal
     @Override
     public void closePanelInternal() {
-        getSyncManager().getModularSyncManager().close(this.panelName);
         this.open = false;
+        // Sync infrastructure may already be torn down if the screen was disposed
+        // (e.g. deferred PanelManager.dispose() running after ModularNetwork.closeAll())
+        if (!isValid()) return;
+        getSyncManager().getModularSyncManager().close(this.panelName);
         if (getSyncManager().isClient()) {
             syncToServer(SYNC_CLOSE);
         }
