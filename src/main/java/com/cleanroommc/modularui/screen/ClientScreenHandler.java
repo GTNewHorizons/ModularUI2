@@ -74,6 +74,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
+//TODO: have to come back to this
 @ApiStatus.Internal
 @SideOnly(Side.CLIENT)
 public class ClientScreenHandler {
@@ -486,7 +487,7 @@ public class ClientScreenHandler {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         RenderHelper.enableGUIStandardItemLighting();
-        if (muiScreen.getContext().getRecipeViewerSettings().isRecipeViewerEnabled(muiScreen)) {
+        if (muiScreen.getContext().getRecipeViewerSettings().isEnabled(muiScreen)) {
             // Copied from GuiContainerManager#renderObjects but without translation
             for (IContainerDrawHandler drawHandler : GuiContainerManager.drawHandlers) {
                 drawHandler.renderObjects(mcScreen, mouseX, mouseY);
