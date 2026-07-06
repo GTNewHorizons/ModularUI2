@@ -445,6 +445,7 @@ public class ClientScreenHandler {
         RenderHelper.enableStandardItemLighting();
         handleAnimationScale(mcScreen);
         muiScreen.drawScreen();
+        Platform.setupDrawTex();
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
@@ -474,6 +475,7 @@ public class ClientScreenHandler {
         //handleAnimationScale(mcScreen);
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         muiScreen.drawScreen();
+        Platform.setupDrawTex();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
