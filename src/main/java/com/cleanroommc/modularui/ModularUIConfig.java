@@ -7,43 +7,43 @@ import com.gtnewhorizon.gtnhlib.config.Config;
 @Config(modid = ModularUI.ID)
 public class ModularUIConfig {
 
-    @Config.Comment("Amount of pixels scrolled")
+    @Config.LangKey("modularui2.config.default_scroll_speed")
     @Config.RangeInt(min = 1, max = 100)
     public static int defaultScrollSpeed = 30;
 
-    @Config.Comment("If progress bar should step in texture pixels or screen pixels. (Screen pixels are way smaller and therefore smoother)")
+    @Config.LangKey("modularui2.config.smooth_progress_bar")
     public static boolean smoothProgressBar = false;
 
     // Default direction
-    @Config.Comment("Default tooltip position around the widget or its panel.")
+    @Config.LangKey("modularui2.config.tooltip_pos")
     public static RichTooltip.Pos tooltipPos = RichTooltip.Pos.NEXT_TO_MOUSE;
 
-    @Config.Comment("If true, pressing ESC key in the text field will restore the last text instead of confirming current one.")
+    @Config.LangKey("modularui2.config.esc_restore_last_text")
     public static boolean escRestoreLastText = false;
 
-    @Config.Comment("If true, display the slot overlay when the slot is occupied.")
+    @Config.LangKey("modularui2.config.show_slot_overlay")
     public static boolean showSlotOverlay = true;
 
-    @Config.Comment("If true, widget outlines and widget information will be drawn.")
+    @Config.LangKey("modularui2.config.gui_debug_mode")
     public static boolean guiDebugMode = ModularUI.isDevEnv;
 
-    @Config.Comment("If true and not specified otherwise, screens will try to use the 'vanilla_dark' theme.")
+    @Config.LangKey("modularui2.config.use_dark_theme_by_default")
     public static boolean useDarkThemeByDefault = false;
 
-    @Config.Comment("Debug text color. Prefix Hex values with a #. Common colors can be referred by their name.")
+    @Config.LangKey("modularui2.config.debug_text_color")
     public static String debugTextColor = "#FFAAAAAA";
 
-    @Config.Comment("Debug outline color. Prefix Hex values with a #. Common colors can be referred by their name.")
+    @Config.LangKey("modularui2.config.debug_outline_color")
     public static String debugOutlineColor = "#DCB42873";
 
+    @Config.LangKey("modularui2.config.enable_test_guis")
     @Config.RequiresMcRestart
-    @Config.Comment("Enables a test block, test item with a test gui and opening a gui by right clicking a diamond.")
     public static boolean enableTestGuis = ModularUI.isDevEnv;
 
+    @Config.LangKey("modularui2.config.enable_test_overlays")
     @Config.RequiresMcRestart
-    @Config.Comment("Enables a test overlay shown on title screen and watermark shown on every GuiContainer.")
     public static boolean enableTestOverlays = false;
 
-    //@Config.Comment("If true, vanilla tooltip will be replaced with MUI's RichTooltip")
+    //@Config.LangKey("modularui2.config.use_rich_tooltips")
     //public static boolean replaceVanillaTooltips = false;
 }
