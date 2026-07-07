@@ -56,5 +56,6 @@ public class ModularUIConfig {
     public static boolean enableTestOverlays = false;
 
     //@Config.LangKey("modularui2.config.use_rich_tooltips")
+    //@Config.Comment("If true, vanilla tooltip will be replaced with MUI's RichTooltip")
     //public static boolean replaceVanillaTooltips = false;
 }
