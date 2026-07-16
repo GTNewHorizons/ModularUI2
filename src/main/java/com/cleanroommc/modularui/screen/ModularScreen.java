@@ -80,7 +80,7 @@ public class ModularScreen {
     private final String owner;
     private final String name;
     private final PanelManager panelManager;
-    private final ModularGuiContext context = new ModularGuiContext(this);
+    private final ModularGuiContext context;
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
     private final ScreenResizeNode resizeNode = new ScreenResizeNode(this);
@@ -128,6 +128,7 @@ public class ModularScreen {
     private ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
         Objects.requireNonNull(owner, "The owner must not be null!");
         this.owner = owner;
+        this.context = new ModularGuiContext(this);
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
         this.name = mainPanel.getName();
@@ -139,6 +140,31 @@ public class ModularScreen {
      */
     ModularScreen(@NotNull String owner) {
         this(owner, null, false);
+    }
+
+    /**
+     * Creates a new screen with a given owner, a panel creator and a context factory.
+     * <p>
+     * This is intended for internal use by the HUD system where a read-only context
+     * ({@link com.cleanroommc.modularui.hud.HudContext}) is needed instead of the default
+     * {@link ModularGuiContext}. The context factory receives {@code this} screen and is
+     * invoked before the panel is created, so the panel creator receives the custom context.
+     *
+     * @param owner          owner of this screen (usually a mod id)
+     * @param panelCreator   function which creates the main panel of this screen
+     * @param contextFactory factory that creates the context for this screen
+     */
+    protected ModularScreen(@NotNull String owner, @NotNull Function<ModularGuiContext, ModularPanel> panelCreator,
+            @NotNull Function<ModularScreen, ModularGuiContext> contextFactory) {
+        Objects.requireNonNull(owner, "The owner must not be null!");
+        Objects.requireNonNull(panelCreator, "The main panel function must not be null!");
+        Objects.requireNonNull(contextFactory, "The context factory must not be null!");
+        this.owner = owner;
+        this.context = contextFactory.apply(this);
+        ModularPanel mainPanel = panelCreator.apply(this.context);
+        Objects.requireNonNull(mainPanel, "The main panel must not be null!");
+        this.name = mainPanel.getName();
+        this.panelManager = new PanelManager(this, mainPanel);
     }
 
     /**
@@ -296,8 +322,13 @@ public class ModularScreen {
      */
     public void drawScreen() {
         GlStateManager.disableRescaleNormal();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableLighting();
+        // enableStandardItemLighting() bakes GL_LIGHT0/1 positions relative to the current matrix -
+        // fine for a normal screen (drawn from the matrix state vanilla expects), but corrupts
+        // lighting for whatever draws next when called from a HUD overlay's own transform stack.
+        if (!isOverlay()) {
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableLighting();
+        }
         GlStateManager.disableDepth();
         GlStateManager.disableAlpha();
 
@@ -317,8 +348,10 @@ public class ModularScreen {
 
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
         GlStateManager.enableRescaleNormal();
-        GlStateManager.enableLighting();
-        RenderHelper.enableStandardItemLighting();
+        if (!isOverlay()) {
+            GlStateManager.enableLighting();
+            RenderHelper.enableStandardItemLighting();
+        }
         GlStateManager.enableAlpha();
     }
 
@@ -329,8 +362,10 @@ public class ModularScreen {
      */
     public void drawForeground() {
         GlStateManager.disableRescaleNormal();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableLighting();
+        if (!isOverlay()) {
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableLighting();
+        }
         GlStateManager.disableDepth();
         GlStateManager.disableAlpha();
 
@@ -346,8 +381,10 @@ public class ModularScreen {
         this.context.popViewport(null);
 
         GlStateManager.enableRescaleNormal();
-        GlStateManager.enableLighting();
-        RenderHelper.enableStandardItemLighting();
+        if (!isOverlay()) {
+            GlStateManager.enableLighting();
+            RenderHelper.enableStandardItemLighting();
+        }
         GlStateManager.enableAlpha();
     }
 
