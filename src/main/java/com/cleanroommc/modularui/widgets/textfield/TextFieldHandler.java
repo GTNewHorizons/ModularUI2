@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
+import com.cleanroommc.modularui.widget.scroll.ScrollData;
 
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +34,16 @@ public class TextFieldHandler {
     private Pattern pattern;
     private int maxCharacters = -1;
     private GuiContext guiContext;
+    /**
+     * Safety margin, in pixels, kept between the cursor/revealed text and the field's real clip edge
+     * (see BaseTextFieldWidget#preDraw's Stencil.apply(1, 1, w - 2, h - 2, ..), which clips a couple
+     * pixels tighter than the raw visible size). Also added on top of scrollSize itself (see
+     * BaseTextFieldWidget#drawText and setMainCursor below), since otherwise ScrollData.clamp's own
+     * "scrollSize - visibleSize" cap silently overrides the right-edge margin back down to zero.
+     * Defaults to matching the field's own default horizontal padding (see BaseTextFieldWidget's
+     * constructor), since that's already the amount of breathing room the field visually reserves.
+     */
+    private int scrollEdgeMargin = 4;
 
     public TextFieldHandler(BaseTextFieldWidget<?> textFieldWidget) {
         this.textFieldWidget = textFieldWidget;
@@ -44,6 +55,14 @@ public class TextFieldHandler {
 
     public void setMaxCharacters(int maxCharacters) {
         this.maxCharacters = maxCharacters;
+    }
+
+    public int getScrollEdgeMargin() {
+        return this.scrollEdgeMargin;
+    }
+
+    public void setScrollEdgeMargin(int scrollEdgeMargin) {
+        this.scrollEdgeMargin = scrollEdgeMargin;
     }
 
     public void setScrollArea(@Nullable ScrollArea scrollArea) {
@@ -93,19 +112,41 @@ public class TextFieldHandler {
         if (main.x != charPos || main.y != linePos) {
             main.setLocation(charPos, linePos);
             if (!this.text.isEmpty() && this.renderer != null && this.scrollArea != null) {
-                // update actual width
-                this.renderer.setSimulate(true);
-                this.renderer.draw(this.text);
-                this.renderer.setSimulate(false);
-                this.scrollArea.getScrollX().setScrollSize((int) this.renderer.getLastActualWidth());
-                if (this.scrollArea.getScrollX().isScrollBarActive(this.scrollArea)) {
-                    String line = this.text.get(main.y);
-                    int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), new Point(main.x, 0)).x;
-                    scrollTo -= this.scrollArea.getScrollX().getFullVisibleSize(this.scrollArea) / 2;
-                    if (animate) {
-                        this.scrollArea.getScrollX().animateTo(this.scrollArea, scrollTo);
-                    } else {
-                        this.scrollArea.getScrollX().scrollTo(this.scrollArea, scrollTo);
+                ScrollData scrollX = this.scrollArea.getScrollX();
+                String line = this.text.get(main.y);
+                var measuredLine = this.renderer.measureLines(Collections.singletonList(line));
+                // scrollSize has to be measured in the same coordinate space as getPosOf's cursor
+                // positions below (which include the field's own left padding baked in via getStartX),
+                // otherwise ScrollData.clamp's own "scrollSize - visibleSize" cap silently overrides our
+                // scrollTo target by that same offset, leaving the cursor a few pixels short of actually
+                // being scrolled into view - i.e. clipped/invisible - no matter what we compute below.
+                int lineEndX = (int) this.renderer.getPosOf(measuredLine, new Point(line.length(), 0)).x;
+                // + scrollEdgeMargin: without this, ScrollData.clamp's own "scrollSize - visibleSize"
+                // cap sits exactly scrollEdgeMargin below the scrollTo computed further down, and
+                // silently pulls it back down to the tight boundary - canceling the margin on this
+                // (the right/end) edge specifically. The left edge has no equivalent upper-bound clamp,
+                // which is why only it appeared to be fixed before this.
+                scrollX.setScrollSize(lineEndX + this.scrollEdgeMargin);
+                if (scrollX.isScrollBarActive(this.scrollArea)) {
+                    int cursorX = (int) this.renderer.getPosOf(measuredLine, new Point(main.x, 0)).x;
+                    // scroll just enough to keep the cursor in view, rather than re-centering it on every
+                    // move: centering combined with an animated scroll can't catch up to a target that
+                    // itself keeps moving forward while typing continuously, so the cursor ends up past the
+                    // visible (clipped) edge - i.e. invisible - until the animation eventually catches up.
+                    int visible = scrollX.getFullVisibleSize(this.scrollArea) - this.scrollEdgeMargin;
+                    int current = scrollX.getScroll();
+                    int scrollTo = current;
+                    if (cursorX < current + this.scrollEdgeMargin) {
+                        scrollTo = Math.max(0, cursorX - this.scrollEdgeMargin);
+                    } else if (cursorX > current + visible) {
+                        scrollTo = cursorX - visible;
+                    }
+                    if (scrollTo != current) {
+                        if (animate) {
+                            scrollX.animateTo(this.scrollArea, scrollTo);
+                        } else {
+                            scrollX.scrollTo(this.scrollArea, scrollTo);
+                        }
                     }
                 }
             }
@@ -308,7 +349,9 @@ public class TextFieldHandler {
         if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
         this.text.clear();
         this.text.addAll(copy);
-        setCursor(point, true);
+        // no animation here: typing fires this on every keystroke, and an animated scroll can't catch up
+        // to a target that keeps moving forward each character - see setMainCursor's comment.
+        setCursor(point, false);
         onChanged();
     }
 
