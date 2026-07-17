@@ -14,10 +14,6 @@ import java.util.function.Function;
 
 /**
  * Internal subclass of {@link ModularScreen} used by {@link HudElement}.
- * <p>
- * Constructs the screen with a read-only {@link HudContext} instead of the default
- * {@link ModularGuiContext}, then builds the main panel via the supplied creator function
- * using that context.
  */
 @ApiStatus.Internal
 @SideOnly(Side.CLIENT)

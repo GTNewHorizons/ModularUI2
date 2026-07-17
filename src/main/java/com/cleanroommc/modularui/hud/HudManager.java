@@ -113,24 +113,24 @@ public class HudManager {
             if (visibility.test(e)) {
                 anyVisible = true;
                 e.getScreen()
-                    .getContext()
-                    .updateState(mouseX, mouseY, partialTicks);
+                        .getContext()
+                        .updateState(mouseX, mouseY, partialTicks);
             }
         }
         if (!anyVisible) return;
 
         // Render from lowest to highest priority so higher priority draws on top.
         elements.stream()
-            .filter(visibility)
-            .sorted(Comparator.comparingInt(HudElement::getRenderPriority))
-            .forEach(e -> {
-                GlStateManager.enableBlend();
-                GlStateManager.color(1f, 1f, 1f, 1f);
-                e.getScreen()
-                    .drawScreen();
-                e.getScreen()
-                    .drawForeground();
-            });
+                .filter(visibility)
+                .sorted(Comparator.comparingInt(HudElement::getRenderPriority))
+                .forEach(e -> {
+                    GlStateManager.enableBlend();
+                    GlStateManager.color(1f, 1f, 1f, 1f);
+                    e.getScreen()
+                            .drawScreen();
+                    e.getScreen()
+                            .drawForeground();
+                });
     }
 
     /**
@@ -143,7 +143,7 @@ public class HudManager {
         for (HudElement e : elements) {
             if (e.canDraw()) {
                 e.getScreen()
-                    .onUpdate();
+                        .onUpdate();
             }
         }
     }
@@ -162,7 +162,10 @@ public class HudManager {
         }
 
         boolean resized = scaledWidth != lastWidth || scaledHeight != lastHeight;
-        if (resized) { lastWidth = scaledWidth; lastHeight = scaledHeight; }
+        if (resized) {
+            lastWidth = scaledWidth;
+            lastHeight = scaledHeight;
+        }
         for (HudElement e : elements) {
             if (resized || !e.getScreen().getPanelManager().isOpen()) {
                 e.getScreen().onResize(scaledWidth, scaledHeight);

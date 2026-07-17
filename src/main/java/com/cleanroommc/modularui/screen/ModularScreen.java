@@ -122,13 +122,15 @@ public class ModularScreen {
      * @param mainPanelCreator function which creates the main panel of this screen
      */
     public ModularScreen(@NotNull String owner, @NotNull Function<ModularGuiContext, ModularPanel> mainPanelCreator) {
-        this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), false);
+        this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), ModularGuiContext::new);
     }
 
-    private ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
+    protected ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator,
+                            @NotNull Function<ModularScreen, ModularGuiContext> contextFactory) {
         Objects.requireNonNull(owner, "The owner must not be null!");
+        Objects.requireNonNull(contextFactory, "The context factory must not be null!");
         this.owner = owner;
-        this.context = new ModularGuiContext(this);
+        this.context = contextFactory.apply(this);
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
         this.name = mainPanel.getName();
@@ -139,32 +141,7 @@ public class ModularScreen {
      * Intended for use in {@link CustomModularScreen}
      */
     ModularScreen(@NotNull String owner) {
-        this(owner, null, false);
-    }
-
-    /**
-     * Creates a new screen with a given owner, a panel creator and a context factory.
-     * <p>
-     * This is intended for internal use by the HUD system where a read-only context
-     * ({@link com.cleanroommc.modularui.hud.HudContext}) is needed instead of the default
-     * {@link ModularGuiContext}. The context factory receives {@code this} screen and is
-     * invoked before the panel is created, so the panel creator receives the custom context.
-     *
-     * @param owner          owner of this screen (usually a mod id)
-     * @param panelCreator   function which creates the main panel of this screen
-     * @param contextFactory factory that creates the context for this screen
-     */
-    protected ModularScreen(@NotNull String owner, @NotNull Function<ModularGuiContext, ModularPanel> panelCreator,
-            @NotNull Function<ModularScreen, ModularGuiContext> contextFactory) {
-        Objects.requireNonNull(owner, "The owner must not be null!");
-        Objects.requireNonNull(panelCreator, "The main panel function must not be null!");
-        Objects.requireNonNull(contextFactory, "The context factory must not be null!");
-        this.owner = owner;
-        this.context = contextFactory.apply(this);
-        ModularPanel mainPanel = panelCreator.apply(this.context);
-        Objects.requireNonNull(mainPanel, "The main panel must not be null!");
-        this.name = mainPanel.getName();
-        this.panelManager = new PanelManager(this, mainPanel);
+        this(owner, null, ModularGuiContext::new);
     }
 
     /**
@@ -565,7 +542,9 @@ public class ModularScreen {
         return false;
     }
 
-    /** Lwjgl3 key press event */
+    /**
+     * Lwjgl3 key press event
+     */
     @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
     public void onKeyEvent(InputEvents.KeyEvent event) {
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {
@@ -578,7 +557,9 @@ public class ModularScreen {
         }
     }
 
-    /** Lwjgl3 text input event */
+    /**
+     * Lwjgl3 text input event
+     */
     @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
     public void onTextEvent(InputEvents.TextEvent event) {
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {

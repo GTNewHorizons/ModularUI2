@@ -46,6 +46,16 @@ public class HudElement {
     @Getter private int renderPriority = 0;
 
     /**
+     * Creates a new HUD element with the given owner and main panel.
+     *
+     * @param owner     owner of this element (usually a mod id). Used for theme lookup.
+     * @param mainPanel main panel of this element.
+     */
+    public HudElement(@NotNull String owner, @NotNull ModularPanel mainPanel) {
+        this(owner, ctx -> mainPanel);
+    }
+
+    /**
      * Creates a new HUD element with the given owner and panel creator.
      *
      * @param owner         owner of this element (usually a mod id). Used for theme lookup.
