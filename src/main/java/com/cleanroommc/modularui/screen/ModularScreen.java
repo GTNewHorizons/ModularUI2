@@ -352,6 +352,7 @@ public class ModularScreen {
             GlStateManager.enableLighting();
             RenderHelper.enableStandardItemLighting();
         }
+        GlStateManager.enableDepth();
         GlStateManager.enableAlpha();
     }
 
@@ -385,6 +386,7 @@ public class ModularScreen {
             GlStateManager.enableLighting();
             RenderHelper.enableStandardItemLighting();
         }
+        GlStateManager.enableDepth();
         GlStateManager.enableAlpha();
     }
 
