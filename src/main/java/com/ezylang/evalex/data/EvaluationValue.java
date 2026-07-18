@@ -15,8 +15,10 @@
 */
 package com.ezylang.evalex.data;
 
+import com.ezylang.evalex.EvaluationException;
 import com.ezylang.evalex.config.ExpressionConfiguration;
 import com.ezylang.evalex.parser.ASTNode;
+import com.ezylang.evalex.parser.Token;
 import lombok.Value;
 
 import java.math.BigDecimal;
@@ -365,20 +367,28 @@ public class EvaluationValue implements Comparable<EvaluationValue> {
     /**
      * Creates a {@link DataType#NUMBER} value from a {@link String}.
      *
-     * @param value       The {@link String} value.
+     * @param token       The {@link Token} token.
      * @param mathContext The math context to use for creation of the {@link BigDecimal} storage.
      */
-    public static EvaluationValue numberOfString(String value, MathContext mathContext) {
-        if (value.startsWith("0x") || value.startsWith("0X")) {
-            BigInteger hexToInteger = new BigInteger(value.substring(2), 16);
-            return EvaluationValue.numberValue(new BigDecimal(hexToInteger, mathContext));
-        } else if (value.toLowerCase().contains("e")) {
-            if (value.toLowerCase().split("e")[1].contains(".")) {
-                return EvaluationValue.numberValue(new BigDecimal(0, mathContext));
+    public static EvaluationValue numberOfString(Token token, MathContext mathContext)
+        throws EvaluationException
+    {
+        try {
+            String value = token.getValue();
+            if (value.startsWith("0x") || value.startsWith("0X")) {
+                BigInteger hexToInteger = new BigInteger(value.substring(2), 16);
+                return EvaluationValue.numberValue(new BigDecimal(hexToInteger, mathContext));
+            } else if (value.toLowerCase().contains("e")) {
+                if (value.toLowerCase().split("e")[1].contains(".")) {
+                    return EvaluationValue.numberValue(new BigDecimal(0, mathContext));
+                }
+                return EvaluationValue.numberValue(new BigDecimal(value, mathContext));
+            } else {
+                return EvaluationValue.numberValue(new BigDecimal(value, mathContext));
             }
-            return EvaluationValue.numberValue(new BigDecimal(value, mathContext));
-        } else {
-            return EvaluationValue.numberValue(new BigDecimal(value, mathContext));
+        }
+        catch (NumberFormatException exception) {
+            throw new EvaluationException(token, "Failed to parse BigDecimal");
         }
     }
 
