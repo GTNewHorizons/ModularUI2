@@ -48,7 +48,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         int h = getArea().height - this.contentPadding.vertical();
         float c = getCapacity();
         if (c > 0 && fluid.amount > 0) {
-            int newH = (int) MathUtils.rescaleLinear(fluid.amount, 0, c, 1, h);
+            int newH = (int) MathUtils.rescaleLinear(getFluidAmountLong(), 0, c, 1, h);
             // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
             if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
             h = newH;
@@ -61,7 +61,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         super.drawOverlay(context, widgetTheme);
         FluidStack fluid = getFluidStack();
         if (fluid != null && displayAmountText()) {
-            String s = NumberFormat.format(getBaseUnitAmount(fluid.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+            String s = NumberFormat.format(getBaseUnitAmount(getFluidAmountLong()), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             // mc doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
             // we only apply padding there
             GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
@@ -72,6 +72,14 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
 
     @Nullable
     protected abstract FluidStack getFluidStack();
+
+    protected long getFluidAmountLong() {
+        FluidStack stack = getFluidStack();
+        if (stack == null) return 0;
+
+        if (ModularUI.Mods.GT5U.isLoaded()) return GTUtility.getFluidAmount(stack);
+        return stack.amount;
+    };
 
     @Override
     public @Nullable ItemStack getStackForRecipeViewer() {
