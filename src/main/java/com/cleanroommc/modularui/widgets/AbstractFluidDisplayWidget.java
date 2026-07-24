@@ -41,13 +41,13 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         FluidStack fluid = getFluidStack();
-        if (fluid == null) return;
+        if (fluid == null || fluid.amount <= 0) return;
         int x = this.contentPadding.getLeft();
         int y = this.contentPadding.getTop();
         int w = getArea().width - this.contentPadding.horizontal();
         int h = getArea().height - this.contentPadding.vertical();
         float c = getCapacity();
-        if (c > 0 && fluid.amount > 0) {
+        if (c > 0) {
             int newH = (int) MathUtils.rescaleLinear(fluid.amount, 0, c, 1, h);
             // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
             if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
