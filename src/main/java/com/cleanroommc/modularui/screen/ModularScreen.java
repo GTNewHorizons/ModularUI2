@@ -80,7 +80,7 @@ public class ModularScreen {
     private final String owner;
     private final String name;
     private final PanelManager panelManager;
-    private final ModularGuiContext context = new ModularGuiContext(this);
+    private final ModularGuiContext context;
     private final Map<Class<?>, List<IGuiAction>> guiActionListeners = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectArrayMap<IWidget, Runnable> frameUpdates = new Object2ObjectArrayMap<>();
     private final ScreenResizeNode resizeNode = new ScreenResizeNode(this);
@@ -122,12 +122,15 @@ public class ModularScreen {
      * @param mainPanelCreator function which creates the main panel of this screen
      */
     public ModularScreen(@NotNull String owner, @NotNull Function<ModularGuiContext, ModularPanel> mainPanelCreator) {
-        this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), false);
+        this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), ModularGuiContext::new);
     }
 
-    private ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
+    protected ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator,
+                            @NotNull Function<ModularScreen, ModularGuiContext> contextFactory) {
         Objects.requireNonNull(owner, "The owner must not be null!");
+        Objects.requireNonNull(contextFactory, "The context factory must not be null!");
         this.owner = owner;
+        this.context = contextFactory.apply(this);
         ModularPanel mainPanel = mainPanelCreator != null ? mainPanelCreator.apply(this.context) : buildUI(this.context);
         Objects.requireNonNull(mainPanel, "The main panel must not be null!");
         this.name = mainPanel.getName();
@@ -138,7 +141,7 @@ public class ModularScreen {
      * Intended for use in {@link CustomModularScreen}
      */
     ModularScreen(@NotNull String owner) {
-        this(owner, null, false);
+        this(owner, null, ModularGuiContext::new);
     }
 
     /**
@@ -296,8 +299,13 @@ public class ModularScreen {
      */
     public void drawScreen() {
         GlStateManager.disableRescaleNormal();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableLighting();
+        // enableStandardItemLighting() bakes GL_LIGHT0/1 positions relative to the current matrix -
+        // fine for a normal screen (drawn from the matrix state vanilla expects), but corrupts
+        // lighting for whatever draws next when called from a HUD overlay's own transform stack.
+        if (!isOverlay()) {
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableLighting();
+        }
         GlStateManager.disableDepth();
         GlStateManager.disableAlpha();
 
@@ -317,8 +325,11 @@ public class ModularScreen {
 
         this.context.postRenderCallbacks.forEach(element -> element.accept(this.context));
         GlStateManager.enableRescaleNormal();
-        GlStateManager.enableLighting();
-        RenderHelper.enableStandardItemLighting();
+        if (!isOverlay()) {
+            GlStateManager.enableLighting();
+            RenderHelper.enableStandardItemLighting();
+        }
+        GlStateManager.enableDepth();
         GlStateManager.enableAlpha();
     }
 
@@ -329,8 +340,10 @@ public class ModularScreen {
      */
     public void drawForeground() {
         GlStateManager.disableRescaleNormal();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableLighting();
+        if (!isOverlay()) {
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableLighting();
+        }
         GlStateManager.disableDepth();
         GlStateManager.disableAlpha();
 
@@ -346,8 +359,11 @@ public class ModularScreen {
         this.context.popViewport(null);
 
         GlStateManager.enableRescaleNormal();
-        GlStateManager.enableLighting();
-        RenderHelper.enableStandardItemLighting();
+        if (!isOverlay()) {
+            GlStateManager.enableLighting();
+            RenderHelper.enableStandardItemLighting();
+        }
+        GlStateManager.enableDepth();
         GlStateManager.enableAlpha();
     }
 
@@ -526,7 +542,9 @@ public class ModularScreen {
         return false;
     }
 
-    /** Lwjgl3 key press event */
+    /**
+     * Lwjgl3 key press event
+     */
     @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
     public void onKeyEvent(InputEvents.KeyEvent event) {
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {
@@ -539,7 +557,9 @@ public class ModularScreen {
         }
     }
 
-    /** Lwjgl3 text input event */
+    /**
+     * Lwjgl3 text input event
+     */
     @Optional.Method(modid = ModularUI.ModIds.LWJGL3IFY)
     public void onTextEvent(InputEvents.TextEvent event) {
         for (ModularPanel panel : this.panelManager.getOpenPanels()) {
