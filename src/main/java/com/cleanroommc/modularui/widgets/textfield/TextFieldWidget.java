@@ -249,12 +249,12 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     @FunctionalInterface
-    private interface NumberValidator {
+    public interface NumberValidator {
 
         double apply(String input, double value);
     }
 
-    private TextFieldWidget numbersDouble(NumberValidator validator) {
+    public TextFieldWidget numbersDouble(NumberValidator validator) {
         this.numbers = true;
         return setValidator(val -> {
             double num;
