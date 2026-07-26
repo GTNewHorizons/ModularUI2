@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -249,7 +248,13 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
         return numbersDouble((input, num) -> validator.apply(num));
     }
 
-    private TextFieldWidget numbersDouble(BiFunction<String, Double, Double> validator) {
+    @FunctionalInterface
+    private interface NumberValidator {
+
+        double apply(String input, double value);
+    }
+
+    private TextFieldWidget numbersDouble(NumberValidator validator) {
         this.numbers = true;
         return setValidator(val -> {
             double num;
@@ -313,7 +318,7 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             if (min != null) {
                 l = Math.max(l, min.getAsLong());
             }
-            return (double) l;
+            return l;
         });
     }
 
