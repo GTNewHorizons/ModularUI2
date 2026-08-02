@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -40,19 +41,18 @@ public abstract class AbstractUIFactory<T extends GuiData> implements UIFactory<
         return this.name;
     }
 
-    @NotNull
-    public abstract IGuiHolder<T> getGuiHolder(T data);
+    public abstract @Nullable IGuiHolder<T> getGuiHolder(T data);
 
     @Override
-    public ModularPanel createPanel(T guiData, PanelSyncManager syncManager, UISettings settings) {
-        IGuiHolder<T> guiHolder = Objects.requireNonNull(getGuiHolder(guiData), "Gui holder must not be null!");
-        return guiHolder.buildUI(guiData, syncManager, settings);
+    public @Nullable ModularPanel createPanel(T guiData, PanelSyncManager syncManager, UISettings settings) {
+        IGuiHolder<T> guiHolder = getGuiHolder(guiData);
+        return guiHolder == null ? null : guiHolder.buildUI(guiData, syncManager, settings);
     }
 
     @Override
-    public ModularScreen createScreen(T guiData, ModularPanel mainPanel) {
-        IGuiHolder<T> guiHolder = Objects.requireNonNull(getGuiHolder(guiData), "Gui holder must not be null!");
-        return guiHolder.createScreen(guiData, mainPanel);
+    public @Nullable ModularScreen createScreen(T guiData, ModularPanel mainPanel) {
+        IGuiHolder<T> guiHolder = getGuiHolder(guiData);
+        return guiHolder == null ? null : guiHolder.createScreen(guiData, mainPanel);
     }
 
     @SuppressWarnings("unchecked")
