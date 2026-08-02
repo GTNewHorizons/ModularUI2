@@ -3,6 +3,7 @@ package com.cleanroommc.modularui.widgets.textfield;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.widget.scroll.ScrollArea;
+import com.cleanroommc.modularui.widget.scroll.ScrollData;
 
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.Nullable;
@@ -33,6 +34,7 @@ public class TextFieldHandler {
     private Pattern pattern;
     private int maxCharacters = -1;
     private GuiContext guiContext;
+    private int scrollEdgeMargin = 4;
 
     public TextFieldHandler(BaseTextFieldWidget<?> textFieldWidget) {
         this.textFieldWidget = textFieldWidget;
@@ -44,6 +46,14 @@ public class TextFieldHandler {
 
     public void setMaxCharacters(int maxCharacters) {
         this.maxCharacters = maxCharacters;
+    }
+
+    public int getScrollEdgeMargin() {
+        return this.scrollEdgeMargin;
+    }
+
+    public void setScrollEdgeMargin(int scrollEdgeMargin) {
+        this.scrollEdgeMargin = scrollEdgeMargin;
     }
 
     public void setScrollArea(@Nullable ScrollArea scrollArea) {
@@ -93,19 +103,27 @@ public class TextFieldHandler {
         if (main.x != charPos || main.y != linePos) {
             main.setLocation(charPos, linePos);
             if (!this.text.isEmpty() && this.renderer != null && this.scrollArea != null) {
-                // update actual width
-                this.renderer.setSimulate(true);
-                this.renderer.draw(this.text);
-                this.renderer.setSimulate(false);
-                this.scrollArea.getScrollX().setScrollSize((int) this.renderer.getLastActualWidth());
-                if (this.scrollArea.getScrollX().isScrollBarActive(this.scrollArea)) {
-                    String line = this.text.get(main.y);
-                    int scrollTo = (int) this.renderer.getPosOf(this.renderer.measureLines(Collections.singletonList(line)), new Point(main.x, 0)).x;
-                    scrollTo -= this.scrollArea.getScrollX().getFullVisibleSize(this.scrollArea) / 2;
-                    if (animate) {
-                        this.scrollArea.getScrollX().animateTo(this.scrollArea, scrollTo);
-                    } else {
-                        this.scrollArea.getScrollX().scrollTo(this.scrollArea, scrollTo);
+                ScrollData scrollX = this.scrollArea.getScrollX();
+                String line = this.text.get(main.y);
+                var measuredLine = this.renderer.measureLines(Collections.singletonList(line));
+                int lineEndX = (int) this.renderer.getPosOf(measuredLine, new Point(line.length(), 0)).x;
+                scrollX.setScrollSize(lineEndX + this.scrollEdgeMargin);
+                if (scrollX.isScrollBarActive(this.scrollArea)) {
+                    int cursorX = (int) this.renderer.getPosOf(measuredLine, new Point(main.x, 0)).x;
+                    int visible = scrollX.getFullVisibleSize(this.scrollArea) - this.scrollEdgeMargin;
+                    int current = scrollX.getScroll();
+                    int scrollTo = current;
+                    if (cursorX < current + this.scrollEdgeMargin) {
+                        scrollTo = Math.max(0, cursorX - this.scrollEdgeMargin);
+                    } else if (cursorX > current + visible) {
+                        scrollTo = cursorX - visible;
+                    }
+                    if (scrollTo != current) {
+                        if (animate) {
+                            scrollX.animateTo(this.scrollArea, scrollTo);
+                        } else {
+                            scrollX.scrollTo(this.scrollArea, scrollTo);
+                        }
                     }
                 }
             }
@@ -308,7 +326,9 @@ public class TextFieldHandler {
         if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
         this.text.clear();
         this.text.addAll(copy);
-        setCursor(point, true);
+        // no animation here: typing fires this on every keystroke, and an animated scroll can't catch up
+        // to a target that keeps moving forward each character - see setMainCursor's comment.
+        setCursor(point, false);
         onChanged();
     }
 

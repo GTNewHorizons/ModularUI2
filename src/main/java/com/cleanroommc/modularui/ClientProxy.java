@@ -8,6 +8,7 @@ import com.cleanroommc.modularui.factory.GuiFactories;
 import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
+import com.cleanroommc.modularui.hud.HudManager;
 import com.cleanroommc.modularui.network.ModularNetwork;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.TestItem;
@@ -66,6 +67,8 @@ public class ClientProxy extends CommonProxy {
         // registered to both buses since handled events are not bound to a single bus
         FMLCommonHandler.instance().bus().register(clientScreenHandler);
         MinecraftForge.EVENT_BUS.register(clientScreenHandler);
+        // register the HUD manager on the Forge event bus
+        HudManager.init();
         AnimatorManager.init();
 
         if (ModularUIConfig.enableTestGuis) {

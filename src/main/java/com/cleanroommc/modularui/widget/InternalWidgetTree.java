@@ -166,6 +166,11 @@ class InternalWidgetTree {
     }
 
     static void drawTreeForeground(IWidget parent, ModularGuiContext context) {
+        // Mirror drawTree: a disabled widget (and its whole subtree) must not draw its foreground
+        // either. This matches the documented contract of IWidget#drawForeground ("If a parent of
+        // this widget is disabled, this widget will not be drawn.") which the recursion below
+        // otherwise violated, leaving tooltips/foreground of disabled widgets rendering.
+        if (!parent.isEnabled()) return;
         IViewport viewport = parent instanceof IViewport viewport1 ? viewport1 : null;
         context.pushMatrix();
         parent.transform(context);
