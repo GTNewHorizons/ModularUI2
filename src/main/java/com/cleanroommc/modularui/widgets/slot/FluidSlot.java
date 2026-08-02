@@ -60,7 +60,7 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getBaseUnit()));
+                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getUnit()));
                 }
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
@@ -73,7 +73,7 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
             }
         } else {
             if (fluid != null) {
-                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getBaseUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
@@ -102,7 +102,6 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
 
     public String formatFluidTooltipAmount(double amount) {
         // the tooltip show the full number
-        // 1.7.10 hardcoded to use UNIT_LITER for now, so no milli-buckets.
         return TOOLTIP_FORMAT.format(amount);
     }
 
