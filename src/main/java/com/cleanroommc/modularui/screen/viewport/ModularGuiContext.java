@@ -55,6 +55,7 @@ public class ModularGuiContext extends GuiContext {
     private int lastDragX, lastDragY;
 
     public List<Consumer<ModularGuiContext>> postRenderCallbacks = new ArrayList<>();
+    private final DeferredRenderQueue foregroundRenderQueue = new DeferredRenderQueue();
 
     private UISettings settings;
 
@@ -79,6 +80,16 @@ public class ModularGuiContext extends GuiContext {
 
     public ModularScreen getScreen() {
         return screen;
+    }
+
+    @ApiStatus.Internal
+    public void queueForegroundRender(Runnable renderCall) {
+        this.foregroundRenderQueue.queue(renderCall);
+    }
+
+    @ApiStatus.Internal
+    public void drawQueuedForeground() {
+        this.foregroundRenderQueue.drawQueued();
     }
 
     /**
