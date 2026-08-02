@@ -102,7 +102,6 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
 
     public String formatFluidTooltipAmount(double amount) {
         // the tooltip show the full number
-        // 1.7.10 hardcoded to use UNIT_LITER for now, so no milli-buckets.
         return TOOLTIP_FORMAT.format(amount);
     }
 

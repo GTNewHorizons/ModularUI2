@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     public static final String UNIT_LITER = "L";
 
     private final Box contentPadding = new Box().all(1);
-    private String unit = UNIT_LITER;
+    private @Nullable String unit = null;
     private SIPrefix baseUnitPrefix = SIPrefix.One;
     private boolean flipLighterThanAir = true;
 
@@ -98,8 +99,11 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
     }
 
+    /**
+     * @return the explicitly set unit, or the fluid unit configured in GTNHLib (mB or L) if none was set
+     */
     public String getBaseUnit() {
-        return this.unit;
+        return this.unit != null ? this.unit : NumberFormatUtil.getFluidUnit();
     }
 
     public SIPrefix getBaseUnitSiPrefix() {
