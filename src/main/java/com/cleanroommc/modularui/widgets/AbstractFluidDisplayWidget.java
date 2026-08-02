@@ -16,7 +16,7 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
-import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil;
+import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatConfig;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
 
     private final Box contentPadding = new Box().all(1);
     private @Nullable String unit = null;
-    private SIPrefix baseUnitPrefix = SIPrefix.One;
+    private @Nullable SIPrefix baseUnitPrefix = null;
     private boolean flipLighterThanAir = true;
 
     protected AbstractFluidDisplayWidget() {
@@ -100,14 +100,20 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     }
 
     /**
-     * @return the explicitly set unit, or the fluid unit configured in GTNHLib (mB or L) if none was set
+     * @return the explicitly set base unit, or the one matching the fluid unit configured in GTNHLib
      */
     public String getBaseUnit() {
-        return this.unit != null ? this.unit : NumberFormatUtil.getFluidUnit();
+        if (this.unit != null) return this.unit;
+        return usesMilliBuckets() ? UNIT_BUCKET : UNIT_LITER;
     }
 
     public SIPrefix getBaseUnitSiPrefix() {
-        return this.baseUnitPrefix;
+        if (this.baseUnitPrefix != null) return this.baseUnitPrefix;
+        return usesMilliBuckets() ? SIPrefix.Milli : SIPrefix.One;
+    }
+
+    private boolean usesMilliBuckets() {
+        return NumberFormatConfig.useForgeFluidMillibuckets;
     }
 
     public boolean isFlipLighterThanAir() {
