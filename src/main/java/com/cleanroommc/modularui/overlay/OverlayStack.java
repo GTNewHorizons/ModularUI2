@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.screen.OpenScreenEvent;
 import com.cleanroommc.modularui.utils.GlStateManager;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -71,6 +72,24 @@ public class OverlayStack {
             fallback = screen;
         }
         ClientScreenHandler.drawDebugScreen(hovered, fallback);
+        drawTooltips();
+    }
+
+    private static void drawTooltips() {
+        GlStateManager.disableRescaleNormal();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.disableAlpha();
+
+        for (ModularScreen screen : overlay) {
+            screen.getContext().drawQueuedForeground();
+        }
+
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableLighting();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableAlpha();
     }
 
     public static void open(ModularScreen screen) {

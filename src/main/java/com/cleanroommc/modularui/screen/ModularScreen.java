@@ -344,6 +344,9 @@ public class ModularScreen {
         }
         this.context.drawDraggable();
         this.context.popViewport(null);
+        if (!isOverlay()) {
+            this.context.drawQueuedForeground();
+        }
 
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
