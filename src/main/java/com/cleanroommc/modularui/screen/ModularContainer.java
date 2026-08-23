@@ -366,6 +366,7 @@ public class ModularContainer extends Container {
                 Slot fromSlot = getSlot(slotId);
                 ItemStack fromItem = fromSlot.getStack();
                 ItemStack hotbarStack = hotbarSlot.getStack();
+                if (hotbarSlot == fromSlot) return null;
                 if (fromItem != null && !hotbarSlot.isItemValid(fromItem)) return null;
                 if (hotbarStack != null && !hotbarSlot.canTakeStack(player)) return null;
             }
