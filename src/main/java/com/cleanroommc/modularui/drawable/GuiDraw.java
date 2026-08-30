@@ -42,6 +42,7 @@ public class GuiDraw {
 
     public static final double PI2 = Math.PI * 2;
     public static final double PI_2 = Math.PI / 2;
+    private static final int FLUID_TILE_SIZE = 16;
 
     public static void drawRect(float x0, float y0, float w, float h, int color) {
         Platform.setupDrawColor();
@@ -337,7 +338,10 @@ public class GuiDraw {
         float r = Color.getRedF(fluidColor), g = Color.getGreenF(fluidColor), b = Color.getBlueF(fluidColor), a = Color.getAlphaF(fluidColor);
         a = a == 0f ? 1f : a;
         GlStateManager.color(r, g, b, a);
-        drawTiledTexture(TextureMap.locationBlocksTexture, x0, y0, width, height, fluidStill.getMinU(), fluidStill.getMinV(), fluidStill.getMaxU(), fluidStill.getMaxV(), fluidStill.getIconWidth(), fluidStill.getIconHeight(), z);
+        // Tile the icon every 16 gui pixels instead of using the sprite resolution. The sprite can be larger than 16x16
+        // because of hd resource packs or because of the atlas padding added for anisotropic filtering, in which case
+        // the sprite size does not describe how large one tile should be drawn and the icon would end up cropped.
+        drawTiledTexture(TextureMap.locationBlocksTexture, x0, y0, width, height, fluidStill.getMinU(), fluidStill.getMinV(), fluidStill.getMaxU(), fluidStill.getMaxV(), FLUID_TILE_SIZE, FLUID_TILE_SIZE, z);
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
