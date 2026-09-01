@@ -135,7 +135,12 @@ public class Platform {
     }
 
     public static void setupDrawFont() {
-        setupDrawTex();
+        // blend must be on (with alpha blend func) or a text color's alpha channel - e.g. a fade-out
+        // effect - has no visual effect: FontRenderer still writes fully opaque pixels with GL_BLEND off.
+        setupDrawTex(true);
+        GlStateManager.tryBlendFuncSeparate(
+            GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+            GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
     }
 
     /**

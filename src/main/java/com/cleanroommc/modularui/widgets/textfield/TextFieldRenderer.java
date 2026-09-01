@@ -235,7 +235,10 @@ public class TextFieldRenderer extends TextRenderer {
     private void drawCursor(float x0, float y0) {
         x0 = (x0 - 0.8f) / this.scale;
         y0 = (y0 - 1) / this.scale;
-        float x1 = x0 + 0.6f;
+        // 1.0 rather than the previous 0.6: a sub-pixel-wide quad can fail to rasterize as a visible
+        // pixel at all once it lands right at a scrolled/clipped edge (see TextFieldHandler's scroll
+        // margin), which is exactly where the cursor sits while typing past a field's visible width.
+        float x1 = x0 + 1.0f;
         float y1 = y0 + 9;
         float red = Color.getRedF(this.cursorColor);
         float green = Color.getGreenF(this.cursorColor);

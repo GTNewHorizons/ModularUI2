@@ -137,7 +137,14 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         } else {
             this.renderer.draw(this.handler.getText());
         }
-        getScrollArea().getScrollX().setScrollSize(Math.max(0, (int) (this.renderer.getLastActualWidth() + 0.5f)));
+        // + renderer.getX(): scrollSize has to be measured in the same coordinate space as
+        // TextFieldHandler's cursor positions (getPosOf, which include the field's left-padding offset
+        // via getStartX) - otherwise ScrollData.clamp's "scrollSize - visibleSize" cap silently pulls the
+        // scroll back short of the cursor on every single frame, undoing whatever the handler just set.
+        // + getScrollEdgeMargin(): matches the same margin setMainCursor bakes into its own scrollSize,
+        // so this per-frame recompute doesn't clamp that margin back down to zero on the right/end edge.
+        getScrollArea().getScrollX().setScrollSize(this.renderer.getX()
+            + Math.max(0, (int) (this.renderer.getLastActualWidth() + 0.5f)) + this.handler.getScrollEdgeMargin());
     }
 
     @Override
@@ -388,6 +395,17 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     public W setFocusOnGuiOpen(boolean focusOnGuiOpen) {
         this.focusOnGuiOpen = focusOnGuiOpen;
+        return getThis();
+    }
+
+    /**
+     * Safety margin, in pixels, kept between the cursor/revealed text and the field's real clip edge
+     * when scrolling horizontally (see {@link TextFieldHandler#setScrollEdgeMargin}). Defaults to
+     * this field's own default horizontal padding, since that's already the breathing room the field
+     * visually reserves; override this if a different padding is configured.
+     */
+    public W scrollEdgeMargin(int margin) {
+        this.handler.setScrollEdgeMargin(margin);
         return getThis();
     }
 
