@@ -31,7 +31,7 @@ public class ModularUIConfig {
 
     @Config.LangKey("modularui2.config.gui_debug_mode")
     @Config.Comment("If true, widget outlines and widget information will be drawn.")
-    public static boolean guiDebugMode = ModularUI.isDevEnv;
+    public static boolean guiDebugMode = false;
 
     @Config.LangKey("modularui2.config.use_dark_theme_by_default")
     @Config.Comment("If true and not specified otherwise, screens will try to use the 'vanilla_dark' theme.")
