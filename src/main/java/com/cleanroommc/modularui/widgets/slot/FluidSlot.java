@@ -33,6 +33,9 @@ import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
 
+import static com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil.formatFluid;
+import static com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil.formatNumber;
+
 public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack> {
 
     private static final DecimalFormat TOOLTIP_FORMAT = new DecimalFormat("#.##");
@@ -60,7 +63,7 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(fluid.amount), getUnit()));
+                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluid(fluid.amount)));
                 }
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
@@ -73,11 +76,11 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
             }
         } else {
             if (fluid != null) {
-                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(fluid.amount), formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatNumber(fluid.amount), formatFluid(fluidTank.getCapacity())));
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
-                tooltip.addLine(IKey.lang("modularui2.fluid.capacity", formatFluidTooltipAmount(fluidTank.getCapacity()), getUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.capacity", formatFluid(fluidTank.getCapacity())));
             }
             if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
                 tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
@@ -98,11 +101,6 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
 
     public void addAdditionalFluidInfo(RichTooltip tooltip, FluidStack fluidStack) {
         tooltip.addAdditionalInfoFromFluid(fluidStack);
-    }
-
-    public String formatFluidTooltipAmount(double amount) {
-        // the tooltip show the full number
-        return TOOLTIP_FORMAT.format(amount);
     }
 
     @Override
