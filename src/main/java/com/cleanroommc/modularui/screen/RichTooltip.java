@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiContainerAccesso
 import com.cleanroommc.modularui.drawable.GuiDraw;
 import com.cleanroommc.modularui.drawable.text.RichText;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
+import com.cleanroommc.modularui.drawable.text.TooltipTextRenderer;
 import com.cleanroommc.modularui.screen.viewport.GuiContext;
 import com.cleanroommc.modularui.utils.Color;
 import com.cleanroommc.modularui.utils.GlStateManager;
@@ -118,7 +119,7 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
         Area screen = context.getScreenArea();
         this.maxWidth = Math.min(this.maxWidth, screen.width);
         int mouseX = context.getAbsMouseX(), mouseY = context.getAbsMouseY();
-        TextRenderer renderer = TextRenderer.SHARED;
+        TextRenderer renderer = TooltipTextRenderer.INSTANCE;
         RichText copy = this.text.copy();
         // this only turns the text and not any drawables into strings
         RichTooltipEvent.Pre event = new RichTooltipEvent.Pre(stack, copy.getAsStrings(), mouseX, mouseY, screen.width, screen.height, this.maxWidth, TextRenderer.getFontRenderer(), copy);

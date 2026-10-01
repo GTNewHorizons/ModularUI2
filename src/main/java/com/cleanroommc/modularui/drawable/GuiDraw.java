@@ -2,6 +2,7 @@ package com.cleanroommc.modularui.drawable;
 
 import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.GuiScreenAccessor;
+import com.cleanroommc.modularui.drawable.text.AmountTextRenderer;
 import com.cleanroommc.modularui.drawable.text.TextRenderer;
 import com.cleanroommc.modularui.screen.RichTooltip;
 import com.cleanroommc.modularui.screen.RichTooltipEvent;
@@ -38,7 +39,7 @@ import java.util.function.Consumer;
 
 public class GuiDraw {
 
-    private static final TextRenderer textRenderer = new TextRenderer();
+    private static final AmountTextRenderer amountTextRenderer = new AmountTextRenderer();
 
     public static final double PI2 = Math.PI * 2;
     public static final double PI_2 = Math.PI / 2;
@@ -364,36 +365,23 @@ public class GuiDraw {
             float scale = Math.min(1f, maxWidth / textWidth);
             if (amountText.length() > 4) scale = Math.max(scale, 0.5f);
 
-            drawVanillaStyleAmountText(amountText, x, y, width, height, alignment, scale);
+
+            amountTextRenderer.setShadow(true);
+            amountTextRenderer.setScale(scale);
+            amountTextRenderer.setColor(Color.WHITE.main);
+            amountTextRenderer.setAlignment(alignment, width, height);
+            amountTextRenderer.setPos(x, y);
+            amountTextRenderer.setHardWrapOnBorder(false);
+            amountTextRenderer.draw(amountText);
+
+            amountTextRenderer.setHardWrapOnBorder(true);
         }
     }
 
     public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
-        String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
-        if (format != null) amountText = format + amountText;
-        if (amountText.isEmpty()) return;
-        float textWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(amountText);
-        float scale = Math.min(1f, width / textWidth);
-        drawVanillaStyleAmountText(amountText, x, y, width, height, alignment, scale);
-    }
-
-    /**
-     * Draws a stack amount with the vanilla font renderer, so it looks like vanilla and ignores themes.
-     */
-    private static void drawVanillaStyleAmountText(String amountText, int x, int y, int width, int height, Alignment alignment, float scale) {
-        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
-        float textWidth = fontRenderer.getStringWidth(amountText) * scale;
-        // the shadow adds one pixel below the glyphs, vanilla ignores it when positioning the amount
-        float textHeight = (fontRenderer.FONT_HEIGHT - 1) * scale;
-        float drawX = x + (width - textWidth) * alignment.x;
-        float drawY = y + (height - textHeight) * alignment.y;
-
-        Platform.setupDrawFont();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(drawX, drawY, 0);
-        GlStateManager.scale(scale, scale, 1f);
-        fontRenderer.drawString(amountText, 0, 0, Color.WHITE.main, true);
-        GlStateManager.popMatrix();
+        String s = NumberFormat.AMOUNT_TEXT.format(amount);
+        if (format != null) s = format + s;
+        drawScaledAlignedTextInBox(s, x, y, width, height, alignment);
     }
 
     public static void drawScaledAlignedTextInBox(String amountText, int x, int y, int width, int height, Alignment alignment) {
@@ -403,21 +391,21 @@ public class GuiDraw {
     public static void drawScaledAlignedTextInBox(String amountText, int x, int y, int width, int height, Alignment alignment, float maxScale) {
         if (amountText == null || amountText.isEmpty()) return;
         // setup text renderer
-        textRenderer.setShadow(true);
-        textRenderer.setScale(1f);
-        textRenderer.setColor(Color.WHITE.main);
-        textRenderer.setAlignment(alignment, width, height);
-        textRenderer.setPos(x, y);
-        textRenderer.setHardWrapOnBorder(false);
+        amountTextRenderer.setShadow(true);
+        amountTextRenderer.setScale(1f);
+        amountTextRenderer.setColor(Color.WHITE.main);
+        amountTextRenderer.setAlignment(alignment, width, height);
+        amountTextRenderer.setPos(x, y);
+        amountTextRenderer.setHardWrapOnBorder(false);
         if (amountText.length() > 2 && width > 16) { // we know that numbers below 100 will always fit in standard slots
             // simulate and calculate scale with width
-            textRenderer.setSimulate(true);
-            textRenderer.draw(amountText);
-            textRenderer.setSimulate(false);
-            textRenderer.setScale(Math.min(maxScale, width / textRenderer.getLastActualWidth()));
+            amountTextRenderer.setSimulate(true);
+            amountTextRenderer.draw(amountText);
+            amountTextRenderer.setSimulate(false);
+            amountTextRenderer.setScale(Math.min(maxScale, width / amountTextRenderer.getLastActualWidth()));
         }
-        textRenderer.draw(amountText);
-        textRenderer.setHardWrapOnBorder(true);
+        amountTextRenderer.draw(amountText);
+        amountTextRenderer.setHardWrapOnBorder(true);
     }
 
     public static void drawStandardSlotAmountText(long amount, String format, Area area) {
@@ -438,7 +426,14 @@ public class GuiDraw {
             } else if (amountText.length() > 4) {
                 scale = 0.5f;
             }
-            drawVanillaStyleAmountText(amountText, x, y, width, height, alignment, scale);
+            amountTextRenderer.setShadow(true);
+            amountTextRenderer.setScale(scale);
+            amountTextRenderer.setColor(Color.WHITE.main);
+            amountTextRenderer.setAlignment(alignment, width, height);
+            amountTextRenderer.setPos(x, y);
+            amountTextRenderer.setHardWrapOnBorder(false);
+            amountTextRenderer.draw(amountText);
+            amountTextRenderer.setHardWrapOnBorder(true);
         }
     }
 
