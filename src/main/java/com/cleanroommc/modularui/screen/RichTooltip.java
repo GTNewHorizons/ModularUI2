@@ -154,9 +154,16 @@ public class RichTooltip implements IRichTextBuilder<RichTooltip> {
 
         renderer.setPos(area.x, area.y);
         renderer.setSimulate(false);
-        renderer.drawCompiled(context, compiledLines);
+        drawTooltipText(context, renderer, compiledLines);
 
         MinecraftForge.EVENT_BUS.post(new RichTooltipEvent.PostText(stack, copy.getAsStrings(), area.x, area.y, TextRenderer.getFontRenderer(), area.width, area.height, copy));
+    }
+
+    /**
+     * Draws the tooltip text. Kept separate so tooltip text can be targeted on its own.
+     */
+    protected void drawTooltipText(GuiContext context, TextRenderer renderer, List<ITextLine> compiledLines) {
+        renderer.drawCompiled(context, compiledLines);
     }
 
     public Rectangle determineTooltipArea(RichText text, GuiContext context, TextRenderer renderer, int screenWidth, int screenHeight, int mouseX, int mouseY) {

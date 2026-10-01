@@ -364,23 +364,36 @@ public class GuiDraw {
             float scale = Math.min(1f, maxWidth / textWidth);
             if (amountText.length() > 4) scale = Math.max(scale, 0.5f);
 
-
-            textRenderer.setShadow(true);
-            textRenderer.setScale(scale);
-            textRenderer.setColor(Color.WHITE.main);
-            textRenderer.setAlignment(alignment, width, height);
-            textRenderer.setPos(x, y);
-            textRenderer.setHardWrapOnBorder(false);
-            textRenderer.draw(amountText);
-
-            textRenderer.setHardWrapOnBorder(true);
+            drawVanillaStyleAmountText(amountText, x, y, width, height, alignment, scale);
         }
     }
 
     public static void drawAmountText(int amount, String format, int x, int y, int width, int height, Alignment alignment) {
-        String s = NumberFormat.AMOUNT_TEXT.format(amount);
-        if (format != null) s = format + s;
-        drawScaledAlignedTextInBox(s, x, y, width, height, alignment);
+        String amountText = NumberFormat.AMOUNT_TEXT.format(amount);
+        if (format != null) amountText = format + amountText;
+        if (amountText.isEmpty()) return;
+        float textWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(amountText);
+        float scale = Math.min(1f, width / textWidth);
+        drawVanillaStyleAmountText(amountText, x, y, width, height, alignment, scale);
+    }
+
+    /**
+     * Draws a stack amount with the vanilla font renderer, so it looks like vanilla and ignores themes.
+     */
+    private static void drawVanillaStyleAmountText(String amountText, int x, int y, int width, int height, Alignment alignment, float scale) {
+        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+        float textWidth = fontRenderer.getStringWidth(amountText) * scale;
+        // the shadow adds one pixel below the glyphs, vanilla ignores it when positioning the amount
+        float textHeight = (fontRenderer.FONT_HEIGHT - 1) * scale;
+        float drawX = x + (width - textWidth) * alignment.x;
+        float drawY = y + (height - textHeight) * alignment.y;
+
+        Platform.setupDrawFont();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(drawX, drawY, 0);
+        GlStateManager.scale(scale, scale, 1f);
+        fontRenderer.drawString(amountText, 0, 0, Color.WHITE.main, true);
+        GlStateManager.popMatrix();
     }
 
     public static void drawScaledAlignedTextInBox(String amountText, int x, int y, int width, int height, Alignment alignment) {
@@ -425,14 +438,7 @@ public class GuiDraw {
             } else if (amountText.length() > 4) {
                 scale = 0.5f;
             }
-            textRenderer.setShadow(true);
-            textRenderer.setScale(scale);
-            textRenderer.setColor(Color.WHITE.main);
-            textRenderer.setAlignment(alignment, width, height);
-            textRenderer.setPos(x, y);
-            textRenderer.setHardWrapOnBorder(false);
-            textRenderer.draw(amountText);
-            textRenderer.setHardWrapOnBorder(true);
+            drawVanillaStyleAmountText(amountText, x, y, width, height, alignment, scale);
         }
     }
 
