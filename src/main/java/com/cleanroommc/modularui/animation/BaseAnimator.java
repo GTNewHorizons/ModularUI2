@@ -94,10 +94,10 @@ public abstract class BaseAnimator<A extends BaseAnimator<A>> implements IAnimat
     }
 
     /**
-     * Sets if the animation should reverse animate once after it finished.
-     * If the animation started in reverse it will animate forward on finish.
+     * Sets if the animation should be reversed after it finished.
+     * If the animation started in reverse, it will animate forwards after finishing.
      *
-     * @param reverseOnFinish if animation should bounce back on finish
+     * @param reverseOnFinish if animation should bounce back after finishing
      * @return this
      */
     public A reverseOnFinish(boolean reverseOnFinish) {
@@ -106,7 +106,7 @@ public abstract class BaseAnimator<A extends BaseAnimator<A>> implements IAnimat
     }
 
     /**
-     * Sets how often the animation should repeat. If {@link #reverseOnFinish(boolean)} is set to true, it will repeat the whole cycle.
+     * Sets how often the animation should repeat. If {@link #reverseOnFinish(boolean)} is set to {@code true}, it will repeat the whole cycle.
      * If the number of repeats is negative, it will repeat infinitely.
      *
      * @param repeats how often the animation should repeat.

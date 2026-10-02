@@ -61,7 +61,7 @@ public interface IDrawable {
     }
 
     /**
-     * Draws this drawable in a given area. The padding of the area is not applied here.
+     * Draws this drawable in a given area without any padding.
      *
      * @param context     current context to draw with
      * @param area        draw area
@@ -98,7 +98,8 @@ public interface IDrawable {
     }
 
     /**
-     * Draws this drawable at the current (0|0) with the given area's size and its padding applied (this means its technically not at 0|0).
+     * Draws this drawable always with padding applied at (0|0) shifting the actual drawable content being drawn within
+     * ({@code 0 + padding.left} | {@code 0 + padding.top}) and ({@code area.paddedWith()}|{@code area.paddedHeight()}).<br>
      * This is useful inside widgets since GL is transformed to their position when they are drawing. The padding of the area is not applied
      * here.
      *

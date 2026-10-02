@@ -95,6 +95,14 @@ public class MCHelper {
         return null;
     }
 
+    /**
+     * Collects the provided item's tooltip depending on the {@link net.minecraft.client.gui.inventory.GuiContainer} it's displayed in.
+     * If the NEI mod is loaded, then all containers tooltip handlers for the given {@code item} will be executed and their result returned.
+     * Otherwise, each tooltip will be prefixed with a text color. The amount of tooltips depends additionally on the clients advanced tooltip display setting.
+     *
+     * @param item the provided item stack
+     * @return a list of strings representing the processed tooltips for the item stack
+     */
     public static List<String> getItemToolTip(ItemStack item) {
         if (!hasMc()) return Collections.emptyList();
         if (ModularUI.Mods.NEI.isLoaded() && getMc().currentScreen instanceof GuiContainer guiContainer)
@@ -123,6 +131,12 @@ public class MCHelper {
         return tooltips;
     }
 
+    /**
+     * Collects the fluid's tooltip, depending on GT5U's loaded state, the clients advanced tooltip display setting and whether shift is pressed.
+     *
+     * @param fluid the provided fluid stack
+     * @return a list of strings representing the processed tooltips for the fluid stack
+     */
     public static List<String> getFluidTooltip(FluidStack fluid) {
         List<String> tooltip = new ArrayList<>();
         tooltip.add(fluid.getLocalizedName());
@@ -141,6 +155,12 @@ public class MCHelper {
         return tooltip;
     }
 
+    /**
+     * Collects fluid's additional tooltip, depending on NEI's loaded state and whether shift is pressed.
+     *
+     * @param fluid fluid the provided fluid stack
+     * @return a list of strings representing the processed tooltips for the fluid stack
+     */
     public static List<String> getAdditionalFluidTooltip(FluidStack fluid) {
         List<String> tooltip = new ArrayList<>();
         if (Interactable.hasShiftDown()) {

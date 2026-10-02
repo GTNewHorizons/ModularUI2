@@ -25,7 +25,7 @@ public class Box implements IAnimatable<Box> {
     protected int bottom;
 
     public Box all(int all) {
-        return this.all(all, all);
+        return this.all(all, all, all, all);
     }
 
     public Box all(int horizontal, int vertical) {

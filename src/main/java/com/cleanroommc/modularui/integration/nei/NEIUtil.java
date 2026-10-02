@@ -9,7 +9,7 @@ import codechicken.nei.ItemPanels;
 public class NEIUtil {
 
     public static ItemStack getNEIDragAndDropTarget(ModularGuiContext context) {
-        if (context.getScreen().isOverlay() || !context.getRecipeViewerSettings().isRecipeViewerEnabled(context.getScreen())) {
+        if (context.getScreen().isOverlay() || !context.getRecipeViewerSettings().isEnabled(context.getScreen())) {
             return null;
         }
         if (ItemPanels.itemPanel.draggedStack != null) {

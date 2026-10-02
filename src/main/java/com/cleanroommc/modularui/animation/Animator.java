@@ -63,6 +63,10 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
         return elapsedTime;
     }
 
+    /**
+     *
+     * @return {@code true} when the animation should be stopped
+     */
     protected boolean onUpdate() {
         return this.onUpdate != null && this.onUpdate.test(getRawValue());
     }
@@ -171,8 +175,9 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
     }
 
     /**
-     * Sets a function which is executed everytime the progress updates, that is on every frame.
-     * The argument of the function is the interpolated value.
+     * Sets a predicate function which is executed everytime the progress updates, that is on every frame.
+     * The argument of the function is the interpolated value.<br>
+     * The predicate's return value effects {@link Animator#onUpdate()}'s return value.
      *
      * @param onUpdate update function
      * @return this
@@ -183,8 +188,12 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
     }
 
     /**
-     * Sets a function which is executed everytime the progress updates, that is on every frame.
-     * The argument of the function is the interpolated value.
+     * Sets a consumer function which is executed everytime the progress updates, that is on every frame.
+     * The argument of the function is the interpolated value.<br>
+     * The consumer will always be wrapped in q {@link DoublePredicate} returning false.
+     *
+     * @see Animator#onUpdate()
+     * @see Animator#onUpdate(DoublePredicate)
      *
      * @param onUpdate update function
      * @return this

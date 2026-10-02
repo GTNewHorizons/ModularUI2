@@ -31,6 +31,12 @@ public class MutableObjectAnimator<T extends IAnimatable<T>> extends Animator {
         return super.onUpdate();
     }
 
+    /**
+     * Sets an additional consumer function, that gets executed on every progress update (animation frame)
+     * before the {@link Animator#onUpdate()}.
+     * @param consumer the extra consumer
+     * @return this
+     */
     public MutableObjectAnimator<T> intermediateConsumer(Consumer<T> consumer) {
         this.intermediateConsumer = consumer;
         return this;
