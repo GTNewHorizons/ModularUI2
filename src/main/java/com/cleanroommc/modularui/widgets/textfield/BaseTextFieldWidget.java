@@ -285,7 +285,8 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
         } else if (Interactable.isKeyComboCtrlV(keyCode)) {
             this.handler.deleteMarked();
             // paste copied text in marked text
-            this.handler.insert(GuiScreen.getClipboardString().replace("§", ""), canScrollHorizontally());
+            String clipboard = GuiScreen.getClipboardString().replace("§", "").replace("\r", "");
+            this.handler.insert(clipboard, canScrollHorizontally());
             return Result.SUCCESS;
         } else if (Interactable.isKeyComboCtrlX(keyCode) && this.handler.hasTextMarked()) {
             // copy and delete copied text
@@ -405,6 +406,19 @@ public class BaseTextFieldWidget<W extends BaseTextFieldWidget<W>> extends Abstr
 
     public W hintColor(int color) {
         this.hintTextColor = color;
+        return getThis();
+    }
+
+    public String getText() {
+        return this.handler.getTextAsString();
+    }
+
+    public List<String> getTextLines() {
+        return this.handler.getText();
+    }
+
+    public W setText(String text) {
+        this.handler.setText(text);
         return getThis();
     }
 
