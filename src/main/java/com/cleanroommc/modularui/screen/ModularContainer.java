@@ -51,6 +51,7 @@ public class ModularContainer extends Container {
     private EntityPlayer player;
     private ModularSyncManager syncManager;
     private boolean init = true;
+    private boolean constructed = false;
     // all phantom slots (inventory don't contain phantom slots)
     private final List<ModularSlot> phantomSlots = new ArrayList<>();
     private final List<ModularSlot> shiftClickSlots = new ArrayList<>();
@@ -70,6 +71,7 @@ public class ModularContainer extends Container {
         this.settings = settings;
         this.guiData = guiData;
         sortShiftClickSlots();
+        this.constructed = true;
     }
 
     @SideOnly(Side.CLIENT)
@@ -166,7 +168,7 @@ public class ModularContainer extends Container {
             SlotGroup slotGroup = slot.getSlotGroup();
             if (slotGroup.allowShiftTransfer()) {
                 this.shiftClickSlots.add(slot);
-                if (!this.init) {
+                if (this.constructed) {
                     sortShiftClickSlots();
                 }
             }
