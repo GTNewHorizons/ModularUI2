@@ -253,6 +253,11 @@ public class ModularContainer extends Container {
         if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) &&
                 (mouseButton == LEFT_MOUSE || mouseButton == RIGHT_MOUSE)) {
             if (slotId == DROP_TO_WORLD) {
+                // vanilla only clears the cursor when the stack size hits exactly 0, an invalid stack would drop forever
+                if (Platform.isStackEmpty(inventoryplayer.getItemStack())) {
+                    inventoryplayer.setItemStack(null);
+                    return Platform.EMPTY_STACK;
+                }
                 return superSlotClick(slotId, mouseButton, mode, player);
             }
 
@@ -277,6 +282,13 @@ public class ModularContainer extends Container {
                 if (clickedSlot != null) {
                     ItemStack slotStack = clickedSlot.getStack();
                     ItemStack heldStack = inventoryplayer.getItemStack();
+
+                    // treat invalid stacks (stack size <= 0) as empty so they can't be picked up and duped
+                    if (Platform.isStackEmpty(slotStack)) slotStack = null;
+                    if (Platform.isStackEmpty(heldStack)) {
+                        heldStack = null;
+                        inventoryplayer.setItemStack(null);
+                    }
 
                     // if (slotStack != null) {
                     //     returnable = slotStack.copy();
@@ -367,6 +379,8 @@ public class ModularContainer extends Container {
                 ItemStack fromItem = fromSlot.getStack();
                 ItemStack hotbarStack = hotbarSlot.getStack();
                 if (hotbarSlot == fromSlot) return null;
+                // vanilla would copy an invalid stack (stack size <= 0) into the hotbar without clearing the slot
+                if (fromItem != null && Platform.isStackEmpty(fromItem)) return null;
                 if (fromItem != null && !hotbarSlot.isItemValid(fromItem)) return null;
                 if (hotbarStack != null && !hotbarSlot.canTakeStack(player)) return null;
             }
@@ -436,7 +450,7 @@ public class ModularContainer extends Container {
         ModularSlot slot = getModularSlot(index);
         if (!slot.isPhantom()) {
             ItemStack stack = slot.getStack();
-            if (stack != null) {
+            if (!Platform.isStackEmpty(stack)) {
                 ItemStack copy = stack.copy();
                 stack = stack.copy();
                 int base = 0;
