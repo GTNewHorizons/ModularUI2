@@ -84,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -759,6 +760,43 @@ public class TestGuis extends CustomModularScreen {
                                 .fullWidth()
                                 .numbersLong(-100_000_000_000_000L, 100_000_000_000_000L)
                                 .usingScrollStep()));
+    }
+
+    public static @NotNull ModularPanel buildCoverChildrenDraggableUI() {
+        int minSize = 8;
+
+        ParentWidget<?> draggableParent = new ParentWidget<>()
+                .coverChildren(minSize)
+                .marginTop(18);
+
+        ParentWidget<?> subParent = new ParentWidget<>();
+
+//        subParent = Flow.col().center();
+
+        Supplier<DraggableWidget<?>> draggableSupplier = () -> new DraggableWidget<>().size(18).background(GuiTextures.MC_BUTTON);
+
+        return ModularPanel.defaultPanel("main")
+                .size(500)
+                .child(subParent
+                        .coverChildren()
+                        .child(Flow.row()
+                                .coverChildrenHeight()
+                                .fullWidth()
+                                .mainAxisAlignment(Alignment.MainAxis.SPACE_BETWEEN)
+                                .child(new ButtonWidget<>().overlay(GuiTextures.REMOVE)
+                                        .onMousePressed(i -> {
+                                            if (!draggableParent.getChildren().isEmpty())
+                                                draggableParent.remove(0);
+                                            return true;
+                                        }))
+                                .child(new ButtonWidget<>().overlay(GuiTextures.ADD)
+                                        .onMousePressed(i -> {
+                                            draggableParent.child(draggableSupplier.get());
+                                            return true;
+                                        })))
+                        .child(draggableParent
+                                .child(draggableSupplier.get())
+                                .child(draggableSupplier.get())));
     }
 
     private static Rectangle rndRect(IntList colors, Random random) {
