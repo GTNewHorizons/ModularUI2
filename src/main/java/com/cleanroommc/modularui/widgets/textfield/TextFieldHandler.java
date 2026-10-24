@@ -36,6 +36,7 @@ public class TextFieldHandler {
 
     public TextFieldHandler(BaseTextFieldWidget<?> textFieldWidget) {
         this.textFieldWidget = textFieldWidget;
+        ensureNotEmpty();
     }
 
     public void setPattern(@Nullable Pattern pattern) {
@@ -137,6 +138,7 @@ public class TextFieldHandler {
     }
 
     private void clampCursor(Point p) {
+        ensureNotEmpty();
         p.y = MathUtils.clamp(p.y, 0, this.text.size() - 1);
         String line = this.text.get(p.y);
         p.x = MathUtils.clamp(p.x, 0, line.length());
@@ -245,13 +247,17 @@ public class TextFieldHandler {
     }
 
     public void markAll() {
+        ensureNotEmpty();
         setOffsetCursor(0, 0);
-        setMainCursor(this.text.size() - 1, this.text.get(this.text.size() - 1).length(), true);
+        int last = this.text.size() - 1;
+        setMainCursor(last, this.text.get(last).length(), true);
     }
 
     public void markCurrentLine() {
-        setOffsetCursor(getMainCursor().y, 0);
-        setMainCursor(getMainCursor().y, this.text.get(getMainCursor().y).length(), true);
+        ensureNotEmpty();
+        int lineY = MathUtils.clamp(getMainCursor().y, 0, this.text.size() - 1);
+        setOffsetCursor(lineY, 0);
+        setMainCursor(lineY, this.text.get(lineY).length(), true);
     }
 
     public String getTextAsString() {
@@ -276,11 +282,15 @@ public class TextFieldHandler {
     }
 
     public String getSelectedText() {
-        if (!hasTextMarked()) return "";
+        if (!hasTextMarked() || this.text.isEmpty()) return "";
         Point min = getStartCursor();
         Point max = getEndCursor();
+
+        if (min.y < 0 || max.y >= this.text.size()) return "";
+
         if (min.y == max.y) {
-            return this.text.get(min.y).substring(min.x, max.x);
+            String line = this.text.get(min.y);
+            return line.substring(MathUtils.clamp(min.x, 0, line.length()), MathUtils.clamp(max.x, 0, line.length()));
         }
         StringBuilder builder = new StringBuilder();
         builder.append(this.text.get(min.y).substring(min.x)).append("\n");
@@ -298,14 +308,22 @@ public class TextFieldHandler {
     }
 
     public void insert(String text, boolean hasHorizontalScrolling) {
+        if (text == null) return;
+        text = text.replace("\r", "");
+
         insert(Arrays.asList(text.split("\n")), hasHorizontalScrolling);
     }
 
     public void insert(List<String> text, boolean hasHorizontalScrolling) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
-        // if we can scroll horizontally, we have virtually an infinite amount of space and don't need to check width
-        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
+
+        if (point == null || copy.size() > this.maxLines) return;
+
+        if (this.maxLines == 1 && !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) {
+            return;
+        }
+
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);
@@ -346,7 +364,7 @@ public class TextFieldHandler {
             x = insertion.get(insertion.size() - 1).length();
             y += 1;
             if (insertion.size() > 2) {
-                text.addAll(this.cursor.y + 1, text.subList(1, insertion.size() - 1));
+                text.addAll(this.cursor.y + 1, insertion.subList(1, insertion.size() - 1));
                 y += insertion.size() - 2;
             }
             return new Point(x, y);
@@ -365,6 +383,8 @@ public class TextFieldHandler {
     public void clear() {
         markAll();
         deleteMarked();
+        ensureNotEmpty();
+        setCursor(0, 0, true);
     }
 
     public void deleteMarked() {
@@ -378,6 +398,11 @@ public class TextFieldHandler {
     }
 
     public void delete(boolean inFront, boolean ctrl, boolean shift) {
+        if (this.text.isEmpty()) {
+            setCursor(0, 0, false);
+            return;
+        }
+
         if (hasTextMarked()) {
             Point min = getStartCursor();
             Point max = getEndCursor();
@@ -393,7 +418,8 @@ public class TextFieldHandler {
             }
             setCursor(min.y, min.x, false);
         } else {
-            String line = this.text.get(this.cursor.y);
+            int lineIdx = MathUtils.clamp(this.cursor.y, 0, this.text.size() - 1);
+            String line = this.text.get(lineIdx);
             if (inFront) {
                 if (this.cursor.x == line.length()) {
                     if (this.text.size() > this.cursor.y + 1) {
@@ -438,7 +464,28 @@ public class TextFieldHandler {
         if (this.scrollArea != null) {
             this.scrollArea.getScrollX().clamp(this.scrollArea);
         }
+        ensureNotEmpty();
         onChanged();
+    }
+
+    public void ensureNotEmpty() {
+        if (this.text.isEmpty()) {
+            this.text.add("");
+        }
+    }
+
+    public void setText(String text) {
+        clear();
+        if (text != null && !text.isEmpty()) {
+            insert(text, false);
+        }
+    }
+
+    public void setText(List<String> lines) {
+        clear();
+        if (lines != null && !lines.isEmpty()) {
+            insert(lines, false);
+        }
     }
 
     public void setMaxLines(int maxLines) {
