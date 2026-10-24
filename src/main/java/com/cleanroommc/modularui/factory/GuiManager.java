@@ -77,6 +77,7 @@ public class GuiManager {
         ModularSyncManager msm = new ModularSyncManager(false);
         PanelSyncManager syncManager = new PanelSyncManager(msm, true);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
+        if (panel == null) return;
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularContainer container = settings.hasCustomContainer() ? settings.createContainer() : factory.createContainer();
         container.construct(player, msm, settings, panel.getName(), guiData);
@@ -106,8 +107,10 @@ public class GuiManager {
         ModularSyncManager msm = new ModularSyncManager(true);
         PanelSyncManager syncManager = new PanelSyncManager(msm, true);
         ModularPanel panel = factory.createPanel(guiData, syncManager, settings);
+        if (panel == null) throw new IllegalStateException("Panel must not be null on Client when Panel was not null on Server!");
         WidgetTree.collectSyncValues(syncManager, panel);
         ModularScreen screen = factory.createScreen(guiData, panel);
+        if (screen == null) throw new IllegalStateException("Screen must not be null on Client when Screen was not null on Server!");
         screen.getContext().setSettings(settings);
         ModularContainer container = settings.hasCustomContainer() ? settings.createContainer() : factory.createContainer();
         container.construct(player, msm, settings, panel.getName(), guiData);
