@@ -16,7 +16,7 @@ public class ParallelAnimator extends BaseAnimator<ParallelAnimator> implements 
     public ParallelAnimator(List<IAnimator> animators) {
         this.animators = new ArrayList<>(animators);
         this.animators.forEach(animator -> {
-            if (animator instanceof BaseAnimator baseAnimator) {
+            if (animator instanceof BaseAnimator<?> baseAnimator) {
                 baseAnimator.setParent(this);
             }
         });
@@ -26,7 +26,7 @@ public class ParallelAnimator extends BaseAnimator<ParallelAnimator> implements 
         this.animators = new ArrayList<>();
         Collections.addAll(this.animators, animators);
         this.animators.forEach(animator -> {
-            if (animator instanceof BaseAnimator baseAnimator) {
+            if (animator instanceof BaseAnimator<?> baseAnimator) {
                 baseAnimator.setParent(this);
             }
         });

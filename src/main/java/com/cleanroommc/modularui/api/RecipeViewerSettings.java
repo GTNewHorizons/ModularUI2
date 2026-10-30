@@ -35,6 +35,7 @@ public interface RecipeViewerSettings {
 
     /**
      * Only enable recipe viewer in synced GUIs
+     * @see com.cleanroommc.modularui.integration.recipeviewer.RecipeViewerState#DEFAULT RecipeViewerState#DEFAULT
      */
     void defaultState();
 
@@ -46,7 +47,7 @@ public interface RecipeViewerSettings {
      * Checks if recipe viewer is enabled for a given screen
      *
      * @param screen modular screen
-     * @return true if jei is enabled
+     * @return true if recipe viewer is enabled
      */
     boolean isEnabled(ModularScreen screen);
 

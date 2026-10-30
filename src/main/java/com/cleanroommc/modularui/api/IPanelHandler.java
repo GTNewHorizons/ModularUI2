@@ -9,13 +9,12 @@ import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * This class can handle opening and closing of a {@link ModularPanel}. It makes sure, that the same panel is not created multiple
- * times and instead reused.
+ * This class handles the opening and closing of a {@link ModularPanel}. It ensures, that the same panel is only created <b>once & reused!</b>
  * <p>Using {@link #openPanel()} is the only way to open multiple panels. </p>
  * <p>Panels can be closed with {@link #closePanel()}, but also with {@link ModularPanel#closeIfOpen()}. With the difference, that the method from this interface also works on server side. </p>
- * Synced panels must be created with {@link PanelSyncManager#panel(String, PanelSyncHandler.IPanelBuilder, boolean)}.
- * If the panel does not contain any synced widgets, a simple panel handler using {@link #simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
- * is likely what you need.
+ * Synced panels must be created with {@link PanelSyncManager#syncedPanel(String, boolean, PanelSyncHandler.IPanelBuilder)}.
+ * If a panel does not contain any synced widgets, a simple panel handler using {@link #simple(ModularPanel, SecondaryPanel.IPanelBuilder, boolean)}
+ * is likely what you should use.
  */
 @ApiStatus.NonExtendable
 public interface IPanelHandler {
@@ -38,19 +37,20 @@ public interface IPanelHandler {
     boolean isPanelOpen();
 
     /**
-     * Opens the panel. If there is no cached panel, one will be created.
+     * Opens the panel. If there is no cached panel, it creates one instead.
      * Can be called on both sides if this handler is synced.
      */
     void openPanel();
 
     /**
      * Initiates the closing animation if the panel is open.
+     * This will also close any open sub panel.
      * Can be called on both sides if this handler is synced.
      */
     void closePanel();
 
     /**
-     * Initiates the closing animation of all sub panels.
+     * Initiates the closing animation for all sub panels.
      * Usually for internal use.
      */
     void closeSubPanels();
@@ -78,16 +78,16 @@ public interface IPanelHandler {
 
     /**
      * Deletes the current cached panel. Should not be used frequently.
-     * This only works on panels which don't have {@link ItemSlotSH} sync handlers.
+     * This only works on panels, which don't have synchronized {@link ItemSlotSH} handlers.
      *
-     * @throws UnsupportedOperationException if this handler has ItemSlot sync handlers
+     * @throws UnsupportedOperationException if this handler has synchronized ItemSlot handlers
      */
     void deleteCachedPanel();
 
     /**
      * If this is a sub panel of another panel. A sub panel will be closed when its parent is closed.
      *
-     * @return true if this is a sub panel
+     * @return {@code true} if this is a sub panel
      */
     boolean isSubPanel();
 }
