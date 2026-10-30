@@ -383,6 +383,16 @@ public class ModularContainer extends Container {
                 if (fromItem != null && Platform.isStackEmpty(fromItem)) return null;
                 if (fromItem != null && !hotbarSlot.isItemValid(fromItem)) return null;
                 if (hotbarStack != null && !hotbarSlot.canTakeStack(player)) return null;
+                // vanilla would put the whole hotbar stack into the empty slot and ignore its stack limit
+                if (fromItem == null && hotbarStack != null && fromSlot.isItemValid(hotbarStack)) {
+                    int limit = stackLimit(fromSlot, hotbarStack);
+                    if (limit <= 0) return null;
+                    if (hotbarStack.stackSize > limit) {
+                        fromSlot.putStack(hotbarStack.splitStack(limit));
+                        hotbarSlot.onSlotChanged();
+                        return null;
+                    }
+                }
             }
         }
 
