@@ -749,6 +749,8 @@ public class TestGuis extends CustomModularScreen {
                         .fullWidth()
                         .child(IKey.str("Any").asWidget())
                         .child(new TextFieldWidget().fullWidth())
+                        .child(IKey.str("Any, 12 px").asWidget())
+                        .child(new TextFieldWidget().fullWidth().height(12))
                         .child(IKey.str("Decimal numbers").asWidget())
                         .child(new TextFieldWidget()
                                 .fullWidth()
