@@ -8,26 +8,25 @@ import com.cleanroommc.modularui.screen.viewport.ModularGuiContext;
 import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.MathUtils;
-import com.cleanroommc.modularui.utils.NumberFormat;
-import com.cleanroommc.modularui.utils.SIPrefix;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
+
+import com.gtnewhorizon.gtnhlib.util.numberformatting.options.CompactOptions;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
-import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatConfig;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
+import static com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil.formatNumberCompact;
+import static com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil.getFluidUnit;
+
 public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayWidget<W>> extends Widget<W> implements RecipeViewerIngredientProvider {
 
-    public static final String UNIT_BUCKET = "B";
-    public static final String UNIT_LITER = "L";
+    public static final CompactOptions customFluidFormatter = new CompactOptions().setCompactThreshold(10_000).setDecimalPlaces(0);
 
     private final Box contentPadding = new Box().all(1);
-    private @Nullable String unit = null;
-    private @Nullable SIPrefix baseUnitPrefix = null;
     private boolean flipLighterThanAir = true;
 
     protected AbstractFluidDisplayWidget() {
@@ -62,7 +61,8 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         super.drawOverlay(context, widgetTheme);
         FluidStack fluid = getFluidStack();
         if (fluid != null && displayAmountText()) {
-            String s = NumberFormat.format(getBaseUnitAmount(fluid.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+            // Avoid usage of formatFluid here just due to tight space for rendering in a single slot, as it adds a space between the unit and number.
+            String s = formatNumberCompact(fluid.amount, customFluidFormatter) + getFluidUnit();
             // mc doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
             // we only apply padding there
             GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
@@ -89,31 +89,6 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
      */
     protected int getCapacity() {
         return 0;
-    }
-
-    public double getBaseUnitAmount(double amount) {
-        return amount * getBaseUnitSiPrefix().factor;
-    }
-
-    public final String getUnit() {
-        return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
-    }
-
-    /**
-     * @return the explicitly set base unit, or the one matching the fluid unit configured in GTNHLib
-     */
-    public String getBaseUnit() {
-        if (this.unit != null) return this.unit;
-        return usesMilliBuckets() ? UNIT_BUCKET : UNIT_LITER;
-    }
-
-    public SIPrefix getBaseUnitSiPrefix() {
-        if (this.baseUnitPrefix != null) return this.baseUnitPrefix;
-        return usesMilliBuckets() ? SIPrefix.Milli : SIPrefix.One;
-    }
-
-    private boolean usesMilliBuckets() {
-        return NumberFormatConfig.useForgeFluidMillibuckets;
     }
 
     public boolean isFlipLighterThanAir() {
@@ -155,12 +130,6 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         return getThis();
     }
 
-    public W fluidUnit(String baseUnitSymbol, SIPrefix baseUnitPrefix) {
-        this.unit = baseUnitSymbol;
-        this.baseUnitPrefix = baseUnitPrefix;
-        return getThis();
-    }
-
     /**
      * Determines if a partially filled fluid should be drawn from the top instead of the bottom if the current fluid is lighter than air.
      * When the full fluid is drawn (when {@link #getCapacity()} returns 0) this does nothing.
@@ -174,7 +143,4 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         return contentPadding;
     }
 
-    public SIPrefix getBaseUnitPrefix() {
-        return baseUnitPrefix;
-    }
 }
