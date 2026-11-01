@@ -32,6 +32,7 @@ dependencies {
     api("com.github.GTNewHorizons:GTNHLib:0.11.19:dev")
     compileOnlyApi("com.github.GTNewHorizons:lwjgl3ify:3.0.25:api") { transitive = false }
 
+    // runtimeOnlyNonPublishable('com.github.GTNewHorizons:Angelica:2.2.31:dev') { transitive = false }
     // used in evalex
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
