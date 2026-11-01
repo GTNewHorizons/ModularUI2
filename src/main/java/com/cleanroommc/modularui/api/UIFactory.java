@@ -15,6 +15,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An interface for UI factories. They are responsible for opening synced GUIs and syncing necessary data.
@@ -41,7 +42,7 @@ public interface UIFactory<D extends GuiData> {
      * @return new main panel
      */
     @ApiStatus.OverrideOnly
-    ModularPanel createPanel(D guiData, PanelSyncManager syncManager, UISettings settings);
+    @Nullable ModularPanel createPanel(D guiData, PanelSyncManager syncManager, UISettings settings);
 
     /**
      * Creates the screen for the GUI. Is only called on client side.
@@ -52,7 +53,7 @@ public interface UIFactory<D extends GuiData> {
      */
     @SideOnly(Side.CLIENT)
     @ApiStatus.OverrideOnly
-    ModularScreen createScreen(D guiData, ModularPanel mainPanel);
+    @Nullable ModularScreen createScreen(D guiData, ModularPanel mainPanel);
 
     /**
      * Creates the screen wrapper for the GUI. Is only called on client side.
