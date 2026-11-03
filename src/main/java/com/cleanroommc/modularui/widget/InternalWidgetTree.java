@@ -51,9 +51,6 @@ class InternalWidgetTree {
 
     static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled, boolean drawBackground) {
         if (!parent.isEnabled() && !ignoreEnabled) return;
-        if (parent.requiresResize()) {
-            WidgetTree.resizeInternal(parent.resizer(), false);
-        }
 
         float alpha = parent.getPanel().getAlpha();
         IViewport viewport = parent instanceof IViewport ? (IViewport) parent : null;

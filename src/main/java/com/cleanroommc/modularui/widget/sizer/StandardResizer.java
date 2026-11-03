@@ -208,22 +208,36 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
             if (resizer.isDecoration()) continue;
             Box margin = child.getArea().getMargin();
             Area area = child.getArea();
+            if (coverWidth && !resizer.xDependsOnParent()) {
+                if (!resizer.isXCalculated()) return true;
+                x0 = Math.min(x0, area.rx - padding.getLeft() - margin.getLeft());
+                if (resizer.widthDependsOnParent()) {
+                    int minWidth = resizer.x.isFullSize() ? child.getDefaultWidth() : 0;
+                    x1 = Math.max(x1, area.rx + minWidth + padding.getRight() + margin.getRight());
+                }
+            }
             if (coverWidth && !resizer.widthDependsOnParent()) {
                 hasIndependentChildX = true;
                 if (!resizer.isWidthCalculated()) return true;
                 w = Math.max(w, area.requestedWidth() + padding.horizontal());
                 if (!resizer.xDependsOnParent()) {
-                    if (!resizer.isXCalculated()) return true;
                     x1 = Math.max(x1, area.rx + area.width + padding.getRight() + margin.getRight());
                 }
             }
 
+            if (coverHeight && !resizer.yDependsOnParent()) {
+                if (!resizer.isYCalculated()) return true;
+                y0 = Math.min(y0, area.ry - padding.getTop() - margin.getTop());
+                if (resizer.heightDependsOnParent()) {
+                    int minHeight = resizer.y.isFullSize() ? child.getDefaultHeight() : 0;
+                    y1 = Math.max(y1, area.ry + minHeight + padding.getBottom() + margin.getBottom());
+                }
+            }
             if (coverHeight && !resizer.heightDependsOnParent()) {
                 hasIndependentChildY = true;
                 if (!resizer.isHeightCalculated()) return true;
                 h = Math.max(h, area.requestedHeight() + padding.vertical());
                 if (!resizer.yDependsOnParent()) {
-                    if (!resizer.isYCalculated()) return true;
                     y1 = Math.max(y1, area.ry + area.height + padding.getBottom() + margin.getBottom());
                 }
             }
@@ -275,14 +289,13 @@ public class StandardResizer extends WidgetResizeNode implements IPositioned<Sta
             }
             moveChildrenY = this.y.postApply(this, relativeTo, y0, y1);
         }
-        // since the edges might have been moved closer to the widgets, the widgets should move back into it's original (absolute) position
+        // Preserve independent positions even when the child's size still needs the parent.
         if (moveChildrenX != 0 || moveChildrenY != 0) {
             for (IWidget child : children) {
                 StandardResizer resizeable = child.resizer();
                 if (resizeable.isDecoration()) continue;
-                Area area = child.getArea();
-                if (resizeable.isXCalculated()) area.rx += moveChildrenX;
-                if (resizeable.isYCalculated()) area.ry += moveChildrenY;
+                if (resizeable.isXCalculated()) resizeable.x.rebase(moveChildrenX);
+                if (resizeable.isYCalculated()) resizeable.y.rebase(moveChildrenY);
             }
         }
         return true;
