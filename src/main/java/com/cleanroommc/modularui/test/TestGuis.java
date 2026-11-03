@@ -766,6 +766,7 @@ public class TestGuis extends CustomModularScreen {
         int minSize = 8;
 
         ParentWidget<?> draggableParent = new ParentWidget<>()
+                .name("drag")
                 .coverChildren(minSize)
                 .marginTop(18);
 
@@ -777,7 +778,7 @@ public class TestGuis extends CustomModularScreen {
 
         return ModularPanel.defaultPanel("main")
                 .size(500)
-                .child(subParent
+                .child(subParent.name("sub")
                         .coverChildren()
                         .child(Flow.row()
                                 .coverChildrenHeight()
