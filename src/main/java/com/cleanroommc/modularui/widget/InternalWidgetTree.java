@@ -99,13 +99,6 @@ class InternalWidgetTree {
         // render all children if there are any
         List<IWidget> children = parent.getChildren();
         if (!children.isEmpty()) {
-            // resize dirty children upfront, so their transforms are up to date before other draw passes
-            // (backgrounds) run. Otherwise a moved widget would be drawn at its old position for one frame.
-            for (IWidget child : children) {
-                if (child.requiresResize()) {
-                    WidgetTree.resizeInternal(child.resizer(), false);
-                }
-            }
             boolean backgroundSeparate = children.size() > 1;
             // draw all backgrounds first if we have more than 1 child
             // the whole reason this exists is because of the hover animation of items with NEA
