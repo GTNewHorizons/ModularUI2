@@ -144,7 +144,7 @@ public class Expression {
         EvaluationValue result;
         switch (token.getType()) {
             case NUMBER_LITERAL:
-                result = EvaluationValue.numberOfString(token.getValue(), configuration.getMathContext());
+                result = EvaluationValue.numberOfString(token, configuration.getMathContext());
                 break;
             case STRING_LITERAL:
                 result = EvaluationValue.stringValue(token.getValue());

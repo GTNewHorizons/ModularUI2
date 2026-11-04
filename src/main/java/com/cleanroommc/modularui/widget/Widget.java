@@ -203,7 +203,7 @@ public class Widget<W extends Widget<W>> extends AbstractWidget implements IPosi
     public void drawForeground(ModularGuiContext context) {
         RichTooltip tooltip = getTooltip();
         if (tooltip != null && isHoveringFor(tooltip.getShowUpTimer()) && !context.hasDraggable()) {
-            tooltip.draw(context);
+            context.queueForegroundRender(() -> tooltip.draw(context));
         }
     }
 

@@ -9,6 +9,7 @@ import com.cleanroommc.modularui.factory.inventory.InventoryTypes;
 import com.cleanroommc.modularui.holoui.HoloScreenEntity;
 import com.cleanroommc.modularui.holoui.ScreenEntityRender;
 import com.cleanroommc.modularui.network.ModularNetwork;
+import com.cleanroommc.modularui.overlay.OverlayInputHandler;
 import com.cleanroommc.modularui.screen.ClientScreenHandler;
 import com.cleanroommc.modularui.test.TestItem;
 import com.cleanroommc.modularui.theme.ThemeManager;
@@ -66,6 +67,9 @@ public class ClientProxy extends CommonProxy {
         // registered to both buses since handled events are not bound to a single bus
         FMLCommonHandler.instance().bus().register(clientScreenHandler);
         MinecraftForge.EVENT_BUS.register(clientScreenHandler);
+        if (ModularUI.Mods.LWJGL3IFY.isLoaded()) {
+            OverlayInputHandler.register();
+        }
         AnimatorManager.init();
 
         if (ModularUIConfig.enableTestGuis) {

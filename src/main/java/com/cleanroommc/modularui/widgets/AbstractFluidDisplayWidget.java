@@ -16,6 +16,7 @@ import com.cleanroommc.modularui.widget.sizer.Box;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatConfig;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +26,8 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     public static final String UNIT_LITER = "L";
 
     private final Box contentPadding = new Box().all(1);
-    private String unit = UNIT_LITER;
-    private SIPrefix baseUnitPrefix = SIPrefix.One;
+    private @Nullable String unit = null;
+    private @Nullable SIPrefix baseUnitPrefix = null;
     private boolean flipLighterThanAir = true;
 
     protected AbstractFluidDisplayWidget() {
@@ -41,13 +42,13 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         FluidStack fluid = getFluidStack();
-        if (fluid == null) return;
+        if (fluid == null || getFluidAmountLong() <= 0) return;
         int x = this.contentPadding.getLeft();
         int y = this.contentPadding.getTop();
         int w = getArea().width - this.contentPadding.horizontal();
         int h = getArea().height - this.contentPadding.vertical();
         float c = getCapacity();
-        if (c > 0 && fluid.amount > 0) {
+        if (c > 0) {
             int newH = (int) MathUtils.rescaleLinear(getFluidAmountLong(), 0, c, 1, h);
             // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
             if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
@@ -79,7 +80,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
 
         if (ModularUI.Mods.GT5U.isLoaded()) return GTUtility.getFluidAmount(stack);
         return stack.amount;
-    };
+    }
 
     @Override
     public @Nullable ItemStack getStackForRecipeViewer() {
@@ -106,12 +107,21 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
     }
 
+    /**
+     * @return the explicitly set base unit, or the one matching the fluid unit configured in GTNHLib
+     */
     public String getBaseUnit() {
-        return this.unit;
+        if (this.unit != null) return this.unit;
+        return usesMilliBuckets() ? UNIT_BUCKET : UNIT_LITER;
     }
 
     public SIPrefix getBaseUnitSiPrefix() {
-        return this.baseUnitPrefix;
+        if (this.baseUnitPrefix != null) return this.baseUnitPrefix;
+        return usesMilliBuckets() ? SIPrefix.Milli : SIPrefix.One;
+    }
+
+    private boolean usesMilliBuckets() {
+        return NumberFormatConfig.useForgeFluidMillibuckets;
     }
 
     public boolean isFlipLighterThanAir() {

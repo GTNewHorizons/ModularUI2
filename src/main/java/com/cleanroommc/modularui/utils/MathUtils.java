@@ -257,6 +257,16 @@ public class MathUtils {
         return Math.round(value * maxValue);
     }
 
+    /**
+     * Resolves a parsed bounded value while preserving an explicit percentage in the source expression.
+     */
+    public static long percentOrSelf(String expression, double value, long maxValue) {
+        if (expression != null && expression.indexOf('%') >= 0) {
+            return Math.round(value * maxValue);
+        }
+        return percentOrSelf(value, maxValue);
+    }
+
     public static int castToIntSaturated(long l) {
         if (l >= Integer.MAX_VALUE) return Integer.MAX_VALUE;
         if (l <= Integer.MIN_VALUE) return Integer.MIN_VALUE;
