@@ -18,7 +18,7 @@ public class ModularUINEIGuiHandler extends INEIGuiAdapter {
             return false;
         }
         ModularScreen screen = muiScreen.getScreen();
-        if (!screen.getContext().getRecipeViewerSettings().isRecipeViewerEnabled(screen)) {
+        if (!screen.getContext().getRecipeViewerSettings().isEnabled(screen)) {
             return false;
         }
         Area.SHARED.set(x, y, w, h);

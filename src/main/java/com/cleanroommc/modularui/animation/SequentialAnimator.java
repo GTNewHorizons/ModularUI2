@@ -9,6 +9,11 @@ public class SequentialAnimator extends BaseAnimator<SequentialAnimator> impleme
     private final List<IAnimator> animators;
     private int currentIndex = 0;
 
+    /**
+     * Creates a sequential animator from a list. The list is copied and each child {@link BaseAnimator} gets this as parent.
+     *
+     * @param animators the animators to run in order
+     */
     public SequentialAnimator(List<IAnimator> animators) {
         this.animators = new ArrayList<>(animators);
         this.animators.forEach(animator -> {
@@ -18,6 +23,11 @@ public class SequentialAnimator extends BaseAnimator<SequentialAnimator> impleme
         });
     }
 
+    /**
+     * Creates a sequential animator from varargs. Each child {@link BaseAnimator} gets this as parent.
+     *
+     * @param animators the animators to run in order
+     */
     public SequentialAnimator(IAnimator... animators) {
         this.animators = new ArrayList<>();
         Collections.addAll(this.animators, animators);
@@ -28,6 +38,11 @@ public class SequentialAnimator extends BaseAnimator<SequentialAnimator> impleme
         });
     }
 
+    /**
+     * Starts the sequence by animating the current child. Does nothing if the sequence is empty.
+     *
+     * @param reverse whether to animate in reverse
+     */
     @Override
     public void animate(boolean reverse) {
         if (this.animators.isEmpty()) return;
@@ -36,6 +51,11 @@ public class SequentialAnimator extends BaseAnimator<SequentialAnimator> impleme
         this.animators.get(this.currentIndex).animate(reverse);
     }
 
+    /**
+     * Resets the sequence and all children. The current index is set to the last child if {@code atEnd} is true, otherwise to the first.
+     *
+     * @param atEnd whether the sequence should be reset to the end
+     */
     @Override
     public void reset(boolean atEnd) {
         super.reset(atEnd);
@@ -43,12 +63,24 @@ public class SequentialAnimator extends BaseAnimator<SequentialAnimator> impleme
         this.animators.forEach(animator -> animator.reset(atEnd));
     }
 
+    /**
+     * Resumes the child at the current index in the given direction.
+     *
+     * @param reverse whether to animate in reverse
+     */
     @Override
     public void resume(boolean reverse) {
         super.resume(reverse);
         this.animators.get(this.currentIndex).resume(reverse);
     }
 
+    /**
+     * Advances the current child and moves to the next one (or previous one when reversing) once it finishes.
+     * The sequence stops when the index leaves the list bounds.
+     *
+     * @param elapsedTime time in milliseconds to advance by
+     * @return the remaining time not consumed by the sequence
+     */
     @Override
     public int advance(int elapsedTime) {
         while (isAnimating() && elapsedTime > 0) {
@@ -71,11 +103,23 @@ public class SequentialAnimator extends BaseAnimator<SequentialAnimator> impleme
         return elapsedTime;
     }
 
+    /**
+     * Checks progress of the first child only.
+     *
+     * @return {@code true} if the first child has progressed
+     */
     @Override
     public boolean hasProgressed() {
         return !this.animators.isEmpty() && this.animators.get(0).hasProgressed();
     }
 
+    /**
+     * Appends an animator to this sequence. Only allowed while not animating; the sequence is reset first.
+     *
+     * @param animator the animator to append
+     * @return this
+     * @throws IllegalStateException if the sequence is currently animating
+     */
     @Override
     public SequentialAnimator followedBy(IAnimator animator) {
         if (isAnimating()) {

@@ -7,7 +7,7 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 
 /**
- * A function that can write any data to an {@link PacketBuffer}.
+ * A functional interface allowing you to write data to the supplied {@link PacketBuffer}.
  */
 @FunctionalInterface
 public interface IPacketWriter {
@@ -16,7 +16,7 @@ public interface IPacketWriter {
      * Writes any data to a packet buffer
      *
      * @param buffer buffer to write to
-     * @throws IOException if data can not be written for some reason
+     * @throws IOException if data cannot be written for some reason
      */
     void write(PacketBuffer buffer) throws IOException;
 

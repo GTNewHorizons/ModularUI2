@@ -128,7 +128,7 @@ public interface IViewportStack {
     void resetCurrent();
 
     /**
-     * Transforms the x component of a position withe current matrix transformations.
+     * Transforms the x component of a position with current matrix transformations.
      *
      * @param x x component of position
      * @param y y component of position
@@ -137,7 +137,7 @@ public interface IViewportStack {
     int transformX(float x, float y);
 
     /**
-     * Transforms the y component of a position withe current matrix transformations.
+     * Transforms the y component of a position with current matrix transformations.
      *
      * @param x x component of position
      * @param y y component of position
@@ -150,7 +150,7 @@ public interface IViewportStack {
      *
      * @param x x component of position
      * @param y y component of position
-     * @return un-transformed x component
+     * @return untransformed x component
      */
     int unTransformX(float x, float y);
 
@@ -159,7 +159,7 @@ public interface IViewportStack {
      *
      * @param x x component of position
      * @param y y component of position
-     * @return un-transformed y component
+     * @return untransformed y component
      */
     int unTransformY(float x, float y);
 
@@ -201,7 +201,7 @@ public interface IViewportStack {
      * This modifies the given vector.
      *
      * @param vec vector to un-transform
-     * @return un-transformed vector
+     * @return untransformed vector
      */
     default Vector3f unTransform(Vector3f vec) {
         return unTransform(vec, vec);
@@ -213,7 +213,7 @@ public interface IViewportStack {
      *
      * @param vec  vector to un-transform
      * @param dest vector to write the result to
-     * @return un-transformed vector
+     * @return untransformed vector
      */
     Vector3f unTransform(Vector3f vec, Vector3f dest);
 
@@ -231,12 +231,12 @@ public interface IViewportStack {
     }
 
     /**
-     * Applies the current matrix transformations the current OpenGL matrix.
+     * Applies the current matrix transformations to the current OpenGL matrix.
      */
     void applyToOpenGl();
 
     /**
-     * @return the top matrix or null if stack is empty
+     * @return the top matrix or null if the stack is empty
      */
     @Nullable
     TransformationMatrix peek();

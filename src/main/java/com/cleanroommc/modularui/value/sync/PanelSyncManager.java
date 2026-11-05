@@ -50,6 +50,12 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
     private final List<Consumer<EntityPlayer>> closeListener = new ArrayList<>();
     private final List<Runnable> tickListener = new ArrayList<>();
 
+    /**
+     * Creates a panel sync manager and registers it as the main one if {@code main} is true.
+     *
+     * @param msm  the modular sync manager this panel belongs to
+     * @param main true if this panel is the main panel of the container
+     */
     @ApiStatus.Internal
     public PanelSyncManager(ModularSyncManager msm, boolean main) {
         this.modularSyncManager = msm;
@@ -57,6 +63,11 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         if (main) msm.setMainPSM(this);
     }
 
+    /**
+     * Locks this manager and initializes all registered sync handlers and sub panels under the given panel name.
+     *
+     * @param panelName the name of the panel
+     */
     @ApiStatus.Internal
     public void initialize(String panelName) {
         this.panelName = panelName;
@@ -83,6 +94,9 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         syncHandler.init(name, this);
     }
 
+    /**
+     * Closes all sub panels marked as sub panels of this panel.
+     */
     void closeSubPanels() {
         this.subPanels.values().forEach(syncHandler -> {
             if (syncHandler.isSubPanel()) {
@@ -91,11 +105,17 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         });
     }
 
+    /**
+     * Notifies all open listeners. Called when the container is opened.
+     */
     @ApiStatus.Internal
     public void onOpen() {
         this.openListener.forEach(listener -> listener.accept(getPlayer()));
     }
 
+    /**
+     * Notifies all close listeners and disposes all sync handlers. Called when the container is closed.
+     */
     @ApiStatus.Internal
     public void onClose() {
         this.closeListener.forEach(listener -> listener.accept(getPlayer()));
@@ -108,6 +128,12 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         return this.panelName != null;
     }
 
+    /**
+     * Detects changes in all sync handlers on the server and sends them to the client.
+     * Does nothing on the client.
+     *
+     * @param init true if this is the initial sync
+     */
     void detectAndSendChanges(boolean init) {
         if (!isClient()) {
             for (SyncHandler<?> syncHandler : this.syncHandlers.values()) {
@@ -117,10 +143,23 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         this.init = false;
     }
 
+    /**
+     * Runs all registered tick listeners.
+     */
     void onUpdate() {
         this.tickListener.forEach(Runnable::run);
     }
 
+    /**
+     * Handles an incoming packet for a sync handler or a synced action.
+     * On the client the packet is read directly. On the server it is only accepted if the sync handler allows client packets.
+     *
+     * @param mapKey the key of the sync handler or synced action
+     * @param action true if the packet targets a synced action instead of a sync handler
+     * @param id     the id of the sync handler update
+     * @param buf    the packet data
+     * @throws IOException if reading the packet data fails
+     */
     @ApiStatus.Internal
     public void receiveWidgetUpdate(String mapKey, boolean action, int id, PacketBuffer buf) throws IOException {
         if (action) {
@@ -141,6 +180,14 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         }
     }
 
+    /**
+     * Invokes the synced action with the given key. Sync handler registration is temporarily allowed
+     * if the action is executed on both sides.
+     *
+     * @param mapKey the key of the synced action
+     * @param buf    the packet data passed to the action
+     * @return true if the action should be forwarded to the other side, false otherwise
+     */
     private boolean invokeSyncedAction(String mapKey, PacketBuffer buf) {
         SyncedAction syncedAction = this.syncedActions.get(mapKey);
         if (syncedAction == null) {
@@ -173,6 +220,15 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         return this != getHyperVisor() && getHyperVisor().hasSyncHandler(syncHandler);
     }
 
+    /**
+     * Registers a sync handler under the key built from {@code name} and {@code id}.
+     * If the sync handler was already registered under another key, the old entry is replaced.
+     *
+     * @param name        the name of the sync handler
+     * @param id          the id of the sync handler
+     * @param syncHandler the sync handler to register
+     * @throws IllegalStateException if registration is locked or the auto sync rules are violated
+     */
     private void putSyncValue(String name, int id, SyncHandler<?> syncHandler) {
         if (isLocked()) {
             // registration of sync handlers forbidden
@@ -265,6 +321,12 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         return this.subPanels.get(key);
     }
 
+    /**
+     * Registers a slot group. Singleton slot groups are not stored.
+     *
+     * @param slotGroup the slot group to register
+     * @return {@code this} for chaining
+     */
     @Override
     public PanelSyncManager registerSlotGroup(SlotGroup slotGroup) {
         if (!slotGroup.isSingleton()) {
@@ -316,6 +378,15 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         return this;
     }
 
+    /**
+     * Registers a synced action. Actions that are executed neither on the client nor on the server are ignored.
+     *
+     * @param mapKey        the key of the action
+     * @param executeClient true if the action should run on the client
+     * @param executeServer true if the action should run on the server
+     * @param action        the action to run
+     * @return {@code this} for chaining
+     */
     @Override
     public PanelSyncManager registerSyncedAction(String mapKey, boolean executeClient, boolean executeServer, ISyncedAction action) {
         if (executeClient || executeServer) {
@@ -324,12 +395,24 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         return this;
     }
 
+    /**
+     * Invokes a synced action and forwards it to the other side if required.
+     *
+     * @param mapKey the key of the action
+     * @param packet the packet data passed to the action
+     */
     public void callSyncedAction(String mapKey, PacketBuffer packet) {
         if (invokeSyncedAction(mapKey, packet)) {
             ModularNetwork.get(isClient()).sendActionPacket(getModularSyncManager(), this.panelName, mapKey, packet, getPlayer());
         }
     }
 
+    /**
+     * Builds a packet with the given builder and invokes the synced action with it.
+     *
+     * @param mapKey        the key of the action
+     * @param packetBuilder function that writes the packet data
+     */
     public void callSyncedAction(String mapKey, Consumer<PacketBuffer> packetBuilder) {
         PacketBuffer packet = new PacketBuffer(Unpooled.buffer());
         packetBuilder.accept(packet);
@@ -340,6 +423,17 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         callSyncedAction(mapKey, new PacketBuffer(Unpooled.buffer(0)));
     }
 
+    /**
+     * Returns the existing sync handler for the given name and id, or creates and registers a new one using the supplier.
+     *
+     * @param name     the name of the sync handler
+     * @param id       the id of the sync handler
+     * @param clazz    the expected type of the sync handler
+     * @param supplier creates the sync handler if none exists
+     * @param <T>      the type of the sync handler
+     * @return the existing or newly created sync handler
+     * @throws IllegalStateException if registration is locked or the existing handler has a different type
+     */
     @Override
     public <T extends SyncHandler<?>> T getOrCreateSyncHandler(String name, int id, Class<T> clazz, Supplier<T> supplier) {
         SyncHandler<?> syncHandler = findSyncHandlerNullable(name, id);
@@ -413,10 +507,22 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
         return locked;
     }
 
+    /**
+     * Temporarily allows or forbids sync handler registration, used while executing synced actions.
+     *
+     * @param allow true to allow registration
+     */
     void allowTemporarySyncHandlerRegistration(boolean allow) {
         this.allowSyncHandlerRegistration = allow;
     }
 
+    /**
+     * Builds the map key of a sync handler from its name and id.
+     *
+     * @param name the name of the sync handler
+     * @param id   the id of the sync handler
+     * @return the key in the form {@code name:id}
+     */
     public static String makeSyncKey(String name, int id) {
         return name + ":" + id;
     }

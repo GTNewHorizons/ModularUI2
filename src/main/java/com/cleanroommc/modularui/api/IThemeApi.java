@@ -114,7 +114,7 @@ public interface IThemeApi {
     ITheme getDefaultTheme();
 
     /**
-     * Finds a theme for an id
+     * Finds a theme by it's id
      *
      * @param id id of the theme
      * @return the found theme or {@link #getDefaultTheme()} if no theme was found
@@ -147,10 +147,10 @@ public interface IThemeApi {
     }
 
     /**
-     * Gets all currently from java side registered theme json's for a theme.
+     * Gets all registered JSONs by id
      *
      * @param id id of the theme
-     * @return all theme json's for a theme.
+     * @return list of JSONs registered by id
      */
     List<JsonBuilder> getJavaDefaultThemes(String id);
 
@@ -225,7 +225,7 @@ public interface IThemeApi {
      * @param id                id of the widget theme
      * @param defaultTheme      the fallback widget theme
      * @param defaultHoverTheme the fallback hover widget theme
-     * @param parser            the widget theme json parser function. This is usually another constructor.
+     * @param parser            the widget theme JSON parser function. This is usually another constructor.
      * @return key to access the widget theme
      */
     <T extends WidgetTheme> WidgetThemeKey<T> registerWidgetTheme(String id, T defaultTheme, T defaultHoverTheme, WidgetThemeParser<T> parser);

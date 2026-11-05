@@ -285,7 +285,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     /**
-     * Sets the state dependent background. The images should be vertically stacked images from top to bottom
+     * Sets the state-dependent background. The images should be vertically stacked images from top to bottom
      * Note: The length must be already set!
      *
      * @param texture background
@@ -298,7 +298,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     /**
-     * Sets the state dependent overlay. The images should be vertically stacked images from top to bottom
+     * Sets the state-dependent overlay. The images should be vertically stacked images from top to bottom
      * Note: The length must be already set!
      *
      * @param texture background
@@ -311,7 +311,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     /**
-     * Sets the state dependent hover background. The images should be vertically stacked images from top to bottom
+     * Sets the state-dependent hover background. The images should be vertically stacked images from top to bottom
      * Note: The length must be already set!
      *
      * @param texture background
@@ -323,8 +323,9 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
         return getThis();
     }
 
+
     /**
-     * Sets the state dependent hover overlay. The images should be vertically stacked images from top to bottom
+     * Sets the state-dependent hover overlay. The images should be vertically stacked images from top to bottom
      * Note: The length must be already set!
      *
      * @param texture background
@@ -586,7 +587,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
     }
 
     /**
-     * Sets the tooltip auto update value for all states.
+     * Sets the tooltip auto-update value for all states.
      *
      * @param update true if tooltips should automatically update
      * @return this
