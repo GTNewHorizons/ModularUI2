@@ -132,7 +132,7 @@ public class AbstractCycleButtonWidget<W extends AbstractCycleButtonWidget<W>> e
 
     public void setState(int state, boolean setSource) {
         if (state < 0 || state >= this.stateCount) {
-            throw new IndexOutOfBoundsException("CycleButton state out of bounds");
+            throw new IndexOutOfBoundsException("CycleButton state " + state + " out of bounds for length " + stateCount);
         }
         updateChild(state);
         if (setSource) {
