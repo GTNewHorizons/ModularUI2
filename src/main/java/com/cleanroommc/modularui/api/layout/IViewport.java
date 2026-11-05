@@ -7,7 +7,7 @@ import com.cleanroommc.modularui.utils.HoveredWidgetList;
 import java.util.function.Predicate;
 
 /**
- * A gui element which can transform its children f.e. a scrollable list.
+ * A gui element that can transform its children f.e. a scrollable list.
  */
 public interface IViewport extends IWidget {
 
@@ -19,7 +19,7 @@ public interface IViewport extends IWidget {
     default void transformChildren(IViewportStack stack) {}
 
     /**
-     * Gathers all children at a position. Transformations from this viewport are already applied.
+     * Gathers all children at the given position. Transformations from this viewport are already applied.
      *
      * @param stack   current viewport stack. Should not be modified.
      * @param widgets widget list of already gathered widgets. Add children here.
@@ -33,7 +33,7 @@ public interface IViewport extends IWidget {
     }
 
     /**
-     * Gathers all children at a position. Transformations from this viewport are not applied.
+     * Gathers all children at the given position. Transformations from this viewport are not applied.
      * Called before {@link #getWidgetsAt(IViewportStack, HoveredWidgetList, int, int)}
      *
      * @param stack   current viewport stack. Should not be modified.
@@ -48,7 +48,7 @@ public interface IViewport extends IWidget {
     }
 
     /**
-     * Called during drawing twice (before children are drawn). Once with transformation of this viewport and once without
+     * Called during drawing twice (before children are drawn). Once with transformation of this viewport applied and once without.
      *
      * @param context     gui context
      * @param transformed if transformation from this viewport is active
@@ -56,7 +56,7 @@ public interface IViewport extends IWidget {
     default void preDraw(ModularGuiContext context, boolean transformed) {}
 
     /**
-     * Called during drawing twice (after children are drawn). Once with transformation of this viewport and once without
+     * Called during drawing twice (after children are drawn). Once with transformation of this viewport applied and once without.
      *
      * @param context     gui context
      * @param transformed if transformation from this viewport is active
@@ -89,6 +89,11 @@ public interface IViewport extends IWidget {
         }
     }
 
+    /**
+     * Applies the given view stack to all children of the given parent, until any child returns false from the predicate.
+     *
+     * @return true if all children returned true from the predicate, false otherwise.
+     */
     static boolean foreachChild(IViewportStack stack, IWidget parent, Predicate<IWidget> predicate, int context) {
         for (IWidget child : parent.getChildren()) {
             if (!child.isEnabled()) {

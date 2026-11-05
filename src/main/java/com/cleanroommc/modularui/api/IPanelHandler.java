@@ -20,15 +20,15 @@ import org.jetbrains.annotations.ApiStatus;
 public interface IPanelHandler {
 
     /**
-     * Creates a non synced panel handler. Trying to use synced values anyway will result in a crash.
-     * It only works on client side. Doing anything with it on server side might result in a crash.
+     * Creates a non-synced panel handler. Trying to use synced values anyway will result in a crash.
+     * It only works on the client side. Doing anything with it on the server side might result in a crash.
      *
      * @param parent   an existing parent panel of the gui
      * @param provider the panel builder, that will create the new panel. It must not return null or the main panel.
      * @param subPanel true if this panel should close when its parent closes (the parent is defined by the first parameter)
      * @return a simple panel handler.
      * @throws NullPointerException     if the build panel of the builder is null
-     * @throws IllegalArgumentException if the build panel of the builder is the main panel or there are synced values in the panel
+     * @throws IllegalArgumentException if the build panel of the builder is the main panel, or there are synced values in the panel
      */
     static IPanelHandler simple(ModularPanel parent, SecondaryPanel.IPanelBuilder provider, boolean subPanel) {
         return new SecondaryPanel(parent, provider, subPanel);
