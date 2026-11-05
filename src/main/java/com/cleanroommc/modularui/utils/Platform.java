@@ -70,6 +70,17 @@ public class Platform {
         GlStateManager.disableAlpha();
     }
 
+    /**
+     * Restores the GL state changed by {@link #setupDrawColor()} to the default GUI state,
+     * like vanilla {@link net.minecraft.client.gui.Gui#drawRect} does.
+     * External code (NEI, vanilla buttons, foreground layers) expects this state.
+     */
+    public static void endDrawColor() {
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.disableBlend();
+    }
+
     public static void setupDrawTex(ResourceLocation texture) {
         setupDrawTex(texture, false);
     }

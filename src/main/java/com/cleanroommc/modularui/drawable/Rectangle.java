@@ -161,6 +161,7 @@ public class Rectangle implements IDrawable, IJsonSerializable, IAnimatable<Rect
                 v(buffer, x1 - d, y0 + d, this.colorTR);
             });
             Platform.endDrawGradient();
+            Platform.endDrawColor();
         }
     }
 

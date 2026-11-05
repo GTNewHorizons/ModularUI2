@@ -408,20 +408,28 @@ public class DAM {
 
     public interface UnaryDoubleOperator {
 
+        UnaryDoubleOperator IDENTITY = v -> v;
+
         double apply(double v);
     }
 
     public interface BinaryDoubleOperator {
+
+        BinaryDoubleOperator IDENTITY = (v, op) -> v;
 
         double apply(double v, double op);
     }
 
     public interface TernaryDoubleOperator {
 
+        TernaryDoubleOperator IDENTITY = (v, op1, op2) -> v;
+
         double apply(double v, double op1, double op2);
     }
 
     public interface NDoubleOperator {
+
+        NDoubleOperator IDENTITY = (v, op) -> v;
 
         double apply(double v, double[] op);
     }

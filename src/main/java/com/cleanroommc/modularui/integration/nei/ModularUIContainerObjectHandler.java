@@ -33,7 +33,7 @@ public class ModularUIContainerObjectHandler implements IContainerObjectHandler 
 
     @Override
     public boolean objectUnderMouse(GuiContainer gui, int mousex, int mousey) {
-        return gui instanceof IMuiScreen muiScreen && muiScreen.getScreen().getContext().isHovered();
+        return false;
     }
 
     @Override

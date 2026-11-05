@@ -415,7 +415,7 @@ public class ClientScreenHandler {
     }
 
     public static void drawDarkBackground(GuiScreen screen, int tint) {
-        if (hasScreen()) {
+        if (hasScreen() && currentScreen.shouldDrawDarkBackground()) {
             float alpha = ModularUI.Mods.NEA.isLoaded() ? OpeningAnimation.getValue(screen) : 1f;
             // vanilla color values as hex
             int color = 0x101010;
@@ -446,6 +446,7 @@ public class ClientScreenHandler {
         RenderHelper.enableStandardItemLighting();
         handleAnimationScale(mcScreen);
         muiScreen.drawScreen();
+        Platform.setupDrawTex();
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
         drawVanillaElements(mcScreen, mouseX, mouseY, partialTicks);
@@ -475,6 +476,7 @@ public class ClientScreenHandler {
         //handleAnimationScale(mcScreen);
         acc.invokeDrawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
         muiScreen.drawScreen();
+        Platform.setupDrawTex();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();

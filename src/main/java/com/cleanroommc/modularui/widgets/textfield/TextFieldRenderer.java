@@ -259,5 +259,6 @@ public class TextFieldRenderer extends TextRenderer {
             bufferBuilder.pos(x0, y0, 0.0D).endVertex();
         });
         GlStateManager.color(1, 1, 1, 1);
+        Platform.endDrawColor();
     }
 }

@@ -86,6 +86,7 @@ public class ModularScreen {
     private final ScreenResizeNode resizeNode = new ScreenResizeNode(this);
     private boolean pausesGame = false;
     private boolean openParentOnClose = false;
+    private boolean drawDarkBackground = true;
 
     private String themeOverride;
     private ITheme currentTheme;
@@ -660,6 +661,10 @@ public class ModularScreen {
         return pausesGame;
     }
 
+    public boolean shouldDrawDarkBackground() {
+        return drawDarkBackground;
+    }
+
     public boolean isOpenParentOnClose() {
         return openParentOnClose;
     }
@@ -779,6 +784,11 @@ public class ModularScreen {
      */
     public ModularScreen pausesGame(boolean pausesGame) {
         this.pausesGame = pausesGame;
+        return this;
+    }
+
+    public ModularScreen drawDarkBackground(boolean drawDarkBackground) {
+        this.drawDarkBackground = drawDarkBackground;
         return this;
     }
 

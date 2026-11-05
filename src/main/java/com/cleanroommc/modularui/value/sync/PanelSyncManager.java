@@ -60,8 +60,8 @@ public class PanelSyncManager implements ISyncRegistrar<PanelSyncManager> {
     @ApiStatus.Internal
     public void initialize(String panelName) {
         this.panelName = panelName;
-        this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
         this.locked = true;
+        this.syncHandlers.forEach((mapKey, syncHandler) -> syncHandler.init(mapKey, this));
         this.init = true;
         this.subPanels.forEach((s, syncHandler) -> this.modularSyncManager.getMainPSM().registerPanelSyncHandler(s, syncHandler));
     }

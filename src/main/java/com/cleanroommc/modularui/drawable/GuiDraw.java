@@ -48,6 +48,7 @@ public class GuiDraw {
         Platform.startDrawing(Platform.DrawMode.QUADS, Platform.VertexFormat.POS_COLOR, bufferBuilder -> {
             drawRectRaw(bufferBuilder, x0, y0, x0 + w, y0 + h, color);
         });
+        Platform.endDrawColor();
     }
 
     public static void drawHorizontalGradientRect(float x0, float y0, float w, float h, int colorLeft, int colorRight) {
@@ -69,6 +70,7 @@ public class GuiDraw {
             bufferBuilder.pos(x1, y0, 0.0f).color(Color.getRed(colorTR), Color.getGreen(colorTR), Color.getBlue(colorTR), Color.getAlpha(colorTR)).endVertex();
         });
         Platform.endDrawGradient();
+        Platform.endDrawColor();
     }
 
     public static void drawRectRaw(BufferBuilder buffer, float x0, float y0, float x1, float y1, int color) {
@@ -115,6 +117,7 @@ public class GuiDraw {
             }
         });
         Platform.endDrawGradient();
+        Platform.endDrawColor();
     }
 
     public static void drawRoundedRect(float x0, float y0, float w, float h, int color, int cornerRadius, int segments) {
@@ -173,6 +176,7 @@ public class GuiDraw {
             bufferBuilder.pos(x0, y0 + cornerRadius, 0.0f).color(Color.getRed(colorTL), Color.getGreen(colorTL), Color.getBlue(colorTL), Color.getAlpha(colorTL)).endVertex();
         });
         Platform.endDrawGradient();
+        Platform.endDrawColor();
     }
 
     public static void drawTexture(ResourceLocation location, float x, float y, float w, float h, int u, int v, int textureWidth, int textureHeight) {
@@ -515,6 +519,7 @@ public class GuiDraw {
             pc(buffer, x0, y0, color);
             pc(buffer, x1 - d, y0 + d, color);
         });
+        Platform.endDrawColor();
     }
 
     public static void drawBorderOutsideLTRB(float left, float top, float right, float bottom, int color) {
@@ -616,6 +621,7 @@ public class GuiDraw {
             bufferBuilder.pos(x1 + oX, y1 + oY, 0).color(r2, g2, b2, a2).endVertex();
         });
         Platform.endDrawGradient();
+        Platform.endDrawColor();
     }
 
     public static void drawDropCircleShadow(int x, int y, int radius, int segments, int opaque, int shadow) {
@@ -640,6 +646,7 @@ public class GuiDraw {
             }
         });
         Platform.endDrawGradient();
+        Platform.endDrawColor();
     }
 
     public static void drawDropCircleShadow(int x, int y, int radius, int offset, int segments, int opaque, int shadow) {
@@ -677,6 +684,7 @@ public class GuiDraw {
             }
         });
         Platform.endDrawGradient();
+        Platform.endDrawColor();
     }
 
     @ApiStatus.ScheduledForRemoval(inVersion = "3.2.0")

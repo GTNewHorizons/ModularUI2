@@ -372,6 +372,11 @@ public class EvaluationValue implements Comparable<EvaluationValue> {
         if (value.startsWith("0x") || value.startsWith("0X")) {
             BigInteger hexToInteger = new BigInteger(value.substring(2), 16);
             return EvaluationValue.numberValue(new BigDecimal(hexToInteger, mathContext));
+        } else if (value.toLowerCase().contains("e")) {
+            if (value.toLowerCase().split("e")[1].contains(".")) {
+                return EvaluationValue.numberValue(new BigDecimal(0, mathContext));
+            }
+            return EvaluationValue.numberValue(new BigDecimal(value, mathContext));
         } else {
             return EvaluationValue.numberValue(new BigDecimal(value, mathContext));
         }

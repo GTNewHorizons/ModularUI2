@@ -197,12 +197,12 @@ public class TextRenderer {
     }
 
     public boolean wouldFit(List<String> text, boolean shouldCheckWidth) {
-        if (this.maxHeight > 0 && this.maxHeight < text.size() * getFontHeight() - this.scale) {
+        if (this.maxHeight > 0 && this.maxHeight < text.size() * getFontHeight()) {
             return false;
         }
         if (this.maxWidth > 0 && shouldCheckWidth) {
             for (String line : text) {
-                if (this.maxWidth < getFontRenderer().getStringWidth(line)) {
+                if (this.maxWidth < getFontRenderer().getStringWidth(line) * this.scale) {
                     return false;
                 }
             }

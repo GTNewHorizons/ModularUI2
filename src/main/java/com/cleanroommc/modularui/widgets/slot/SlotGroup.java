@@ -1,5 +1,7 @@
 package com.cleanroommc.modularui.widgets.slot;
 
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -27,6 +29,7 @@ public class SlotGroup {
     private final boolean allowShiftTransfer;
     private boolean allowSorting = true;
     private final boolean singleton;
+    private final IInventory dummyInventory = new InventoryBasic("[Null]", true, 0);
 
     /**
      * Creates a slot group that is only a single slot. Singleton groups don't need to be registered.
@@ -116,5 +119,10 @@ public class SlotGroup {
     public SlotGroup setAllowSorting(boolean allowSorting) {
         this.allowSorting = allowSorting;
         return this;
+    }
+
+    @ApiStatus.Internal
+    public IInventory getDummyInventoryForComparison() {
+        return dummyInventory;
     }
 }

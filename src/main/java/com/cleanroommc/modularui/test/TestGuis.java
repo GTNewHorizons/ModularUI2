@@ -737,6 +737,30 @@ public class TestGuis extends CustomModularScreen {
                         .name("side_options"));
     }
 
+    public static @NotNull ModularPanel buildTextFieldUI() {
+        return new ModularPanel("text_fields")
+                .coverChildrenHeight()
+                .width(120)
+                .padding(7)
+                .child(Flow.col()
+                        .coverChildrenHeight()
+                        .childPadding(2)
+                        .crossAxisAlignment(Alignment.CrossAxis.START)
+                        .fullWidth()
+                        .child(IKey.str("Any").asWidget())
+                        .child(new TextFieldWidget().fullWidth())
+                        .child(IKey.str("Decimal numbers").asWidget())
+                        .child(new TextFieldWidget()
+                                .fullWidth()
+                                .numbersDouble(-1000, 1000)
+                                .usingScrollStep())
+                        .child(IKey.str("Whole numbers").asWidget())
+                        .child(new TextFieldWidget()
+                                .fullWidth()
+                                .numbersLong(-100_000_000_000_000L, 100_000_000_000_000L)
+                                .usingScrollStep()));
+    }
+
     private static Rectangle rndRect(IntList colors, Random random) {
         int i = random.nextInt(colors.size());
         int c = colors.removeInt(i);

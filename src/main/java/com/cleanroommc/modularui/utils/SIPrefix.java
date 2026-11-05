@@ -70,6 +70,11 @@ public enum SIPrefix {
         e.with(String.valueOf(this.symbol), this.factor);
     }
 
+    public void addToExpression(Expression e, String alternativeSymbol) {
+        addToExpression(e);
+        e.with(alternativeSymbol, this.factor);
+    }
+
     public static final SIPrefix[] VALUES = values();
     public static final SIPrefix[] HIGH = new SIPrefix[values().length / 2];
     public static final SIPrefix[] LOW = new SIPrefix[values().length / 2];
@@ -82,8 +87,9 @@ public enum SIPrefix {
         }
     }
 
-    public static void addAllToExpression(Expression e) {
+    public static void addAllToExpression(Expression e, boolean biggerThanOne) {
         for (SIPrefix siPrefix : VALUES) {
+            if (siPrefix == One || siPrefix.infiniteLike || (biggerThanOne && siPrefix.factor < 1)) continue;
             siPrefix.addToExpression(e);
         }
     }

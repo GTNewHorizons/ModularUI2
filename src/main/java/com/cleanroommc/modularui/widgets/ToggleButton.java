@@ -59,7 +59,9 @@ public class ToggleButton extends AbstractCycleButtonWidget<ToggleButton> {
 
     @Override
     public ToggleButton backgroundOverlay(IDrawable... selectedBackground) {
-        return background(false, selectedBackground);
+        this.background = addToArray(this.background, selectedBackground, 0);
+        this.background = addToArray(this.background, selectedBackground, 1);
+        return this;
     }
 
     @Override

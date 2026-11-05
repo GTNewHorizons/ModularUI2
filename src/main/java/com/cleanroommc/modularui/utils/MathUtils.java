@@ -1,6 +1,11 @@
 package com.cleanroommc.modularui.utils;
 
+import com.cleanroommc.modularui.utils.math.CustomDataAccessor;
 import com.cleanroommc.modularui.utils.math.PostfixPercentOperator;
+
+import com.cleanroommc.modularui.widgets.textfield.INumberParser;
+
+import com.google.common.math.LongMath;
 
 import net.minecraft.util.MathHelper;
 
@@ -11,6 +16,7 @@ import com.ezylang.evalex.data.EvaluationValue;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
+import java.util.function.LongSupplier;
 
 public class MathUtils {
 
@@ -23,30 +29,50 @@ public class MathUtils {
             .arraysAllowed(false)
             .structuresAllowed(false)
             .stripTrailingZeros(true)
+            .allowOverwriteConstants(true)
+            .dataAccessorSupplier(() -> new CustomDataAccessor(false))
             .build()
             .withAdditionalOperators(Pair.of("%", new PostfixPercentOperator()));
 
-    public static ParseResult parseExpression(String expression) {
-        return parseExpression(expression, Double.NaN, false);
-    }
+    public static final ExpressionConfiguration MATH_CFG_CASE_SENSITIVE = MATH_CFG.toBuilder()
+            .dataAccessorSupplier(() -> new CustomDataAccessor(true))
+            .build();
 
-    public static ParseResult parseExpression(String expression, boolean useSiPrefixes) {
-        return parseExpression(expression, Double.NaN, useSiPrefixes);
-    }
+    public static final INumberParser PARSER_WITH_SI = MathUtils::parseExpression;
+    public static final INumberParser PARSER_WHOLE_NUMBER = MathUtils::parseExpressionWholeNumber;
 
     public static ParseResult parseExpression(String expression, double defaultValue) {
-        return parseExpression(expression, defaultValue, true);
+        return parseExpression(expression, defaultValue, true, false);
     }
 
-    public static ParseResult parseExpression(String expression, double defaultValue, boolean useSiPrefixes) {
+    public static ParseResult parseExpression(String expression, double defaultValue, boolean useSiPrefixes, boolean biggerThanOne) {
+        if (expression == null || expression.isEmpty()) {
+            return ParseResult.success(EvaluationValue.numberValue(new BigDecimal(defaultValue)));
+        }
+
+        Expression e = new Expression(expression, MATH_CFG_CASE_SENSITIVE);
+        if (useSiPrefixes) {
+            SIPrefix.addAllToExpression(e, biggerThanOne);
+        }
+        try {
+            return ParseResult.success(e.evaluate());
+        } catch (BaseException exception) {
+            return ParseResult.failure(exception);
+        }
+    }
+
+    public static ParseResult parseExpressionWholeNumber(String expression, double defaultValue) {
         if (expression == null || expression.isEmpty()) {
             return ParseResult.success(EvaluationValue.numberValue(new BigDecimal(defaultValue)));
         }
 
         Expression e = new Expression(expression, MATH_CFG);
-        if (useSiPrefixes) {
-            SIPrefix.addAllToExpression(e);
-        }
+        SIPrefix.Kilo.addToExpression(e);
+        SIPrefix.Mega.addToExpression(e);
+        SIPrefix.Giga.addToExpression(e, "b");
+        SIPrefix.Tera.addToExpression(e);
+        e.with("i", 144); // ingot
+        e.with("s", 64); // stack
         try {
             return ParseResult.success(e.evaluate());
         } catch (BaseException exception) {
@@ -219,5 +245,47 @@ public class MathUtils {
         // correct rounding errors
         if (Math.pow(10, d - 1) > x) d--;
         return Math.max(d, 1);
+    }
+
+    public static boolean areBothSmallerOrBiggerThanOne(double a, double b) {
+        return a > 1 ? b > 1 : b <= 1;
+    }
+
+    public static long percentOrSelf(double value, long maxValue) {
+        long rounded = Math.round(value);
+        if (value > 1 || Math.abs(value - rounded) < 0.0000001) return rounded;
+        return Math.round(value * maxValue);
+    }
+
+    public static int castToIntSaturated(long l) {
+        if (l >= Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if (l <= Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        return (int) l;
+    }
+
+    public static short castToShortSaturated(long l) {
+        if (l >= Short.MAX_VALUE) return Short.MAX_VALUE;
+        if (l <= Short.MIN_VALUE) return Short.MIN_VALUE;
+        return (short) l;
+    }
+
+    public static byte castToByteSaturated(long l) {
+        if (l >= Byte.MAX_VALUE) return Byte.MAX_VALUE;
+        if (l <= Byte.MIN_VALUE) return Byte.MIN_VALUE;
+        return (byte) l;
+    }
+
+    public interface UnaryLongOperator {
+
+        UnaryLongOperator IDENTITY = v -> v;
+
+        long apply(long l);
+    }
+
+    public interface UnaryIntOperator {
+
+        UnaryIntOperator IDENTITY = v -> v;
+
+        int apply(int l);
     }
 }
