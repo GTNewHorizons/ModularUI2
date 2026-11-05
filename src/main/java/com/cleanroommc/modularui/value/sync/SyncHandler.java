@@ -34,6 +34,12 @@ public abstract class SyncHandler<S extends SyncHandler<S>> implements ISyncOrVa
     private String key;
     private boolean allowC2S;
 
+    /**
+     * Initializes this sync handler with its key and the panel sync manager it belongs to.
+     *
+     * @param key         the key this sync handler is registered under
+     * @param syncManager the panel sync manager
+     */
     @ApiStatus.OverrideOnly
     @MustBeInvokedByOverriders
     public void init(String key, PanelSyncManager syncManager) {

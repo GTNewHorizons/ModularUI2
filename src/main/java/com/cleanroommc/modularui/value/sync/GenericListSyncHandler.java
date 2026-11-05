@@ -23,6 +23,16 @@ public class GenericListSyncHandler<T> extends GenericCollectionSyncHandler<T, L
 
     private final ObjectList<T> cache = ObjectList.create();
 
+    /**
+     * Creates a list sync handler and initializes its cache from the getter.
+     *
+     * @param getter       supplies the source list
+     * @param setter       writes the list back to the source, may be null
+     * @param deserializer reads a single element from the buffer
+     * @param serializer   writes a single element to the buffer
+     * @param equals       element equality check, may be null
+     * @param copy         element copy strategy, may be null
+     */
     public GenericListSyncHandler(@NotNull Supplier<List<T>> getter, @Nullable Consumer<List<T>> setter, @NotNull IByteBufDeserializer<T> deserializer, @NotNull IByteBufSerializer<T> serializer, @Nullable IEquals<T> equals, @Nullable ICopy<T> copy) {
         super(getter, setter, deserializer, serializer, equals, copy);
         setCache(getter.get());

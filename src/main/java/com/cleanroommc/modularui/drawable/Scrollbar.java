@@ -14,6 +14,12 @@ public class Scrollbar implements IDrawable, IJsonSerializable {
     public static final Scrollbar DEFAULT = new Scrollbar(false);
     public static final Scrollbar VANILLA = new Scrollbar(true);
 
+    /**
+     * Creates a scrollbar from json. Returns {@link #VANILLA} if {@code striped} or {@code vanilla} is true, otherwise {@link #DEFAULT}.
+     *
+     * @param json the json object to read from
+     * @return the matching scrollbar instance
+     */
     public static Scrollbar ofJson(JsonObject json) {
         if (JsonHelper.getBoolean(json, false, "striped", "vanilla")) {
             return VANILLA;

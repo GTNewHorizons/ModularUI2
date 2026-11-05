@@ -33,6 +33,13 @@ public abstract class BaseAnimator<A extends BaseAnimator<A>> implements IAnimat
         this.repeated = 0;
     }
 
+    /**
+     * Stops the animation or bounces back / repeats it if {@link #reverseOnFinish(boolean)} or {@link #repeatsOnFinish(int)}
+     * are configured and the animation is not forced to stop.
+     *
+     * @param force whether to stop immediately, ignoring reverse and repeat settings
+     * @return {@code true} if the animation is fully stopped, {@code false} if it continues running
+     */
     @Override
     public boolean stop(boolean force) {
         if (isAnimating() && !force) {
@@ -55,6 +62,12 @@ public abstract class BaseAnimator<A extends BaseAnimator<A>> implements IAnimat
         return true;
     }
 
+    /**
+     * Hook called when a cycle or the whole animation finishes. Does nothing by default.
+     *
+     * @param finishedOneCycle whether a single cycle has completed
+     * @param finishedAllRepeats whether all repeats have completed
+     */
     protected void onAnimationFinished(boolean finishedOneCycle, boolean finishedAllRepeats) {}
 
     @Override
@@ -62,6 +75,12 @@ public abstract class BaseAnimator<A extends BaseAnimator<A>> implements IAnimat
         this.paused = true;
     }
 
+    /**
+     * Resumes the animation in the given direction. Top-level animators without a parent are queued in the
+     * {@link AnimatorManager} so they get advanced automatically.
+     *
+     * @param reverse whether to animate in reverse
+     */
     @Override
     public void resume(boolean reverse) {
         this.paused = false;
@@ -117,10 +136,22 @@ public abstract class BaseAnimator<A extends BaseAnimator<A>> implements IAnimat
         return getThis();
     }
 
+    /**
+     * Creates a sequential animator that runs this animator and then the given one.
+     *
+     * @param animator the animator to run after this one
+     * @return a new sequential animator
+     */
     public SequentialAnimator followedBy(IAnimator animator) {
         return new SequentialAnimator(this, animator);
     }
 
+    /**
+     * Creates a parallel animator that runs this animator together with the given one.
+     *
+     * @param animator the animator to run alongside this one
+     * @return a new parallel animator
+     */
     public ParallelAnimator inParallelWith(IAnimator animator) {
         return new ParallelAnimator(this, animator);
     }

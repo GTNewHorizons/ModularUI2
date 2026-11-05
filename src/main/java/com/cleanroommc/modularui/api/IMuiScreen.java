@@ -141,12 +141,22 @@ public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListene
         return getScreen().getMainPanel().getArea().height;
     }
 
+    /**
+     * Forwards LWJGL3ify keyboard events to the wrapped {@link ModularScreen}.
+     *
+     * @param event the key event
+     */
     @ApiStatus.Internal
     @Override
     default void onKeyEvent(InputEvents.KeyEvent event) {
         getScreen().onKeyEvent(event);
     }
 
+    /**
+     * Forwards LWJGL3ify text input events to the wrapped {@link ModularScreen}.
+     *
+     * @param event the text event
+     */
     @ApiStatus.Internal
     @Override
     default void onTextEvent(InputEvents.TextEvent event) {

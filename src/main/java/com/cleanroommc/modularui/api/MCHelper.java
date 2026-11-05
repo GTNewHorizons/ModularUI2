@@ -55,6 +55,13 @@ public class MCHelper {
         return false;
     }
 
+    /**
+     * Closes the current screen, either returning to the given parent screen or closing to the game.
+     * If the player is not in a world, the parent screen is always displayed.
+     *
+     * @param openParentOnClose whether the parent screen should be opened when a player is in a world
+     * @param parent            the screen to return to
+     */
     @SideOnly(Side.CLIENT)
     public static void popScreen(boolean openParentOnClose, GuiScreen parent) {
         EntityPlayer player = MCHelper.getPlayer();

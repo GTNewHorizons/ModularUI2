@@ -100,6 +100,9 @@ public class GuiDraw {
         drawEllipse(x0, y0, w, h, color, color, segments);
     }
 
+    /**
+     * Draw a filled ellipse as a triangle fan, with a gradient from the center color to the outer color
+     */
     public static void drawEllipse(float x0, float y0, float w, float h, int centerColor, int outerColor, int segments) {
         Platform.setupDrawColor();
         Platform.setupDrawGradient();
@@ -132,6 +135,9 @@ public class GuiDraw {
         drawRoundedRect(x0, y0, w, h, colorLeft, colorRight, colorLeft, colorRight, cornerRadius, segments);
     }
 
+    /**
+     * Draw a filled rectangle with rounded corners as a triangle fan, with per-corner colors
+     */
     public static void drawRoundedRect(float x0, float y0, float w, float h, int colorTL, int colorTR, int colorBL, int colorBR, int cornerRadius, int segments) {
         Platform.setupDrawColor();
         Platform.setupDrawGradient();
@@ -278,6 +284,9 @@ public class GuiDraw {
         });
     }
 
+    /**
+     * Draw a texture repeated in tiles of the given size to fill the area. The last row and column are cropped to fit
+     */
     public static void drawTiledTexture(BufferBuilder bufferBuilder, float x, float y, float w, float h, float u0, float v0, float u1, float v1, int tileWidth, int tileHeight, float z) {
         int countX = (((int) w - 1) / tileWidth) + 1;
         int countY = (((int) h - 1) / tileHeight) + 1;

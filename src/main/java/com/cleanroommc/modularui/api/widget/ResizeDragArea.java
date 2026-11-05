@@ -1,5 +1,8 @@
 package com.cleanroommc.modularui.api.widget;
 
+/**
+ * The edge or corner of a widget that is being dragged to resize it.
+ */
 public enum ResizeDragArea {
 
     TOP_LEFT(true, true, false, false),
@@ -13,6 +16,13 @@ public enum ResizeDragArea {
 
     public final boolean top, left, bottom, right;
 
+    /**
+     * @param top    if the top edge is affected
+     * @param left   if the left edge is affected
+     * @param bottom if the bottom edge is affected
+     * @param right  if the right edge is affected
+     * @throws IllegalArgumentException if both top and bottom or both left and right are set
+     */
     ResizeDragArea(boolean top, boolean left, boolean bottom, boolean right) {
         if (top && bottom || left && right) throw new IllegalArgumentException();
         this.top = top;

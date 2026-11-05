@@ -18,12 +18,23 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
 
     private int progress = 0;
 
+    /**
+     * Resets the animation progress to the start or the end and resets the base animator state.
+     *
+     * @param atEnd whether the progress should be set to the end ({@code true}) or the start ({@code false})
+     */
     @Override
     public void reset(boolean atEnd) {
         super.reset(atEnd);
         this.progress = atEnd ? this.duration : 0;
     }
 
+    /**
+     * Creates a new animator with the same curve, duration, repeat and finish settings and callbacks.
+     *
+     * @param reversed whether the bounds of the copy should be swapped so it animates in reverse
+     * @return a new animator with the copied configuration
+     */
     public Animator copy(boolean reversed) {
         Animator animator = new Animator()
                 .curve(this.curve)
@@ -40,6 +51,13 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
         return animator;
     }
 
+    /**
+     * Advances the animation by the given time. The time is consumed in steps, stopping early when the update callback
+     * requests a stop or when the animation finishes.
+     *
+     * @param elapsedTime time in milliseconds to advance by
+     * @return the remaining time that was not consumed by this animation
+     */
     @Override
     public int advance(int elapsedTime) {
         if (!isAnimating()) return elapsedTime;
@@ -71,6 +89,12 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
         return this.onUpdate != null && this.onUpdate.test(getRawValue());
     }
 
+    /**
+     * Called when the animation finishes a cycle. Runs the finish callback if one is set.
+     *
+     * @param finishedOneCycle whether a single cycle has completed
+     * @param finishedAllRepeats whether all repeats have completed
+     */
     protected void onAnimationFinished(boolean finishedOneCycle, boolean finishedAllRepeats) {
         if (this.onFinish != null) {
             this.onFinish.run();
@@ -101,6 +125,11 @@ public class Animator extends BaseAnimator<Animator> implements IAnimator {
         return curve;
     }
 
+    /**
+     * Computes the current value by interpolating between min and max using the curve and the current progress.
+     *
+     * @return the interpolated value
+     */
     protected float getRawValue() {
         return this.curve.interpolate(this.min, this.max, (float) this.progress / this.duration);
     }

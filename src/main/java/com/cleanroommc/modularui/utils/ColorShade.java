@@ -12,8 +12,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * A named color with lighter and darker variants. Shades are registered by name so they can be looked up later.
+ */
 public class ColorShade implements IntIterable {
 
+    /**
+     * Starts building a new shade around the given main color.
+     *
+     * @param name unique name of the shade
+     * @param main the main color
+     * @return a new builder
+     */
     public static Builder builder(String name, int main) {
         return new Builder(name, main);
     }
@@ -34,6 +44,9 @@ public class ColorShade implements IntIterable {
     private final int[] darker;
     private final int[] all;
 
+    /**
+     * Creates the shade and registers it by name. The full sequence is ordered from brightest to darkest.
+     */
     private ColorShade(String name, int main, int[] brighter, int[] darker) {
         this.name = name;
         this.main = main;
@@ -51,10 +64,22 @@ public class ColorShade implements IntIterable {
         COLOR_SHADES.put(name, this);
     }
 
+    /**
+     * Returns the darker shade at the given index.
+     *
+     * @param index index of the darker shade
+     * @return the darker shade color
+     */
     public int darker(int index) {
         return this.darker[index];
     }
 
+    /**
+     * Returns the darker shade at the index, clamped to the valid range.
+     *
+     * @param index shade index, clamped to the available darker shades
+     * @return the darker shade color
+     */
     public int darkerSafe(int index) {
         return this.darker[MathUtils.clamp(index, 0, this.darker.length - 1)];
     }
@@ -63,10 +88,22 @@ public class ColorShade implements IntIterable {
         return this.darker.length;
     }
 
+    /**
+     * Returns the brighter shade at the given index.
+     *
+     * @param index index of the brighter shade
+     * @return the brighter shade color
+     */
     public int brighter(int index) {
         return this.brighter[index];
     }
 
+    /**
+     * Returns the brighter shade at the index, clamped to the valid range.
+     *
+     * @param index shade index, clamped to the available brighter shades
+     * @return the brighter shade color
+     */
     public int brighterSafe(int index) {
         return this.brighter[MathUtils.clamp(index, 0, this.brighter.length - 1)];
     }
@@ -81,6 +118,9 @@ public class ColorShade implements IntIterable {
         return IntIterators.wrap(this.all);
     }
 
+    /**
+     * Collects darker and brighter shades before creating a {@link ColorShade}.
+     */
     public static class Builder {
 
         private final String name;
