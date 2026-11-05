@@ -245,7 +245,7 @@ public abstract class AbstractWidget implements IWidget {
     /**
      * Returns the parent of this widget. If this is a {@link ModularPanel} this will always return null contrary to the annotation.
      *
-     * @return the screen of this widget
+     * @return the parent of this widget
      * @throws IllegalStateException if {@link #isValid()} returns false
      */
     @Override
@@ -259,7 +259,7 @@ public abstract class AbstractWidget implements IWidget {
     /**
      * Returns the gui context of the screen this widget is part of.
      *
-     * @return the screen of this widget
+     * @return the gui context of this widget
      * @throws IllegalStateException if {@link #isValid()} returns false
      */
     @Override
@@ -281,7 +281,7 @@ public abstract class AbstractWidget implements IWidget {
     /**
      * Returns the panel of this widget is being opened in.
      *
-     * @return the screen of this widget
+     * @return the panel of this widget
      * @throws IllegalStateException if {@link #isValid()} returns false
      */
     @Override

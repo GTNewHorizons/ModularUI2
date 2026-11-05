@@ -258,7 +258,9 @@ public interface IKey extends IDrawable, IJsonSerializable {
     }
 
     /**
-     * @return the formatting state of this key
+     * Returns the formatting state of this key.
+     *
+     * @return the formatting state of this key, or {@code null} if this key has no formatting state
      */
     //TODO: consider un-defaulting this, as this looks like to be just a normal abstract function of an interface
     default @Nullable FormattingState getFormatting() {
