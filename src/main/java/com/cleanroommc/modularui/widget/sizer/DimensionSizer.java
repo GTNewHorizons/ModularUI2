@@ -6,6 +6,7 @@ import com.cleanroommc.modularui.ModularUIConfig;
 import com.cleanroommc.modularui.api.GuiAxis;
 import com.cleanroommc.modularui.api.widget.IWidget;
 import com.cleanroommc.modularui.network.NetworkUtils;
+import com.cleanroommc.modularui.widget.scroll.ScrollArea;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -334,6 +335,10 @@ public class DimensionSizer {
         }
         if (end > 0 && ((this.end != null && !this.end.isRelative()) ||
                 (this.start != null && !this.start.isRelative() && (this.size == null || !this.size.isRelative())))) {
+            end = 0;
+        }
+        // content of a scrolling parent can go past its end, so don't push it back inside
+        if (relativeTo instanceof ScrollArea scrollArea && scrollArea.getScrollData(this.axis) != null) {
             end = 0;
         }
         if (start == 0 && end == 0) return;
