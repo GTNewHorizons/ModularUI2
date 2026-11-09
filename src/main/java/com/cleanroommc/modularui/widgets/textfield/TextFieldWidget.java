@@ -245,13 +245,13 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
     }
 
     public TextFieldWidget numbersDouble(DAM.UnaryDoubleOperator validator) {
-        return numbersDouble((input, num) -> validator.apply(num));
+        return numbersDouble((input, num) -> validator.apply(num.doubleValue()));
     }
 
     @FunctionalInterface
     public interface NumberValidator {
 
-        double apply(String input, double value);
+        Number apply(String input, Number value);
     }
 
     public TextFieldWidget numbersDouble(NumberValidator validator) {
@@ -310,10 +310,10 @@ public class TextFieldWidget extends BaseTextFieldWidget<TextFieldWidget> {
             long l;
             if (max != null) {
                 long maxValue = max.getAsLong();
-                l = MathUtils.percentOrSelf(val, d, maxValue);
+                l = MathUtils.percentOrSelf(val, d.doubleValue(), maxValue);
                 l = Math.min(validator.apply(l), maxValue);
             } else {
-                l = validator.apply(Math.round(d));
+                l = validator.apply(Math.round(d.doubleValue()));
             }
             if (min != null) {
                 l = Math.max(l, min.getAsLong());
