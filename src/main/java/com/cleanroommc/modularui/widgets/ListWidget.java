@@ -65,6 +65,12 @@ public class ListWidget<I extends IWidget, W extends ListWidget<I, W>> extends A
     }
 
     @Override
+    public void postResize() {
+        super.postResize();
+        getScrollData().clamp(getScrollArea());
+    }
+
+    @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         if (this.childSeparator == null || this.separatorPositions.isEmpty()) return;
         GuiAxis axis = this.scrollData.getAxis();
