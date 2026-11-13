@@ -19,6 +19,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.ForgeHooks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -114,6 +115,7 @@ public class ModularContainer extends Container {
     @MustBeInvokedByOverriders
     @Override
     public void detectAndSendChanges() {
+        if (!isClient() && !ForgeHooks.canInteractWith(this.player, this)) return;
         super.detectAndSendChanges();
         if (this.syncManager != null) {
             this.syncManager.detectAndSendChanges(this.init);
