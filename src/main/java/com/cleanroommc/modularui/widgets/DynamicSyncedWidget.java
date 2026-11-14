@@ -19,7 +19,6 @@ import java.util.function.Supplier;
  * Such a sync handler must be supplied or else this widget has no effect.
  * The dynamic child can be a widget tree of any size which can also contain {@link SyncHandler}s. These sync handlers MUST be registered
  * via a variant of {@link com.cleanroommc.modularui.value.sync.PanelSyncManager#getOrCreateSyncHandler(String, Class, Supplier) PanelSyncManager#getOrCreateSyncHandler(String, Class, Supplier)}.
- * L
  *
  * @param <W> type of this widget
  */

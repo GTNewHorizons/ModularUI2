@@ -234,7 +234,7 @@ class InternalWidgetTree {
             checkFullyCalculated(anotherResize, state, isLayout);
         }
 
-        // now fully resize all children which needs it
+        // now fully resize all children that need it
         if (!anotherResize.isEmpty()) {
             for (int i = 0; i < anotherResize.size(); i++) {
                 if (resize(anotherResize.get(i), false, onOpen, isLayout)) {

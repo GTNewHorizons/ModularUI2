@@ -17,11 +17,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 public interface IGuiHolder<T extends GuiData> {
 
     /**
-     * Only called on client side.
+     * Only called on the client side.
      *
      * @param data      information about the creation context
      * @param mainPanel the panel created in {@link #buildUI(GuiData, PanelSyncManager, UISettings)}
-     * @return a modular screen instance with the given panel
+     * @return the new modular screen instance with the given panel
      */
     @SideOnly(Side.CLIENT)
     default ModularScreen createScreen(T data, ModularPanel mainPanel) {

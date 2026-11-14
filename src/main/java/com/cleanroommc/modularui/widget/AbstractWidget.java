@@ -93,6 +93,11 @@ public abstract class AbstractWidget implements IWidget {
         onResized();
     }
 
+    /**
+     * Internal hook called during {@link #initialise(IWidget, boolean)} before {@link #onInit()}.
+     *
+     * @param late true if this is called some time after the widget tree of the parent has been initialised
+     */
     void onInitInternal(boolean late) {}
 
     /**
@@ -145,41 +150,72 @@ public abstract class AbstractWidget implements IWidget {
         return valid;
     }
 
+    /**
+     * Increments the hover and below-mouse timers while this widget is hovered or below the mouse.
+     */
     @Override
     public void onUpdate() {
         if (isHovering()) this.timeHovered++;
         if (isBelowMouse()) this.timeBelowMouse++;
     }
 
+    /**
+     * Resets the hover timer to zero when the mouse starts hovering this widget.
+     * Overriding this is fine, but super must be called.
+     */
     @MustBeInvokedByOverriders
     @Override
     public void onMouseStartHover() {
         this.timeHovered = 0;
     }
 
+    /**
+     * Resets the hover timer when the mouse stops hovering this widget.
+     * Overriding this is fine, but super must be called.
+     */
     @MustBeInvokedByOverriders
     @Override
     public void onMouseEndHover() {
         this.timeHovered = -1;
     }
 
+    /**
+     * Resets the below-mouse timer to zero when the mouse enters the area of this widget.
+     * Overriding this is fine, but super must be called.
+     */
     @MustBeInvokedByOverriders
     @Override
     public void onMouseEnterArea() {
         this.timeBelowMouse = 0;
     }
 
+    /**
+     * Resets the below-mouse timer when the mouse leaves the area of this widget.
+     * Overriding this is fine, but super must be called.
+     */
     @MustBeInvokedByOverriders
     @Override
     public void onMouseLeaveArea() {
         this.timeBelowMouse = -1;
     }
 
+    /**
+     * Returns whether this widget has been hovered for at least the given number of ticks.
+     *
+     * @param ticks number of ticks to check against
+     * @return true if the hover time is at least {@code ticks}
+     */
     @Override
     public boolean isHoveringFor(int ticks) {
         return timeHovered >= ticks;
     }
 
+    /**
+     * Returns whether the mouse has been below this widget for at least the given number of ticks.
+     *
+     * @param ticks number of ticks to check against
+     * @return true if the below-mouse time is at least {@code ticks}
+     */
     @Override
     public boolean isBelowMouseFor(int ticks) {
         return timeBelowMouse >= ticks;
@@ -205,7 +241,7 @@ public abstract class AbstractWidget implements IWidget {
     }
 
     /**
-     * Shortcut to get the area of the parent
+     * Shortcut to get the area of the parent. Delegating widgets are skipped, so the area of the first non-delegating ancestor is returned.
      *
      * @return parent area
      */
@@ -245,7 +281,7 @@ public abstract class AbstractWidget implements IWidget {
     /**
      * Returns the parent of this widget. If this is a {@link ModularPanel} this will always return null contrary to the annotation.
      *
-     * @return the screen of this widget
+     * @return the parent of this widget
      * @throws IllegalStateException if {@link #isValid()} returns false
      */
     @Override
@@ -259,7 +295,7 @@ public abstract class AbstractWidget implements IWidget {
     /**
      * Returns the gui context of the screen this widget is part of.
      *
-     * @return the screen of this widget
+     * @return the gui context of this widget
      * @throws IllegalStateException if {@link #isValid()} returns false
      */
     @Override
@@ -281,7 +317,7 @@ public abstract class AbstractWidget implements IWidget {
     /**
      * Returns the panel of this widget is being opened in.
      *
-     * @return the screen of this widget
+     * @return the panel of this widget
      * @throws IllegalStateException if {@link #isValid()} returns false
      */
     @Override
@@ -301,6 +337,13 @@ public abstract class AbstractWidget implements IWidget {
         return this.resizer;
     }
 
+    /**
+     * Replaces the resizer of this widget. If this widget is currently valid and already has a resizer, the new resizer is
+     * notified that it replaces the old one.
+     *
+     * @param resizer the new resizer, must not be null
+     * @throws NullPointerException if resizer is null
+     */
     protected void resizer(StandardResizer resizer) {
         Objects.requireNonNull(resizer);
         if (this.resizer == resizer) return;

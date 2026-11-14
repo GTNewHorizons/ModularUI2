@@ -13,17 +13,17 @@ import org.jetbrains.annotations.Nullable;
 public interface IIcon extends IDrawable {
 
     /**
-     * @return the drawable this icon wraps or null if it doesn't wrap anything
+     * @return the drawable this icon wraps or {@code null} if it doesn't wrap anything
      */
     @Nullable IDrawable getWrappedDrawable();
 
     /**
-     * @return width of this icon or 0 if the width should be dynamic
+     * @return width of this icon or {@code 0} if the width should be dynamic
      */
     int getWidth();
 
     /**
-     * @return height of this icon or 0 of the height should be dynamic
+     * @return height of this icon or {@code 0} of the height should be dynamic
      */
     int getHeight();
 
@@ -42,7 +42,7 @@ public interface IIcon extends IDrawable {
     }
 
     /**
-     * @return the margin of this icon. Only used if width or height is 0
+     * @return the margin of this icon. Only used if width or height is {@code 0}
      */
     Box getMargin();
 
@@ -56,17 +56,17 @@ public interface IIcon extends IDrawable {
     }
 
     /**
-     * This returns a hoverable wrapper of this icon. This is only used in {@link com.cleanroommc.modularui.drawable.text.RichText RichText}.
      * This allows this icon to have its own tooltip.
+     * @return a hoverable wrapper of this icon. This is only used in {@link com.cleanroommc.modularui.drawable.text.RichText RichText}
      */
     default HoverableIcon asHoverable() {
         return new HoverableIcon(this);
     }
 
     /**
-     * This returns an interactable wrapper of this icon. This is only used in
-     * {@link com.cleanroommc.modularui.drawable.text.RichText RichText}. This allows this icon to be able to listen to clicks and other
-     * inputs.
+     * This allows this icon to be able to listen to clicks and other inputs.
+     * @return an interactable wrapper of this icon. This is only used in
+     *         {@link com.cleanroommc.modularui.drawable.text.RichText RichText}.
      */
     default InteractableIcon asInteractable() {
         return new InteractableIcon(this);

@@ -55,7 +55,7 @@ public interface ITooltip<W extends ITooltip<W>> {
     }
 
     /**
-     * Helper method to call tooltip setters within a widget tree initialisation.
+     * Helper method to call tooltip setters within a widget tree initialization.
      * Only called once.
      *
      * @param tooltipConsumer tooltip function
@@ -66,7 +66,7 @@ public interface ITooltip<W extends ITooltip<W>> {
     }
 
     /**
-     * Helper method to call tooltip setters within a widget tree initialisation.
+     * Helper method to call tooltip setters within a widget tree initialization.
      * Only called once.
      *
      * @param tooltipConsumer tooltip function
@@ -241,7 +241,7 @@ public interface ITooltip<W extends ITooltip<W>> {
     }
 
     /**
-     * Helper method to add a simple string as a line. Adds multiple lines if string contains <code>\n</code>.
+     * Helper method to add a simple string as a line. Adds multiple lines if a string contains <code>\n</code>.
      *
      * @param line text line
      * @return this

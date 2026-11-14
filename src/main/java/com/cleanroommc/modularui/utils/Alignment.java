@@ -13,6 +13,10 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * A relative position within a rectangle, where {@code x} and {@code y} are fractions from 0 (start) to 1 (end).
+ * Named constants are registered in a lookup map so they can be resolved from JSON.
+ */
 public class Alignment {
 
     private static final Map<String, Alignment> ALIGNMENT_MAP = new Object2ObjectOpenHashMap<>();
@@ -112,8 +116,14 @@ public class Alignment {
         END
     }
 
+    /**
+     * Gson adapter for {@link Alignment}. Accepts either a named constant or an object with {@code x} and {@code y}.
+     */
     public static class Json implements JsonDeserializer<Alignment>, JsonSerializer<Alignment> {
 
+        /**
+         * Resolves a named alignment or reads explicit {@code x}/{@code y} values.
+         */
         @Override
         public Alignment deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (!json.isJsonObject()) {
@@ -128,6 +138,9 @@ public class Alignment {
             return new Alignment(x, y);
         }
 
+        /**
+         * Writes the registered name if the alignment is a known constant, otherwise writes {@code x} and {@code y}.
+         */
         @Override
         public JsonElement serialize(Alignment src, Type typeOfSrc, JsonSerializationContext context) {
             for (Map.Entry<String, Alignment> entry : ALIGNMENT_MAP.entrySet()) {
