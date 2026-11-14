@@ -34,10 +34,7 @@ import java.util.Objects;
 public class Area extends Rectangle implements IAnimatable<Area> {
 
     public static boolean isInside(int x, int y, int w, int h, int px, int py) {
-        // why does this even need a static object for a simple check?
-        // if at all, instances may use a shared & stateless static method
-        SHARED.set(x, y, w, h);
-        return SHARED.isInside(px, py);
+        return x <= px && px < x + w && y <= py && py < y + h;
     }
 
     @Deprecated
