@@ -195,6 +195,7 @@ public class ClientProxy extends CommonProxy {
 
     @SubscribeEvent
     public void onUnloadWorld(WorldEvent.Unload event) {
+        if (!event.world.isRemote) return;
         if (Minecraft.getMinecraft().thePlayer != null) {
             ModularNetwork.CLIENT.onPlayerLeave(Minecraft.getMinecraft().thePlayer);
 
