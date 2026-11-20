@@ -32,17 +32,22 @@ public class LocatedWidget extends LocatedElement<IWidget> {
         }
         // iterate through each parent starting at the root and apply each transformation
         STACK.reset();
-        for (IWidget widget1 : ancestors) {
-            if (widget1 instanceof IViewport viewport) {
-                STACK.pushViewport(viewport, widget1.getArea());
-                widget1.transform(STACK);
-                viewport.transformChildren(STACK);
-            } else {
-                STACK.pushMatrix();
-                widget1.transform(STACK);
+        try {
+            for (IWidget widget1 : ancestors) {
+                if (widget1 instanceof IViewport viewport) {
+                    STACK.pushViewport(viewport, widget1.getArea());
+                    widget1.transform(STACK);
+                    viewport.transformChildren(STACK);
+                } else {
+                    STACK.pushMatrix();
+                    widget1.transform(STACK);
+                }
             }
+            return new LocatedWidget(widget, STACK.peek(), null);
+        } finally {
+            // clear the STACK to avoid memory leaks
+            STACK.reset();
         }
-        return new LocatedWidget(widget, STACK.peek(), null);
     }
 
     public static final LocatedWidget EMPTY = new LocatedWidget(null, TransformationMatrix.EMPTY, null);
