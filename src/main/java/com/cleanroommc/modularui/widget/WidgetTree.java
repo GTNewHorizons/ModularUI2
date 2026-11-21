@@ -220,7 +220,19 @@ public class WidgetTree extends TreeUtil {
     }
 
     public static void drawTree(IWidget parent, ModularGuiContext context, boolean ignoreEnabled, boolean drawBackground) {
+        if (!parent.isEnabled() && !ignoreEnabled) return;
+        resizeDirty(parent.resizer());
         InternalWidgetTree.drawTree(parent, context, ignoreEnabled, drawBackground);
+    }
+
+    @ApiStatus.Internal
+    public static void resizeDirty(ResizeNode parent) {
+        if (parent.requiresResize()) {
+            resizeInternal(parent, false);
+        }
+        for (ResizeNode child : parent.getChildren()) {
+            resizeDirty(child);
+        }
     }
 
     public static void drawTreeForeground(IWidget parent, ModularGuiContext context) {
