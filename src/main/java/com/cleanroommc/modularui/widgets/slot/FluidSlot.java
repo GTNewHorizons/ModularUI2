@@ -17,6 +17,7 @@ import com.cleanroommc.modularui.theme.WidgetThemeEntry;
 import com.cleanroommc.modularui.utils.IMultiFluidTankHandler;
 import com.cleanroommc.modularui.utils.MouseData;
 import com.cleanroommc.modularui.utils.Platform;
+import com.cleanroommc.modularui.utils.fluid.FluidUtils;
 import com.cleanroommc.modularui.value.sync.FluidSlotSyncHandler;
 import com.cleanroommc.modularui.widgets.AbstractFluidDisplayWidget;
 
@@ -32,9 +33,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
 
 import java.text.DecimalFormat;
-
-import static com.cleanroommc.modularui.utils.fluid.FluidUtils.fluidAmount;
-import static com.cleanroommc.modularui.utils.fluid.FluidUtils.fluidCapacity;
 
 public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements Interactable, RecipeViewerGhostIngredientSlot<FluidStack> {
 
@@ -63,7 +61,7 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
         if (this.syncHandler.isPhantom()) {
             if (fluid != null) {
                 if (this.syncHandler.controlsAmount()) {
-                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(fluidAmount(fluid)), getUnit()));
+                    tooltip.addLine(IKey.lang("modularui2.fluid.phantom.amount", formatFluidTooltipAmount(FluidUtils.fluidAmount(fluid)), getUnit()));
                 }
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
@@ -76,11 +74,11 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
             }
         } else {
             if (fluid != null) {
-                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(fluidAmount(fluid)), formatFluidTooltipAmount(fluidCapacity(fluidTank)), getUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.amount", formatFluidTooltipAmount(FluidUtils.fluidAmount(fluid)), formatFluidTooltipAmount(FluidUtils.fluidCapacity(fluidTank)), getUnit()));
                 addAdditionalFluidInfo(tooltip, fluid);
             } else {
                 tooltip.addLine(IKey.lang("modularui2.fluid.empty"));
-                tooltip.addLine(IKey.lang("modularui2.fluid.capacity", formatFluidTooltipAmount(fluidCapacity(fluidTank)), getUnit()));
+                tooltip.addLine(IKey.lang("modularui2.fluid.capacity", formatFluidTooltipAmount(FluidUtils.fluidCapacity(fluidTank)), getUnit()));
             }
             if (this.syncHandler.canFillSlot() || this.syncHandler.canDrainSlot()) {
                 tooltip.addLine(IKey.EMPTY); // Add an empty line to separate from the bottom material tooltips
@@ -199,7 +197,7 @@ public class FluidSlot extends AbstractFluidDisplayWidget<FluidSlot> implements 
 
     @Override
     protected long getCapacityLong() {
-        return this.alwaysShowFull ? 0 : fluidCapacity(getFluidTank());
+        return this.alwaysShowFull ? 0 : FluidUtils.fluidCapacity(getFluidTank());
     }
 
     @Nullable

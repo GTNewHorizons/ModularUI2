@@ -20,10 +20,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
-import static com.cleanroommc.modularui.utils.fluid.FluidUtils.copyFluid;
-import static com.cleanroommc.modularui.utils.fluid.FluidUtils.fluidAmount;
-import static com.cleanroommc.modularui.utils.fluid.FluidUtils.fluidCapacity;
-
 public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlotSyncHandler> {
 
     public static boolean isFluidEmpty(@Nullable FluidStack fluidStack) {
@@ -59,7 +55,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
 
     @Override
     public void setValue(@Nullable FluidStack value, boolean setSource, boolean sync) {
-        this.cache = copyFluid(value);
+        this.cache = FluidUtils.copyFluid(value);
         if (setSource) {
             this.fluidTank.drain(Integer.MAX_VALUE, true);
             if (!isFluidEmpty(value)) {
@@ -74,7 +70,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
         FluidStack current = this.fluidTank.getFluid();
         if (current == this.cache) return false;
         if (current == null || this.cache == null) return true;
-        return fluidAmount(current) != fluidAmount(this.cache) || !current.isFluidEqual(this.cache);
+        return FluidUtils.fluidAmount(current) != FluidUtils.fluidAmount(this.cache) || !current.isFluidEqual(this.cache);
     }
 
     @Override
@@ -168,7 +164,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
             return;
         }
 
-        if (heldFluid != null && fluidAmount(fluidTank) < fluidCapacity(fluidTank)) {
+        if (heldFluid != null && FluidUtils.fluidAmount(fluidTank) < FluidUtils.fluidCapacity(fluidTank)) {
             if (canFillSlot) {
                 fillFluid(heldFluid, processFullStack);
                 return;
@@ -387,7 +383,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
             }
 
             // 2. Try to drain one container in a stack
-            int freeSpace = (int) Math.min(fluidCapacity(fluidTank) - fluidAmount(fluidTank), Integer.MAX_VALUE);
+            int freeSpace = (int) Math.min(FluidUtils.fluidCapacity(fluidTank) - FluidUtils.fluidAmount(fluidTank), Integer.MAX_VALUE);
             int amountToDrain = Math.min(heldFluid.amount, freeSpace);
             if (amountToDrain <= 0) {
                 return;
@@ -421,7 +417,7 @@ public class FluidSlotSyncHandler extends ValueSyncHandler<FluidStack, FluidSlot
             return 0;
         }
 
-        int freeSpace = (int) Math.min(fluidCapacity(fluidTank) - fluidAmount(fluidTank), Integer.MAX_VALUE);
+        int freeSpace = (int) Math.min(FluidUtils.fluidCapacity(fluidTank) - FluidUtils.fluidAmount(fluidTank), Integer.MAX_VALUE);
         int containersToEmpty = Math.min(freeSpace / heldFluid.amount, heldItem.stackSize);
 
         if (!processFullStack && containersToEmpty > 1) {
