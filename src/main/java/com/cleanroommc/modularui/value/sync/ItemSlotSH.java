@@ -26,12 +26,23 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
     private ItemStack lastStoredItem;
     private boolean registered = false;
 
+    /**
+     * Creates a sync handler for the given slot. Client packets are allowed.
+     *
+     * @param slot the slot to sync
+     */
     public ItemSlotSH(ModularSlot slot) {
         this.slot = slot;
         this.playerSlotType = PlayerSlotType.getPlayerSlotType(slot);
         allowC2S();
     }
 
+    /**
+     * Initializes the slot on first init, registers it in the container and stores the current stack.
+     *
+     * @param key         the key this sync handler is registered under
+     * @param syncHandler the panel sync manager
+     */
     @Override
     public void init(String key, PanelSyncManager syncHandler) {
         super.init(key, syncHandler);
@@ -44,21 +55,38 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
         this.lastStoredItem = currentStack != null ? currentStack.copy() : null;
     }
 
+    /**
+     * Disposes the slot in addition to the base cleanup.
+     */
     @Override
     public void dispose() {
         super.dispose();
         this.slot.dispose();
     }
 
+    /**
+     * Checks the slot for changes and syncs them to the client.
+     *
+     * @param init true if this is the initial sync
+     */
     @Override
     public void detectAndSendChanges(boolean init) {
         checkUpdate(init);
     }
 
+    /**
+     * Checks the slot for changes on the server and syncs them if any were found.
+     */
     public void checkUpdate() {
         checkUpdate(false);
     }
 
+    /**
+     * Compares the current stack with the last stored one and syncs the slot if it changed.
+     * If only the stack size changed, only the size is updated in the cache.
+     *
+     * @param init true if this is the initial sync
+     */
     private void checkUpdate(boolean init) {
         if (!isValid() || getSyncManager().isClient()) return;
         ItemStack itemStack = getSlot().getStack();
@@ -84,6 +112,12 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
         }
     }
 
+    /**
+     * Applies a sync packet on the client. Handles item updates and enabled state changes.
+     *
+     * @param id  the packet id ({@link #SYNC_ITEM} or {@link #SYNC_ENABLED})
+     * @param buf the packet data
+     */
     @Override
     public void readOnClient(int id, PacketBuffer buf) {
         if (id == SYNC_ITEM) {
@@ -99,6 +133,13 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
         }
     }
 
+    /**
+     * Applies a sync packet on the server. Only enabled state changes are accepted.
+     *
+     * @param id  the packet id ({@link #SYNC_ENABLED})
+     * @param buf the packet data
+     * @throws IOException if reading the packet fails
+     */
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
         if (id == SYNC_ENABLED) {
@@ -106,10 +147,24 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
         }
     }
 
+    /**
+     * Forwards a slot change to the slot.
+     *
+     * @param stack             the new stack
+     * @param onlyAmountChanged true if only the stack size changed
+     * @param client            true if this runs on the client
+     * @param init              true if this is the initial sync
+     */
     protected void onSlotUpdate(ItemStack stack, boolean onlyAmountChanged, boolean client, boolean init) {
         getSlot().onSlotChangedReal(stack, onlyAmountChanged, client, init);
     }
 
+    /**
+     * Enables or disables the slot and optionally syncs the new state.
+     *
+     * @param enabled true to enable the slot
+     * @param sync    true to send the state to the other side
+     */
     public void setEnabled(boolean enabled, boolean sync) {
         this.slot.setEnabled(enabled);
         if (sync) {
@@ -117,6 +172,9 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
         }
     }
 
+    /**
+     * Forces the current slot stack to be sent to the client, even if it did not change.
+     */
     public void forceSyncItem() {
         boolean onlyAmountChanged = false;
         ItemStack stack = slot.getStack();
@@ -136,10 +194,21 @@ public class ItemSlotSH extends SyncHandler<ItemSlotSH> {
         return this.slot;
     }
 
+    /**
+     * Checks whether the slot accepts the given stack.
+     *
+     * @param itemStack the stack to check
+     * @return true if the slot accepts the stack
+     */
     public boolean isItemValid(ItemStack itemStack) {
         return getSlot().isItemValid(itemStack);
     }
 
+    /**
+     * Phantom slots do not hold real items. Subclasses override this.
+     *
+     * @return false by default
+     */
     public boolean isPhantom() {
         return false;
     }

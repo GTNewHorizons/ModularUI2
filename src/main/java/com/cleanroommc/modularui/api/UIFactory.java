@@ -33,7 +33,7 @@ public interface UIFactory<D extends GuiData> {
     String getFactoryName();
 
     /**
-     * Creates the main panel for the GUI. Is called on client and server side.
+     * Creates the main panel for the GUI. It's called on client and server side.
      *
      * @param guiData     gui data
      * @param syncManager sync manager
@@ -44,7 +44,7 @@ public interface UIFactory<D extends GuiData> {
     ModularPanel createPanel(D guiData, PanelSyncManager syncManager, UISettings settings);
 
     /**
-     * Creates the screen for the GUI. Is only called on client side.
+     * Creates the screen for the GUI. It's only called on client side.
      *
      * @param guiData   gui data
      * @param mainPanel main panel created in {@link #createPanel(GuiData, PanelSyncManager, UISettings)}
@@ -55,9 +55,9 @@ public interface UIFactory<D extends GuiData> {
     ModularScreen createScreen(D guiData, ModularPanel mainPanel);
 
     /**
-     * Creates the screen wrapper for the GUI. Is only called on client side.
+     * Creates the screen wrapper for the GUI. It's only called on client side.
      *
-     * @param container container for the gui
+     * @param container container for the GUI
      * @param screen    the screen which was created in {@link #createScreen(GuiData, ModularPanel)}
      * @return new screen wrapper
      * @throws IllegalStateException if the wrapping screen is not a {@link net.minecraft.client.gui.inventory.GuiContainer GuiContainer} or if the
@@ -80,20 +80,20 @@ public interface UIFactory<D extends GuiData> {
     }
 
     /**
-     * A default function to check if the current interacting player can interact with the ui. If not overridden on {@link UISettings},
+     * A default function to check if the current interacting player can interact with the UI. If not overridden on {@link UISettings},
      * then this is called every tick while a UI opened by this factory is open. Once this function returns false, the UI is immediately
      * closed.
      *
      * @param player  current interacting player
      * @param guiData gui data of the current ui
-     * @return if the player can interact with the player.
+     * @return if the player can interact with the UI.
      */
     default boolean canInteractWith(EntityPlayer player, D guiData) {
         return player == guiData.getPlayer();
     }
 
     /**
-     * Writes the gui data to a buffer.
+     * Writes the gui data to the provided buffer.
      *
      * @param guiData gui data
      * @param buffer  buffer
@@ -102,9 +102,9 @@ public interface UIFactory<D extends GuiData> {
     void writeGuiData(D guiData, PacketBuffer buffer);
 
     /**
-     * Reads and creates the gui data from the buffer.
+     * Reads and creates the gui data from the provided buffer.
      *
-     * @param player player
+     * @param player current interacting player
      * @param buffer buffer
      * @return new gui data
      */

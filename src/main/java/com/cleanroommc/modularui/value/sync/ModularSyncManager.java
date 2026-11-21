@@ -51,6 +51,13 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         this.mainPSM = mainPSM;
     }
 
+    /**
+     * Binds this sync manager to its container, binds the player inventory to the main panel if not yet bound,
+     * registers the cursor slot sync handler, and opens the main panel.
+     *
+     * @param container     the container this sync manager belongs to
+     * @param mainPanelName name of the main panel to open
+     */
     @ApiStatus.Internal
     public void construct(ModularContainer container, String mainPanelName) {
         this.container = container;
@@ -74,6 +81,11 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         this.panelSyncManagerMap.values().forEach(psm -> psm.detectAndSendChanges(init));
     }
 
+    /**
+     * Disposes all panel sync managers and the container. Does nothing if already disposed.
+     *
+     * @throws IllegalStateException if this sync manager has not been closed yet
+     */
     @ApiStatus.Internal
     public void dispose() {
         if (isDisposed()) return;
@@ -84,6 +96,11 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         setState(State.DISPOSED);
     }
 
+    /**
+     * Opens all panel sync managers and notifies the container. Does nothing if already open.
+     *
+     * @throws IllegalStateException if this sync manager has been disposed or is not yet constructed
+     */
     @ApiStatus.Internal
     public void onOpen() {
         if (isOpen()) return;
@@ -96,6 +113,11 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         this.container.onModularContainerOpened();
     }
 
+    /**
+     * Notifies the container of closing and sets the state to closed.
+     *
+     * @throws IllegalStateException if this sync manager is not open
+     */
     @ApiStatus.Internal
     public void onClose() {
         if (!isOpen()) throw new IllegalStateException();
@@ -130,6 +152,12 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         this.cursorSlotSyncHandler.sync();
     }
 
+    /**
+     * Registers a panel sync manager under the given name, records it in the panel history and initializes it.
+     *
+     * @param name        the panel name
+     * @param syncManager the panel sync manager to register
+     */
     @ApiStatus.Internal
     public void open(String name, PanelSyncManager syncManager) {
         this.panelSyncManagerMap.put(name, syncManager);
@@ -137,6 +165,11 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         syncManager.initialize(name);
     }
 
+    /**
+     * Removes the panel sync manager with the given name and closes it, if present.
+     *
+     * @param name the panel name
+     */
     @ApiStatus.Internal
     public void close(String name) {
         PanelSyncManager psm = this.panelSyncManagerMap.remove(name);
@@ -147,6 +180,18 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         return this.panelSyncManagerMap.containsKey(panelName);
     }
 
+    /**
+     * Forwards an incoming widget update packet to the matching panel. If the panel is not open but was opened
+     * earlier during this UI session, the packet is discarded silently, since it arrived after the panel closed.
+     * If the panel was never opened, an exception is logged.
+     *
+     * @param panelName the target panel name
+     * @param mapKey    the sync key of the target sync handler
+     * @param action    whether this is a synced action (true) or a value update (false)
+     * @param id        the id of the target widget or sync handler
+     * @param buf       the packet payload
+     * @throws IOException if reading the payload fails
+     */
     @ApiStatus.Internal
     public void receiveWidgetUpdate(String panelName, String mapKey, boolean action, int id, PacketBuffer buf) throws IOException {
         PanelSyncManager psm = this.panelSyncManagerMap.get(panelName);
@@ -167,6 +212,12 @@ public class ModularSyncManager implements ISyncRegistrar<ModularSyncManager> {
         return container;
     }
 
+    /**
+     * Checks whether the slot belongs to the player's main inventory (hotbar and storage, indices 0-35).
+     *
+     * @param slot the slot to check, may be null
+     * @return true if the slot is a player inventory slot in that index range, false otherwise
+     */
     private static boolean isPlayerSlot(Slot slot) {
         if (slot == null) return false;
         if (slot.inventory instanceof InventoryPlayer) {

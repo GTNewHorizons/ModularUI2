@@ -29,7 +29,7 @@ import java.util.function.IntConsumer;
  * See {@link com.cleanroommc.modularui.screen.GuiScreenWrapper GuiScreenWrapper} and {@link com.cleanroommc.modularui.screen.GuiContainerWrapper GuiContainerWrapper}
  * for default implementations.
  * <p>
- * {@link InputEvents.KeyboardListener} is implemented for Lwjgl3ify compat.
+ * {@link InputEvents.KeyboardListener} is implemented for LWJGL3ify compat.
  */
 @Optional.InterfaceList({
         @Optional.Interface(modid = ModularUI.ModIds.NEA, iface = "com.cleanroommc.neverenoughanimations.api.IAnimatedScreen"),
@@ -39,9 +39,9 @@ import java.util.function.IntConsumer;
 public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListener {
 
     /**
-     * Returns the {@link ModularScreen} that is being wrapped. This should return a final instance field.
+     * This should return an immutable instance field.
      *
-     * @return the wrapped modular screen
+     * @return the wrapped {@link ModularScreen}
      */
     @NotNull
     ModularScreen getScreen();
@@ -72,7 +72,7 @@ public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListene
         }
         ClientScreenHandler.drawDarkBackground(getGuiScreen(), tint);
         // after this recipe viewer will draw itself
-        // for some reason recipe viewer is too stupid to set up opengl properly
+        // for some reason recipe viewer is too stupid to set up OpenGL properly
         // without this (enableTexture2D() specifically) every item in recipe viewer will be texture less (white)
         Platform.setupDrawTex();
     }
@@ -98,8 +98,9 @@ public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListene
     }
 
     /**
-     * Hovering widget is handled by {@link ModularGuiContext}.
-     * If it detects a slot, this method is called. Only affects {@link GuiContainer GuiContainers}.
+     * This method is called when a hovering widget detects that it's over a slot.
+     * Hovering widgets are handled by {@link ModularGuiContext}.
+     * Only affects {@link GuiContainer GuiContainers}.
      *
      * @param slot hovered slot
      */
@@ -111,8 +112,8 @@ public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListene
     }
 
     /**
-     * Returns the {@link GuiScreen} that wraps the {@link ModularScreen}.
-     * In most cases this does not need to be overridden as this interfaces should be implemented on {@link GuiScreen GuiScreens}.
+     * Returns the {@link GuiScreen} wrapping the {@link ModularScreen}.
+     * In most cases this does not need to be overridden as this interface should be implemented on {@link GuiScreen GuiScreens}.
      *
      * @return the wrapping gui screen
      */
@@ -140,12 +141,22 @@ public interface IMuiScreen extends IAnimatedScreen, InputEvents.KeyboardListene
         return getScreen().getMainPanel().getArea().height;
     }
 
+    /**
+     * Forwards LWJGL3ify keyboard events to the wrapped {@link ModularScreen}.
+     *
+     * @param event the key event
+     */
     @ApiStatus.Internal
     @Override
     default void onKeyEvent(InputEvents.KeyEvent event) {
         getScreen().onKeyEvent(event);
     }
 
+    /**
+     * Forwards LWJGL3ify text input events to the wrapped {@link ModularScreen}.
+     *
+     * @param event the text event
+     */
     @ApiStatus.Internal
     @Override
     default void onTextEvent(InputEvents.TextEvent event) {

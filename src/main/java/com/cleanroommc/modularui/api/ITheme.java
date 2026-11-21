@@ -12,7 +12,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.Collection;
 
 /**
- * A theme is parsed from json and contains style information like color or background texture.
+ * A theme is parsed from JSON and contains style information like color or background texture.
  */
 public interface ITheme {
 
