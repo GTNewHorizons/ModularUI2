@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import com.gtnewhorizon.gtnhlib.blockpos.BlockPos;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -15,12 +16,14 @@ import java.util.Objects;
 public class PosGuiData extends GuiData {
 
     private final int x, y, z;
+    private final @Nullable TileEntity initialTileEntity;
 
     public PosGuiData(@NotNull EntityPlayer player, int x, int y, int z) {
         super(player);
         this.x = x;
         this.y = y;
         this.z = z;
+        this.initialTileEntity = player.getEntityWorld().getTileEntity(this.x, this.y, this.z);
     }
 
     public PosGuiData(@NotNull EntityPlayer player, @NotNull BlockPos pos) {
@@ -29,6 +32,7 @@ public class PosGuiData extends GuiData {
         this.x = pos.getX();
         this.y = pos.getY();
         this.z = pos.getZ();
+        this.initialTileEntity = player.getEntityWorld().getTileEntity(this.x, this.y, this.z);
     }
 
     public int getX() {
@@ -65,5 +69,10 @@ public class PosGuiData extends GuiData {
     public TileEntity getTileEntity() {
         // no blockpos needed
         return getWorld().getTileEntity(this.x, this.y, this.z);
+    }
+
+    @Override
+    public boolean hasGuiHolder() {
+        return this.initialTileEntity == null || !this.initialTileEntity.isInvalid();
     }
 }

@@ -42,4 +42,8 @@ public class GuiData {
     public ItemStack getMainHandItem() {
         return this.player.getHeldItem();
     }
+
+    public boolean hasGuiHolder() {
+        return true;
+    }
 }
