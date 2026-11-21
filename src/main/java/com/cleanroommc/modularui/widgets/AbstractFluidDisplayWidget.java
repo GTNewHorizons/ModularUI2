@@ -20,6 +20,8 @@ import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatConfig;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
+import static com.cleanroommc.modularui.utils.fluid.FluidUtils.fluidAmount;
+
 public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayWidget<W>> extends Widget<W> implements RecipeViewerIngredientProvider {
 
     public static final String UNIT_BUCKET = "B";
@@ -42,14 +44,14 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         FluidStack fluid = getFluidStack();
-        if (fluid == null || getFluidAmountLong() <= 0) return;
+        if (fluid == null || fluidAmount(fluid) <= 0) return;
         int x = this.contentPadding.getLeft();
         int y = this.contentPadding.getTop();
         int w = getArea().width - this.contentPadding.horizontal();
         int h = getArea().height - this.contentPadding.vertical();
-        float c = getCapacity();
+        double c = getCapacityLong();
         if (c > 0) {
-            int newH = (int) MathUtils.rescaleLinear(getFluidAmountLong(), 0, c, 1, h);
+            int newH = (int) MathUtils.rescaleLinear(fluidAmount(fluid), 0, c, 1, h);
             // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
             if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
             h = newH;
@@ -62,7 +64,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         super.drawOverlay(context, widgetTheme);
         FluidStack fluid = getFluidStack();
         if (fluid != null && displayAmountText()) {
-            String s = NumberFormat.format(getBaseUnitAmount(getFluidAmountLong()), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+            String s = NumberFormat.format(getBaseUnitAmount(fluidAmount(fluid)), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             // mc doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
             // we only apply padding there
             GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
@@ -73,14 +75,6 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
 
     @Nullable
     protected abstract FluidStack getFluidStack();
-
-    protected long getFluidAmountLong() {
-        FluidStack stack = getFluidStack();
-        if (stack == null) return 0;
-
-        if (ModularUI.Mods.GT5U.isLoaded()) return GTUtility.getFluidAmount(stack);
-        return stack.amount;
-    }
 
     @Override
     public @Nullable ItemStack getStackForRecipeViewer() {
@@ -98,6 +92,13 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     protected int getCapacity() {
         return 0;
     }
+
+    /**
+     * Return a positive value if the fluid should be drawn partly depending on the amount filled.
+     *
+     * @return capacity in milli buckets or zero/negative if fluid should always be drawn full
+     */
+    protected long getCapacityLong() { return getCapacity(); }
 
     public double getBaseUnitAmount(double amount) {
         return amount * getBaseUnitSiPrefix().factor;
