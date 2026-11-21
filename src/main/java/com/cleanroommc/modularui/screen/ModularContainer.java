@@ -4,6 +4,7 @@ import com.cleanroommc.modularui.ModularUI;
 import com.cleanroommc.modularui.api.inventory.ClickType;
 import com.cleanroommc.modularui.core.mixins.early.minecraft.ContainerAccessor;
 import com.cleanroommc.modularui.factory.GuiData;
+import com.cleanroommc.modularui.factory.PosGuiData;
 import com.cleanroommc.modularui.network.NetworkUtils;
 import com.cleanroommc.modularui.utils.Platform;
 import com.cleanroommc.modularui.utils.item.ItemHandlerHelper;
@@ -19,6 +20,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -114,11 +116,19 @@ public class ModularContainer extends Container {
     @MustBeInvokedByOverriders
     @Override
     public void detectAndSendChanges() {
+        // `EntityPlayerMP.onUpdate()` calls `detectAndSendChanges()` before the check that closes the container
+        if (!isClient() && !hasGuiHolder()) return;
         super.detectAndSendChanges();
         if (this.syncManager != null) {
             this.syncManager.detectAndSendChanges(this.init);
         }
         this.init = false;
+    }
+
+    private boolean hasGuiHolder() {
+        if (!(this.guiData instanceof PosGuiData posData)) return true;
+        TileEntity tile = posData.getTileEntity();
+        return tile != null && !tile.isInvalid();
     }
 
     @MustBeInvokedByOverriders
