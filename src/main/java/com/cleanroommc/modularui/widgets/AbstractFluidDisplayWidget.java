@@ -10,6 +10,7 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.SIPrefix;
+import com.cleanroommc.modularui.utils.fluid.FluidUtils;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
@@ -42,14 +43,14 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         FluidStack fluid = getFluidStack();
-        if (fluid == null || fluid.amount <= 0) return;
+        if (fluid == null || FluidUtils.fluidAmount(fluid) <= 0) return;
         int x = this.contentPadding.getLeft();
         int y = this.contentPadding.getTop();
         int w = getArea().width - this.contentPadding.horizontal();
         int h = getArea().height - this.contentPadding.vertical();
-        float c = getCapacity();
+        double c = getCapacityLong();
         if (c > 0) {
-            int newH = (int) MathUtils.rescaleLinear(fluid.amount, 0, c, 1, h);
+            int newH = (int) MathUtils.rescaleLinear(FluidUtils.fluidAmount(fluid), 0, c, 1, h);
             // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
             if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
             h = newH;
@@ -62,7 +63,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         super.drawOverlay(context, widgetTheme);
         FluidStack fluid = getFluidStack();
         if (fluid != null && displayAmountText()) {
-            String s = NumberFormat.format(getBaseUnitAmount(fluid.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+            String s = NumberFormat.format(getBaseUnitAmount(FluidUtils.fluidAmount(fluid)), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             // mc doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
             // we only apply padding there
             GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
@@ -90,6 +91,13 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     protected int getCapacity() {
         return 0;
     }
+
+    /**
+     * Return a positive value if the fluid should be drawn partly depending on the amount filled.
+     *
+     * @return capacity in milli buckets or zero/negative if fluid should always be drawn full
+     */
+    protected long getCapacityLong() { return getCapacity(); }
 
     public double getBaseUnitAmount(double amount) {
         return amount * getBaseUnitSiPrefix().factor;
