@@ -1,6 +1,7 @@
 package com.cleanroommc.modularui.widgets;
 
 import com.cleanroommc.modularui.api.GuiAxis;
+import com.cleanroommc.modularui.api.UpOrDown;
 import com.cleanroommc.modularui.api.drawable.IDrawable;
 import com.cleanroommc.modularui.api.value.IDoubleValue;
 import com.cleanroommc.modularui.api.value.ISyncOrValue;
@@ -34,6 +35,14 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     private final Area sliderArea = new Area();
     private double min, max, each = 0;
     private boolean dragging = false;
+
+
+    private double scrollStep = 1;
+    private double scrollStepCtrl = 0.1;
+    private double scrollStepShift = 100;
+    private double scrollStepAlt = 10000;
+    private boolean usingScrollStep = false;
+
 
     private double cache = Double.MIN_VALUE;
 
@@ -283,6 +292,60 @@ public class SliderWidget extends Widget<SliderWidget> implements Interactable {
     public SliderWidget stopperSize(int w, int h) {
         this.stopperWidth = w;
         this.stopperHeight = h;
+        return this;
+    }
+
+    /**
+     * Allows for setting the slider values with scrolling
+     * Will only allow for this behavior when scrolling is enabled
+     */
+    @Override
+    public boolean onMouseScroll(UpOrDown scrollDirection, int amount) {
+        if (!this.usingScrollStep) return Interactable.super.onMouseScroll(scrollDirection, amount);
+        double step = this.scrollStep;
+        if (Interactable.hasControlDown()) step *= this.scrollStepCtrl;
+        if (Interactable.hasShiftDown()) step *= this.scrollStepShift;
+        if (Interactable.hasAltDown()) step *= this.scrollStepAlt;
+        step *= scrollDirection.modifier;
+        this.setValue(this.getSliderValue() + step, true);
+        this.markTooltipDirty();
+        return true;
+    }
+
+
+    /**
+     * Sets the values by which to increment the field when the player uses the scroll wheel.
+     * Scrolling up increases value, and scrolling down decreases value. When multiple modifiers are held at the same time, the increments
+     * will be multiplied with each other.
+     * Also enables the usingScrollStep flag.
+     * Default values: 1, 100, 0.1, 10000 in order.
+     *
+     * @param baseStep  By how much to change the value when no modifier key is held
+     * @param ctrlStep  By how much to change the value when the ctrl key is held
+     * @param shiftStep By how much to change the value when the shift key is held
+     * @param altStep   By how much to change the value when the alt key is held
+     * @return this
+     */
+    public SliderWidget scrollValues(double baseStep, double shiftStep, double ctrlStep, double altStep) {
+        this.scrollStep = baseStep;
+        this.scrollStepCtrl = ctrlStep;
+        this.scrollStepShift = shiftStep;
+        this.scrollStepAlt = altStep;
+        this.usingScrollStep = true;
+        return this;
+    }
+
+    public SliderWidget usingScrollStep() {
+        return usingScrollStep(true);
+    }
+
+    /**
+     * Sets the usingScrollStep flag
+     *
+     * @return this
+     */
+    public SliderWidget usingScrollStep(boolean usingScrollStep) {
+        this.usingScrollStep = usingScrollStep;
         return this;
     }
 

@@ -46,7 +46,7 @@ public class RichTextWidget extends Widget<RichTextWidget> implements IRichTextB
             hoverable.onHover();
             RichTooltip tooltip = hoverable.getTooltip();
             if (tooltip != null) {
-                tooltip.draw(context);
+                context.queueForegroundRender(() -> tooltip.draw(context));
             }
         }
     }

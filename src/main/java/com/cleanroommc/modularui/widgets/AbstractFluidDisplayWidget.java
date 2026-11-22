@@ -10,12 +10,14 @@ import com.cleanroommc.modularui.utils.Alignment;
 import com.cleanroommc.modularui.utils.MathUtils;
 import com.cleanroommc.modularui.utils.NumberFormat;
 import com.cleanroommc.modularui.utils.SIPrefix;
+import com.cleanroommc.modularui.utils.fluid.FluidUtils;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
+import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatConfig;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +27,8 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     public static final String UNIT_LITER = "L";
 
     private final Box contentPadding = new Box().all(1);
-    private String unit = UNIT_LITER;
-    private SIPrefix baseUnitPrefix = SIPrefix.One;
+    private @Nullable String unit = null;
+    private @Nullable SIPrefix baseUnitPrefix = null;
     private boolean flipLighterThanAir = true;
 
     protected AbstractFluidDisplayWidget() {
@@ -41,14 +43,14 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
     @Override
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         FluidStack fluid = getFluidStack();
-        if (fluid == null || fluid.amount <= 0) return;
+        if (fluid == null || FluidUtils.fluidAmount(fluid) <= 0) return;
         int x = this.contentPadding.getLeft();
         int y = this.contentPadding.getTop();
         int w = getArea().width - this.contentPadding.horizontal();
         int h = getArea().height - this.contentPadding.vertical();
-        float c = getCapacity();
+        double c = getCapacityLong();
         if (c > 0) {
-            int newH = (int) MathUtils.rescaleLinear(fluid.amount, 0, c, 1, h);
+            int newH = (int) MathUtils.rescaleLinear(FluidUtils.fluidAmount(fluid), 0, c, 1, h);
             // 1.12 has a method called isLighterThanAir(), using isGaseous() as a replacement here
             if (!this.flipLighterThanAir || !fluid.getFluid().isGaseous()) y += h - newH;
             h = newH;
@@ -61,7 +63,7 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         super.drawOverlay(context, widgetTheme);
         FluidStack fluid = getFluidStack();
         if (fluid != null && displayAmountText()) {
-            String s = NumberFormat.format(getBaseUnitAmount(fluid.amount), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+            String s = NumberFormat.format(getBaseUnitAmount(FluidUtils.fluidAmount(fluid)), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
             // mc doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
             // we only apply padding there
             GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
@@ -90,6 +92,13 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         return 0;
     }
 
+    /**
+     * Return a positive value if the fluid should be drawn partly depending on the amount filled.
+     *
+     * @return capacity in milli buckets or zero/negative if fluid should always be drawn full
+     */
+    protected long getCapacityLong() { return getCapacity(); }
+
     public double getBaseUnitAmount(double amount) {
         return amount * getBaseUnitSiPrefix().factor;
     }
@@ -98,12 +107,21 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         return getBaseUnitSiPrefix().stringSymbol + getBaseUnit();
     }
 
+    /**
+     * @return the explicitly set base unit, or the one matching the fluid unit configured in GTNHLib
+     */
     public String getBaseUnit() {
-        return this.unit;
+        if (this.unit != null) return this.unit;
+        return usesMilliBuckets() ? UNIT_BUCKET : UNIT_LITER;
     }
 
     public SIPrefix getBaseUnitSiPrefix() {
-        return this.baseUnitPrefix;
+        if (this.baseUnitPrefix != null) return this.baseUnitPrefix;
+        return usesMilliBuckets() ? SIPrefix.Milli : SIPrefix.One;
+    }
+
+    private boolean usesMilliBuckets() {
+        return NumberFormatConfig.useForgeFluidMillibuckets;
     }
 
     public boolean isFlipLighterThanAir() {
