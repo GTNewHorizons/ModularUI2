@@ -304,8 +304,11 @@ public class TextFieldHandler {
     public void insert(List<String> text, boolean hasHorizontalScrolling) {
         List<String> copy = new ArrayList<>(this.text);
         Point point = insert(copy, text);
+        if (point == null || copy.size() > this.maxLines) return;
+        // a single line is already limited by maxLines, and an active scroll bar can shrink the height below one line
+        boolean singleLineScrolling = this.maxLines == 1 && hasHorizontalScrolling;
         // if we can scroll horizontally, we have virtually an infinite amount of space and don't need to check width
-        if (point == null || copy.size() > this.maxLines || !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
+        if (!singleLineScrolling && !this.renderer.wouldFit(copy, !hasHorizontalScrolling)) return;
         this.text.clear();
         this.text.addAll(copy);
         setCursor(point, true);
