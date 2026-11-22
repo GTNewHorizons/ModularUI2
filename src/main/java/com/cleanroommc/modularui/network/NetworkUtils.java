@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import gregtech.api.util.GTUtility;
+
 public class NetworkUtils {
 
     public static final Consumer<PacketBuffer> EMPTY_PACKET = buffer -> {};
@@ -91,6 +93,7 @@ public class NetworkUtils {
             return null;
         }
         try {
+            if (ModularUI.Mods.GT5U.isLoaded()) return GTUtility.loadFluid(buffer.readNBTTagCompoundFromBuffer());
             return FluidStack.loadFluidStackFromNBT(buffer.readNBTTagCompoundFromBuffer());
         } catch (IOException e) {
             ModularUI.LOGGER.catching(e);
