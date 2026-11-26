@@ -390,9 +390,7 @@ public class TextFieldHandler {
             } else {
                 String maxLine = this.text.get(Math.min(this.text.size() - 1, max.y));
                 this.text.set(min.y, minLine.substring(0, min.x) + maxLine.substring(max.x));
-                if (max.y > min.y + 1) {
-                    this.text.subList(min.y + 1, max.y + 1).clear();
-                }
+                this.text.subList(min.y + 1, max.y + 1).clear();
             }
             setCursor(min.y, min.x, false);
         } else {
