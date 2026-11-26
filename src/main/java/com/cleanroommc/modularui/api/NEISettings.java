@@ -12,7 +12,9 @@ import java.awt.*;
  * Keeps track of everything related to NEI in a Modular GUI.
  * By default, NEI is disabled in client only GUIs.
  * This class can be safely interacted with even when NEI is not installed.
+ * @see RecipeViewerSettings
  */
+@Deprecated
 @ApiStatus.NonExtendable
 public interface NEISettings {
 

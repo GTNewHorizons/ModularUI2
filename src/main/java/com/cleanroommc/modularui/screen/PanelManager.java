@@ -50,6 +50,12 @@ public class PanelManager {
         this.mainPanel = Objects.requireNonNull(panel, "Main panel must not be null!");
     }
 
+    /**
+     * Opens the main panel on the first initialization or reopens the stored panels if the screen was closed before.
+     *
+     * @return true if the panels were opened or reopened, false if the screen is already open
+     * @throws IllegalStateException if the screen was closed, and all panels have been disposed, or a panel is waiting for disposal
+     */
     boolean tryInit() {
         return switch (this.state) {
             case WAIT_DISPOSAL ->
@@ -86,6 +92,13 @@ public class PanelManager {
         }
     }
 
+    /**
+     * Adds a panel to the top of the open panels and calls its open lifecycle. Optionally resizes the panel immediately.
+     *
+     * @param panel  panel to open
+     * @param resize true if the panel's resizer should be applied right away
+     * @throws IllegalStateException if more than 127 panels are open or the panel is already open
+     */
     private void openPanel(ModularPanel panel, boolean resize) {
         if (this.panels.size() == 127) {
             throw new IllegalStateException("Too many panels are open!");
@@ -196,6 +209,12 @@ public class PanelManager {
         openPanel(panel, true);
     }
 
+    /**
+     * Closes a panel. Closing the main panel closes all panels and the screen. Other panels are finalized and kept for possible reopening.
+     *
+     * @param panel panel to close
+     * @throws IllegalArgumentException if the panel is not open in this screen
+     */
     void closePanel(@NotNull ModularPanel panel) {
         if (!hasOpenPanel(panel)) {
             throw new IllegalArgumentException("Panel '" + panel.getName() + "' is open in this screen!");
@@ -275,6 +294,14 @@ public class PanelManager {
         }
     }
 
+    /**
+     * Runs the given supplier while disposal is blocked. If a dispose was requested during execution and the state is
+     * {@link State#WAIT_DISPOSAL}, the manager closes and disposes itself afterwards.
+     *
+     * @param runnable code to execute
+     * @param <T>      return type
+     * @return the result of the supplier, or null if this manager is already disposed
+     */
     public <T> T doSafe(Supplier<T> runnable) {
         if (isDisposed()) return null;
         this.cantDisposeNow = true;
@@ -287,6 +314,12 @@ public class PanelManager {
         return t;
     }
 
+    /**
+     * Disposes all panels and this manager. The screen must be closed first. If disposal is currently blocked by {@link #doSafe(Supplier)},
+     * the state is set to {@link State#WAIT_DISPOSAL} and the disposal is postponed.
+     *
+     * @throws IllegalStateException if the screen is not closed or waiting for disposal
+     */
     @ApiStatus.Internal
     public void dispose() {
         if (isDisposed()) return;

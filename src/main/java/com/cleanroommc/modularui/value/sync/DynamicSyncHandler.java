@@ -30,6 +30,13 @@ public class DynamicSyncHandler extends SyncHandler<DynamicSyncHandler> implemen
     private IPacketWriter lastRejectedPacket;
     private IWidget lastRejectedWidget;
 
+    /**
+     * Parses a widget update packet received on the client and applies the widget.
+     *
+     * @param id  the packet id, only {@code 0} is handled
+     * @param buf the packet data
+     * @throws IOException if reading the packet fails
+     */
     @Override
     public void readOnClient(int id, PacketBuffer buf) throws IOException {
         if (id == 0) {
@@ -37,6 +44,13 @@ public class DynamicSyncHandler extends SyncHandler<DynamicSyncHandler> implemen
         }
     }
 
+    /**
+     * Parses a widget update packet received on the server. The widget is only validated, not applied.
+     *
+     * @param id  the packet id, only {@code 0} is handled
+     * @param buf the packet data
+     * @throws IOException if reading the packet fails
+     */
     @Override
     public void readOnServer(int id, PacketBuffer buf) throws IOException {
         if (id == 0) {
@@ -45,6 +59,12 @@ public class DynamicSyncHandler extends SyncHandler<DynamicSyncHandler> implemen
         }
     }
 
+    /**
+     * Initializes this sync handler and sends any update that was cached before initialization.
+     *
+     * @param key         the key this sync handler is registered under
+     * @param syncManager the panel sync manager
+     */
     @Override
     public void init(String key, PanelSyncManager syncManager) {
         super.init(key, syncManager);
@@ -54,6 +74,14 @@ public class DynamicSyncHandler extends SyncHandler<DynamicSyncHandler> implemen
         }
     }
 
+    /**
+     * Creates a widget from the packet data using the widget provider.
+     * Sync handlers created here must be registered explicitly, implicit registration is rejected.
+     *
+     * @param buf the packet data
+     * @return the created widget
+     * @throws IllegalStateException if the widget has unregistered sync handlers
+     */
     private IWidget parseWidget(PacketBuffer buf) {
         getSyncManager().allowTemporarySyncHandlerRegistration(true);
         IWidget widget = this.widgetProvider.createWidget(getSyncManager(), buf);
@@ -68,6 +96,11 @@ public class DynamicSyncHandler extends SyncHandler<DynamicSyncHandler> implemen
         return widget;
     }
 
+    /**
+     * Hands the widget to the linked dynamic widget, or stores it until one is attached.
+     *
+     * @param widget the widget to apply
+     */
     private void updateWidget(IWidget widget) {
         if (this.onWidgetUpdate == null) {
             // no dynamic widget is yet attached
@@ -116,7 +149,9 @@ public class DynamicSyncHandler extends SyncHandler<DynamicSyncHandler> implemen
     }
 
     /**
-     * An internal function which is used to link the {@link com.cleanroommc.modularui.widgets.DynamicSyncedWidget}.
+     * Attaches the listener and applies any widget that was stored while no listener was attached.
+     *
+     * @param onWidgetUpdate the listener to call on widget updates, may be null
      */
     @ApiStatus.Internal
     @Override

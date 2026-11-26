@@ -3,7 +3,7 @@ package com.cleanroommc.modularui.api.value.sync;
 import com.cleanroommc.modularui.api.value.ILongValue;
 
 /**
- * A helper interface for sync values which can be turned into an integer.
+ * A helper interface for sync values which can be turned into a long.
  *
  * @param <T> value type
  */

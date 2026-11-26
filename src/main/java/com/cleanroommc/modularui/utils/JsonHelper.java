@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Utility methods for reading, writing, and (de)serializing JSON with a shared {@link Gson} instance.
+ */
 public class JsonHelper {
 
     public static final Gson GSON = new GsonBuilder()
@@ -52,6 +55,15 @@ public class JsonHelper {
         return GSON.fromJson(json, clazz);
     }
 
+    /**
+     * Deserializes the first present key's value into the given class.
+     *
+     * @param json         object to read from
+     * @param clazz        target type
+     * @param defaultValue value returned if no key is present or the result is null
+     * @param keys         candidate keys, checked in order
+     * @return the deserialized value, or {@code defaultValue}
+     */
     public static <T> T deserialize(JsonObject json, Class<T> clazz, T defaultValue, String... keys) {
         JsonElement element = getJsonElement(json, keys);
         if (element != null) {
@@ -61,11 +73,29 @@ public class JsonHelper {
         return defaultValue;
     }
 
+    /**
+     * Deserializes from {@code json}, and if that yields null, deserializes from {@code fallback} instead.
+     *
+     * @param json         primary object to read from
+     * @param fallback     object used when the primary value is null
+     * @param clazz        target type
+     * @param defaultValue value returned if neither object provides a value
+     * @param keys         candidate keys, checked in order
+     * @return the deserialized value, or {@code defaultValue}
+     */
     public static <T> T deserializeWithFallback(JsonObject json, JsonObject fallback, Class<T> clazz, T defaultValue, String... keys) {
         T t = deserialize(json, clazz, null, keys);
         return t != null ? t : deserialize(fallback, clazz, defaultValue, keys);
     }
 
+    /**
+     * Reads a float from the first present key. A non-primitive value under that key yields {@code defaultValue}.
+     *
+     * @param json         object to read from, may be null
+     * @param defaultValue value returned if the object is null or no usable key is found
+     * @param keys         candidate keys, checked in order
+     * @return the float value, or {@code defaultValue}
+     */
     public static float getFloat(JsonObject json, float defaultValue, String @NotNull ... keys) {
         if (json == null) return defaultValue;
         for (String key : keys) {
@@ -80,6 +110,14 @@ public class JsonHelper {
         return defaultValue;
     }
 
+    /**
+     * Reads an int from the first present key. A non-primitive value under that key yields {@code defaultValue}.
+     *
+     * @param json         object to read from, may be null
+     * @param defaultValue value returned if the object is null or no usable key is found
+     * @param keys         candidate keys, checked in order
+     * @return the int value, or {@code defaultValue}
+     */
     public static int getInt(JsonObject json, int defaultValue, String @NotNull ... keys) {
         if (json == null) return defaultValue;
         for (String key : keys) {
@@ -94,11 +132,28 @@ public class JsonHelper {
         return defaultValue;
     }
 
+    /**
+     * Reads an int from {@code json}, falling back to {@code fallback} if the primary object has no value.
+     *
+     * @param json         primary object to read from
+     * @param fallback     object used when the primary value is absent
+     * @param defaultValue value returned if neither object provides a value
+     * @param keys         candidate keys, checked in order
+     * @return the int value, or {@code defaultValue}
+     */
     public static int getIntWithFallback(JsonObject json, JsonObject fallback, int defaultValue, String @NotNull ... keys) {
         Integer i = getBoxedInt(json, null, keys);
         return i != null ? i : getInt(fallback, defaultValue, keys);
     }
 
+    /**
+     * Reads a boolean from the first present key. A non-primitive value under that key yields {@code defaultValue}.
+     *
+     * @param json         object to read from, may be null
+     * @param defaultValue value returned if the object is null or no usable key is found
+     * @param keys         candidate keys, checked in order
+     * @return the boolean value, or {@code defaultValue}
+     */
     public static boolean getBoolean(JsonObject json, boolean defaultValue, String @NotNull ... keys) {
         if (json == null) return defaultValue;
         for (String key : keys) {

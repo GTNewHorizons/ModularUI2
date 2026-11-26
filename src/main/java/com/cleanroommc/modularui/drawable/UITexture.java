@@ -500,7 +500,7 @@ public class UITexture implements IDrawable, IJsonSerializable {
 
         /**
          * This will draw the corners, edges and body of the image separately. This allows to only stretch/tile the body so the border
-         * * looks right on all sizes. This is also known as a <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice texture</a>.
+         * looks right on all sizes. This is also known as a <a href="https://en.wikipedia.org/wiki/9-slice_scaling">9-slice texture</a>.
          *
          * @param border border width
          */

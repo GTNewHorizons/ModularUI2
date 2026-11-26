@@ -1,8 +1,9 @@
 package com.cleanroommc.modularui.api.drawable;
 
 /**
- * A function which interpolates between two values.
+ * A functional interface interpolating between two values.
  */
+@FunctionalInterface
 public interface IInterpolation {
 
     /**

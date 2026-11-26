@@ -16,6 +16,11 @@ public class AnimatorManager {
     private static final List<IAnimator> queuedAnimators = new ArrayList<>(8);
     private static long lastTime = 0;
 
+    /**
+     * Queues an animator to be started on the next draw. Animators that are already running or queued are ignored.
+     *
+     * @param animator the animator to start
+     */
     static void startAnimation(IAnimator animator) {
         if (!animators.contains(animator) && !queuedAnimators.contains(animator)) {
             queuedAnimators.add(animator);
@@ -28,6 +33,12 @@ public class AnimatorManager {
         MinecraftForge.EVENT_BUS.register(new AnimatorManager());
     }
 
+    /**
+     * Advances all active animators by the time elapsed since the previous draw. Finished animators are removed,
+     * paused ones are kept without advancing, and queued animators are moved into the active list.
+     *
+     * @param event the pre-draw event of the screen
+     */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onDraw(GuiScreenEvent.DrawScreenEvent.Pre event) {
         long time = Minecraft.getSystemTime();
@@ -45,6 +56,11 @@ public class AnimatorManager {
         queuedAnimators.clear();
     }
 
+    /**
+     * Stops and removes all active animators when the current GUI is closed.
+     *
+     * @param event the GUI open event, whose GUI is {@code null} when a GUI is closed
+     */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDraw(GuiOpenEvent event) {
         if (event.gui == null) {

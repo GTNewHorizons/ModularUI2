@@ -125,6 +125,14 @@ public class ModularScreen {
         this(owner, Objects.requireNonNull(mainPanelCreator, "The main panel function must not be null!"), false);
     }
 
+    /**
+     * Internal constructor. Creates the main panel either via the given creator or via {@link #buildUI(ModularGuiContext)} if the creator is null,
+     * then sets the name of this screen from the main panel and creates the {@link PanelManager}.
+     *
+     * @param owner            owner of this screen
+     * @param mainPanelCreator function which creates the main panel, or null to use {@link #buildUI(ModularGuiContext)}
+     * @param ignored          unused, only exists to differentiate this constructor
+     */
     private ModularScreen(@NotNull String owner, @Nullable Function<ModularGuiContext, ModularPanel> mainPanelCreator, boolean ignored) {
         Objects.requireNonNull(owner, "The owner must not be null!");
         this.owner = owner;
@@ -142,7 +150,12 @@ public class ModularScreen {
     }
 
     /**
+     * Builds the main panel of this screen. Only called when no main panel creator was given to the constructor.
      * Intended for use in {@link CustomModularScreen}
+     *
+     * @param context the gui context of this screen
+     * @return the main panel of this screen
+     * @throws UnsupportedOperationException always, unless overridden by {@link CustomModularScreen}
      */
     ModularPanel buildUI(ModularGuiContext context) {
         throw new UnsupportedOperationException();
@@ -150,8 +163,12 @@ public class ModularScreen {
 
     /**
      * Should be called in custom {@link GuiScreen GuiScreen} constructors which implement {@link IMuiScreen}.
+     * Links this screen to its {@link IMuiScreen} wrapper. If the wrapper is a container screen, the container is initialized for the client.
+     * The wrapper's gui area is then updated to the area of the main panel.
      *
      * @param wrapper the gui screen wrapping this screen
+     * @throws IllegalStateException if this screen was already constructed
+     * @throws NullPointerException  if the wrapper is null
      */
     @MustBeInvokedByOverriders
     public void construct(IMuiScreen wrapper) {
@@ -165,6 +182,13 @@ public class ModularScreen {
         this.overlay = false;
     }
 
+    /**
+     * Links this screen to a {@link GuiScreen} as an overlay. A {@link ScreenWrapper} is created around the given screen and this screen is marked as overlay.
+     *
+     * @param screen the gui screen this overlay is attached to
+     * @throws IllegalStateException if this screen was already constructed
+     * @throws NullPointerException  if the screen is null
+     */
     @ApiStatus.Internal
     @MustBeInvokedByOverriders
     public void constructOverlay(GuiScreen screen) {

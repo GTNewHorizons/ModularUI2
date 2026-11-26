@@ -37,6 +37,7 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
      * Creates a PanelSyncHandler
      *
      * @param panelBuilder a panel builder function
+     * @param subPanel     true if this panel should close when its parent closes
      */
     PanelSyncHandler(IPanelBuilder panelBuilder, boolean subPanel) {
         this.panelBuilder = panelBuilder;
@@ -44,6 +45,12 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         allowC2S();
     }
 
+    /**
+     * Creates the panel using the panel builder.
+     *
+     * @param syncManager the sync manager for the new panel
+     * @return the created panel
+     */
     public ModularPanel createUI(PanelSyncManager syncManager) {
         return this.panelBuilder.buildUI(syncManager, this);
     }
@@ -53,6 +60,13 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         openPanel(true);
     }
 
+    /**
+     * Opens the panel on the current side. On the client it first notifies the server if {@code syncToServer} is true.
+     * The panel is created lazily on the first open.
+     *
+     * @param syncToServer true if the open should be sent to the server first
+     * @throws IllegalStateException if the panel is already open in another screen
+     */
     private void openPanel(boolean syncToServer) {
         if (isPanelOpen()) return;
         boolean client = getSyncManager().isClient();
@@ -89,10 +103,16 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         this.open = true;
     }
 
+    /**
+     * Registers this panel as open in the modular sync manager.
+     */
     private void openInModularSyncManager() {
         getSyncManager().getModularSyncManager().open(this.panelName, this.syncManager);
     }
 
+    /**
+     * Closes the panel. On the client the local panel is closed, on the server the close is synced to the client.
+     */
     @Override
     public void closePanel() {
         if (getSyncManager().isClient()) {
@@ -104,11 +124,17 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         }
     }
 
+    /**
+     * Closes all sub panels of this panel.
+     */
     @Override
     public void closeSubPanels() {
         this.syncManager.closeSubPanels();
     }
 
+    /**
+     * Marks the panel as closed and closes it in the modular sync manager. On the client the close is sent to the server.
+     */
     @ApiStatus.Internal
     @Override
     public void closePanelInternal() {
@@ -122,6 +148,12 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         }
     }
 
+    /**
+     * Deletes the cached panel and syncs the disposal to the client. Only possible if the panel is closed
+     * and contains no {@link ItemSlotSH} sync handlers.
+     *
+     * @throws UnsupportedOperationException if the panel is open or contains item slot sync handlers
+     */
     @Override
     public void deleteCachedPanel() {
         if (openedPanel == null || isPanelOpen()) return;
@@ -142,6 +174,9 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         sync(SYNC_DISPOSE);
     }
 
+    /**
+     * Clears the cached panel name, sync manager, and panel references.
+     */
     private void disposePanel() {
         this.panelName = null;
         this.syncManager = null;
@@ -158,6 +193,13 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         return this.open;
     }
 
+    /**
+     * Handles a sync packet received on the client.
+     *
+     * @param i            the sync action id ({@link #SYNC_OPEN}, {@link #SYNC_CLOSE} or {@link #SYNC_DISPOSE})
+     * @param packetBuffer the packet data
+     * @throws IOException if reading the packet fails
+     */
     @Override
     public void readOnClient(int i, PacketBuffer packetBuffer) throws IOException {
         if (i == SYNC_OPEN) {
@@ -169,6 +211,13 @@ public final class PanelSyncHandler extends SyncHandler<PanelSyncHandler> implem
         }
     }
 
+    /**
+     * Handles a sync packet received on the server. Opening is confirmed back to the client.
+     *
+     * @param i            the sync action id ({@link #SYNC_NOTIFY_OPEN}, {@link #SYNC_CLOSE} or {@link #SYNC_DISPOSE})
+     * @param packetBuffer the packet data
+     * @throws IOException if reading the packet fails
+     */
     @Override
     public void readOnServer(int i, PacketBuffer packetBuffer) throws IOException {
         if (i == SYNC_NOTIFY_OPEN) {

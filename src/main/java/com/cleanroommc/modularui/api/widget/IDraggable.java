@@ -36,6 +36,12 @@ public interface IDraggable {
      */
     void onDragEnd(boolean successful);
 
+    /**
+     * Called every tick while the widget is being dragged.
+     *
+     * @param mouseButton    mouse button that drags
+     * @param timeSinceLastClick time since the drag began
+     */
     void onDrag(int mouseButton, long timeSinceLastClick);
 
     /**

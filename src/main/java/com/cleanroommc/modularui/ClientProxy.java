@@ -113,6 +113,15 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    /**
+     * Creates a copy of a buffered image as an int buffer with sequential rgb-values after applying all optional transformations.<br>
+     * If {@code inverse} & {@code transpose} both are {@code true}, the x=y-axis will be from bottom-left to top-right, instead of
+     * top-left to bottom-right.
+     * @param img the input image
+     * @param inverse whether to read the image top to bottom or bottom to top
+     * @param transpose whether to flip the pixels along the x=y-axis (diagonal)
+     * @return the int buffer
+     */
     public static IntBuffer readPixel(BufferedImage img, boolean inverse, boolean transpose) {
         int size = img.getHeight();
         IntBuffer buffer = IntBuffer.allocate(size * size);
