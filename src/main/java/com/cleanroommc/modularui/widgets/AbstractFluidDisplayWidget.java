@@ -14,17 +14,27 @@ import com.cleanroommc.modularui.utils.fluid.FluidUtils;
 import com.cleanroommc.modularui.widget.Widget;
 import com.cleanroommc.modularui.widget.sizer.Box;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
 import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatConfig;
+import com.gtnewhorizon.gtnhlib.util.numberformatting.NumberFormatUtil;
+import com.gtnewhorizon.gtnhlib.util.numberformatting.options.CompactOptions;
 import gregtech.api.util.GTUtility;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
+
+import java.math.RoundingMode;
 
 public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayWidget<W>> extends Widget<W> implements RecipeViewerIngredientProvider {
 
     public static final String UNIT_BUCKET = "B";
     public static final String UNIT_LITER = "L";
+
+    private static final CompactOptions AMOUNT_FORMAT = new CompactOptions().setCompactThreshold(10_000)
+            .setDecimalPlaces(1).setRoundingMode(RoundingMode.DOWN);
 
     private final Box contentPadding = new Box().all(1);
     private @Nullable String unit = null;
@@ -63,11 +73,35 @@ public abstract class AbstractFluidDisplayWidget<W extends AbstractFluidDisplayW
         super.drawOverlay(context, widgetTheme);
         FluidStack fluid = getFluidStack();
         if (fluid != null && displayAmountText()) {
-            String s = NumberFormat.format(getBaseUnitAmount(FluidUtils.fluidAmount(fluid)), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
-            // mc doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
-            // we only apply padding there
-            GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
+            if (this.unit != null || this.baseUnitPrefix != null) {
+                String s = NumberFormat.format(getBaseUnitAmount(FluidUtils.fluidAmount(fluid)), NumberFormat.AMOUNT_TEXT) + getBaseUnit();
+                // it doesn't consider the 1px border in item slots for amount text, but it looks weird when it touches the left border, so
+                // we only apply padding there
+                GuiDraw.drawScaledAlignedTextInBox(s, this.contentPadding.getLeft(), 0, getArea().width - this.contentPadding.getLeft(), getArea().height, Alignment.BottomRight);
+            } else {
+                drawSlotAmount(NumberFormatUtil.formatNumberCompact(FluidUtils.fluidAmount(fluid), AMOUNT_FORMAT), this.contentPadding.getLeft(), this.contentPadding.getTop(),
+                        getArea().width - this.contentPadding.horizontal(), getArea().height - this.contentPadding.vertical());
+            }
         }
+    }
+
+    private static void drawSlotAmount(String text, int x, int y, int width, int height) {
+        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+        int textWidth = fontRenderer.getStringWidth(text);
+        float scale = fontRenderer.getUnicodeFlag() ? 0.75f : 0.5f;
+        if (textWidth * scale > width) scale = (float) width / textWidth;
+
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_CURRENT_BIT);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glPushMatrix();
+        GL11.glTranslatef(x, y + height, 0);
+        GL11.glScalef(scale, scale, 1);
+        // The last row of the font is padding, so the text sits on the bottom edge
+        fontRenderer.drawString(text, 0, 1 - fontRenderer.FONT_HEIGHT, 0xFFFFFF, true);
+        GL11.glPopMatrix();
+        GL11.glPopAttrib();
     }
 
     protected abstract boolean displayAmountText();
