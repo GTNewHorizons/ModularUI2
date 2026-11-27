@@ -103,6 +103,10 @@ public class Unit {
         this.offset = offset;
     }
 
+    void translate(int amount) {
+        this.offset += amount;
+    }
+
     public void setMeasure(Measure measure) {
         this.measure = measure;
     }
